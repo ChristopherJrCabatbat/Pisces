@@ -130,10 +130,11 @@
                 <div class="container">
 
                     <div class="hero-content" data-reveal="left">
-                        <h1 class="h1 hero-title">The Best Restaurants In Your Home</h1>
+                        {{-- <h1 class="h1 hero-title">The Best Restaurants In Your Home</h1> --}}
+                        <h1 class="h1 hero-title">Pisces Coffee Hub</h1>
 
                         <p class="hero-text">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
+                            Cofee makes everything possible - and our variety of meals, from appetizers to hearty dishes, make every visit unforgettable.
                         </p>
 
                         <a href="#" class="btn btn-secondary has-after">Order Now</a>
@@ -273,12 +274,11 @@
 
                         <li data-reveal="left">
                             <h2 class="h2 section-title" id="top-restaurent-label">
-                                12 Best Restaurants in Your City
+                                Explore Our Menu
                             </h2>
 
                             <p class="section-text">
-                                Magna sit amet purus gravida quis blandit turpis cursus. Venenatis tellus in metus
-                                vulputate.
+                                From handcrafted coffee to a variety of delicious dishes, our menu has something for everyone. Whether you're craving a light snack, a hearty meal, or the perfect brew, we’ve got you covered. Discover your next favorite bite!
                             </p>
                         </li>
 
@@ -409,13 +409,11 @@
                     <div class="cta-content" data-reveal="right">
 
                         <h2 class="h3 section-title" id="cta-label">
-                            Food from your favorite restaurants to your table
+                            Hungry? We've Got You Covered!
                         </h2>
 
                         <p class="section-text">
-                            Pretium lectus quam id leo in vitae turpis massa sed. Lorem donec massa sapien faucibus et
-                            molestie. Vitae
-                            elementum curabitur vitae nunc.
+                            From coffee to pizza and more, we have what you're craving. Order now for a quick and delicious treat!
                         </p>
 
                         <a href="#" class="btn btn-primary has-after">Order Now</a>
@@ -644,12 +642,10 @@
                         <img src="./images/logo-name.png" width="148" height="38" alt="Fasteat home">
                     </a>
 
-                    <h2 class="h2 section-title">The Best Restaurants in Your Home</h2>
+                    <h2 class="h2 section-title">Pisces Coffee Hub</h2>
 
                     <p class="section-text">
-                        Vitae congue mauris rhoncus aenean. Enim nulla aliquet porttitor lacus luctus accumsan tortor
-                        posuere.
-                        Tempus egestas sed sed risus pretium quam.
+                        Cofee makes everything possible - and our variety of meals, from appetizers to hearty dishes, make every visit unforgettable.
                     </p>
 
                 </div>
@@ -704,7 +700,8 @@
                         <address class="address">
                             <ion-icon name="location" aria-hidden="true"></ion-icon>
 
-                            <span class="span">1717 Harrison St, San Francisco, CA 94103, United States</span>
+                            {{-- <span class="span">1717 Harrison St, San Francisco, CA 94103, United States</span> --}}
+                            <span class="span">Barangay Ilang, San Carlos City, Pangasinan</span>
                         </address>
                     </li>
 
@@ -712,7 +709,7 @@
                         <a href="mailto:quickeat@mail.net" class="footer-link">
                             <ion-icon name="mail" aria-hidden="true"></ion-icon>
 
-                            <span class="span">quickeat@mail.net</span>
+                            <span class="span">piscescoffeehub@gmail.com</span>
                         </a>
                     </li>
 
@@ -720,7 +717,7 @@
                         <a href="tel:+12344567890" class="footer-link">
                             <ion-icon name="call" aria-hidden="true"></ion-icon>
 
-                            <span class="span">+1 234 456 78 90</span>
+                            <span class="span">0945 839 3794</span>
                         </a>
                     </li>
 
@@ -728,7 +725,7 @@
                         <ul class="social-list">
 
                             <li>
-                                <a href="#" class="social-link">
+                                <a href="https://www.facebook.com/piscesCH" target="_blank" class="social-link">
                                     <ion-icon name="logo-facebook"></ion-icon>
                                 </a>
                             </li>
