@@ -24,7 +24,8 @@
   --eerie-black: hsl(210, 11%, 15%);
   --light-gray: hsl(0, 0%, 83%);
   --davys-gray: hsl(0, 0%, 30%);
-  --marigold: hsl(39, 96%, 48%);
+  /* --marigold: hsl(39, 96%, 48%); */
+  --marigold: #f81d0b;
   --platinum: hsl(0, 0%, 90%);
   --white: hsl(0, 0%, 100%);
   --black: hsl(0, 0%, 0%);
@@ -680,7 +681,8 @@ body.active { overflow: hidden; }
 }
 
 .footer-list-title {
-  color: var(--sonic-silver);
+  /* color: var(--sonic-silver); */
+  color: var(--jet);
   margin-block-end: 25px;
 }
 
@@ -718,6 +720,7 @@ body.active { overflow: hidden; }
 .social-link:is(:hover, :focus-visible) {
   background-color: var(--marigold);
   border-color: var(--marigold);
+  color: white;
 }
 
 .footer-top {

@@ -10,7 +10,7 @@
     - primary meta tags
   -->
     {{-- <title>Pisces - The Best Restaurants In Your Home</title> --}}
-    <title>Pisces</title>
+    <title>Pisces Coffee Hub</title>
     <meta name="title" content="Pisces - The Best Restaurants In Your Home">
     <meta name="description" content="This is a food html template made by codewithsadee">
 
@@ -79,19 +79,19 @@
                 <ul class="navbar-list">
 
                     <li class="navbar-item">
-                        <a href="#" class="navbar-link" data-nav-link>Home</a>
+                        <a href="#home" class="navbar-link" data-nav-link>Home</a>
                     </li>
 
-                    <li class="navbar-item">
+                    {{-- <li class="navbar-item">
                         <a href="#" class="navbar-link" data-nav-link>About Us</a>
+                    </li> --}}
+
+                    <li class="navbar-item">
+                        <a href="#menu" class="navbar-link" data-nav-link>Menu</a>
                     </li>
 
                     <li class="navbar-item">
-                        <a href="#" class="navbar-link" data-nav-link>Restaurants</a>
-                    </li>
-
-                    <li class="navbar-item">
-                        <a href="#" class="navbar-link" data-nav-link>Contacts</a>
+                        <a href="#contacts" class="navbar-link" data-nav-link>Contacts</a>
                     </li>
 
                 </ul>
@@ -102,7 +102,7 @@
                     <ion-icon name="bag" aria-hidden="true"></ion-icon>
                 </button>
 
-                <a href="#" class="btn btn-primary has-after">Order Now</a>
+                <a href="{{ route('login') }}" class="btn btn-primary has-after">Order Now</a>
             </div>
 
             <button class="nav-open-btn" aria-label="open menu" data-nav-toggler>
@@ -125,7 +125,7 @@
         - #HERO
       -->
 
-            <section class="section hero has-bg-image" aria-label="home"
+            <section class="section hero has-bg-image" id="home" aria-label="home"
                 style="background-image: url('./home-assets/images/hero-bg.png')">
                 <div class="container">
 
@@ -137,7 +137,7 @@
                             Cofee makes everything possible - and our variety of meals, from appetizers to hearty dishes, make every visit unforgettable.
                         </p>
 
-                        <a href="#" class="btn btn-secondary has-after">Order Now</a>
+                        <a href="{{ route('login') }}" class="btn btn-secondary has-after">Order Now</a>
                     </div>
 
                     <figure class="hero-banner" data-reveal>
@@ -164,14 +164,14 @@
         - #INSTRUCTION
       -->
 
-            <section class="section instruction" aria-labelledby="">
+            <section class="section instruction" id="menu" aria-labelledby="">
                 <div class="container">
 
-                    <h2 class="h2 section-title" id="instruction-label" data-reveal>How It Works</h2>
+                    {{-- <h2 class="h2 section-title" id="instruction-label" data-reveal>How It Works</h2> --}}
+                    <h2 class="h2 section-title" id="instruction-label" data-reveal>What's New?</h2>
 
                     <p class="section-text" data-reveal>
-                        Magna sit amet purus gravida quis blandit turpis cursus. Venenatis tellus in
-                        metus vulputate eu scelerisque felis.
+                        Discover our latest dishes, made to satisfy every craving. Don’t miss out – try them today!
                     </p>
 
                     <ul class="grid-list">
@@ -416,7 +416,7 @@
                             From coffee to pizza and more, we have what you're craving. Order now for a quick and delicious treat!
                         </p>
 
-                        <a href="#" class="btn btn-primary has-after">Order Now</a>
+                        <a href="{{ route('login') }}" class="btn btn-primary has-after">Order Now</a>
 
                     </div>
 
@@ -488,9 +488,7 @@
                         <h2 class="h2 section-title" id="testi-label">What customers say about us</h2>
 
                         <blockquote class="testi-text">
-                            "Dapibus ultrices in iaculis nunc sed augue lacus viverra vitae. Mauris a diam maecenas sed
-                            enim. Egestas
-                            diam in arcu cursus euismod quis. Quam quisque id diam vel".
+                            "I really love this place! The coffee is amazing, and the food is so good, especially the pizza! The staff is super friendly, and it feels just like home. It's definitely my new favorite tambayan!"
                         </blockquote>
 
                         <div class="wrapper">
@@ -498,7 +496,7 @@
                                 loading="lazy" alt="Thomas Adamson" class="author-img">
 
                             <div>
-                                <p class="author-title">Thomas Adamson</p>
+                                <p class="author-title">Cardo Dalisay</p>
 
                                 <div class="rating-wrapper">
                                     <ion-icon name="star" aria-hidden="true"></ion-icon>
@@ -528,7 +526,7 @@
         - #PARTNERSHIP
       -->
 
-            <section class="section partnership" aria-label="partnership">
+            {{-- <section class="section partnership" aria-label="partnership">
                 <div class="container">
 
                     <h2 class="h2 section-title" data-reveal>Want to Join Partnership?</h2>
@@ -580,7 +578,7 @@
                     </ul>
 
                 </div>
-            </section>
+            </section> --}}
 
 
 
@@ -590,7 +588,7 @@
         - #NEWSLETTER
       -->
 
-            <section class="section newsletter" aria-label="newsletter">
+            {{-- <section class="section newsletter" aria-label="newsletter">
                 <div class="container">
 
                     <figure class="newsletter-banner" data-reveal="left">
@@ -617,7 +615,7 @@
                     </div>
 
                 </div>
-            </section>
+            </section> --}}
 
         </article>
     </main>
@@ -630,8 +628,8 @@
     - #FOOTER
   -->
 
-    <footer class="footer">
-        <div class="container">
+    <footer class="footer" id="footer">
+        <div class="container" id="contacts">
 
             <div class="section footer-top grid-list">
 
@@ -653,35 +651,35 @@
                 <ul class="footer-list">
 
                     <li>
-                        <p class="footer-list-title h5">Menu</p>
+                        <p class="footer-list-title h5">Navigation</p>
                     </li>
 
                     <li>
-                        <a href="#" class="footer-link">
+                        <a href="#home" class="footer-link">
                             <span class="span">Home</span>
 
                             <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
                         </a>
                     </li>
 
-                    <li>
+                    {{-- <li>
                         <a href="#" class="footer-link">
                             <span class="span">About Us</span>
 
                             <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <li>
-                        <a href="#" class="footer-link">
-                            <span class="span">Restaurants</span>
+                        <a href="#menu" class="footer-link">
+                            <span class="span">Menu</span>
 
                             <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
                         </a>
                     </li>
 
                     <li>
-                        <a href="#" class="footer-link">
+                        <a href="#contacts" class="footer-link">
                             <span class="span">Contacts</span>
 
                             <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
