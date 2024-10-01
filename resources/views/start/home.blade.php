@@ -20,6 +20,11 @@
     {{-- <link rel="shortcut icon" href="./images/logo.jpg" type="image/svg+xml"> --}}
     <link rel="shortcut icon" href="{{ asset('images/logo-icon.png') }}" type="image/svg+xml">
 
+    {{-- Bootstrap link --}}
+    {{-- <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}"> --}}
+    <script src="https://kit.fontawesome.com/f416851b63.js" crossorigin="anonymous"></script>
+
+
     <!--
     - custom css link
   -->
@@ -134,7 +139,8 @@
                         <h1 class="h1 hero-title">Pisces Coffee Hub</h1>
 
                         <p class="hero-text">
-                            Cofee makes everything possible - and our variety of meals, from appetizers to hearty dishes, make every visit unforgettable.
+                            Coffee makes everything possible - and our variety of meals, from appetizers to hearty
+                            dishes, make every visit unforgettable.
                         </p>
 
                         <a href="{{ route('login') }}" class="btn btn-secondary has-after">Order Now</a>
@@ -278,7 +284,9 @@
                             </h2>
 
                             <p class="section-text">
-                                From handcrafted coffee to a variety of delicious dishes, our menu has something for everyone. Whether you're craving a light snack, a hearty meal, or the perfect brew, we’ve got you covered. Discover your next favorite bite!
+                                From handcrafted coffee to a variety of delicious dishes, our menu has something for
+                                everyone. Whether you're craving a light snack, a hearty meal, or the perfect brew,
+                                we’ve got you covered. Discover your next favorite bite!
                             </p>
                         </li>
 
@@ -413,7 +421,8 @@
                         </h2>
 
                         <p class="section-text">
-                            From coffee to pizza and more, we have what you're craving. Order now for a quick and delicious treat!
+                            From coffee to pizza and more, we have what you're craving. Order now for a quick and
+                            delicious treat!
                         </p>
 
                         <a href="{{ route('login') }}" class="btn btn-primary has-after">Order Now</a>
@@ -488,7 +497,9 @@
                         <h2 class="h2 section-title" id="testi-label">What customers say about us</h2>
 
                         <blockquote class="testi-text">
-                            "I really love this place! The coffee is amazing, and the food is so good, especially the pizza! The staff is super friendly, and it feels just like home. It's definitely my new favorite tambayan!"
+                            "I really love this place! The coffee is amazing, and the food is so good, especially the
+                            pizza! The staff is super friendly, and it feels just like home. It's definitely my new
+                            favorite tambayan!"
                         </blockquote>
 
                         <div class="wrapper">
@@ -643,7 +654,8 @@
                     <h2 class="h2 section-title">Pisces Coffee Hub</h2>
 
                     <p class="section-text">
-                        Cofee makes everything possible - and our variety of meals, from appetizers to hearty dishes, make every visit unforgettable.
+                        Coffee makes everything possible - and our variety of meals, from appetizers to hearty dishes,
+                        make every visit unforgettable.
                     </p>
 
                 </div>
