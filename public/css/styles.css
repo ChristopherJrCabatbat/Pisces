@@ -31,6 +31,66 @@ body {
     color: #f81d0b;
 }
 
-.fa-start {
+.fa-star {
     color: #484045;
+}
+
+.price-line {
+    text-decoration: line-through;
+}
+
+
+/* Animation Hover Styles */
+.card {
+    position: relative;
+    overflow: hidden;
+}
+
+.img-container {
+    position: relative;
+}
+
+.card-img-top {
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+/* Darken image on hover */
+.img-container:hover .darken {
+    filter: brightness(30%);
+}
+
+/* Icon overlay styles */
+.icon-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(100%);
+    display: flex;
+    gap: 15px;
+    font-size: 24px;
+    color: #fff;
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+.icon-overlay i {
+    cursor: pointer;
+}
+
+/* Slide-up icons on hover */
+.img-container:hover .icon-overlay {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+}
+
+/* Smooth transition back when hover ends */
+.img-container:hover .icon-overlay i {
+    transition: all 0.3s ease;
+}
+
+/* Hover effect on icons */
+.icon-overlay i:hover {
+    transform: scale(1.2);
+    color: #f81d0b; /* Optional: Add a hover color effect */
 }
