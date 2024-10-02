@@ -1,0 +1,36 @@
+body {
+    overflow-x: hidden;
+    background-color: #484045;
+    color: white;
+}
+
+.dropdown-menu .dropdown-item:active {
+    background-color: #f81d0b;
+    color: white;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #dddddd;
+    color: black;
+}
+
+/* Main Content */
+.main-content {
+    margin-top: 17vh;
+}
+
+.border-baba {
+    border-bottom: 1px solid rgb(255, 255, 255, 0.6);
+}
+
+.card {
+    border: 2px solid #f81d0b;
+}
+
+.price {
+    color: #f81d0b;
+}
+
+.fa-start {
+    color: #484045;
+}
