@@ -1,32 +1,37 @@
 @extends('user.layout')
 
-@section('title', 'User')
+@section('title', 'Menu')
 
 @section('styles-links')
     <style>
-        .card-best {
-            max-width: 50vw;
-        }
-
-        @media (max-width: 1244px) {
-            .card-best {
-                max-width: none;
-            }
+        .main-content {
+            margin-top: 13vh;
         }
     </style>
 @endsection
 
 @section('topbar')
     <li class="nav-item">
-        <a class="nav-link fw-bold active" aria-current="page" href="{{ route('user.dashboard') }}">HOME</a>
+        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.dashboard') }}">HOME</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
+        <a class="nav-link fw-bold active" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
 @endsection
 
 @section('main-content')
     <div class="container main-content d-flex flex-column justify-content-center align-items-center">
+
+        {{-- Top Container --}}
+        <div class="top-container d-flex w-100 p-4 mb-5 justify-content-between  align-items-center">
+            <div class="fw-bold h1">
+                Pizza
+            </div>
+            <div class="menu-chosen d-flex gap-1 fs-5">
+                <div>Menu > </div>
+                <div class="low-opacity-white">Pizza</div>
+            </div>
+        </div>
 
         {{-- Top Categories --}}
         <div class="text-center mb-5">

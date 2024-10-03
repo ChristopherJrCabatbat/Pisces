@@ -45,4 +45,6 @@ Route::group([
 
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
     
+    Route::get('/menu', [UserController::class, 'menu'])->name('menu');
+    
 });

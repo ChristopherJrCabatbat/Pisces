@@ -31,6 +31,7 @@ class RoleMiddleware
 
             'User'  => [
                 'user.dashboard',
+                'user.menu',
             ],
         ];
 

@@ -39,6 +39,10 @@ body {
     text-decoration: line-through;
 }
 
+.nav-link:hover {
+    color: #f81d0b;
+}
+
 
 /* Animation Hover Styles */
 .card {
@@ -93,4 +97,18 @@ body {
 .icon-overlay i:hover {
     transform: scale(1.2);
     color: #f81d0b; /* Optional: Add a hover color effect */
+}
+
+
+
+/* Menu Styles */
+.top-container {
+    background-color: rgb(122, 109, 117);
+    width: 99vw !important;
+    padding-left: 9vw !important;
+    padding-right: 9vw !important;
+}
+
+.low-opacity-white {
+    color: rgb(255, 255, 255, 0.7);
 }
