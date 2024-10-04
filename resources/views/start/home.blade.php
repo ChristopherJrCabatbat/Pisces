@@ -648,7 +648,7 @@
 
                     <a href="#" class="logo">
                         {{-- <img src="./home-assets/images/logo-footer.svg" width="148" height="38" alt="fasteat home"> --}}
-                        <img src="./images/logo-name.png" width="148" height="38" alt="Fasteat home">
+                        <img src="{{ asset('images/logo-name.png') }}" width="148" height="38" alt="Fasteat home">
                     </a>
 
                     <h2 class="h2 section-title">Pisces Coffee Hub</h2>

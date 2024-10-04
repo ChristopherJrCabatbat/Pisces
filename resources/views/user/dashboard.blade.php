@@ -3,6 +3,8 @@
 @section('title', 'User')
 
 @section('styles-links')
+    {{-- <link rel="stylesheet" href="{{ asset('home-assets/css/style.css') }}"> --}}
+
     <style>
         .card-best {
             max-width: 50vw;
@@ -359,6 +361,7 @@
 
 
     </div>
+
 @endsection
 
 @section('scripts')

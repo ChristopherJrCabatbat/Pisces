@@ -124,3 +124,11 @@ select {
 .category-lists {
     font-size: 1.1rem;
 }
+
+.footer {
+    background-color: #e3f2fd;
+}
+
+.rounded-circle {
+    border: 1px solid #f81d0b;
+}
