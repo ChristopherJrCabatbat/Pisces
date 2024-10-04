@@ -112,3 +112,15 @@ body {
 .low-opacity-white {
     color: rgb(255, 255, 255, 0.7);
 }
+
+select {
+    width: 30% !important;
+}
+
+.categories {
+    min-width: 20vw !important;
+}
+
+.category-lists {
+    font-size: 1.1rem;
+}

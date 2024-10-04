@@ -20,7 +20,7 @@
 @endsection
 
 @section('main-content')
-    <div class="container main-content d-flex flex-column justify-content-center align-items-center">
+    <div class="container main-content d-flex flex-column align-items-center">
 
         {{-- Top Container --}}
         <div class="top-container d-flex w-100 p-4 mb-5 justify-content-between  align-items-center">
@@ -33,206 +33,203 @@
             </div>
         </div>
 
-        {{-- Top Categories --}}
-        <div class="text-center mb-5">
-            <div class="h2">
-                Top Categories
-            </div>
-            <div class="w-50 text-center mx-auto">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Et vero fugit, repellat aperiam doloremque
-                voluptatibus illum voluptate saepe eum nostrum!
-            </div>
-            <div class="container text-center mt-4">
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5">
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
+        {{-- Content --}}
+        <div class="d-flex container gap-5 p-0">
 
-                </div>
-            </div>
-        </div>
-
-        {{-- Best Deals For You --}}
-        <div class="w-100 mb-5">
-            <div class="h2 border-baba pb-3 mb-4">
-                Best Deals For You
-            </div>
-            <div>
-                <div class="card card-best mb-3">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <!-- Image with overlay -->
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="img-fluid rounded-start darken"
-                                    alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">Dark Coffee</h5>
-                                <div class="price-container d-flex align-items-center gap-3 mb-2">
-                                    <div class="price fw-bold fs-5">$10.00</div>
-                                    <div class="price-line">$12.00</div>
-                                    <div class="off text-success">-10% Off</div>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                                <p class="card-text mt-2">
-                                    <small class="text-body-secondary">Bold and intense, our dark coffee offers deep, rich
-                                        flavors with a smooth finish. Perfect for those who enjoy a strong, full-bodied
-                                        brew.</small>
-                                </p>
-                            </div>
-                        </div>
+            {{-- Categories --}}
+            <div class="categories d-flex flex-column">
+                <div class="h3 mb-4">Categories</div>
+                <div class="category-lists d-flex flex-column gap-2">
+                    <div>> All Menus</div>
+                    <div class="d-flex justify-content-between">
+                        <div>> Coffee</div>
+                        <div>(6)</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div>> Pizza</div>
+                        <div>(11)</div>
+                    </div>
+                    <div class="d-flex justify-content-between border-baba pb-4">
+                        <div>> Pansit</div>
+                        <div>(7)</div>
                     </div>
                 </div>
+
+
             </div>
-        </div>
 
+            {{-- Menus --}}
+            <div class="menus d-flex flex-column gap-4 mb-5">
 
+                <div class="top-menus">
+                    <select class="form-select" aria-label="Default select example">
+                        <option selected value="Default">Default</option>
+                        <option value="Expensive">Expensive</option>
+                        <option value="Cheap">Cheap</option>
+                    </select>
+                </div>
 
-        {{-- Popular Menus --}}
-        <div class="w-100 mb-5">
-            <div class="h2 border-baba pb-3 mb-4">
-                Popular Menus
-            </div>
-            <div>
-                <div class="row row-cols-1 row-cols-md-4 g-4">
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
+                <div class="menu-list">
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="img-container">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
+                                    <div class="icon-overlay">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <i class="fa-solid fa-share"></i>
+                                        <i class="fa-solid fa-search"></i>
+                                        <i class="fa-solid fa-heart"></i>
                                     </div>
-                                    <div>(2)</div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Special Pisces Pizza</h5>
+                                    <div class="price fw-bold mb-2">$10.00</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <div>(2)</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="img-container">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
+                                    <div class="icon-overlay">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <i class="fa-solid fa-share"></i>
+                                        <i class="fa-solid fa-search"></i>
+                                        <i class="fa-solid fa-heart"></i>
                                     </div>
-                                    <div>(2)</div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Special Pisces Pizza</h5>
+                                    <div class="price fw-bold mb-2">$10.00</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <div>(2)</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="img-container">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
+                                    <div class="icon-overlay">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <i class="fa-solid fa-share"></i>
+                                        <i class="fa-solid fa-search"></i>
+                                        <i class="fa-solid fa-heart"></i>
                                     </div>
-                                    <div>(2)</div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Special Pisces Pizza</h5>
+                                    <div class="price fw-bold mb-2">$10.00</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <div>(2)</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="img-container">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
+                                    <div class="icon-overlay">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <i class="fa-solid fa-share"></i>
+                                        <i class="fa-solid fa-search"></i>
+                                        <i class="fa-solid fa-heart"></i>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Special Pisces Pizza</h5>
+                                    <div class="price fw-bold mb-2">$10.00</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <div>(2)</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
+                        </div>
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="img-container">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
+                                    <div class="icon-overlay">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <i class="fa-solid fa-share"></i>
+                                        <i class="fa-solid fa-search"></i>
+                                        <i class="fa-solid fa-heart"></i>
                                     </div>
-                                    <div>(2)</div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Special Pisces Pizza</h5>
+                                    <div class="price fw-bold mb-2">$10.00</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <div>(2)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="img-container">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
+                                    <div class="icon-overlay">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <i class="fa-solid fa-share"></i>
+                                        <i class="fa-solid fa-search"></i>
+                                        <i class="fa-solid fa-heart"></i>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Special Pisces Pizza</h5>
+                                    <div class="price fw-bold mb-2">$10.00</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <div>(2)</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -240,128 +237,8 @@
                 </div>
 
             </div>
+
         </div>
-
-        {{-- New Menus --}}
-        <div class="w-100 mb-5">
-            <div class="h2 border-baba pb-3 mb-4">
-                New Menus
-            </div>
-            <div>
-                <div class="row row-cols-1 row-cols-md-4 g-4">
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
 
     </div>
 @endsection
