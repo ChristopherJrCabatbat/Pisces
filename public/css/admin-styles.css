@@ -1,0 +1,61 @@
+/* Ensure the dropdown menu is absolute and floating */
+.nav-item.dropdown .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    z-index: 1000;
+}
+
+/* Optional: Ensure no overlap with other nav items */
+.nav-item.dropdown {
+    position: relative;
+}
+
+/* Adjust for smaller screens */
+@media (max-width: 768px) {
+    .nav-item.dropdown .dropdown-menu {
+        position: fixed; /* Fixed for mobile */
+        top: 10vw;
+        right: 0;
+        left: auto;
+        z-index: 1050;
+    }
+
+    /* Prevent the navbar from having scrollbars */
+    .navbar-nav-scroll {
+        overflow: hidden;
+    }
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background-color: #f5f5f5;
+    padding: 15px;
+    padding-top: 12vw;
+    width: 200px;
+    position: relative;
+    border-top: 1px solid #ddd;
+    height: 100vh;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    font-size: 18px;
+    color: #484045;
+}
+
+.sidebar ul li:hover {
+    color: white;
+    background-color: #f81d0b;
+}
