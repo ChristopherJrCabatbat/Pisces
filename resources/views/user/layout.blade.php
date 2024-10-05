@@ -66,33 +66,50 @@
     </main>
 
     <footer class="footer text-black">
-        <div class="">
-            <div class="container">
-                <div class="row">
+        <div>
+            <div class="container pt-5">
+                <div class="row footer-content border-bottoms pb-4 gap-4 footer-fs">
                     <div class="col d-flex flex-column">
                         <div>
-                            <img src="{{ asset('images/logo-name.png') }}" width="148" height="38" alt="Fasteat home">
+                            <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces Coffee Hub">
                         </div>
-                        <div class="h1">Pisces Coffee Hub</div>
-                        <div>Coffee makes everything possible - and our variety of meals, from appetizers to hearty dishes, make every visit unforgettable.</div>
-
-                    </div>
-                    <div class="col d-flex flex-column">
-                        <div class="h3">Contact Info</div>
-                        <div class="d-flex align-items-center gap-3 border-bottom"><i class="fa-solid fa-location-dot"></i> Barangay Ilang, San Carlos City, Pangasinan</div>
-                        <div class="d-flex align-items-center gap-3"><i class="fa-solid fa-envelope"></i> piscescoffeehub@gmail.com</div>
-                        <div class="d-flex align-items-center gap-3"><i class="fa-solid fa-phone"></i> 0945 839 3794</div>
-
-                        <div class="icons d-flex align-items-center gap-4">
-                            <div class="rounded-circle"><i class="fa-brands fa-facebook"></i></div>
-                            <div class="rounded-circle"><i class="fa-brands fa-instagram"></i></div>
-                            <div class="rounded-circle"><i class="fa-brands fa-twitter"></i></div>
+                        <div class="h1 footer-title my-3 fw-bold">Pisces Coffee Hub</div>
+                        <div>
+                            Coffee makes everything possible - and our variety of meals, from appetizers to hearty dishes, make every visit unforgettable.
                         </div>
                     </div>
+                    <div class="col d-flex flex-column gap-3">
+                        <div class="h3 footer-title mb-3 fw-bold">Contact Info</div>
+                        <div class="d-flex align-items-center">
+                            <span class="border-bottoms pb-2"><i class="fa-solid fa-location-dot me-2"></i> Barangay Ilang, San Carlos City, Pangasinan</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-envelope me-2"></i> piscescoffeehub@gmail.com
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-phone me-2"></i> 0945 839 3794
+                        </div>
+                        <div class="icons d-flex align-items-center gap-4 mt-4">
+                            <div class="rounded-circle">
+                                <i class="fa-brands fa-facebook"></i>
+                            </div>
+                            <div class="rounded-circle">
+                                <i class="fa-brands fa-instagram"></i>
+                            </div>
+                            <div class="rounded-circle">
+                                <i class="fa-brands fa-twitter"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="copyright text-center py-4">
+                    <div>Copyright 2024 Pisces. All rights reserved.</div>
                 </div>
             </div>
         </div>
     </footer>
+    
 
     @yield('scripts')
 

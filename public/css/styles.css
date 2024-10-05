@@ -125,10 +125,58 @@ select {
     font-size: 1.1rem;
 }
 
+
+/* Footer Styles */
+
 .footer {
     background-color: #e3f2fd;
+    color: hsl(0, 0%, 47%) !important;
 }
 
-.rounded-circle {
-    border: 1px solid #f81d0b;
+.footer-title {
+    color: hsl(0, 0%, 21%);
+    /* font-size: 3rem; */
+}
+
+.footer-content .col {
+    flex: 1;
+    padding: 10px;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+    }
+
+    .footer-content .col {
+        margin-bottom: 20px; /* Add spacing between stacked sections */
+    }
+}
+
+/* Optional styling for icons */
+.icons .rounded-circle {
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid hsl(0, 0%, 47%);
+}
+
+.icons .rounded-circle:hover {
+    background-color: #f81d0b;
+    color: white;
+    cursor: pointer;
+    border-color: transparent;
+    transition: ease-in-out;
+}
+
+.border-bottoms {
+    border-bottom: 1px solid hsl(0, 0%, 47%);
+}
+
+.footer-fs {
+    font-size: 1.1rem;
 }
