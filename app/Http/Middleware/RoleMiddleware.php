@@ -23,6 +23,7 @@ class RoleMiddleware
         $allowedRoutes = [
             'Admin' => [
                 'admin.dashboard',
+                'admin.menu',
             ],
 
             'Staff' => [

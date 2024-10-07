@@ -27,13 +27,13 @@
                 <a class="navbar-brand" href="#">
                     <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo">
                 </a>
-    
+
                 <div class="navbar-scroll" id="navbarScroll">
                     <div>
                         <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
                             <li class="nav-item dropdown position-relative">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
                                     {{ Auth::user()->first_name }}
                                 </a>
                                 <ul class="dropdown-menu">
@@ -54,21 +54,21 @@
                 </div>
             </div>
         </nav>
-    
+
         {{-- Sidebar --}}
         <div class="sidebar">
             <ul>
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Menu</a></li>
+                @yield('sidebar')
             </ul>
         </div>
-    
+
+
     </header>
-    
+
     <main>
         @yield('main-content')
     </main>
-    
+
 
     @yield('scripts')
 

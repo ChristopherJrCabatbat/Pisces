@@ -33,6 +33,7 @@ Route::group([
 ], function () {
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/menu', [AdminController::class, 'menu'])->name('menu');
     
 });
 

@@ -12,6 +12,10 @@
     position: relative;
 }
 
+.navbar {
+    border-bottom: 1px solid #484045;
+}
+
 /* Adjust for smaller screens */
 @media (max-width: 768px) {
     .nav-item.dropdown .dropdown-menu {
@@ -30,13 +34,17 @@
 
 /* Sidebar Styles */
 .sidebar {
-    background-color: #f5f5f5;
-    padding: 15px;
-    padding-top: 12vw;
+    background-color: #e3f2fd;
+    padding-top: 18vh; /* Adjust space from the top nav */
+    /* width: 15vw; */
     width: 200px;
-    position: relative;
-    border-top: 1px solid #ddd;
-    height: 100vh;
+    position: fixed; /* Fix the sidebar on the screen */
+    top: 0; /* Make sure it starts from the top of the page */
+    left: 0; /* Align to the left */
+    height: 100vh; /* Full height */
+    border-right: 1px solid #ddd;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Add slight shadow for depth */
+    /* z-index: 1050; */
 }
 
 .sidebar ul {
@@ -46,16 +54,42 @@
 }
 
 .sidebar ul li {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+    /* padding: 10px; */
+    font-size: 18px;
+    font-weight: 500; /* Make text slightly bold */
+    /* border-radius: 5px; */
+    transition: background-color 0.1s ease, color 0.1s ease;
 }
 
 .sidebar ul li a {
     text-decoration: none;
-    font-size: 18px;
-    color: #484045;
+    padding: 15px;  
+    color: black; /* Light color for sidebar text */
+    display: block;
+    width: 100%;
+}
+
+.sidebar ul li a.active {
+    background-color: #f81d0b;
+    color: white;
+}
+
+.sidebar ul li a.active:hover {
+   cursor: default;
 }
 
 .sidebar ul li:hover {
-    color: white;
-    background-color: #f81d0b;
+    background-color: #c4c4c4; /* Red background on hover */
+    /* color: white; */
+}
+
+
+
+
+/* Main Content Styles */
+.main-content {
+    margin-top: 18vh;
+    /* margin-left: 18vw; */
+    margin-left: 240px;
 }
