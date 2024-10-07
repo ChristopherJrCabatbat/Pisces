@@ -35,16 +35,16 @@
 /* Sidebar Styles */
 .sidebar {
     background-color: #e3f2fd;
-    padding-top: 18vh; /* Adjust space from the top nav */
-    /* width: 15vw; */
+    padding-top: 18vh;
     width: 200px;
-    position: fixed; /* Fix the sidebar on the screen */
-    top: 0; /* Make sure it starts from the top of the page */
-    left: 0; /* Align to the left */
-    height: 100vh; /* Full height */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
     border-right: 1px solid #ddd;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Add slight shadow for depth */
-    /* z-index: 1050; */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(0); /* Sidebar is shown initially on all screens */
 }
 
 .sidebar ul {
@@ -55,19 +55,35 @@
 
 .sidebar ul li {
     margin-bottom: 5px;
-    /* padding: 10px; */
     font-size: 18px;
-    font-weight: 500; /* Make text slightly bold */
-    /* border-radius: 5px; */
+    font-weight: 500;
     transition: background-color 0.1s ease, color 0.1s ease;
 }
 
 .sidebar ul li a {
     text-decoration: none;
-    padding: 15px;  
-    color: black; /* Light color for sidebar text */
+    padding: 15px;
+    color: black;
     display: block;
     width: 100%;
+}
+
+.sidebar ul li:hover {
+    background-color: #c4c4c4;
+}
+
+.burger-icon {
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: none; /* Initially hidden */
+}
+
+/* Main Content Styles */
+.main-content {
+    margin-top: 18vh;
+    margin-left: 240px;
 }
 
 .sidebar ul li a.active {
@@ -79,17 +95,32 @@
    cursor: default;
 }
 
-.sidebar ul li:hover {
-    background-color: #c4c4c4; /* Red background on hover */
-    /* color: white; */
-}
+/* Adjustments for Small Screens */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+        transform: translateX(0); /* Initially shown on smaller screens */
+    }
 
+    .sidebar.active {
+        transform: translateX(-100%); /* Sidebar will hide when burger is clicked */
+    }
 
+    /* Burger Icon for Mobile */
+    .burger-icon {
+        display: inline-block;
+    }
 
+    /* Center logo on small screens */
+    .navbar-brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 
-/* Main Content Styles */
-.main-content {
-    margin-top: 18vh;
-    /* margin-left: 18vw; */
-    margin-left: 240px;
+    /* Reset the main content margin when the sidebar is hidden */
+    .main-content {
+        margin-left: 0;
+        padding: 0px 5vw;
+    }
 }

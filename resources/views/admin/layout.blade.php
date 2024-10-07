@@ -23,52 +23,50 @@
     <header>
         {{-- Top Nav --}}
         <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">
-            <div class="container">
+            <div class="container d-flex justify-content-between align-items-center">
+                <!-- Burger Icon -->
+                <button class="burger-icon" id="burgerBtn">&#9776;</button>
+
+                <!-- Logo -->
                 <a class="navbar-brand" href="#">
                     <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo">
                 </a>
 
+                <!-- Right-side User Info -->
                 <div class="navbar-scroll" id="navbarScroll">
-                    <div>
-                        <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
-                            <li class="nav-item dropdown position-relative">
-                                <a class="nav-link dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ Auth::user()->first_name }}
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="POST" action="{{ route('logout') }}">
-                                            @csrf
-                                            <button class="dropdown-item" type="submit">Log out</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
+                    <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
+                        <li class="nav-item dropdown position-relative">
+                            <a class="nav-link dropdown-toggle" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ Auth::user()->first_name }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button class="dropdown-item" type="submit">Log out</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>
 
         {{-- Sidebar --}}
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <ul>
                 @yield('sidebar')
             </ul>
         </div>
-
-
     </header>
 
     <main>
         @yield('main-content')
     </main>
-
 
     @yield('scripts')
 
