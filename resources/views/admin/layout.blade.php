@@ -33,8 +33,8 @@
                 </a>
 
                 <!-- Right-side User Info -->
-                <div class="navbar-scroll" id="navbarScroll">
-                    <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
+                <div class="" id="">
+                    <ul class="navbar-nav me-auto my-2 my-lg-0">
                         <li class="nav-item dropdown position-relative">
                             <a class="nav-link dropdown-toggle" href="#" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
@@ -53,6 +53,7 @@
                         </li>
                     </ul>
                 </div>
+                
             </div>
         </nav>
 

@@ -1,32 +1,46 @@
 /* Ensure the dropdown menu is absolute and floating */
 .nav-item.dropdown .dropdown-menu {
-    position: absolute;
+    /* position: fixed !important;
     top: 100%;
     left: 0;
     min-width: 200px;
-    z-index: 1000;
+    z-index: 1000; */
+}
+
+.nav-item.dropdown .dropdown-menu {
+    position: fixed;
+    top: 10vh;
+    /* right: 0; */
+    left: auto;
+    z-index: 1050;
 }
 
 /* Optional: Ensure no overlap with other nav items */
-.nav-item.dropdown {
+/* .nav-item.dropdown {
     position: relative;
-}
+} */
 
 .navbar {
     border-bottom: 1px solid #484045;
 }
 
 /* Adjust for smaller screens */
-@media (max-width: 768px) {
-    .nav-item.dropdown .dropdown-menu {
-        position: fixed; /* Fixed for mobile */
+@media (max-width: 890px) {
+    /* .nav-item.dropdown .dropdown-menu {
+        position: fixed;
         top: 10vw;
         right: 0;
         left: auto;
         z-index: 1050;
+    } */
+    .nav-item.dropdown .dropdown-menu {
+        position: fixed;
+        top: 10vh;
+        left: auto;
+        right: 0;
+        z-index: 1050;
     }
 
-    /* Prevent the navbar from having scrollbars */
     .navbar-nav-scroll {
         overflow: hidden;
     }
@@ -36,7 +50,7 @@
 .sidebar {
     background-color: #e3f2fd;
     padding-top: 18vh;
-    width: 200px;
+    width: 230px;
     position: fixed;
     top: 0;
     left: 0;
@@ -82,8 +96,8 @@
 
 /* Main Content Styles */
 .main-content {
-    margin-top: 18vh;
-    margin-left: 240px;
+    margin-top: 16vh;
+    margin-left: 260px;
     margin-right: 2vw;
 }
 
@@ -100,7 +114,7 @@
 /* @media (max-width: 768px) { */
 @media (max-width: 980px) {
     .sidebar {
-        width: 200px;
+        width: 230px;
         transform: translateX(0); /* Initially shown on smaller screens */
     }
 
@@ -113,28 +127,58 @@
         display: inline-block;
     }
 
-    /* Center logo on small screens */
-    /* .navbar-brand {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    } */
-
     /* Reset the main content margin when the sidebar is hidden */
     .main-content {
         margin-left: 0;
-        padding: 0px 2vw 0px 5vw;
+        padding: 0px 2vw 0px 4vw;
     }
 }
 
 
 /* Table */
+.faded-white {
+    color: rgb(255, 255, 255, 0.7);
+}
+
 table {
     margin-bottom: 0px;
 }
 
 .table-container {
     background-color: #e3f2fd;
-    padding: 2rem;
+    padding: 1rem 2rem;
     border-radius: 5px;
+}
+
+/* Taas ng Table */
+/* Custom filter container */
+.custom-filter {
+    display: flex;
+    align-items: center;
+}
+
+.custom-filter select {
+    width: 100% !important;
+    margin-right: 10px; /* Ensure proper spacing between the select and button */
+}
+
+select:hover {
+    cursor: pointer;
+}
+
+/* Custom search input with icon */
+.custom-search {
+    position: relative;
+}
+
+.custom-search input#search-input {
+    padding-right: 40px; /* Add space for the search icon inside the input */
+}
+
+.custom-search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d; /* Optional: Adjust icon color if needed */
 }
