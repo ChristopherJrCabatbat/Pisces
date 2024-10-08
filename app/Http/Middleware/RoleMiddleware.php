@@ -24,6 +24,7 @@ class RoleMiddleware
             'Admin' => [
                 'admin.dashboard',
                 'admin.menu',
+                'admin.users',
             ],
 
             'Staff' => [

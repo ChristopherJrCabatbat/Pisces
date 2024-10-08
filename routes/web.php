@@ -34,6 +34,7 @@ Route::group([
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/menu', [AdminController::class, 'menu'])->name('menu');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
     
 });
 
