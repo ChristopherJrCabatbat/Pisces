@@ -1,13 +1,5 @@
 /* Ensure the dropdown menu is absolute and floating */
 .nav-item.dropdown .dropdown-menu {
-    /* position: fixed !important;
-    top: 100%;
-    left: 0;
-    min-width: 200px;
-    z-index: 1000; */
-}
-
-.nav-item.dropdown .dropdown-menu {
     position: fixed;
     top: 10vh;
     /* right: 0; */
@@ -15,24 +7,12 @@
     z-index: 1050;
 }
 
-/* Optional: Ensure no overlap with other nav items */
-/* .nav-item.dropdown {
-    position: relative;
-} */
-
 .navbar {
     border-bottom: 1px solid #484045;
 }
 
 /* Adjust for smaller screens */
 @media (max-width: 890px) {
-    /* .nav-item.dropdown .dropdown-menu {
-        position: fixed;
-        top: 10vw;
-        right: 0;
-        left: auto;
-        z-index: 1050;
-    } */
     .nav-item.dropdown .dropdown-menu {
         position: fixed;
         top: 10vh;
@@ -49,8 +29,8 @@
 /* Sidebar Styles */
 .sidebar {
     background-color: #e3f2fd;
-    padding-top: 18vh;
-    width: 230px;
+    padding-top: 16vh;
+    width: 250px;
     position: fixed;
     top: 0;
     left: 0;
@@ -94,10 +74,79 @@
     display: none; /* Initially hidden */
 }
 
+
+
+/* Sidebar Dropdown Styles */
+.sidebar ul li.sidebar-item:hover {
+    background-color: transparent;
+}
+
+li.sidebar-item a.customers:hover {
+    background-color: #c4c4c4;
+}
+
+/* If the .customers link has the 'active' class, do NOT apply the hover background */
+li.sidebar-item a.customers.active:hover {
+    background-color: #f81d0b;
+}
+
+.sidebar-item {
+    position: relative;
+    list-style: none;
+}
+
+.sidebar-item > a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Puts the icon at the right end */
+    padding: 10px;
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.caret-icon {
+    /* margin-left: auto; */
+    transition: transform 0.3s ease;
+}
+
+/* When the dropdown is open (applied by JS when the route is active) */
+.caret-icon.open {
+    transform: rotate(90deg); /* Rotates the caret to point down */
+}
+
+.caret-icon:hover {
+    cursor: pointer;
+}
+/* End Sidebar */
+
+
+/* Dropdown menu styles */
+.dropdown-customers {
+    list-style: none;
+    padding-left: 20px;
+    margin: 0;
+    margin-top: 5px !important;
+    display: none;
+}
+
+.dropdown-customers li {
+    margin-bottom: 3px !important;
+}
+ 
+.dropdown-customers li a {
+    text-decoration: none;
+    color: black;
+    padding: 12px 12px 12px 30px !important;
+    font-size: 0.96rem;
+    display: block;
+}
+
+
 /* Main Content Styles */
 .main-content {
     margin-top: 16vh;
-    margin-left: 260px;
+    margin-left: 280px;
     margin-right: 2vw;
 }
 
@@ -106,12 +155,17 @@
     color: white;
 }
 
-.sidebar ul li a.active:hover {
+.active-customer {
+    background-color: #c4c4c4;
+    /* color: white !important; */
+}
+
+.sidebar ul li a.active:hover, .active-customer {
    cursor: default;
 }
 
-/* Adjustments for Small Screens */
-/* @media (max-width: 768px) { */
+
+/* Responsive Sidebar */
 @media (max-width: 980px) {
     .sidebar {
         width: 230px;

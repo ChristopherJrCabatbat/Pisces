@@ -16,9 +16,26 @@ class AdminController extends Controller
     {
         return view('admin.menu');
     }
-    
-    public function users()
+   
+    public function delivery()
     {
-        return view('admin.users');
+        return view('admin.delivery');
+    }
+    
+    public function customers()
+    {
+        return view('admin.customers');
+    }
+    public function feedback()
+    {
+        return view('admin.feedback');
+    }
+    public function updates()
+    {
+        return view('admin.updates');
+    }
+    public function monitoring()
+    {
+        return view('admin.monitoring');
     }
 }

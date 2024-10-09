@@ -1,13 +1,21 @@
 @extends('admin.layout')
 
-@section('title', 'Menu')
+@section('title', 'Customer Activity Monitoring')
 
 @section('styles-links')
 @endsection
 
 @section('sidebar')
-    <li><a href="{{ route('admin.dashboard') }}" class="fs-5"><i class="fa-solid fa-house me-3"></i>Dashboard</a></li>
-    <li><a href="#" class="active fs-5"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
+    <li>
+        <a href="{{ route('admin.dashboard') }}" class="fs-5">
+            <i class="fa-solid fa-house me-3"></i>Dashboard
+        </a>
+    </li>
+    <li>
+        <a href="{{ route('admin.menu') }}" class="fs-5">
+            <i class="fa-solid fa-utensils me-3"></i> Menu
+        </a>
+    </li>
     <li>
         <a href="{{ route('admin.delivery') }}" class="fs-5"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
@@ -29,19 +37,21 @@
                     class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}">Feedback
                     Collection</a></li>
             <li><a href="{{ route('admin.monitoring') }}"
-                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}">Customer Activity
+                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }} active-customer">Customer
+                    Activity
                     Monitoring</a></li>
         </ul>
     </li>
 
 @endsection
 
+
 @section('main-content')
     <div class="main-content">
 
         <div class="current-file mb-3 d-flex">
-            <div class="fw-bold"><i class="fa-solid fa-house me-2"></i>Dashboard /</div>
-            <span class="faded-white ms-1">Menu</span>
+            <div class="fw-bold"><i class="fa-solid fa-house me-2"></i>Dashboard / Customers /</div>
+            <span class="faded-white ms-1">Customer Activity Monitoring</span>
         </div>
 
         <div class="table-container">

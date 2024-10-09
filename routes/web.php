@@ -33,8 +33,15 @@ Route::group([
 ], function () {
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
     Route::get('/menu', [AdminController::class, 'menu'])->name('menu');
-    Route::get('/users', [AdminController::class, 'users'])->name('users');
+
+    Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');
+
+    Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
+    Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
+    Route::get('/updates', [AdminController::class, 'updates'])->name('updates');
+    Route::get('/monitoring', [AdminController::class, 'monitoring'])->name('monitoring');
     
 });
 
