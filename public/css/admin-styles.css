@@ -74,8 +74,6 @@
     display: none; /* Initially hidden */
 }
 
-
-
 /* Sidebar Dropdown Styles */
 .sidebar ul li.sidebar-item:hover {
     background-color: transparent;
@@ -118,8 +116,12 @@ li.sidebar-item a.customers.active:hover {
 .caret-icon:hover {
     cursor: pointer;
 }
-/* End Sidebar */
 
+/* .sidebar ul li a {
+    font-size: 1.25rem !important;
+} */
+
+/* End Sidebar */
 
 /* Dropdown menu styles */
 .dropdown-customers {
@@ -133,15 +135,18 @@ li.sidebar-item a.customers.active:hover {
 .dropdown-customers li {
     margin-bottom: 3px !important;
 }
- 
+
 .dropdown-customers li a {
     text-decoration: none;
     color: black;
     padding: 12px 12px 12px 30px !important;
-    font-size: 0.96rem;
+    font-size: 0.94rem;
     display: block;
 }
 
+.monitor-margin {
+    margin-left: 1.64rem;
+}
 
 /* Main Content Styles */
 .main-content {
@@ -160,10 +165,10 @@ li.sidebar-item a.customers.active:hover {
     /* color: white !important; */
 }
 
-.sidebar ul li a.active:hover, .active-customer {
-   cursor: default;
+.sidebar ul li a.active:hover,
+.active-customer {
+    cursor: default;
 }
-
 
 /* Responsive Sidebar */
 @media (max-width: 980px) {
@@ -173,7 +178,9 @@ li.sidebar-item a.customers.active:hover {
     }
 
     .sidebar.active {
-        transform: translateX(-100%); /* Sidebar will hide when burger is clicked */
+        transform: translateX(
+            -100%
+        ); /* Sidebar will hide when burger is clicked */
     }
 
     /* Burger Icon for Mobile */
@@ -186,8 +193,15 @@ li.sidebar-item a.customers.active:hover {
         margin-left: 0;
         padding: 0px 2vw 0px 4vw;
     }
-}
 
+    .sidebar-font {
+        font-size: 1.1rem !important;
+    }
+
+    .dropdown-customers li a {
+        font-size: 0.92rem;
+    }
+}
 
 /* Table */
 .faded-white {
@@ -205,7 +219,6 @@ table {
 }
 
 /* Taas ng Table */
-/* Custom filter container */
 .custom-filter {
     display: flex;
     align-items: center;
