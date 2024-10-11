@@ -1,36 +1,29 @@
 @extends('admin.layout')
 
-@section('title', 'Customer Updates')
+@section('title', 'Add Menu')
 
 @section('styles-links')
 @endsection
 
 @section('sidebar')
-    <li>
-        <a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font">
-            <i class="fa-solid fa-house me-3"></i>Dashboard
-        </a>
-    </li>
-    <li>
-        <a href="/admin/menu" class="fs-5 sidebar-font">
-            <i class="fa-solid fa-utensils me-3"></i> Menu
-        </a>
-    </li>
+    <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a></li>
+    <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
     <li>
         <a href="{{ route('admin.delivery') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
 
     <li class="sidebar-item" id="customersDropdown">
-        <a href="javascript:void(0)" class="fs-5 sidebar-font d-flex active customers justify-content-between">
+        <a href="javascript:void(0)"
+            class="fs-5 sidebar-font d-flex customers justify-content-between {{ request()->is('admin/updates', 'admin/feedback', 'admin/monitoring') ? 'active' : '' }}">
             <div><i class="fa-solid fa-users me-3"></i>Customers</div>
             <div class="caret-icon">
                 <i class="fa-solid fa-caret-right"></i>
             </div>
         </a>
         <!-- Dropdown menu -->
-        <ul class="dropdown-customers">
+        <ul class="dropdown-customers" style="display: none;">
             <li><a href="{{ route('admin.updates') }}"
-                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }} active-customer"><i class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
+                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
             </li>
             <li><a href="{{ route('admin.feedback') }}"
                     class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-comments me-2"></i>Feedback
@@ -43,13 +36,12 @@
 
 @endsection
 
-
 @section('main-content')
     <div class="main-content">
 
         <div class="current-file mb-3 d-flex">
-            <div class="fw-bold"><i class="fa-solid fa-house me-2"></i>Dashboard / Customers /</div>
-            <span class="faded-white ms-1">Customer Updates</span>
+            <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}" class="navigation">Dashboard</a> / <a href="/admin/menu" class="navigation">Menu</a> /</div>
+            <span class="faded-white ms-1">Add Menu</span>
         </div>
 
         <div class="table-container">
@@ -64,7 +56,7 @@
                             <option value="2">Two</option>
                             <option value="3">Three</option>
                         </select>
-                        <button type="submit" class="btn btn-primary custom-filter-btn">Filter</button>
+                        <button type="submit" class="btn btn-primary custom-filter-btn button-wid"><i class="fa-solid fa-sort me-2"></i>Filter</button>
                     </div>
                     <!-- Search Input with Icon -->
                     <div class="position-relative custom-search">
@@ -75,7 +67,7 @@
 
                 <!-- Right Section -->
                 <div class="right">
-                    <button type="submit" class="btn btn-primary">Add</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</button>
                 </div>
             </div>
 

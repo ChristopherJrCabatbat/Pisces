@@ -6,10 +6,12 @@
 @endsection
 
 @section('sidebar')
-    <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a></li>
+    <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a>
+    </li>
     <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
     <li>
-        <a href="{{ route('admin.delivery') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
+        <a href="{{ route('admin.delivery') }}" class="fs-5 sidebar-font"><i
+                class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
 
     <li class="sidebar-item" id="customersDropdown">
@@ -23,13 +25,16 @@
         <!-- Dropdown menu -->
         <ul class="dropdown-customers" style="display: none;">
             <li><a href="{{ route('admin.updates') }}"
-                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
+                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
             </li>
             <li><a href="{{ route('admin.feedback') }}"
-                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-comments me-2"></i>Feedback
+                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-comments me-2"></i>Feedback
                     Collection</a></li>
             <li><a href="{{ route('admin.monitoring') }}"
-                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-users-gear me-2"></i>Customer Activity
+                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-users-gear me-2"></i>Customer Activity
                     Monitoring</a></li>
         </ul>
     </li>
@@ -56,7 +61,8 @@
                             <option value="2">Two</option>
                             <option value="3">Three</option>
                         </select>
-                        <button type="submit" class="btn btn-primary custom-filter-btn">Filter</button>
+                        <button type="submit" class="btn btn-primary custom-filter-btn button-wid"><i
+                                class="fa-solid fa-sort me-2"></i>Filter</button>
                     </div>
                     <!-- Search Input with Icon -->
                     <div class="position-relative custom-search">
@@ -67,7 +73,10 @@
 
                 <!-- Right Section -->
                 <div class="right">
-                    <button type="submit" class="btn btn-primary">Add</button>
+                    <form action="menu/create">
+                        @csrf
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</button>
+                    </form>
                 </div>
             </div>
 

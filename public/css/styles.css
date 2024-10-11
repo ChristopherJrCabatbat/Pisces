@@ -43,7 +43,6 @@ body {
     color: #f81d0b;
 }
 
-
 /* Animation Hover Styles */
 .card {
     position: relative;
@@ -99,8 +98,6 @@ body {
     color: #f81d0b; /* Optional: Add a hover color effect */
 }
 
-
-
 /* Menu Styles */
 .top-container {
     background-color: rgb(122, 109, 117);
@@ -124,7 +121,6 @@ select {
 .category-lists {
     font-size: 1.1rem;
 }
-
 
 /* Footer Styles */
 
@@ -180,3 +176,18 @@ select {
 .footer-fs {
     font-size: 1.1rem;
 }
+
+/* Filter Button Width */
+.button-wid {
+    width: 37%;
+}
+
+/* Navigation sa Taas ng Table */
+.navigation {
+    text-decoration: none;
+    color: white;
+}
+.navigation:hover {
+    text-decoration: underline;
+}
+

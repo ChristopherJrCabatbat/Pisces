@@ -12,7 +12,7 @@
         </a>
     </li>
     <li>
-        <a href="{{ route('admin.menu') }}" class="fs-5 sidebar-font">
+        <a href="/admin/menu" class="fs-5 sidebar-font">
             <i class="fa-solid fa-utensils me-3"></i> Menu
         </a>
     </li>

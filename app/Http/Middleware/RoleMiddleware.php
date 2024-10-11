@@ -24,7 +24,14 @@ class RoleMiddleware
             'Admin' => [
                 'admin.dashboard',
 
-                'admin.menu',
+                // Allow all resource routes for 'menu'
+                'admin.menu.index',
+                'admin.menu.create',
+                'admin.menu.store',
+                'admin.menu.show',
+                'admin.menu.edit',
+                'admin.menu.update',
+                'admin.menu.destroy',
                 
                 'admin.delivery',
 

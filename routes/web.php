@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MenuController;
 
 Route::get('/', function () {
     // return view('welcome');
@@ -34,7 +35,9 @@ Route::group([
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/menu', [AdminController::class, 'menu'])->name('menu');
+    // Route::get('/menu', [AdminController::class, 'menu'])->name('menu');
+    Route::resource('menu', MenuController::class);
+
 
     Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');
 
@@ -42,7 +45,6 @@ Route::group([
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
     Route::get('/updates', [AdminController::class, 'updates'])->name('updates');
     Route::get('/monitoring', [AdminController::class, 'monitoring'])->name('monitoring');
-    
 });
 
 // User Routes
