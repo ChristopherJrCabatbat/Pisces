@@ -3,6 +3,7 @@
 @section('title', 'Add Menu')
 
 @section('styles-links')
+
 @endsection
 
 @section('sidebar')
@@ -30,7 +31,7 @@
                     Collection</a></li>
             <li><a href="{{ route('admin.monitoring') }}"
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-users-gear me-2"></i>Customer Activity
-                    Monitoring</a></li>
+                    <span class="monitor-margin">Monitoring</span></a></li>
         </ul>
     </li>
 
@@ -44,64 +45,57 @@
             <span class="faded-white ms-1">Add Menu</span>
         </div>
 
-        <div class="table-container">
+        <div class="table-container p-4 text-black mb-4">
 
-            <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
-                <!-- Left Section -->
-                <div class="left d-flex">
-                    <div class="d-flex custom-filter me-3">
-                        <select class="form-select custom-select" aria-label="Default select example">
-                            <option selected>Open this select menu</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                        </select>
-                        <button type="submit" class="btn btn-primary custom-filter-btn button-wid"><i class="fa-solid fa-sort me-2"></i>Filter</button>
-                    </div>
-                    <!-- Search Input with Icon -->
-                    <div class="position-relative custom-search">
-                        <input type="text" placeholder="Search something..." class="form-control" id="search-input">
-                        <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
-                    </div>
-                </div>
-
-                <!-- Right Section -->
-                <div class="right">
-                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</button>
-                </div>
+            <div class="taas-table d-flex justify-content-center align-items-center">
+               <div class="h2"><i class="fa-solid fa-plus me-2"></i>Add Menu</div>
             </div>
 
-            <table class="table text-center">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        {{-- <td colspan="2">Larry the Bird</td> --}}
-                        <td>Larry</td>
-                        <td>Bird</td>
-                        <td>@twitter</td>
-                    </tr>
-                </tbody>
-            </table>
+            <form action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data"> 
+                @csrf
+                <!-- Name -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="name" class="form-label">Name:</label>
+                    <input type="text" name="name" class="form-control" id="name" value="{{ old('name') }}" required
+                        placeholder="e.g. Pisces Pizza" autofocus>
+                </div>
+            
+                <!-- Price -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="price" class="form-label">Price:</label>
+                    <input type="text" name="price" class="form-control" id="price" value="{{ old('price') }}" required
+                        placeholder="e.g. 199">
+                </div>
+            
+                <!-- Category -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="category" class="form-label">Category:</label>
+                    <select class="form-select" required name="category" id="category">
+                        <option value="" disabled selected>Select Category</option>
+                        <option value="Pizza" {{ old('category') === 'Pizza' ? 'selected' : '' }}>Pizza</option>
+                        <option value="Pasta" {{ old('category') === 'Pasta' ? 'selected' : '' }}>Pasta</option>
+                    </select>
+                </div>
+            
+                <!-- Image -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="image" class="form-label">Image:</label>
+                    <input type="file" name="image" class="form-control" id="image" required>
+                </div>
+            
+                <!-- Description -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea name="description" id="description" cols="30" rows="5" class="form-control" required
+                        placeholder="Enter menu description here...">{{ old('description') }}</textarea>
+                </div>
+            
+                <div class="d-grid my-2">
+                    <button class="btn btn-primary dark-blue" type="submit">Add Menu</button>
+                </div>
+            </form>
+            
+
         </div>
 
     </div>

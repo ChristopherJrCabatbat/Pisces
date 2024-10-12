@@ -7,6 +7,10 @@
         .main-content {
             margin-top: 13vh;
         }
+
+        select {
+            width: 30% !important;
+        }
     </style>
 @endsection
 

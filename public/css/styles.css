@@ -110,10 +110,6 @@ body {
     color: rgb(255, 255, 255, 0.7);
 }
 
-select {
-    width: 30% !important;
-}
-
 .categories {
     min-width: 20vw !important;
 }
@@ -191,3 +187,6 @@ select {
     text-decoration: underline;
 }
 
+td, th {
+    vertical-align: middle;
+}

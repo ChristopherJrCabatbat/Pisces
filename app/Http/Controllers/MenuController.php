@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\Menu;
 
@@ -35,7 +36,32 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the form data
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'description' => 'required|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
+        ]);
+
+        // Handle file upload
+        if ($request->hasFile('image')) {
+            // Store the uploaded image in a public directory
+            $imagePath = $request->file('image')->store('menu_images', 'public');
+        }
+
+        // Create a new menu entry in the database
+        Menu::create([
+            'name' => $validated['name'],
+            'category' => $validated['category'],
+            'price' => $validated['price'],
+            'description' => $validated['description'],
+            'image' => $imagePath ?? null, // Save image path
+        ]);
+
+        // Redirect back with a success message
+        return redirect()->route('admin.menu.index')->with('success', 'Menu item added successfully.');
     }
 
     /**

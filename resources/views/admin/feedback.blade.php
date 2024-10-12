@@ -38,7 +38,7 @@
                     Collection</a></li>
             <li><a href="{{ route('admin.monitoring') }}"
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-users-gear me-2"></i>Customer Activity
-                    Monitoring</a></li>
+                    <span class="monitor-margin">Monitoring</span></a></li>
         </ul>
     </li>
 

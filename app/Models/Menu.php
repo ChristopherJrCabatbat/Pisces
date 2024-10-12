@@ -14,5 +14,6 @@ class Menu extends Model
         'category',
         'price',
         'description',
+        'image',
     ];
 }
