@@ -121,16 +121,13 @@
                             
                             <!-- Action Column (View, Edit, Delete) -->
                             <td>
-                                {{-- <a href="{{ route('menu.show', $menu->id) }}" class="btn btn-sm btn-info" title="View"> --}}
-                                <a href="" class="btn btn-sm btn-info" title="View">
+                                <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info" title="View">
                                     <i class="fa fa-eye"></i>
                                 </a>
-                                {{-- <a href="{{ route('menu.edit', $menu->id) }}" class="btn btn-sm btn-warning" title="Edit"> --}}
-                                <a href="" class="btn btn-sm btn-warning" title="Edit">
+                                <a href="{{ route('admin.menu.edit', $menu->id) }}" class="btn btn-sm btn-warning" title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                {{-- <form action="{{ route('menu.destroy', $menu->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this menu?');"> --}}
-                                <form action="" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this menu?');">
+                                <form action="{{ route('admin.menu.destroy', $menu->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this menu?');">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-danger" type="submit" title="Delete">

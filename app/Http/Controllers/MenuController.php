@@ -39,18 +39,17 @@ class MenuController extends Controller
         // Validate the form data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'description' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
         ]);
-
+    
         // Handle file upload
         if ($request->hasFile('image')) {
-            // Store the uploaded image in a public directory
+            // Store the uploaded image in the 'public/menu_images' directory
             $imagePath = $request->file('image')->store('menu_images', 'public');
         }
-
+    
         // Create a new menu entry in the database
         Menu::create([
             'name' => $validated['name'],
@@ -59,17 +58,20 @@ class MenuController extends Controller
             'description' => $validated['description'],
             'image' => $imagePath ?? null, // Save image path
         ]);
-
+    
         // Redirect back with a success message
         return redirect()->route('admin.menu.index')->with('success', 'Menu item added successfully.');
     }
+    
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        // Fetch the menu item details
+        $menus = Menu::findOrFail($id);
+        return view('admin.menuShow', compact('menus'));
     }
 
     /**
@@ -77,7 +79,7 @@ class MenuController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        return view('admin.menuEdit');
     }
 
     /**
@@ -93,6 +95,8 @@ class MenuController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $menu = Menu::findOrFail($id);
+        $menu->delete();
+        return redirect()->route('admin.menu.index')->with('success', 'Menu item deleted successfully.');
     }
 }
