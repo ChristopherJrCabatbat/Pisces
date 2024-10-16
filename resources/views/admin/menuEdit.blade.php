@@ -51,56 +51,54 @@
                <div class="h2"><i class="fa fa-edit me-2"></i>Edit Menu</div>
             </div>
 
-            <form action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data"> 
+            <form action="{{ route('admin.menu.update', $menus->id) }}" method="POST" enctype="multipart/form-data"> 
                 @csrf
+                @method('PUT') <!-- Use PUT method for updating -->
+                
                 <!-- Name -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="name" class="form-label">Name:</label>
-                    <input type="text" name="name" class="form-control" id="name" value="{{ old('name') }}" required
-                        placeholder="e.g. Pisces Pizza" autofocus>
+                    <input type="text" name="name" class="form-control" id="name" value="{{ old('name', $menus->name) }}" required autofocus>
                 </div>
             
                 <!-- Price -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="price" class="form-label">Price:</label>
-                    <input type="text" name="price" class="form-control" id="price" value="{{ old('price') }}" required
-                        placeholder="e.g. 199">
+                    <input type="text" name="price" class="form-control" id="price" value="{{ old('price', $menus->price) }}" required>
                 </div>
             
                 <!-- Category -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="category" class="form-label">Category:</label>
                     <select class="form-select" required name="category" id="category">
-                        <option value="" disabled selected>Select Category</option>
-                        <option value="Pizza" {{ old('category') === 'Pizza' ? 'selected' : '' }}>Pizza</option>
-                        <option value="Pasta" {{ old('category') === 'Pasta' ? 'selected' : '' }}>Pasta</option>
+                        <option value="" disabled>Select Category</option>
+                        <option value="Pizza" {{ old('category', $menus->category) === 'Pizza' ? 'selected' : '' }}>Pizza</option>
+                        <option value="Pasta" {{ old('category', $menus->category) === 'Pasta' ? 'selected' : '' }}>Pasta</option>
                     </select>
                 </div>
-                
-                 <!-- Current Image -->
-                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="image" class="form-label"> Current Image:</label>
-                    <input type="file" name="image" class="form-control" id="image" required>
+            
+                <!-- Current Image -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="current_image" class="form-label">Current Image:</label>
+                    <img src="{{ Storage::url($menus->image) }}" alt="{{ $menus->name }}" class="img-fluid" width="150">
                 </div>
             
-                <!-- Image -->
+                <!-- New Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="image" class="form-label">Image:</label>
-                    <input type="file" name="image" class="form-control" id="image" required>
+                    <label for="image" class="form-label">New Image (optional):</label>
+                    <input type="file" name="image" class="form-control" id="image">
                 </div>
             
                 <!-- Description -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="description" class="form-label">Description:</label>
-                    <textarea name="description" id="description" cols="30" rows="5" class="form-control" required
-                        placeholder="Enter menu description here...">{{ old('description') }}</textarea>
+                    <textarea name="description" id="description" cols="30" rows="5" class="form-control" required>{{ old('description', $menus->description) }}</textarea>
                 </div>
             
                 <div class="d-grid my-2">
-                    <button class="btn btn-primary dark-blue" type="submit">Add Menu</button>
+                    <button class="btn btn-primary dark-blue" type="submit">Update Menu</button>
                 </div>
             </form>
-            
 
         </div>
 

@@ -92,7 +92,7 @@
                 <!-- Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="image" class="form-label">Image:</label>
-                    <input type="file" name="image" class="form-control" id="image">
+                    <input type="file" name="image" class="form-control" id="image" required>
                     @error('image')
                         <div class="error alert alert-danger">{{ $message }}</div>
                         <!-- Display the error message for 'image' -->

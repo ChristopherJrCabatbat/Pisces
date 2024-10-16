@@ -24,7 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // Admin Routes
 Route::group([
@@ -55,7 +55,8 @@ Route::group([
 ], function () {
 
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
-    
+
     Route::get('/menu', [UserController::class, 'menu'])->name('menu');
-    
+    // Route to show menus filtered by category
+    Route::get('/menus/category/{category}', [MenuController::class, 'category'])->name('menus.category');
 });

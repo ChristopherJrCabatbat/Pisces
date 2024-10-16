@@ -40,6 +40,7 @@ class MenuController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'category' => 'required|string', // Add validation for category
             'description' => 'required|string',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
         ]);
@@ -53,7 +54,7 @@ class MenuController extends Controller
         // Create a new menu entry in the database
         Menu::create([
             'name' => $validated['name'],
-            'category' => $validated['category'],
+            'category' => $validated['category'], // Store the category
             'price' => $validated['price'],
             'description' => $validated['description'],
             'image' => $imagePath ?? null, // Save image path
@@ -63,13 +64,13 @@ class MenuController extends Controller
         return redirect()->route('admin.menu.index')->with('success', 'Menu item added successfully.');
     }
     
+    
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        // Fetch the menu item details
         $menus = Menu::findOrFail($id);
         return view('admin.menuShow', compact('menus'));
     }
@@ -79,7 +80,8 @@ class MenuController extends Controller
      */
     public function edit(string $id)
     {
-        return view('admin.menuEdit');
+        $menus = Menu::findOrFail($id);
+        return view('admin.menuEdit', compact('menus'));
     }
 
     /**
@@ -87,8 +89,43 @@ class MenuController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Fetch the existing menu item
+        $menu = Menu::findOrFail($id);
+    
+        // Validate the form data
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string',
+            'description' => 'required|string',
+            'image' => '|image|mimes:jpeg,png,jpg,gif|max:2048', // Image is optional on update
+        ]);
+    
+        // Handle file upload if a new image is provided
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($menu->image) {
+                Storage::delete('public/' . $menu->image);
+            }
+    
+            // Store the new image in 'public/menu_images' directory
+            $imagePath = $request->file('image')->store('menu_images', 'public');
+            $menu->image = $imagePath; // Update the image path
+        }
+    
+        // Update the menu entry with new values
+        $menu->update([
+            'name' => $validated['name'],
+            'category' => $validated['category'],
+            'price' => $validated['price'],
+            'description' => $validated['description'],
+            'image' => $menu->image ?? $menu->image, // Keep the existing image if no new one is uploaded
+        ]);
+    
+        // Redirect back with a success message
+        return redirect()->route('admin.menu.index')->with('success', 'Menu item updated successfully.');
     }
+    
 
     /**
      * Remove the specified resource from storage.
