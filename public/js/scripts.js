@@ -40,3 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
         caretIcon.classList.toggle('fa-caret-down');
     });
 });
+
+
+// Image Preview
+function previewImage(event) {
+    const imagePreview = document.getElementById('imagePreview');
+    const reader = new FileReader();
+
+    reader.onload = function(){
+        imagePreview.src = reader.result;
+        imagePreview.style.display = 'block';  // Show the preview image
+    }
+
+    if (event.target.files.length) {
+        reader.readAsDataURL(event.target.files[0]);  // Read the uploaded image file
+    }
+}

@@ -59,6 +59,7 @@
 
             <form action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+
                 <!-- Name -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="name" class="form-label">Name:</label>
@@ -76,7 +77,6 @@
                             {{ $message }}
                         </div>
                     @enderror
-
                 </div>
 
                 <!-- Category -->
@@ -92,10 +92,12 @@
                 <!-- Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="image" class="form-label">Image:</label>
-                    <input type="file" name="image" class="form-control" id="image" required>
+                    <input type="file" name="image" class="form-control" id="image" accept="image/*"
+                        onchange="previewImage(event)" required>
+                    <img id="imagePreview" src="#" alt="Selected Image Preview"
+                        style="display:none; width:150px; margin-top:10px;">
                     @error('image')
                         <div class="error alert alert-danger">{{ $message }}</div>
-                        <!-- Display the error message for 'image' -->
                     @enderror
                 </div>
 

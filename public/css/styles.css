@@ -122,6 +122,15 @@ body {
     font-size: 1.1rem;
 }
 
+.category-links {
+    text-decoration: none;
+    color: white;
+}
+
+.category-links:hover {
+    text-decoration: underline;
+}
+
 /* Footer Styles */
 
 .footer {

@@ -27,16 +27,15 @@
     <div class="container main-content d-flex flex-column align-items-center">
 
         {{-- Top Container --}}
-        <div class="top-container d-flex w-100 p-4 mb-5 justify-content-between align-items-center">
+        <div class="top-container d-flex w-100 p-4 mb-5 justify-content-between  align-items-center">
             <div class="fw-bold h1">
-                {{ $selectedCategory }}
+                Pizza
             </div>
-            <div class="menu-chosen d-flex justify-content-center align-items-center gap-2 fs-5">
-                <div>Menu <i class="fa-solid fa-caret-right mx-1"></i></div>
-                <div class="low-opacity-white">{{ $selectedCategory }}</div>
+            <div class="menu-chosen d-flex gap-1 fs-5">
+                <div>Menu > </div>
+                <div class="low-opacity-white">Pizza</div>
             </div>
         </div>
-
 
         {{-- Content --}}
         <div class="d-flex container gap-5 p-0">
@@ -49,10 +48,8 @@
                     <div>
                         <div>
                             <i class="fa-solid fa-caret-right me-2"></i>
-                            <a href="{{ route('user.menu', ['category' => 'All Menus']) }}" class="category-links">
-                                <span class="{{ $selectedCategory == 'All Menus' ? 'active-category' : '' }}">All
-                                    Menus</span>
-                            </a>
+                            {{-- <a href="{{ route('menus.index') }}" class="text-decoration-none">> All Menus</a> --}}
+                            <a href="" class="category-links"><span class="">All Menus</span></a>
                         </div>
                     </div>
 
@@ -61,11 +58,9 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <i class="fa-solid fa-caret-right me-2"></i>
-                                <a href="{{ route('user.menu', ['category' => $category->category]) }}"
-                                    class="category-links">
-                                    <span
-                                        class="{{ $selectedCategory == $category->category ? 'active-category' : '' }}">{{ $category->category }}</span>
-                                </a>
+                                {{-- <a href="{{ route('menus.category', ['category' => $category->category]) }}" --}}
+                                <a href="" class="category-links"> <span
+                                        class="">{{ $category->category }}</span></a>
                             </div>
                             <div>({{ $category->menu_count }})</div>
                         </div>
@@ -75,6 +70,7 @@
 
             {{-- Menus --}}
             <div class="menus d-flex flex-column gap-4 mb-5">
+
                 <div class="top-menus">
                     <select class="form-select" aria-label="Default select example">
                         <option selected value="Default">Default</option>
@@ -127,13 +123,13 @@
                             </div>
                         @empty
                             <div class="col">
-                                <p>No menus available in this category.</p>
+                                <p>No menus available.</p>
                             </div>
                         @endforelse
                     </div>
                 </div>
-            </div>
 
+            </div>
 
 
         </div>
