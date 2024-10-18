@@ -1,0 +1,135 @@
+Simple Search Script
+
+    <script>
+        document.getElementById('search-input').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const tableRows = document.querySelectorAll('#menu-table-body tr');
+
+            tableRows.forEach(row => {
+                // Get the text from the columns that we want to search (Name, Category, Description)
+                const name = row.cells[1].textContent.toLowerCase();
+                const category = row.cells[2].textContent.toLowerCase();
+                const price = row.cells[3].textContent.toLowerCase();
+                const description = row.cells[4].textContent.toLowerCase();
+
+                // Check if the search term is in any of those fields
+                if (name.includes(searchTerm) || category.includes(searchTerm) || description.includes(
+                        searchTerm) || price.includes(searchTerm)) {
+                    row.style.display = ''; // Show the row
+                } else {
+                    row.style.display = 'none'; // Hide the row
+                }
+            });
+        });
+    </script>
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+Advanced Separate Table Search Script
+
+ {{-- Display Search Results --}}
+            {{-- <div id="search-results">
+                @include('admin.tables.menu_table', ['menus' => $menus])
+            </div> --}}
+
+  <script>
+        let debounceTimer;
+
+        function debounce(func, delay) {
+            return function(...args) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        function performSearch(query) {
+            fetch(`{{ route('admin.menuSearch') }}?query=${query}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('search-results').innerHTML = html;
+                });
+        }
+
+        document.getElementById('search-input').addEventListener('input', debounce(function() {
+            let query = this.value.trim();
+            if (query.length > 0) {
+                performSearch(query);
+            } else {
+                fetch(`{{ route('admin.menuSearch') }}?query=`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('search-results').innerHTML = html;
+                    });
+            }
+        }, 500));
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.pagination a')) {
+                e.preventDefault();
+                let page = e.target.getAttribute('href').split('page=')[1];
+                let query = document.getElementById('search-input').value.trim();
+                fetch(`{{ route('admin.menuSearch') }}?query=${query}&page=${page}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('search-results').innerHTML = html;
+                    });
+            }
+        });
+    </script>
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+Pagination
+<nav aria-label="Pagination">
+    <ul class="pagination justify-content-end mb-1">
+        {{-- Previous Page Link --}}
+        @if ($menus->onFirstPage())
+            <li class="page-item disabled">
+                <span class="page-link">Previous</span>
+            </li>
+        @else
+            <li class="page-item">
+                <a class="page-link custom-pagination-link" href="{{ $menus->previousPageUrl() }}">Previous</a>
+            </li>
+        @endif
+
+        {{-- Pagination Links --}}
+        @foreach ($menus->links()->elements[0] as $page => $url)
+            <li class="page-item {{ $page == $menus->currentPage() ? 'active custom-active' : '' }}">
+                <a class="page-link custom-pagination-link" href="{{ $url }}">{{ $page }}</a>
+            </li>
+        @endforeach
+
+        {{-- Next Page Link --}}
+        @if ($menus->hasMorePages())
+            <li class="page-item">
+                <a class="page-link custom-pagination-link" href="{{ $menus->nextPageUrl() }}">Next</a>
+            </li>
+        @else
+            <li class="page-item disabled">
+                <span class="page-link">Next</span>
+            </li>
+        @endif
+    </ul>
+</nav>

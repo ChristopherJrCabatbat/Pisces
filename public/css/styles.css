@@ -212,3 +212,39 @@ th {
     margin-bottom: 0;
     padding: 0.5rem 1rem;
 }
+
+
+/* Custom Pagination */
+.custom-pagination-link:hover {
+    background-color: #d1e7dd; /* Light green background on hover */
+    border-color: #badbcc; /* Slightly darker border color on hover */
+}
+
+/* Active page styling */
+.custom-active .page-link {
+    background-color: #0d6efd; /* Bootstrap primary color for active page */
+    color: white; /* White text for active page */
+    border-color: #0a58ca; /* Darker border color for active page */
+}
+
+/* Disabled state styling */
+.page-item.disabled .page-link {
+    background-color: #e9ecef; /* Light grey background for disabled items */
+    color: #6c757d; /* Muted text color for disabled items */
+    border-color: #dee2e6; /* Light grey border color for disabled items */
+}
+
+/* Smooth transition for pagination container visibility */
+#pagination-container {
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out; /* Smooth opacity transition */
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hidden state for pagination (smooth) */
+#pagination-container.hide-pagination {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* End Custom Pagination */

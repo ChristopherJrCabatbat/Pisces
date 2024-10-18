@@ -14,13 +14,12 @@ class MenuController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index()
     {
-        $menus = Menu::all();
-        return view(
-            'admin.menu',
-            compact('menus')
-        );
+        $menus = Menu::paginate(2);
+        // $menus = Menu::all();
+        return view('admin.menu', compact('menus'));
     }
 
     // public function menuSearch(Request $request)
@@ -30,33 +29,37 @@ class MenuController extends Controller
     //     // Search and paginate results
     //     $menus = Menu::when($searchTerm, function ($query, $searchTerm) {
     //         return $query->where('name', 'LIKE', "%{$searchTerm}%")
-    //             ->orWhere('categories', 'LIKE', "%{$searchTerm}%")
+    //             ->orWhere('category', 'LIKE', "%{$searchTerm}%")
     //             ->orWhere('price', 'LIKE', "%{$searchTerm}%")
-    //             ->orWhere('description', 'LIKE', "%{$searchTerm}%")
-    //         ;
-    //     })
-    //         ->paginate(3); // Adjust pagination size here as well
+    //             ->orWhere('description', 'LIKE', "%{$searchTerm}%");
+    //     })->paginate(2); // Adjust pagination size
 
-    //     // Return only the table content to be replaced via AJAX
+    //     // Return the partial view with the search results to be replaced via AJAX
     //     return view('admin.tables.menu_table', compact('menus'))->render();
     // }
 
     public function menuSearch(Request $request)
-{
-    $searchTerm = $request->input('query');
+    {
+        // Get the search query from the request
+        $search = $request->input('search');
 
-    // Search and paginate results
-    $menus = Menu::when($searchTerm, function ($query, $searchTerm) {
-        return $query->where('name', 'LIKE', "%{$searchTerm}%")
-            ->orWhere('category', 'LIKE', "%{$searchTerm}%")  // Fixed 'categories' to 'category'
-            ->orWhere('price', 'LIKE', "%{$searchTerm}%")
-            ->orWhere('description', 'LIKE', "%{$searchTerm}%");
-    })
-    ->paginate(3); // Adjust pagination size here as well
+        // Check if a search query exists
+        if ($search) {
+            // Search the menus by name, category, price, or description
+            $menus = Menu::where('name', 'LIKE', '%' . $search . '%')
+                ->orWhere('category', 'LIKE', '%' . $search . '%')
+                ->orWhere('description', 'LIKE', '%' . $search . '%')
+                ->orWhere('price', 'LIKE', '%' . $search . '%')
+                ->paginate(2); // Adjust pagination size if needed
+        } else {
+            // No search query, return all menus paginated
+            $menus = Menu::paginate(2); // Adjust pagination size if needed
+        }
 
-    // Return only the tbody content to avoid duplicating the whole table
-    return view('admin.tables.menu_table', compact('menus'))->render();  // New partial for only table rows
-}
+        // Return the view with the menus
+        return view('admin.menu', compact('menus', 'search')); // Pass search query for reuse in the view
+    }
+
 
 
     /**

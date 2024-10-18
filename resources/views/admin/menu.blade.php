@@ -66,13 +66,15 @@
                         </button>
                     </div>
 
-                    <!-- Search Input with Icon -->
-                    <div class="position-relative custom-search">
-                        <form action="">
-                            <input type="search" placeholder="Search something..." class="form-control" id="search-input">
+                    <!-- Search -->
+                    <div class="position-relative custom-search" method="GET" id="search-form">
+                        <form action="{{ route('admin.menuSearch') }}">
+                            <input type="search" placeholder="Search something..." class="form-control" id="search-input"
+                                value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
                     </div>
+
                 </div>
 
                 <!-- Right Section -->
@@ -93,10 +95,105 @@
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
-                <tbody id="search-results">
-                    @include('admin.tables.menu_table', ['menus' => $menus])
+                <tbody id="menu-table-body">
+                    @forelse ($menus as $menu)
+                        <tr class="menu-row">
+                            <!-- Image Column -->
+                            <td>
+                                @if ($menu->image)
+                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                        class="img-fluid" width="50">
+                                @else
+                                    <span>No Image</span>
+                                @endif
+                            </td>
+                            <!-- Name, Category, Description -->
+                            <td>{{ $menu->name }}</td>
+                            <td>{{ $menu->category }}</td>
+                            <!-- Price (Remove trailing .00 if present) -->
+                            <td>
+                                @if (floor($menu->price) == $menu->price)
+                                    {{ number_format($menu->price, 0) }} <!-- Show without decimals -->
+                                @else
+                                    {{ number_format($menu->price, 2) }} <!-- Show with decimals -->
+                                @endif
+                            </td>
+                            <td>{{ $menu->description }}</td>
+                            <!-- Action Column (View, Edit, Delete) -->
+                            <td>
+                                <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info"
+                                    title="View">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                                <a href="{{ route('admin.menu.edit', $menu->id) }}" class="btn btn-sm btn-warning"
+                                    title="Edit">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <form action="{{ route('admin.menu.destroy', $menu->id) }}" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete this menu?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr id="no-menus-row">
+                            <td colspan="6">There are no menus available.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
+
+            {{-- Pagination --}}
+            {{-- @include('admin.components.pagination', ['menus' => $menus]) --}}
+            
+            {{-- Pagination --}}
+            @if ($menus->hasPages())
+                <nav aria-label="Pagination">
+                    <ul class="pagination justify-content-end mb-1">
+                        {{-- Previous Page Link --}}
+                        @if ($menus->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link custom-pagination-link"
+                                    href="{{ $menus->appends(['search' => request('search')])->previousPageUrl() }}">
+                                    Previous
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Links --}}
+                        @foreach ($menus->links()->elements[0] as $page => $url)
+                            <li class="page-item {{ $page == $menus->currentPage() ? 'active custom-active' : '' }}">
+                                <a class="page-link custom-pagination-link"
+                                    href="{{ $url }}&search={{ request('search') }}">{{ $page }}</a>
+                            </li>
+                        @endforeach
+
+                        {{-- Next Page Link --}}
+                        @if ($menus->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link custom-pagination-link"
+                                    href="{{ $menus->appends(['search' => request('search')])->nextPageUrl() }}">
+                                    Next
+                                </a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+            @endif
+
 
         </div>
 
@@ -104,106 +201,12 @@
 @endsection
 
 @section('scripts')
+
     <script>
-        let debounceTimer;
-
-        function debounce(func, delay) {
-            return function(...args) {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => func.apply(this, args), delay);
-            };
-        }
-
-        function performSearch(query) {
-            fetch(`{{ route('admin.menuSearch') }}?query=${query}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                }
-            })
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('search-results').innerHTML = html;
-            });
-        }
-
-        document.getElementById('search-input').addEventListener('input', debounce(function() {
-            let query = this.value.trim();
-            performSearch(query);
-        }, 500));
-
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.pagination a')) {
-                e.preventDefault();
-                let page = e.target.getAttribute('href').split('page=')[1];
-                let query = document.getElementById('search-input').value.trim();
-                fetch(`{{ route('admin.menuSearch') }}?query=${query}&page=${page}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('search-results').innerHTML = html;
-                });
-            }
+        document.getElementById('search-input').addEventListener('input', function() {
+            document.getElementById('search-form').submit(); // Submit the form when typing
         });
     </script>
-     {{-- <script>
-        let debounceTimer;
 
-        function debounce(func, delay) {
-            return function(...args) {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => func.apply(this, args), delay);
-            };
-        }
 
-        function performSearch(query) {
-            fetch(`{{ route('admin.menuSearch') }}?query=${query}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('search-results').innerHTML = html;
-                });
-        }
-
-        document.getElementById('search-input').addEventListener('input', debounce(function() {
-            let query = this.value.trim();
-            if (query.length > 0) {
-                performSearch(query);
-            } else {
-                // Optional: Handle the case when the search box is empty
-                // You may need to ensure the server-side handles an empty query correctly
-                fetch(`{{ route('admin.menuSearch') }}?query=`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                        }
-                    })
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('search-results').innerHTML = html;
-                    });
-            }
-        }, 500)); // Adjust the debounce delay as needed
-
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.pagination a')) {
-                e.preventDefault();
-                let page = e.target.getAttribute('href').split('page=')[1];
-                let query = document.getElementById('search-input').value.trim();
-                fetch(`{{ route('admin.menuSearch') }}?query=${query}&page=${page}`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                        }
-                    })
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('search-results').innerHTML = html;
-                    });
-            }
-        });
-    </script> --}}
 @endsection
