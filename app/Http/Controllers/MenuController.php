@@ -23,6 +23,42 @@ class MenuController extends Controller
         );
     }
 
+    // public function menuSearch(Request $request)
+    // {
+    //     $searchTerm = $request->input('query');
+
+    //     // Search and paginate results
+    //     $menus = Menu::when($searchTerm, function ($query, $searchTerm) {
+    //         return $query->where('name', 'LIKE', "%{$searchTerm}%")
+    //             ->orWhere('categories', 'LIKE', "%{$searchTerm}%")
+    //             ->orWhere('price', 'LIKE', "%{$searchTerm}%")
+    //             ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+    //         ;
+    //     })
+    //         ->paginate(3); // Adjust pagination size here as well
+
+    //     // Return only the table content to be replaced via AJAX
+    //     return view('admin.tables.menu_table', compact('menus'))->render();
+    // }
+
+    public function menuSearch(Request $request)
+{
+    $searchTerm = $request->input('query');
+
+    // Search and paginate results
+    $menus = Menu::when($searchTerm, function ($query, $searchTerm) {
+        return $query->where('name', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('category', 'LIKE', "%{$searchTerm}%")  // Fixed 'categories' to 'category'
+            ->orWhere('price', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('description', 'LIKE', "%{$searchTerm}%");
+    })
+    ->paginate(3); // Adjust pagination size here as well
+
+    // Return only the tbody content to avoid duplicating the whole table
+    return view('admin.tables.menu_table', compact('menus'))->render();  // New partial for only table rows
+}
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -44,13 +80,13 @@ class MenuController extends Controller
             'description' => 'required|string',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
         ]);
-    
+
         // Handle file upload
         if ($request->hasFile('image')) {
             // Store the uploaded image in the 'public/menu_images' directory
             $imagePath = $request->file('image')->store('menu_images', 'public');
         }
-    
+
         // Create a new menu entry in the database
         Menu::create([
             'name' => $validated['name'],
@@ -59,12 +95,12 @@ class MenuController extends Controller
             'description' => $validated['description'],
             'image' => $imagePath ?? null, // Save image path
         ]);
-    
+
         // Redirect back with a success message
         return redirect()->route('admin.menu.index')->with('success', 'Menu item added successfully.');
     }
-    
-    
+
+
 
     /**
      * Display the specified resource.
@@ -91,7 +127,7 @@ class MenuController extends Controller
     {
         // Fetch the existing menu item
         $menu = Menu::findOrFail($id);
-    
+
         // Validate the form data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -100,19 +136,19 @@ class MenuController extends Controller
             'description' => 'required|string',
             'image' => '|image|mimes:jpeg,png,jpg,gif|max:2048', // Image is optional on update
         ]);
-    
+
         // Handle file upload if a new image is provided
         if ($request->hasFile('image')) {
             // Delete the old image if it exists
             if ($menu->image) {
                 Storage::delete('public/' . $menu->image);
             }
-    
+
             // Store the new image in 'public/menu_images' directory
             $imagePath = $request->file('image')->store('menu_images', 'public');
             $menu->image = $imagePath; // Update the image path
         }
-    
+
         // Update the menu entry with new values
         $menu->update([
             'name' => $validated['name'],
@@ -121,11 +157,11 @@ class MenuController extends Controller
             'description' => $validated['description'],
             'image' => $menu->image ?? $menu->image, // Keep the existing image if no new one is uploaded
         ]);
-    
+
         // Redirect back with a success message
         return redirect()->route('admin.menu.index')->with('success', 'Menu item updated successfully.');
     }
-    
+
 
     /**
      * Remove the specified resource from storage.

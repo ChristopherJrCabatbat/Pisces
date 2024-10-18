@@ -61,30 +61,31 @@
                             <option value="2">Two</option>
                             <option value="3">Three</option>
                         </select>
-                        <button type="submit" class="btn btn-primary custom-filter-btn button-wid"><i
-                                class="fa-solid fa-sort me-2"></i>Filter</button>
+                        <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
+                            <i class="fa-solid fa-sort me-2"></i>Filter
+                        </button>
                     </div>
+
                     <!-- Search Input with Icon -->
                     <div class="position-relative custom-search">
-                        <input type="text" placeholder="Search something..." class="form-control" id="search-input">
-                        <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
+                        <form action="">
+                            <input type="search" placeholder="Search something..." class="form-control" id="search-input">
+                            <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
+                        </form>
                     </div>
                 </div>
 
                 <!-- Right Section -->
                 <div class="right">
-                    {{-- <form action="menu/create">
-                        @csrf
-                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</button>
-                    </form> --}}
                     <a href="menu/create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</a>
                 </div>
             </div>
 
+            {{-- Table --}}
             <table class="table text-center">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col">Image</th> <!-- Added Image Column -->
+                        <th scope="col">Image</th>
                         <th scope="col">Name</th>
                         <th scope="col">Category</th>
                         <th scope="col">Price</th>
@@ -92,58 +93,10 @@
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse ($menus as $menu)
-                        <tr>
-                            <!-- Image Column -->
-                            <td>
-                                @if ($menu->image)
-                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}" class="img-fluid" width="50">
-                                @else
-                                    <span>No Image</span>
-                                @endif
-                            </td>
-                            
-                            <!-- Name, Category, Description -->
-                            <td>{{ $menu->name }}</td>
-                            <td>{{ $menu->category }}</td>
-                            
-                            <!-- Price (Remove trailing .00 if present) -->
-                            <td>
-                                @if(floor($menu->price) == $menu->price)
-                                    {{ number_format($menu->price, 0) }} <!-- Show without decimals -->
-                                @else
-                                    {{ number_format($menu->price, 2) }} <!-- Show with decimals -->
-                                @endif
-                            </td>
-                            
-                            <td>{{ $menu->description }}</td>
-                            
-                            <!-- Action Column (View, Edit, Delete) -->
-                            <td>
-                                <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info" title="View">
-                                    <i class="fa fa-eye"></i>
-                                </a>
-                                <a href="{{ route('admin.menu.edit', $menu->id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <form action="{{ route('admin.menu.destroy', $menu->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this menu?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6">There are no menus available.</td>
-                        </tr>
-                    @endforelse
+                <tbody id="search-results">
+                    @include('admin.tables.menu_table', ['menus' => $menus])
                 </tbody>
             </table>
-            
 
         </div>
 
@@ -151,4 +104,106 @@
 @endsection
 
 @section('scripts')
+    <script>
+        let debounceTimer;
+
+        function debounce(func, delay) {
+            return function(...args) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        function performSearch(query) {
+            fetch(`{{ route('admin.menuSearch') }}?query=${query}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('search-results').innerHTML = html;
+            });
+        }
+
+        document.getElementById('search-input').addEventListener('input', debounce(function() {
+            let query = this.value.trim();
+            performSearch(query);
+        }, 500));
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.pagination a')) {
+                e.preventDefault();
+                let page = e.target.getAttribute('href').split('page=')[1];
+                let query = document.getElementById('search-input').value.trim();
+                fetch(`{{ route('admin.menuSearch') }}?query=${query}&page=${page}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('search-results').innerHTML = html;
+                });
+            }
+        });
+    </script>
+     {{-- <script>
+        let debounceTimer;
+
+        function debounce(func, delay) {
+            return function(...args) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        function performSearch(query) {
+            fetch(`{{ route('admin.menuSearch') }}?query=${query}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('search-results').innerHTML = html;
+                });
+        }
+
+        document.getElementById('search-input').addEventListener('input', debounce(function() {
+            let query = this.value.trim();
+            if (query.length > 0) {
+                performSearch(query);
+            } else {
+                // Optional: Handle the case when the search box is empty
+                // You may need to ensure the server-side handles an empty query correctly
+                fetch(`{{ route('admin.menuSearch') }}?query=`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('search-results').innerHTML = html;
+                    });
+            }
+        }, 500)); // Adjust the debounce delay as needed
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.pagination a')) {
+                e.preventDefault();
+                let page = e.target.getAttribute('href').split('page=')[1];
+                let query = document.getElementById('search-input').value.trim();
+                fetch(`{{ route('admin.menuSearch') }}?query=${query}&page=${page}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('search-results').innerHTML = html;
+                    });
+            }
+        });
+    </script> --}}
 @endsection
