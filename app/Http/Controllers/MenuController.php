@@ -17,26 +17,10 @@ class MenuController extends Controller
 
     public function index()
     {
-        $menus = Menu::paginate(2);
-        // $menus = Menu::all();
+        // $menus = Menu::paginate(2);
+        $menus = Menu::all();
         return view('admin.menu', compact('menus'));
     }
-
-    // public function menuSearch(Request $request)
-    // {
-    //     $searchTerm = $request->input('query');
-
-    //     // Search and paginate results
-    //     $menus = Menu::when($searchTerm, function ($query, $searchTerm) {
-    //         return $query->where('name', 'LIKE', "%{$searchTerm}%")
-    //             ->orWhere('category', 'LIKE', "%{$searchTerm}%")
-    //             ->orWhere('price', 'LIKE', "%{$searchTerm}%")
-    //             ->orWhere('description', 'LIKE', "%{$searchTerm}%");
-    //     })->paginate(2); // Adjust pagination size
-
-    //     // Return the partial view with the search results to be replaced via AJAX
-    //     return view('admin.tables.menu_table', compact('menus'))->render();
-    // }
 
     public function menuSearch(Request $request)
     {
@@ -56,10 +40,14 @@ class MenuController extends Controller
             $menus = Menu::paginate(2); // Adjust pagination size if needed
         }
 
-        // Return the view with the menus
+        // If the request is AJAX, return only the table rows
+        if ($request->ajax()) {
+            return view('admin.partials.menu_table_body', compact('menus'))->render();
+        }
+
+        // Return the full view with the menus
         return view('admin.menu', compact('menus', 'search')); // Pass search query for reuse in the view
     }
-
 
 
     /**

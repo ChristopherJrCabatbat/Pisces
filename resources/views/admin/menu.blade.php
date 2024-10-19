@@ -150,49 +150,6 @@
 
             {{-- Pagination --}}
             {{-- @include('admin.components.pagination', ['menus' => $menus]) --}}
-            
-            {{-- Pagination --}}
-            @if ($menus->hasPages())
-                <nav aria-label="Pagination">
-                    <ul class="pagination justify-content-end mb-1">
-                        {{-- Previous Page Link --}}
-                        @if ($menus->onFirstPage())
-                            <li class="page-item disabled">
-                                <span class="page-link">Previous</span>
-                            </li>
-                        @else
-                            <li class="page-item">
-                                <a class="page-link custom-pagination-link"
-                                    href="{{ $menus->appends(['search' => request('search')])->previousPageUrl() }}">
-                                    Previous
-                                </a>
-                            </li>
-                        @endif
-
-                        {{-- Pagination Links --}}
-                        @foreach ($menus->links()->elements[0] as $page => $url)
-                            <li class="page-item {{ $page == $menus->currentPage() ? 'active custom-active' : '' }}">
-                                <a class="page-link custom-pagination-link"
-                                    href="{{ $url }}&search={{ request('search') }}">{{ $page }}</a>
-                            </li>
-                        @endforeach
-
-                        {{-- Next Page Link --}}
-                        @if ($menus->hasMorePages())
-                            <li class="page-item">
-                                <a class="page-link custom-pagination-link"
-                                    href="{{ $menus->appends(['search' => request('search')])->nextPageUrl() }}">
-                                    Next
-                                </a>
-                            </li>
-                        @else
-                            <li class="page-item disabled">
-                                <span class="page-link">Next</span>
-                            </li>
-                        @endif
-                    </ul>
-                </nav>
-            @endif
 
 
         </div>
@@ -202,9 +159,47 @@
 
 @section('scripts')
 
+    <!-- Updated Script -->
     <script>
         document.getElementById('search-input').addEventListener('input', function() {
-            document.getElementById('search-form').submit(); // Submit the form when typing
+            const searchTerm = this.value.toLowerCase();
+            const tableRows = document.querySelectorAll('#menu-table-body tr.menu-row');
+            let rowCount = 0; // To track visible rows
+
+            // Loop through all rows
+            tableRows.forEach(row => {
+                // Get the text from the columns (Name, Category, Price, Description)
+                const name = row.cells[1].textContent.toLowerCase();
+                const category = row.cells[2].textContent.toLowerCase();
+                const price = row.cells[3].textContent.toLowerCase();
+                const description = row.cells[4].textContent.toLowerCase();
+
+                // Check if the search term matches any column
+                if (name.includes(searchTerm) || category.includes(searchTerm) || description.includes(
+                        searchTerm) || price.includes(searchTerm)) {
+                    row.style.display = ''; // Show matching row
+                    rowCount++;
+                } else {
+                    row.style.display = 'none'; // Hide non-matching row
+                }
+            });
+
+            // Handle "No results found"
+            const noResultsRow = document.getElementById('no-results-row');
+            if (rowCount === 0) {
+                // If no "No results" row exists, create one
+                if (!noResultsRow) {
+                    const newRow = document.createElement('tr');
+                    newRow.id = 'no-results-row';
+                    newRow.innerHTML = `<td colspan="6">No results found</td>`;
+                    document.getElementById('menu-table-body').appendChild(newRow);
+                }
+            } else {
+                // If there are results, remove "No results" row
+                if (noResultsRow) {
+                    noResultsRow.remove();
+                }
+            }
         });
     </script>
 
