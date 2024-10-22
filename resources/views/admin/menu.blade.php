@@ -10,7 +10,7 @@
     </li>
     <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
     <li>
-        <a href="{{ route('admin.delivery') }}" class="fs-5 sidebar-font"><i
+        <a href="/admin/delivery" class="fs-5 sidebar-font"><i
                 class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
 
@@ -67,6 +67,19 @@
                     </div>
 
                     <!-- Search -->
+                    {{-- <div class="position-relative custom-search" method="GET" id="search-form">
+                        <form action="{{ route('admin.menuSearch') }}">
+                            <input type="search" placeholder="Search something..." class="form-control" id="search-input"
+                                value="{{ request('search') }}">
+                            <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
+                        </form>
+                    </div> --}}
+
+                </div>
+
+                <!-- Right Section -->
+                <div class="right d-flex gap-3">
+                    <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
                         <form action="{{ route('admin.menuSearch') }}">
                             <input type="search" placeholder="Search something..." class="form-control" id="search-input"
@@ -75,11 +88,7 @@
                         </form>
                     </div>
 
-                </div>
-
-                <!-- Right Section -->
-                <div class="right">
-                    <a href="menu/create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</a>
+                    <div><a href="menu/create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</a></div>
                 </div>
             </div>
 

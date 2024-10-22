@@ -33,12 +33,37 @@
                     <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
                         @yield('topbar')
                     </ul>
+    
+                    <!-- Heart (Favorite) and Cart Icons -->
+                    <div class="d-flex align-items-center">
+                        <!-- Favorite Icon -->
+                        <div class="position-relative mx-2">
+                            <a href="#" class="nav-link">
+                                <i class="fa-regular fa-heart fs-4 text-dark"></i>
+                            </a>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: 0.75rem;">
+                                0
+                            </span>
+                        </div>
+    
+                        <!-- Cart Icon -->
+                        <div class="position-relative mx-2">
+                            <a href="#" class="nav-link">
+                                <i class="fa-regular fa-cart-shopping fs-4 text-dark"></i>
+                            </a>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: 0.75rem;">
+                                0
+                            </span>
+                        </div>
+                    </div>
+    
                     <div>
                         <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
-                            {{-- style="--bs-scroll-height: 100px;" --}}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                   data-bs-toggle="dropdown" aria-expanded="false">
                                     {{ Auth::user()->first_name }}
                                 </a>
                                 <ul class="dropdown-menu">

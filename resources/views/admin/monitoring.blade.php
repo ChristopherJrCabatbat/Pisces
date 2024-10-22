@@ -17,7 +17,7 @@
         </a>
     </li>
     <li>
-        <a href="{{ route('admin.delivery') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
+        <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
 
     <li class="sidebar-item" id="customersDropdown">

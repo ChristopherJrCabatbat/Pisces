@@ -32,8 +32,14 @@ class RoleMiddleware
                 'admin.menu.edit',
                 'admin.menu.update',
                 'admin.menu.destroy',
-                
-                'admin.delivery',
+
+                'admin.delivery.index',
+                'admin.delivery.create',
+                'admin.delivery.store',
+                'admin.delivery.show',
+                'admin.delivery.edit',
+                'admin.delivery.update',
+                'admin.delivery.destroy',
 
                 'admin.customers',
                 'admin.feedback',

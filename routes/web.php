@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\DeliveryController;
 
 Route::get('/', function () {
     // return view('welcome');
@@ -40,7 +41,9 @@ Route::group([
     Route::get('/menuSearch', [MenuController::class, 'menuSearch'])->name('menuSearch');
 
 
-    Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');
+    // Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');
+    Route::resource('delivery', DeliveryController::class);
+
 
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
