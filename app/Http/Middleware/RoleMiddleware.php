@@ -53,7 +53,12 @@ class RoleMiddleware
 
             'User'  => [
                 'user.dashboard',
+
                 'user.menu',
+                
+                'user.addToCart',
+                'user.menuDetail',
+                'user.addToFavorites',
             ],
         ];
 

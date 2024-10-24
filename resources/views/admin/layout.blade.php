@@ -28,7 +28,7 @@
                 <button class="burger-icon" id="burgerBtn">&#9776;</button>
 
                 <!-- Logo -->
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="{{ route('user.dashboard') }}">
                     <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo">
                 </a>
 

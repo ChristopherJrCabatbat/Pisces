@@ -61,6 +61,20 @@ Route::group([
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/menu', [UserController::class, 'menu'])->name('menu');
+
+    Route::post('/user/add-to-cart/{menuId}', [UserController::class, 'addToCart'])->name('addToCart');
+    Route::post('/user/add-to-favorites/{menuId}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
+    // Route::post('/user/add-to-cart', [UserController::class, 'addToCart'])->name('addToCart');
+    Route::put('addToCart/{id}', [UserController::class, 'addToCart'])->name('addToCart');
+
+    // Route::post('/user/add-to-cart', [UserController::class, 'addToCart'])->name('addToCart');
+
+
+
+    // Route for viewing menu details
+    Route::get('/menu-detail/{menuId}', [UserController::class, 'menuDetail'])->name('menuDetail');
+
+
     // Route to show menus filtered by category
-    Route::get('/menus/category/{category}', [MenuController::class, 'category'])->name('menus.category');
+    // Route::get('/menus/category/{category}', [MenuController::class, 'category'])->name('menus.category');
 });

@@ -57,7 +57,7 @@
                     <div class="form-group">
                         <label for="last_name">Last Name</label>
                         <input id="last_name" type="text" name="last_name" value="{{ old('last_name') }}" required
-                            autofocus autocomplete="username" placeholder="e.g. Doe" class="input-field">
+                            placeholder="e.g. Doe" class="input-field">
                         @error('last_name')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
@@ -67,7 +67,7 @@
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                            autocomplete="username" placeholder="e.g. my@email.com" class="input-field">
+                            placeholder="e.g. my@email.com" class="input-field">
                         @error('email')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
@@ -87,8 +87,8 @@
                     <!-- Password -->
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input id="password" type="password" name="password" required autocomplete="current-password"
-                            placeholder="Enter your password" class="input-field">
+                        <input id="password" type="password" name="password" required placeholder="Enter your password"
+                            class="input-field">
                         @error('password')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
@@ -98,7 +98,7 @@
                     <div class="form-group">
                         <label for="password_confirmation">Confirm Password</label>
                         <input id="password_confirmation" type="password" name="password_confirmation" required
-                            autocomplete="current-password" placeholder="Confirm your password" class="input-field">
+                            placeholder="Confirm your password" class="input-field">
                         @error('password')
                             <div class="error-message">{{ $message }}</div>
                         @enderror

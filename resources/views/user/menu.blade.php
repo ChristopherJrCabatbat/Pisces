@@ -37,7 +37,6 @@
             </div>
         </div>
 
-
         {{-- Content --}}
         <div class="d-flex container gap-5 p-0">
 
@@ -75,6 +74,8 @@
 
             {{-- Menus --}}
             <div class="menus d-flex flex-column gap-4 mb-5">
+
+                {{-- Select --}}
                 <div class="top-menus">
                     <select class="form-select" aria-label="Default select example">
                         <option selected value="Default">Default</option>
@@ -83,12 +84,15 @@
                     </select>
                 </div>
 
+                {{-- Menu --}}
                 <div class="menu-list">
                     <div class="row row-cols-1 row-cols-md-3 g-4">
                         @forelse($menus as $menu)
                             <div class="col">
                                 <div class="card h-100">
+
                                     <div class="img-container">
+
                                         @if ($menu->image)
                                             <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
                                                 alt="{{ $menu->name }}">
@@ -96,13 +100,50 @@
                                             <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken"
                                                 alt="No Image">
                                         @endif
+
                                         <div class="icon-overlay">
-                                            <i class="fa-solid fa-cart-plus"></i>
-                                            <i class="fa-solid fa-share"></i>
-                                            <i class="fa-solid fa-search"></i>
-                                            <i class="fa-solid fa-heart"></i>
+                                            {{-- <i class="fa-solid fa-cart-plus" title="Add to Cart"></i> --}}
+                                            <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                                enctype="multipart/form-data">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit"
+                                                    style="background-color: transparent; border: none; padding: 0;"><i
+                                                        class="fa-solid fa-cart-plus" title="Add to Cart"></i></button>
+                                            </form>
+                                            <i class="fa-solid fa-share" title="Share"></i>
+                                            <i class="fa-solid fa-search" title="View"></i>
+                                            <i class="fa-solid fa-heart" title="Add to Favorites"></i>
                                         </div>
+
+                                        {{-- <div class="icon-overlay">
+                                            <!-- Add to Cart -->
+                                            <a href="{{ route('user.addToCart', ['menuId' => $menu->id]) }}"
+                                                class="nav-icon add-to-cart" data-menu-id="{{ $menu->id }}"
+                                                title="Add to Cart">
+                                                <i class="fa-solid fa-cart-plus"></i>
+                                            </a>
+
+                                            <!-- Share (You can add a share link here, maybe a modal or link to a share page) -->
+                                            <a href="#" class="nav-icon" title="Share">
+                                                <i class="fa-solid fa-share"></i>
+                                            </a>
+
+                                            <!-- View Details (Link to the menu's details) -->
+                                            <a href="{{ route('user.menuDetail', ['menuId' => $menu->id]) }}">
+                                                <i class="fa-solid fa-search"></i>
+                                            </a>
+
+                                            <!-- Add to Favorites -->
+                                            <a href="{{ route('user.addToFavorites', ['menuId' => $menu->id]) }}"
+                                                class="nav-icon" title="Add to Favorites">
+                                                <i class="fa-solid fa-heart"></i>
+                                            </a>
+
+                                        </div> --}}
+
                                     </div>
+
                                     <div class="card-body card-body-mt">
                                         <h5 class="card-title">{{ $menu->name }}</h5>
                                         <div class="price fw-bold mb-2">
@@ -132,9 +173,8 @@
                         @endforelse
                     </div>
                 </div>
+
             </div>
-
-
 
         </div>
 
@@ -142,4 +182,70 @@
 @endsection
 
 @section('scripts')
+    {{-- <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get the CSRF token from the page
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Handle add to cart click
+            document.querySelectorAll('.add-to-cart').forEach(function(cartButton) {
+                cartButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const menuId = this.getAttribute('data-menu-id');
+                    addToCart(menuId);
+                });
+            });
+
+            // Handle add to favorites click
+            document.querySelectorAll('.add-to-favorites').forEach(function(favoriteButton) {
+                favoriteButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const menuId = this.getAttribute('data-menu-id');
+                    addToFavorites(menuId);
+                });
+            });
+
+            // Function to update cart
+            function addToCart(menuId) {
+                fetch(`/user/add-to-cart/${menuId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken // Include CSRF token
+                        }
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            console.log(data.message);
+                            let badge = document.getElementById("cart-badge");
+                            let currentCount = parseInt(badge.textContent);
+                            badge.textContent = currentCount + 1;
+                        }
+                    })
+                    .catch((error) => console.error("Error:", error));
+            }
+
+            // Function to update favorites
+            function addToFavorites(menuId) {
+                fetch(`/user/add-to-favorites/${menuId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken // Include CSRF token
+                        }
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            console.log(data.message);
+                            let badge = document.getElementById("heart-badge");
+                            let currentCount = parseInt(badge.textContent);
+                            badge.textContent = currentCount + 1;
+                        }
+                    })
+                    .catch((error) => console.error("Error:", error));
+            }
+        });
+    </script> --}}
 @endsection

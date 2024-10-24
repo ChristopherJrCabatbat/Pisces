@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>@yield('title')</title>
 
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-icon.png') }}">
@@ -22,7 +24,7 @@
     <header>
         <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">
             <div class="container">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="{{ route('user.dashboard') }}">
                     <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
@@ -33,37 +35,31 @@
                     <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
                         @yield('topbar')
                     </ul>
-    
-                    <!-- Heart (Favorite) and Cart Icons -->
+
                     <div class="d-flex align-items-center">
-                        <!-- Favorite Icon -->
-                        <div class="position-relative mx-2">
-                            <a href="#" class="nav-link">
-                                <i class="fa-regular fa-heart fs-4 text-dark"></i>
+
+                        <!-- Heart Icon -->
+                        <div class="icon-wrapper">
+                            <a href="#" class="nav-icon">
+                                <i class="fa fa-heart" id="heart-icon"></i>
+                                <span class="notification-badge" id="heart-badge">{{ $userFavorites ?? 0 }}</span>
                             </a>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                  style="font-size: 0.75rem;">
-                                0
-                            </span>
                         </div>
-    
+
                         <!-- Cart Icon -->
-                        <div class="position-relative mx-2">
-                            <a href="#" class="nav-link">
-                                <i class="fa-regular fa-cart-shopping fs-4 text-dark"></i>
+                        <div class="icon-wrapper ms-3">
+                            <a href="#" class="nav-icon">
+                                <i class="fa-solid fa-cart-shopping" id="cart-icon"></i>
+                                <span class="notification-badge" id="cart-badge">{{ $userCart ?? 0 }}</span>
                             </a>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                  style="font-size: 0.75rem;">
-                                0
-                            </span>
                         </div>
-                    </div>
-    
-                    <div>
-                        <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
+
+
+                        <!-- User Dropdown -->
+                        <ul class="navbar-nav ms-4 my-2 my-lg-0 navbar-nav-scroll">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button"
-                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    data-bs-toggle="dropdown" aria-expanded="false">
                                     {{ Auth::user()->first_name }}
                                 </a>
                                 <ul class="dropdown-menu">
@@ -96,17 +92,20 @@
                 <div class="row footer-content border-bottoms pb-4 gap-4 footer-fs">
                     <div class="col d-flex flex-column">
                         <div>
-                            <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces Coffee Hub">
+                            <img src="{{ asset('images/logo-name.png') }}" width="148" height=""
+                                alt="Pisces Coffee Hub">
                         </div>
                         <div class="h1 footer-title my-3 fw-bold">Pisces Coffee Hub</div>
                         <div>
-                            Coffee makes everything possible - and our variety of meals, from appetizers to hearty dishes, make every visit unforgettable.
+                            Coffee makes everything possible - and our variety of meals, from appetizers to hearty
+                            dishes, make every visit unforgettable.
                         </div>
                     </div>
                     <div class="col d-flex flex-column gap-3">
                         <div class="h3 footer-title mb-3 fw-bold">Contact Info</div>
                         <div class="d-flex align-items-center">
-                            <span class="border-bottoms pb-2"><i class="fa-solid fa-location-dot me-2"></i> Barangay Ilang, San Carlos City, Pangasinan</span>
+                            <span class="border-bottoms pb-2"><i class="fa-solid fa-location-dot me-2"></i> Barangay
+                                Ilang, San Carlos City, Pangasinan</span>
                         </div>
                         <div class="d-flex align-items-center">
                             <i class="fa-solid fa-envelope me-2"></i> piscescoffeehub@gmail.com
@@ -134,7 +133,7 @@
             </div>
         </div>
     </footer>
-    
+
 
     @yield('scripts')
 
