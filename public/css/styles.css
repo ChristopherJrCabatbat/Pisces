@@ -106,7 +106,7 @@ body {
 /* Menu Styles */
 .top-container {
     background-color: rgb(122, 109, 117);
-    width: 99vw !important;
+    width: 100vw !important;
     padding-left: 9vw !important;
     padding-right: 9vw !important;
 }

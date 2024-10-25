@@ -133,3 +133,36 @@ Pagination
         @endif
     </ul>
 </nav>
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+   {{-- <div class="icon-overlay">
+        <!-- Add to Cart -->
+        <a href="{{ route('user.addToCart', ['menuId' => $menu->id]) }}"
+        class="nav-icon add-to-cart" data-menu-id="{{ $menu->id }}"
+        title="Add to Cart">
+        <i class="fa-solid fa-cart-plus"></i>
+        </a>
+
+        <!-- Share (You can add a share link here, maybe a modal or link to a share page) -->
+        <a href="#" class="nav-icon" title="Share">
+        <i class="fa-solid fa-share"></i>
+        </a>
+
+        <!-- View Details (Link to the menu's details) -->
+        <a href="{{ route('user.menuDetail', ['menuId' => $menu->id]) }}">
+        <i class="fa-solid fa-search"></i>
+        </a>
+
+        <!-- Add to Favorites -->
+        <a href="{{ route('user.addToFavorites', ['menuId' => $menu->id]) }}"
+        class="nav-icon" title="Add to Favorites">
+        <i class="fa-solid fa-heart"></i>
+        </a>
+    </div> --}}

@@ -38,7 +38,7 @@
         </div>
 
         {{-- Content --}}
-        <div class="d-flex container gap-5 p-0">
+        <div class="d-flex container content user-content gap-5 p-0">
 
             {{-- Categories --}}
             <div class="categories d-flex flex-column">
@@ -91,6 +91,7 @@
                             <div class="col">
                                 <div class="card h-100">
 
+                                    {{-- Menu Image --}}
                                     <div class="img-container">
 
                                         @if ($menu->image)
@@ -116,34 +117,10 @@
                                             <i class="fa-solid fa-heart" title="Add to Favorites"></i>
                                         </div>
 
-                                        {{-- <div class="icon-overlay">
-                                            <!-- Add to Cart -->
-                                            <a href="{{ route('user.addToCart', ['menuId' => $menu->id]) }}"
-                                                class="nav-icon add-to-cart" data-menu-id="{{ $menu->id }}"
-                                                title="Add to Cart">
-                                                <i class="fa-solid fa-cart-plus"></i>
-                                            </a>
-
-                                            <!-- Share (You can add a share link here, maybe a modal or link to a share page) -->
-                                            <a href="#" class="nav-icon" title="Share">
-                                                <i class="fa-solid fa-share"></i>
-                                            </a>
-
-                                            <!-- View Details (Link to the menu's details) -->
-                                            <a href="{{ route('user.menuDetail', ['menuId' => $menu->id]) }}">
-                                                <i class="fa-solid fa-search"></i>
-                                            </a>
-
-                                            <!-- Add to Favorites -->
-                                            <a href="{{ route('user.addToFavorites', ['menuId' => $menu->id]) }}"
-                                                class="nav-icon" title="Add to Favorites">
-                                                <i class="fa-solid fa-heart"></i>
-                                            </a>
-
-                                        </div> --}}
 
                                     </div>
 
+                                    {{-- Menu Body --}}
                                     <div class="card-body card-body-mt">
                                         <h5 class="card-title">{{ $menu->name }}</h5>
                                         <div class="price fw-bold mb-2">
@@ -164,6 +141,7 @@
                                             <div>(2)</div> <!-- Example rating count -->
                                         </div>
                                     </div>
+                                    
                                 </div>
                             </div>
                         @empty

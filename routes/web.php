@@ -64,8 +64,10 @@ Route::group([
 
     Route::post('/user/add-to-cart/{menuId}', [UserController::class, 'addToCart'])->name('addToCart');
     Route::post('/user/add-to-favorites/{menuId}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
-    // Route::post('/user/add-to-cart', [UserController::class, 'addToCart'])->name('addToCart');
     Route::put('addToCart/{id}', [UserController::class, 'addToCart'])->name('addToCart');
+    // Route::get('/shoppingCart/{menu}', [UserController::class, 'shoppingCart'])->name('shoppingCart');
+    Route::get('/shoppingCart', [UserController::class, 'shoppingCart'])->name('shoppingCart');
+
 
     // Route::post('/user/add-to-cart', [UserController::class, 'addToCart'])->name('addToCart');
 

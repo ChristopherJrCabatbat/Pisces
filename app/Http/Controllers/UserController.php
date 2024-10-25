@@ -14,42 +14,34 @@ class UserController extends Controller
 {
     public function dashboard()
     {
-        return view('user.dashboard');
-    }
-
-    // public function menu()
-    // {
-    //     // Retrieve all menus
-    //     $menus = Menu::all();
-
-    //     // Retrieve distinct categories and their menu counts
-    //     $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-    //         ->groupBy('category')
-    //         ->get();
-
-    //     return view('user.menu', compact('menus', 'categories'));
-    // }
-    public function menu(Request $request)
-    {
-        // Retrieve distinct categories and their menu counts
-        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-            ->groupBy('category')
-            ->get();
-
-        // Get the category selected by the user
-        $selectedCategory = $request->input('category', 'All Menus'); // Default to 'All Menus' if no category is selected
-
-        // Retrieve the menus based on the selected category
-        if ($selectedCategory == 'All Menus') {
-            $menus = Menu::all();
-        } else {
-            $menus = Menu::where('category', $selectedCategory)->get();
-        }
-
         // Retrieve the current logged-in user's cart and favorites values
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
+
+        return view('user.dashboard', compact('userCart'));
+    }
+
+
+    public function menu(Request $request)
+    {
+        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+            ->groupBy('category')
+            ->get();
+
+        $selectedCategory = $request->input('category', 'All Menus');
+
+        $user = Auth::user();
+        $userCart = $user->cart;
+
+        // Retrieve menus based on selected category, excluding items in the cart
+        if ($selectedCategory == 'All Menus') {
+            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
+        } else {
+            $menus = Menu::where('category', $selectedCategory)
+                ->whereNotIn('id', $user->cartItems->pluck('id'))
+                ->get();
+        }
 
         return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart'));
     }
@@ -57,19 +49,40 @@ class UserController extends Controller
 
     public function addToCart(Request $request, $menuId)
     {
-        // Retrieve the currently logged-in user
         /** @var User $user */
         $user = Auth::user();
 
-        // Increment the 'cart' field by 1
-        $user->cart += 1;
+        // Check if the menu item is already in the user's cart
+        if (!$user->cartItems()->where('menu_id', $menuId)->exists()) {
+            // Attach the menu item to the user's cart
+            $user->cartItems()->attach($menuId);
+        }
 
-        // Save the updated user data
-        $user->save();
+        // Increment the cart count
+        $user->increment('cart');
 
-        // Redirect back with a success message
         return redirect()->back()->with('success', 'Item added to cart!');
     }
+
+    // public function shoppingCart($menu)
+    public function shoppingCart()
+    {
+        $user = Auth::user();
+        $userCart = $user->cart;
+        
+        return view('user.shoppingCart', compact('userCart'));
+    }
+
+    // public function shoppingCart($menu)
+    // {
+    //     // Find the DERM by name
+    //     $dermRecord = Derm::where('derm', $derm)->firstOrFail();
+
+    //     // Retrieve paginated records associated with this DERM
+    //     $records = Record::where('category', $derm)->paginate(3); // Adjust pagination size as needed
+
+    //     return view('admin.dermShow', compact('dermRecord', 'records'));
+    // }
 
 
     public function addToFavorites($menuId)

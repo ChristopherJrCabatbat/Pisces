@@ -16,4 +16,9 @@ class Menu extends Model
         'description',
         'image',
     ];
+
+    public function cartUsers()
+    {
+        return $this->belongsToMany(User::class, 'cart_items');
+    }
 }

@@ -48,7 +48,7 @@
 
                         <!-- Cart Icon -->
                         <div class="icon-wrapper ms-3">
-                            <a href="#" class="nav-icon">
+                            <a href="{{ route('user.shoppingCart') }}" class="nav-icon">
                                 <i class="fa-solid fa-cart-shopping" id="cart-icon"></i>
                                 <span class="notification-badge" id="cart-badge">{{ $userCart ?? 0 }}</span>
                             </a>
@@ -76,6 +76,7 @@
                                 </ul>
                             </li>
                         </ul>
+
                     </div>
                 </div>
             </div>
