@@ -160,7 +160,6 @@
             {{-- Pagination --}}
             {{-- @include('admin.components.pagination', ['menus' => $menus]) --}}
 
-
         </div>
 
     </div>
