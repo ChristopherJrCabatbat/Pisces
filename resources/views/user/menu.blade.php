@@ -48,7 +48,7 @@
                     <div>
                         <div>
                             <i class="fa-solid fa-caret-right me-2"></i>
-                            <a href="{{ route('user.menu', ['category' => 'All Menus']) }}" class="category-links">
+                            <a href="{{ route('user.menu', ['category' => 'All Menus']) }}" class="white-underline">
                                 <span class="{{ $selectedCategory == 'All Menus' ? 'active-category' : '' }}">All
                                     Menus</span>
                             </a>
@@ -61,7 +61,7 @@
                             <div>
                                 <i class="fa-solid fa-caret-right me-2"></i>
                                 <a href="{{ route('user.menu', ['category' => $category->category]) }}"
-                                    class="category-links">
+                                    class="white-underline">
                                     <span
                                         class="{{ $selectedCategory == $category->category ? 'active-category' : '' }}">{{ $category->category }}</span>
                                 </a>
@@ -125,9 +125,9 @@
                                         <h5 class="card-title">{{ $menu->name }}</h5>
                                         <div class="price fw-bold mb-2">
                                             @if (floor($menu->price) == $menu->price)
-                                                ${{ number_format($menu->price, 0) }} <!-- Without decimals -->
+                                                ₱{{ number_format($menu->price, 0) }} <!-- Without decimals -->
                                             @else
-                                                ${{ number_format($menu->price, 2) }} <!-- With decimals -->
+                                                ₱{{ number_format($menu->price, 2) }} <!-- With decimals -->
                                             @endif
                                         </div>
                                         <div class="d-flex align-items-center gap-2">

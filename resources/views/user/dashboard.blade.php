@@ -36,8 +36,7 @@
                 Top Categories
             </div>
             <div class="w-50 text-center mx-auto">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Et vero fugit, repellat aperiam doloremque
-                voluptatibus illum voluptate saepe eum nostrum!
+                Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for more.
             </div>
             <div class="container text-center mt-4">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5">

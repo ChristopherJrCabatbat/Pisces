@@ -64,25 +64,65 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Item added to cart!');
     }
 
-    // public function shoppingCart($menu)
     public function shoppingCart()
     {
+        /** @var User $user */
         $user = Auth::user();
-        $userCart = $user->cart;
-        
-        return view('user.shoppingCart', compact('userCart'));
+
+        // Get menus added to cart by the current user along with their cart_items IDs
+        $menus = DB::table('menus')
+            ->join('cart_items', 'menus.id', '=', 'cart_items.menu_id')
+            ->where('cart_items.user_id', $user->id)
+            ->select('menus.*', 'cart_items.id as cart_item_id')
+            ->get();
+
+        return view('user.shoppingCart', compact('user', 'menus'));
     }
 
-    // public function shoppingCart($menu)
+
+
+    // public function removeCart($menuId)
     // {
-    //     // Find the DERM by name
-    //     $dermRecord = Derm::where('derm', $derm)->firstOrFail();
+    //     /** @var User $user */
+    //     $user = Auth::user();
 
-    //     // Retrieve paginated records associated with this DERM
-    //     $records = Record::where('category', $derm)->paginate(3); // Adjust pagination size as needed
+    //     // Check if the cart item exists for the current user and specified menu_id
+    //     $cartItem = DB::table('cart_items')
+    //         ->where('user_id', $user->id)
+    //         ->where('menu_id', $menuId)
+    //         ->first();
 
-    //     return view('admin.dermShow', compact('dermRecord', 'records'));
+    //     if ($cartItem) {
+    //         // Delete the cart item for this user and menu_id
+    //         DB::table('cart_items')
+    //             ->where('user_id', $user->id)
+    //             ->where('menu_id', $menuId)
+    //             ->delete();
+
+    //         // Decrement the user's cart count
+    //         $user->decrement('cart');
+
+    //         return redirect()->route('user.shoppingCart')->with('success', 'Item removed from cart!');
+    //     }
+
+    //     return redirect()->route('user.shoppingCart')->with('error', 'Item not found in cart.');
     // }
+
+    public function removeCart($cartItemId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // $cart_id = Menu::all();
+
+        // Delete the specific cart item by its ID
+        DB::table('cart_items')->where('id', $cartItemId)->delete();
+
+        // Decrement the user's cart count
+        $user->decrement('cart');
+
+        return redirect()->route('user.shoppingCart')->with('success', 'Item removed from cart!');
+    }
 
 
     public function addToFavorites($menuId)

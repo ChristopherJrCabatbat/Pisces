@@ -166,3 +166,102 @@ Pagination
         <i class="fa-solid fa-heart"></i>
         </a>
     </div> --}}
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+public function menu(Request $request)
+    {
+        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+            ->groupBy('category')
+            ->get();
+
+        $selectedCategory = $request->input('category', 'All Menus');
+
+        $user = Auth::user();
+        $userCart = $user->cart;
+
+        // Retrieve menus based on selected category, excluding items currently in the cart
+        $cartMenuIds = $user->cartItems->pluck('menu_id');
+
+        if ($selectedCategory == 'All Menus') {
+            $menus = Menu::whereNotIn('id', $cartMenuIds)->get();
+        } else {
+            $menus = Menu::where('category', $selectedCategory)
+                ->whereNotIn('id', $cartMenuIds)
+                ->get();
+        }
+
+        return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart'));
+    }
+
+
+
+    public function addToCart(Request $request, $menuId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Check if the menu item is already in the user's cart
+        if (!$user->cartItems()->where('menu_id', $menuId)->exists()) {
+            // Attach the menu item to the user's cart
+            $user->cartItems()->attach($menuId);
+        }
+
+        // Increment the cart count
+        $user->increment('cart');
+
+        return redirect()->back()->with('success', 'Item added to cart!');
+    }
+
+    public function shoppingCart()
+    {
+        // Get the logged-in user
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Retrieve only the menu items the user added to their cart
+        $menus = Menu::whereIn('id', function ($query) use ($user) {
+            $query->select('menu_id')
+                ->from('cart_items')
+                ->where('user_id', $user->id);
+        })->get();
+
+        // Pass the filtered menus to the view
+        return view('user.shoppingCart', compact('user', 'menus'));
+    }
+
+
+    public function removeCart($menuId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Check if the cart item exists for the current user and specified menu_id
+        $cartItem = DB::table('cart_items')
+            ->where('user_id', $user->id)
+            ->where('menu_id', $menuId)
+            ->first();
+
+        if ($cartItem) {
+            // Delete the cart item for this user and menu_id
+            DB::table('cart_items')
+                ->where('user_id', $user->id)
+                ->where('menu_id', $menuId)
+                ->delete();
+
+            // Decrement the user's cart count
+            $user->decrement('cart');
+
+            return redirect()->route('user.shoppingCart')->with('success', 'Item removed from cart!');
+        }
+
+        return redirect()->route('user.shoppingCart')->with('error', 'Item not found in cart.');
+    }

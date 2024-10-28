@@ -55,3 +55,16 @@ function previewImage(event) {
         reader.readAsDataURL(event.target.files[0]); // Read the uploaded image file
     }
 }
+
+// Shopping Cart Plus Minus Quantity
+function incrementQuantity(button) {
+    let input = button.previousElementSibling;
+    input.value = parseInt(input.value) + 1;
+}
+
+function decrementQuantity(button) {
+    let input = button.nextElementSibling;
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}

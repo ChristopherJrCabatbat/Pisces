@@ -62,21 +62,18 @@ Route::group([
 
     Route::get('/menu', [UserController::class, 'menu'])->name('menu');
 
-    Route::post('/user/add-to-cart/{menuId}', [UserController::class, 'addToCart'])->name('addToCart');
     Route::post('/user/add-to-favorites/{menuId}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
     Route::put('addToCart/{id}', [UserController::class, 'addToCart'])->name('addToCart');
-    // Route::get('/shoppingCart/{menu}', [UserController::class, 'shoppingCart'])->name('shoppingCart');
     Route::get('/shoppingCart', [UserController::class, 'shoppingCart'])->name('shoppingCart');
+    // Route::delete('/removeCart/{id}', [UserController::class, 'removeCart'])->name('removeCart');
+    Route::delete('/removeCart/{cartItemId}', [UserController::class, 'removeCart'])->name('removeCart');
 
-
-    // Route::post('/user/add-to-cart', [UserController::class, 'addToCart'])->name('addToCart');
-
+    
+    // Route::post('/user/add-to-cart/{menuId}', [UserController::class, 'addToCart'])->name('addToCart');
+    // Route::get('/shoppingCart/{menu}', [UserController::class, 'shoppingCart'])->name('shoppingCart');
 
 
     // Route for viewing menu details
     Route::get('/menu-detail/{menuId}', [UserController::class, 'menuDetail'])->name('menuDetail');
 
-
-    // Route to show menus filtered by category
-    // Route::get('/menus/category/{category}', [MenuController::class, 'category'])->name('menus.category');
 });

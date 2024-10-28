@@ -49,7 +49,7 @@
                         <div>
                             <i class="fa-solid fa-caret-right me-2"></i>
                             {{-- <a href="{{ route('menus.index') }}" class="text-decoration-none">> All Menus</a> --}}
-                            <a href="" class="category-links"><span class="">All Menus</span></a>
+                            <a href="" class="white-underline"><span class="">All Menus</span></a>
                         </div>
                     </div>
 
@@ -59,7 +59,7 @@
                             <div>
                                 <i class="fa-solid fa-caret-right me-2"></i>
                                 {{-- <a href="{{ route('menus.category', ['category' => $category->category]) }}" --}}
-                                <a href="" class="category-links"> <span
+                                <a href="" class="white-underline"> <span
                                         class="">{{ $category->category }}</span></a>
                             </div>
                             <div>({{ $category->menu_count }})</div>

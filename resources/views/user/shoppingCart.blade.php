@@ -11,6 +11,10 @@
         select {
             width: 30% !important;
         }
+
+        #cart-icon {
+            color:  #007bff;
+        }
     </style>
 @endsection
 
@@ -19,7 +23,7 @@
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.dashboard') }}">HOME</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link fw-bold active" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
+        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
 @endsection
 
@@ -32,47 +36,84 @@
                 Shopping Cart
             </div>
             <div class="menu-chosen d-flex justify-content-center align-items-center gap-2 fs-5">
-                <div>Menu <i class="fa-solid fa-caret-right mx-1"></i></div>
+                <div><a href="{{ route('user.menu') }}" class="white-underline">Menu</a> <i class="fa-solid fa-caret-right mx-1"></i></div>
                 <div class="low-opacity-white">Shopping Cart</div>
             </div>
         </div>
 
         {{-- Content --}}
-        <div class="d-flex container gap-5 p-0">
+        <div class="d-flex container p-0">
 
-
-            <table class="table text-center">
+            {{-- Table --}}
+            <table class="table text-center mb-5">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Menu Name</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Delete</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        {{-- <td colspan="2">Larry the Bird</td> --}}
-                        <td>Larry</td>
-                        <td>Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+                <tbody id="menu-table-body">
+                    @forelse ($menus as $menu)
+                        <tr class="menu-row">
+                            <!-- Image Column -->
+                            <td>
+                                @if ($menu->image)
+                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                        class="img-fluid" width="50">
+                                @else
+                                    <span>No Image</span>
+                                @endif
+                            </td>
+                            <!-- Name, Category, Description -->
+                            <td>{{ $menu->name }}</td>
+                            <td>{{ $menu->category }}</td>
+                            <!-- Price (Remove trailing .00 if present) -->
+                            <td>
+                                @if (floor($menu->price) == $menu->price)
+                                    {{ number_format($menu->price, 0) }} <!-- Show without decimals -->
+                                @else
+                                    {{ number_format($menu->price, 2) }} <!-- Show with decimals -->
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                {{-- <form action="{{ route('user.updateQuantity', $menu->cart_item_id) }}" method="POST"> --}}
+                                <form action="" method="POST">
+                                    {{-- @csrf
+                                    @method('PUT') --}}
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <button type="button" class="btn qty-btn rounded-circle" onclick="decrementQuantity(this)"><i class="fa fa-minus"></i></button>
+                                        <input type="text" name="quantity" value="{{ $menu->pivot->quantity ?? 1 }}" min="1" class="form-control text-center mx-2 quantity-input" style="width: 60px;">
+                                        <button type="button" class="btn qty-btn rounded-circle" onclick="incrementQuantity(this)"><i class="fa fa-plus"></i></button>
+                                    </div>
+                                </form>
+                            </td>
+                            
+                            <td>
+                                <form action="{{ route('user.removeCart',  $menu->cart_item_id) }}" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to remove this menu?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                    @empty
+                        <tr id="no-menus-row">
+                            <td colspan="6">There are no menus added to cart.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
 
+            <div></div>
 
         </div>
 

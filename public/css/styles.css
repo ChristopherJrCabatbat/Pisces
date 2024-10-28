@@ -123,12 +123,12 @@ body {
     font-size: 1.1rem;
 }
 
-.category-links {
+.white-underline {
     text-decoration: none;
     color: white;
 }
 
-.category-links:hover {
+.white-underline:hover {
     text-decoration: underline;
 }
 
@@ -292,3 +292,13 @@ th {
 
 
 /* End icon styles */
+
+
+/* Quantity Plus Minus Buttons */
+.qty-btn {
+    background-color: #d3d4d5;
+}
+
+.qty-btn:hover, .qty-btn:active, .qty-btn:focus {
+    background-color: rgb(169, 169, 169);
+}
