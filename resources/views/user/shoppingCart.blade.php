@@ -13,7 +13,7 @@
         }
 
         #cart-icon {
-            color:  #007bff;
+            color: #007bff;
         }
     </style>
 @endsection
@@ -36,13 +36,14 @@
                 Shopping Cart
             </div>
             <div class="menu-chosen d-flex justify-content-center align-items-center gap-2 fs-5">
-                <div><a href="{{ route('user.menu') }}" class="white-underline">Menu</a> <i class="fa-solid fa-caret-right mx-1"></i></div>
+                <div><a href="{{ route('user.menu') }}" class="white-underline">Menu</a> <i
+                        class="fa-solid fa-caret-right mx-1"></i></div>
                 <div class="low-opacity-white">Shopping Cart</div>
             </div>
         </div>
 
         {{-- Content --}}
-        <div class="d-flex container p-0">
+        <div class="d-flex flex-column container p-0">
 
             {{-- Table --}}
             <table class="table text-center mb-5">
@@ -74,26 +75,31 @@
                             <!-- Price (Remove trailing .00 if present) -->
                             <td>
                                 @if (floor($menu->price) == $menu->price)
-                                    {{ number_format($menu->price, 0) }} <!-- Show without decimals -->
+                                    ₱{{ number_format($menu->price, 0) }} <!-- Show without decimals -->
                                 @else
-                                    {{ number_format($menu->price, 2) }} <!-- Show with decimals -->
+                                    ₱{{ number_format($menu->price, 2) }} <!-- Show with decimals -->
                                 @endif
                             </td>
                             <td class="text-center">
-                                {{-- <form action="{{ route('user.updateQuantity', $menu->cart_item_id) }}" method="POST"> --}}
                                 <form action="" method="POST">
-                                    {{-- @csrf
-                                    @method('PUT') --}}
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <button type="button" class="btn qty-btn rounded-circle" onclick="decrementQuantity(this)"><i class="fa fa-minus"></i></button>
-                                        <input type="text" name="quantity" value="{{ $menu->pivot->quantity ?? 1 }}" min="1" class="form-control text-center mx-2 quantity-input" style="width: 60px;">
-                                        <button type="button" class="btn qty-btn rounded-circle" onclick="incrementQuantity(this)"><i class="fa fa-plus"></i></button>
+                                        <button type="button" class="btn qty-btn rounded-circle"
+                                            onclick="decrementQuantity(this)">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                        <input type="text" name="quantity" value="{{ $menu->pivot->quantity ?? 1 }}"
+                                            min="1" class="form-control text-center mx-2 quantity-input"
+                                            style="width: 60px;">
+                                        <button type="button" class="btn qty-btn rounded-circle"
+                                            onclick="incrementQuantity(this)">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
                                     </div>
                                 </form>
                             </td>
-                            
+
                             <td>
-                                <form action="{{ route('user.removeCart',  $menu->cart_item_id) }}" method="POST"
+                                <form action="{{ route('user.removeCart', $menu->cart_item_id) }}" method="POST"
                                     style="display:inline;"
                                     onsubmit="return confirm('Are you sure you want to remove this menu?');">
                                     @csrf
@@ -102,7 +108,6 @@
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </form>
-
                             </td>
                         </tr>
                     @empty
@@ -113,9 +118,32 @@
                 </tbody>
             </table>
 
-            <div></div>
+            {{-- Divider with Cart Icon --}}
+            <div class="cart-divider text-center mb-5">
+                <hr class="line-left">
+                <i class="fa fa-shopping-cart mx-3" style="font-size: 1.5em; color: gray;"></i>
+                <hr class="line-right">
+            </div>
+
+            {{-- Cart Totals --}}
+            <div class="cart-totals-container mb-5 p-4 text-black"
+                style="border: 1px solid #ddd; width: 400px;">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Cart Totals</h5>
+                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                    <span>Subtotal</span>
+                    <span>$862.00</span> <!-- Replace with dynamic subtotal value -->
+                </div>
+                <div class="d-flex justify-content-between font-weight-bold border-bottom pb-2">
+                    <span>Total (Shipping fees not included)</span>
+                    <span>$948.20</span> <!-- Replace with dynamic total value -->
+                </div>
+                <a href="{{ route('user.order') }}" class="btn btn-danger rounded-1 checkout-btn mt-4 px-4" style="font-size: 1em;">Order Now</a>
+            </div>
+
+            <hr class="mb-5">
 
         </div>
+
 
     </div>
 @endsection

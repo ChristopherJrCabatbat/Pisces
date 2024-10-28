@@ -68,6 +68,7 @@ class UserController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+        $userCart = $user->cart;
 
         // Get menus added to cart by the current user along with their cart_items IDs
         $menus = DB::table('menus')
@@ -76,7 +77,7 @@ class UserController extends Controller
             ->select('menus.*', 'cart_items.id as cart_item_id')
             ->get();
 
-        return view('user.shoppingCart', compact('user', 'menus'));
+        return view('user.shoppingCart', compact('user', 'menus', 'userCart'));
     }
 
 
@@ -133,6 +134,11 @@ class UserController extends Controller
         DB::table('users')->where('id', $userId)->increment('favorites_count');
 
         return response()->json(['success' => true, 'message' => 'Item added to favorites']);
+    }
+
+    public function order() 
+    {
+        return view('user.order');
     }
 
 

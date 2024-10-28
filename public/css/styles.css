@@ -214,7 +214,6 @@ th {
     padding: 0.5rem 1rem;
 }
 
-
 /* Custom Pagination */
 .custom-pagination-link:hover {
     background-color: #d1e7dd; /* Light green background on hover */
@@ -249,7 +248,6 @@ th {
 }
 
 /* End Custom Pagination */
-
 
 /* Icon color default */
 .a.nav-icon {
@@ -290,15 +288,46 @@ th {
     position: absolute;
 }
 
-
 /* End icon styles */
 
+/* Cart Styles */
 
-/* Quantity Plus Minus Buttons */
 .qty-btn {
     background-color: #d3d4d5;
 }
 
-.qty-btn:hover, .qty-btn:active, .qty-btn:focus {
+.qty-btn:hover,
+.qty-btn:active,
+.qty-btn:focus {
     background-color: rgb(169, 169, 169);
 }
+
+.cart-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.line-left,
+.line-right {
+    flex: 1;
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 0;
+}
+
+.cart-totals-container {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+.cart-totals-container h5 {
+    font-size: 1.25em;
+}
+
+.checkout-btn:hover {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    background-color: transparent;
+}
+
+/* End of Cart Styles */
+
