@@ -31,8 +31,12 @@ class UserController extends Controller
 
         $selectedCategory = $request->input('category', 'All Menus');
 
+        /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
+
+        // Count the number of favorite items
+        $userFavorites = $user->favoriteItems()->count();
 
         // Retrieve menus based on selected category, excluding items in the cart
         if ($selectedCategory == 'All Menus') {
@@ -43,7 +47,7 @@ class UserController extends Controller
                 ->get();
         }
 
-        return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart'));
+        return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
 
 
@@ -62,6 +66,25 @@ class UserController extends Controller
         $user->increment('cart');
 
         return redirect()->back()->with('success', 'Item added to cart!');
+    }
+
+    public function addToFavorites(Request $request, $menuId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Check if the item is already in the user's favorites
+    if ($user->favoriteItems()->where('menu_id', $menuId)->exists()) {
+        // Remove from favorites if already present
+        $user->favoriteItems()->detach($menuId);
+        $user->decrement('favorites');
+    } else {
+        // Add to favorites if not present
+        $user->favoriteItems()->attach($menuId);
+        $user->increment('favorites');
+    }
+
+        return redirect()->back()->with('success', 'Item added to favorites!');
     }
 
     public function shoppingCart()
@@ -98,22 +121,13 @@ class UserController extends Controller
     }
 
 
-    public function addToFavorites($menuId)
-    {
-        $userId = Auth::id();
-
-        // Increment the user's favorites count in the database
-        DB::table('users')->where('id', $userId)->increment('favorites_count');
-
-        return response()->json(['success' => true, 'message' => 'Item added to favorites']);
-    }
 
     public function order()
     {
         $user = Auth::user();
         return view('user.order', compact('user'));
     }
-    
+
 
 
     // public function menuDetail($menuId)

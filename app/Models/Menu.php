@@ -21,4 +21,9 @@ class Menu extends Model
     {
         return $this->belongsToMany(User::class, 'cart_items');
     }
+
+    public function favoritedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'favorite_items');
+    }
 }

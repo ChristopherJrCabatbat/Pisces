@@ -62,10 +62,10 @@ Route::group([
 
     Route::get('/menu', [UserController::class, 'menu'])->name('menu');
 
-    Route::post('/user/add-to-favorites/{menuId}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
     Route::put('addToCart/{id}', [UserController::class, 'addToCart'])->name('addToCart');
+    Route::put('addToFavorites/{id}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
+
     Route::get('/shoppingCart', [UserController::class, 'shoppingCart'])->name('shoppingCart');
-    // Route::delete('/removeCart/{id}', [UserController::class, 'removeCart'])->name('removeCart');
     Route::delete('/removeCart/{cartItemId}', [UserController::class, 'removeCart'])->name('removeCart');
 
     Route::get('/order', [UserController::class, 'order'])->name('order');

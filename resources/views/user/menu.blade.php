@@ -102,7 +102,7 @@
                                                 alt="No Image">
                                         @endif
 
-                                        <div class="icon-overlay">
+                                        <div class="icon-overlay text-white">
                                             {{-- <i class="fa-solid fa-cart-plus" title="Add to Cart"></i> --}}
                                             <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
                                                 enctype="multipart/form-data">
@@ -110,11 +110,24 @@
                                                 @method('PUT')
                                                 <button type="submit"
                                                     style="background-color: transparent; border: none; padding: 0;"><i
-                                                        class="fa-solid fa-cart-plus" title="Add to Cart"></i></button>
+                                                        class="fa-solid fa-cart-plus text-white"
+                                                        title="Add to Cart"></i></button>
                                             </form>
                                             <i class="fa-solid fa-share" title="Share"></i>
                                             <i class="fa-solid fa-search" title="View"></i>
-                                            <i class="fa-solid fa-heart" title="Add to Favorites"></i>
+                                            <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
+                                                enctype="multipart/form-data">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit"
+                                                    style="background-color: transparent; border: none; padding: 0;">
+                                                    <i class="fa-solid fa-heart"
+                                                        style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
+                                                        title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                                    </i>
+                                                </button>
+                                            </form>
+
                                         </div>
 
 
@@ -141,7 +154,7 @@
                                             <div>(2)</div> <!-- Example rating count -->
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         @empty

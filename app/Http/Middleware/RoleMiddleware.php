@@ -57,6 +57,7 @@ class RoleMiddleware
                 'user.menu',
                 
                 'user.addToCart',
+                'user.addToFavorites',
                 'user.menuDetail',
                 'user.addToFavorites',
                 'user.shoppingCart',

@@ -83,7 +83,7 @@ body {
 
 .icon-overlay i {
     cursor: pointer;
-    color: white !important;
+    color: white;
 }
 
 /* Slide-up icons on hover */
@@ -102,6 +102,8 @@ body {
     transform: scale(1.2);
     color: #f81d0b !important; /* Optional: Add a hover color effect */
 }
+/* End Icon overlay styles */
+
 
 /* Menu Styles */
 .top-container {
