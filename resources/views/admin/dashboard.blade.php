@@ -33,7 +33,7 @@
                     class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-comments me-2"></i>Feedback
                     Collection</a></li>
             <li><a href="{{ route('admin.monitoring') }}"
-                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-users-gear me-2"></i>Customer Activity
+                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li>
         </ul>
     </li>

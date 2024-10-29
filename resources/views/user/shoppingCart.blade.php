@@ -126,8 +126,7 @@
             </div>
 
             {{-- Cart Totals --}}
-            <div class="cart-totals-container mb-5 p-4 text-black"
-                style="border: 1px solid #ddd; width: 400px;">
+            <div class="cart-totals-container mb-5 p-4 text-black" style="border: 1px solid #ddd; width: 400px;">
                 <h5 class="fw-bold mb-3 border-bottom pb-2">Cart Totals</h5>
                 <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
                     <span>Subtotal</span>
@@ -137,7 +136,8 @@
                     <span>Total (Shipping fees not included)</span>
                     <span>$948.20</span> <!-- Replace with dynamic total value -->
                 </div>
-                <a href="{{ route('user.order') }}" class="btn btn-danger rounded-1 checkout-btn mt-4 px-4" style="font-size: 1em;">Order Now</a>
+                <a href="{{ route('user.order') }}" class="btn btn-danger rounded-1 checkout-btn mt-4 px-4"
+                    style="font-size: 1em;">Order Now</a>
             </div>
 
             <hr class="mb-5">

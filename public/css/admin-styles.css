@@ -144,6 +144,11 @@ li.sidebar-item a.customers.active:hover {
     display: block;
 }
 
+.fa-users-gear {
+    margin-top: .9rem;
+    position: absolute;
+}
+
 .monitor-margin {
     /* margin-left: 1.64rem; */
     margin-left: 1.64rem;

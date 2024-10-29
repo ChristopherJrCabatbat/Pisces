@@ -8,12 +8,127 @@
     <title>Order</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-icon.png') }}">
 
+    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('css/order-styles.css') }}">
+
 
 </head>
 
 <body>
+
     <div class="container">
+        <div class="d-flex">
+
+            {{-- Left --}}
+            <div class="left d-flex flex-column py-5 pe-5 border-end">
+                <div class="logo border-bottom pb-4 mb-4">
+                    <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo">
+                </div>
+                <div class="form-container">
+                    <form action="">
+                        <div class="mb-3 h3">Shipping Information</div>
+
+                        {{-- Full Name --}}
+                        <div class="mb-3">
+                            <label for="" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="" aria-describedby="">
+                        </div>
+
+
+                        <div class="d-flex gap-4 mb-3">
+                            {{-- Email --}}
+                            <div class="w-50">
+                                <label for="exampleInputEmail1" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="emailHelp">
+                            </div>
+
+                            {{-- Number --}}
+                            <div class="w-50">
+                                <label for="" class="form-label">Contact Number</label>
+                                <input type="text" class="form-control" id="" aria-describedby="">
+                            </div>
+                        </div>
+
+                        {{-- Full Address --}}
+                        <div class="mb-3">
+                            <label for="" class="form-label">Full Address</label>
+                            <input type="text" class="form-control" id="" aria-describedby="">
+                        </div>
+
+                        {{-- Shipping Information --}}
+                        <div class="mb-3 h3">Shipping Information</div>
+                        <div class="form-check form-control p-2 ps-5 mb-3">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                id="flexRadioDefault2" checked>
+                            <label class="form-check-label" for="flexRadioDefault2">
+                                Delivery - <strong>Free shipping</strong>
+                            </label>
+                        </div>
+
+                        {{-- Payment Method --}}
+                        <div class="mb-3 h3">Payment Method</div>
+                        <div class="form-check form-control p-2 ps-5 mb-3">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                id="flexRadioDefault2" checked>
+                            <label class="form-check-label" for="flexRadioDefault2">
+                                Delivery - <strong>Free shipping</strong>
+                            </label>
+                        </div>
+
+                        <div class="">
+                            <label for="" class="form-label">Note</label>
+                            <textarea class="form-control" placeholder="Leave a note here..." id="" style="height: 100px"></textarea>
+                        </div>
+
+<button type="submit">Order now</button>
+                    </form>
+                </div>
+
+            </div>
+
+            {{-- Right --}}
+            <div class="right d-flex flex-column py-5 ps-5">
+
+                <div class="products border-bottom pb-4 mb-4">
+                    <div class="mb-3">Product(s):</div>
+                    <div class="d-flex gap-3 justify-content-between">
+                        <div class="picture border border-3">
+                            <img src="{{ asset('images/logo.jpg') }}" class="image-fluid" width="70" height=""
+                                alt="Picture">
+                        </div>
+                        <div class="menu-name d-flex flex-column">
+                            <div class="name">Smart Home Speaker</div>
+                            <div class="size">(Color: Black, Size: S)</div>
+                        </div>
+                        <div class="price">430</div>
+                    </div>
+                </div>
+
+                <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
+                    <div class="d-flex justify-content-between">
+                        <div class="">Subtotal:</div>
+                        <div class="fw-bold">862</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="">Subtotal:</div>
+                        <div class="fw-bold">862</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="">Subtotal:</div>
+                        <div class="fw-bold">862</div>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <div class="">Total:</div>
+                        <div class="fs-4">862</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {{-- <div class="container">
         <h2>Shipping Information</h2>
         <div class="row">
             <!-- Left side: Shipping Information -->
@@ -106,7 +221,8 @@
                 <a href="#" class="coupon-link">You have a coupon code?</a>
             </div>
         </div>
-    </div>
+    </div> --}}
+
 </body>
 
 </html>
