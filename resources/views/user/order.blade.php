@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('css/order-styles.css') }}">
 
+    <script src="https://kit.fontawesome.com/f416851b63.js" crossorigin="anonymous"></script>
 
 </head>
 
@@ -30,60 +31,68 @@
 
                         {{-- Full Name --}}
                         <div class="mb-3">
-                            <label for="" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="" aria-describedby="">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" name="fullName"
+                                value="{{ $user->first_name . ' ' . $user->last_name }}" required>
                         </div>
-
 
                         <div class="d-flex gap-4 mb-3">
                             {{-- Email --}}
                             <div class="w-50">
-                                <label for="exampleInputEmail1" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="exampleInputEmail1"
-                                    aria-describedby="emailHelp">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                    value="{{ $user->email }}" required>
                             </div>
 
-                            {{-- Number --}}
+                            {{-- Contact Number --}}
                             <div class="w-50">
-                                <label for="" class="form-label">Contact Number</label>
-                                <input type="text" class="form-control" id="" aria-describedby="">
+                                <label for="contactNumber" class="form-label">Contact Number</label>
+                                <input type="text" class="form-control" id="contactNumber" name="contactNumber"
+                                    value="{{ $user->contact_number }}" required>
                             </div>
                         </div>
 
                         {{-- Full Address --}}
                         <div class="mb-3">
-                            <label for="" class="form-label">Full Address</label>
-                            <input type="text" class="form-control" id="" aria-describedby="">
+                            <label for="address" class="form-label">Full Address</label>
+                            <input type="text" class="form-control" id="address" name="address" required autofocus>
                         </div>
 
-                        {{-- Shipping Information --}}
-                        <div class="mb-3 h3">Shipping Information</div>
+                        {{-- Shipping Method --}}
+                        <label for="shippingMethod" class="form-label">Shipping Method</label>
                         <div class="form-check form-control p-2 ps-5 mb-3">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                id="flexRadioDefault2" checked>
-                            <label class="form-check-label" for="flexRadioDefault2">
+                            <input class="form-check-input" type="radio" name="shippingMethod" id="freeShipping"
+                                checked>
+                            <label class="form-check-label" for="freeShipping">
                                 Delivery - <strong>Free shipping</strong>
                             </label>
                         </div>
 
                         {{-- Payment Method --}}
-                        <div class="mb-3 h3">Payment Method</div>
+                        <label for="paymentMethod" class="form-label">Payment Method</label>
                         <div class="form-check form-control p-2 ps-5 mb-3">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                id="flexRadioDefault2" checked>
-                            <label class="form-check-label" for="flexRadioDefault2">
-                                Delivery - <strong>Free shipping</strong>
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" checked>
+                            <label class="form-check-label" for="cod">
+                                Cash on Delivery (COD)
                             </label>
                         </div>
 
-                        <div class="">
-                            <label for="" class="form-label">Note</label>
-                            <textarea class="form-control" placeholder="Leave a note here..." id="" style="height: 100px"></textarea>
+                        {{-- Note --}}
+                        <div class="mb-3">
+                            <label for="note" class="form-label">Note</label>
+                            <textarea class="form-control" placeholder="Leave a note here..." id="note" name="note" style="height: 100px"></textarea>
                         </div>
 
-<button type="submit">Order now</button>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div><a href="{{ route('user.shoppingCart') }}" class="btn btn-outline-info back-cart">
+                                    <i class="fa-solid fa-arrow-left-long me-2"></i>Back To Cart</a></div>
+                            <div><button class="btn btn-danger order" type="submit">
+                                    Order now <i class="fa-solid fa-cart-shopping ms-1"></i></button></div>
+                        </div>
+                        
                     </form>
                 </div>
+
 
             </div>
 
@@ -128,100 +137,8 @@
         </div>
     </div>
 
-    {{-- <div class="container">
-        <h2>Shipping Information</h2>
-        <div class="row">
-            <!-- Left side: Shipping Information -->
-            <div class="col-left">
-                <form>
-                    <div class="form-group">
-                        <label for="fullName">Full Name</label>
-                        <input type="text" id="fullName" placeholder="Full Name">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" placeholder="Email">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input type="text" id="phone" placeholder="Phone">
-                    </div>
-                    <div class="form-group">
-                        <label for="country">Country</label>
-                        <select id="country">
-                            <option selected>Select country...</option>
-                            <option>Country 1</option>
-                            <option>Country 2</option>
-                            <option>Country 3</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="state">State</label>
-                        <input type="text" id="state" placeholder="State">
-                    </div>
-                    <div class="form-group">
-                        <label for="city">City</label>
-                        <input type="text" id="city" placeholder="City">
-                    </div>
-                    <div class="form-group">
-                        <label for="address">Address</label>
-                        <input type="text" id="address" placeholder="Address">
-                    </div>
-
-                    <h4>Shipping Method</h4>
-                    <div class="form-check">
-                        <input type="radio" id="freeShipping" name="shippingMethod" checked>
-                        <label for="freeShipping">Delivery - Free Shipping</label>
-                    </div>
-
-                    <h4>Payment Method</h4>
-                    <div class="form-check">
-                        <input type="radio" id="cod" name="paymentMethod" checked>
-                        <label for="cod">Cash on Delivery (COD)</label>
-                    </div>
-                    <small>Please pay money directly to the postman if you choose Cash on Delivery.</small>
-
-                    <div class="form-group">
-                        <label for="note">Note</label>
-                        <textarea id="note" rows="3" placeholder="Note..."></textarea>
-                    </div>
-
-                    <button type="submit" class="btn-primary">Checkout</button>
-                    <a href="/cart" class="btn-link">Back to cart</a>
-                </form>
-            </div>
-
-            <!-- Right side: Order Summary -->
-            <div class="col-right">
-                <h4>Order Summary</h4>
-                <div class="order-summary">
-                    <div>
-                        <span>Product(s):</span>
-                        <span>Smart Home Speaker (x2)</span>
-                    </div>
-                    <hr>
-                    <div>
-                        <span>Subtotal:</span>
-                        <span>$862.00</span>
-                    </div>
-                    <div>
-                        <span>Shipping fee:</span>
-                        <span>$0.00</span>
-                    </div>
-                    <div>
-                        <span>Tax:</span>
-                        <span>$86.20</span>
-                    </div>
-                    <hr>
-                    <div class="total">
-                        <span>Total:</span>
-                        <span>$948.20</span>
-                    </div>
-                </div>
-                <a href="#" class="coupon-link">You have a coupon code?</a>
-            </div>
-        </div>
-    </div> --}}
+    <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>
+    <script src="{{ asset('bootstrap/js/bootstrap.bundle.js') }}"></script>
 
 </body>
 

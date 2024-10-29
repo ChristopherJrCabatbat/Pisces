@@ -1,107 +1,3 @@
-/* Basic Reset
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
-}
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-h2, h4 {
-    margin-bottom: 10px;
-}
-.row {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-.col-left, .col-right {
-    padding: 15px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-.col-left {
-    flex: 1 1 60%;
-}
-.col-right {
-    flex: 1 1 35%;
-}
-.form-group {
-    margin-bottom: 15px;
-}
-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-input[type="text"],
-input[type="email"],
-select,
-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-    background-color: #f9f9f9;
-}
-textarea {
-    resize: vertical;
-}
-.form-check {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-.form-check-input {
-    margin-right: 10px;
-}
-.form-check-label {
-    font-weight: normal;
-}
-.btn-primary {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-.btn-link {
-    color: #007bff;
-    text-decoration: none;
-    font-size: 16px;
-}
-.order-summary {
-    margin-bottom: 20px;
-}
-.order-summary div {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-}
-.order-summary .total {
-    font-weight: bold;
-    font-size: 18px;
-}
-.coupon-link {
-    color: #007bff;
-    text-decoration: none;
-    font-size: 14px;
-} */
-
 .left {
     width: 60%;
 }
@@ -111,6 +7,27 @@ textarea {
 }
 
 .size {
-    font-size: .8rem;
+    font-size: 0.8rem;
 }
 
+.back-cart {
+    border-color: #0d6efd !important;
+    color: #0d6efd;
+}
+
+.back-cart:hover,
+.back-cart:active {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
+
+.order {
+    background-color: #f81d0b;
+    color: white;
+}
+
+.order:hover,
+.order:active {
+    background-color: transparent !important;
+    color: #f81d0b !important;
+}

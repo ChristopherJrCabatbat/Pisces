@@ -81,34 +81,6 @@ class UserController extends Controller
     }
 
 
-
-    // public function removeCart($menuId)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Check if the cart item exists for the current user and specified menu_id
-    //     $cartItem = DB::table('cart_items')
-    //         ->where('user_id', $user->id)
-    //         ->where('menu_id', $menuId)
-    //         ->first();
-
-    //     if ($cartItem) {
-    //         // Delete the cart item for this user and menu_id
-    //         DB::table('cart_items')
-    //             ->where('user_id', $user->id)
-    //             ->where('menu_id', $menuId)
-    //             ->delete();
-
-    //         // Decrement the user's cart count
-    //         $user->decrement('cart');
-
-    //         return redirect()->route('user.shoppingCart')->with('success', 'Item removed from cart!');
-    //     }
-
-    //     return redirect()->route('user.shoppingCart')->with('error', 'Item not found in cart.');
-    // }
-
     public function removeCart($cartItemId)
     {
         /** @var User $user */
@@ -136,10 +108,12 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'Item added to favorites']);
     }
 
-    public function order() 
+    public function order()
     {
-        return view('user.order');
+        $user = Auth::user();
+        return view('user.order', compact('user'));
     }
+    
 
 
     // public function menuDetail($menuId)
