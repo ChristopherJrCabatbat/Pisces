@@ -67,6 +67,12 @@ body {
     filter: brightness(30%);
 }
 
+/* Icon Footer */
+.icons a {
+    text-decoration: none;
+    color: #787878;
+}
+
 /* Icon overlay styles */
 .icon-overlay {
     position: absolute;
@@ -333,3 +339,15 @@ th {
 
 /* End of Cart Styles */
 
+
+/* Checkout button styles */
+.order {
+    background-color: #f81d0b;
+    color: white;
+}
+
+.order:hover,
+.order:active {
+    background-color: transparent !important;
+    color: #f81d0b !important;
+}

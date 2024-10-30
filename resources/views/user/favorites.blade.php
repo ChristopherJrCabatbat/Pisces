@@ -1,6 +1,6 @@
 @extends('user.layout')
 
-@section('title', 'Menu')
+@section('title', 'Favorites')
 
 @section('styles-links')
     <style>
@@ -11,6 +11,10 @@
         select {
             width: 30% !important;
         }
+
+        #heart-icon {
+            color: #f81d0b;
+        }
     </style>
 @endsection
 
@@ -19,58 +23,27 @@
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.dashboard') }}">HOME</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link fw-bold active" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
+        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
 @endsection
 
 @section('main-content')
-    <div class="container main-content d-flex flex-column align-items-center mb-5">
+    <div class="container main-content d-flex flex-column align-items-center">
 
         {{-- Top Container --}}
         <div class="top-container d-flex w-100 p-4 mb-5 justify-content-between align-items-center">
             <div class="fw-bold h1">
-                {{ $selectedCategory }}
+                Favorites
             </div>
             <div class="menu-chosen d-flex justify-content-center align-items-center gap-2 fs-5">
-                <div>Menu <i class="fa-solid fa-caret-right mx-1"></i></div>
-                <div class="low-opacity-white">{{ $selectedCategory }}</div>
+                <div><a href="{{ route('user.menu') }}" class="white-underline">Menu</a> <i
+                        class="fa-solid fa-caret-right mx-1"></i></div>
+                <div class="low-opacity-white">Favorites</div>
             </div>
         </div>
 
         {{-- Content --}}
         <div class="d-flex container content user-content gap-5 p-0">
-
-            {{-- Categories --}}
-            <div class="categories d-flex flex-column">
-                <div class="h3 mb-4">Categories</div>
-                <div class="category-lists d-flex flex-column gap-2">
-                    <!-- All Menus -->
-                    <div>
-                        <div>
-                            <i class="fa-solid fa-caret-right me-2"></i>
-                            <a href="{{ route('user.menu', ['category' => 'All Menus']) }}" class="white-underline">
-                                <span class="{{ $selectedCategory == 'All Menus' ? 'active-category' : '' }}">All
-                                    Menus</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Dynamically generated categories with counts -->
-                    @foreach ($categories as $category)
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <i class="fa-solid fa-caret-right me-2"></i>
-                                <a href="{{ route('user.menu', ['category' => $category->category]) }}"
-                                    class="white-underline">
-                                    <span
-                                        class="{{ $selectedCategory == $category->category ? 'active-category' : '' }}">{{ $category->category }}</span>
-                                </a>
-                            </div>
-                            <div>({{ $category->menu_count }})</div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
 
             {{-- Menus --}}
             <div class="menus d-flex flex-column gap-4 mb-5 w-100">
@@ -159,7 +132,7 @@
                             </div>
                         @empty
                             <div class="col">
-                                <p>No menus available.</p>
+                                <p>No menus available in this category.</p>
                             </div>
                         @endforelse
                     </div>

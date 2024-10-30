@@ -136,8 +136,8 @@
                     <span>Total (Shipping fees not included)</span>
                     <span>$948.20</span> <!-- Replace with dynamic total value -->
                 </div>
-                <a href="{{ route('user.order') }}" class="btn btn-danger rounded-1 checkout-btn mt-4 px-4"
-                    style="font-size: 1em;">Order Now</a>
+                <a href="{{ route('user.order') }}" class="btn btn-danger order rounded-1 checkout-btn mt-4 px-4"
+                    style="font-size: 1em;">Check out</a>
             </div>
 
             <hr class="mb-5">

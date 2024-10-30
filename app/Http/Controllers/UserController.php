@@ -18,8 +18,9 @@ class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
 
-        return view('user.dashboard', compact('userCart'));
+        return view('user.dashboard', compact('userCart', 'userFavorites'));
     }
 
 
@@ -34,8 +35,6 @@ class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
-
-        // Count the number of favorite items
         $userFavorites = $user->favoriteItems()->count();
 
         // Retrieve menus based on selected category, excluding items in the cart
@@ -68,30 +67,12 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Item added to cart!');
     }
 
-    public function addToFavorites(Request $request, $menuId)
-    {
-        /** @var User $user */
-        $user = Auth::user();
-
-        // Check if the item is already in the user's favorites
-    if ($user->favoriteItems()->where('menu_id', $menuId)->exists()) {
-        // Remove from favorites if already present
-        $user->favoriteItems()->detach($menuId);
-        $user->decrement('favorites');
-    } else {
-        // Add to favorites if not present
-        $user->favoriteItems()->attach($menuId);
-        $user->increment('favorites');
-    }
-
-        return redirect()->back()->with('success', 'Item added to favorites!');
-    }
-
     public function shoppingCart()
     {
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
 
         // Get menus added to cart by the current user along with their cart_items IDs
         $menus = DB::table('menus')
@@ -100,8 +81,58 @@ class UserController extends Controller
             ->select('menus.*', 'cart_items.id as cart_item_id')
             ->get();
 
-        return view('user.shoppingCart', compact('user', 'menus', 'userCart'));
+        return view('user.shoppingCart', compact('user', 'menus', 'userCart', 'userFavorites'));
     }
+
+
+    public function addToFavorites(Request $request, $menuId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Check if the item is already in the user's favorites
+        if ($user->favoriteItems()->where('menu_id', $menuId)->exists()) {
+            // Remove from favorites if already present
+            $user->favoriteItems()->detach($menuId);
+            $user->decrement('favorites');
+        } else {
+            // Add to favorites if not present
+            $user->favoriteItems()->attach($menuId);
+            $user->increment('favorites');
+        }
+
+        return redirect()->back()->with('success', 'Item added to favorites!');
+    }
+
+    public function favorites(Request $request)
+    {
+        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+            ->groupBy('category')
+            ->get();
+    
+        $selectedCategory = $request->input('category', 'All Menus');
+    
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
+    
+        // Retrieve favorite menus, excluding items already in the cart
+        if ($selectedCategory == 'All Menus') {
+            $menus = $user->favoriteItems()
+                ->whereNotIn('menus.id', $user->cartItems->pluck('id'))
+                ->get();
+        } else {
+            $menus = $user->favoriteItems()
+                ->where('menus.category', $selectedCategory)
+                ->whereNotIn('menus.id', $user->cartItems->pluck('id'))
+                ->get();
+        }
+    
+        return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    }
+    
+
 
 
     public function removeCart($cartItemId)

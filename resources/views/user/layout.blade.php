@@ -40,8 +40,8 @@
 
                         <!-- Heart Icon -->
                         <div class="icon-wrapper">
-                            <a href="#" class="nav-icon">
-                                <i class="fa fa-heart" id="heart-icon"></i>
+                            <a href="{{ route('user.favorites') }}" class="nav-icon">
+                                <i class="fa fa-heart" id="heart-icon" title="View Favorites"></i>
                                 <span class="notification-badge" id="heart-badge">{{ $userFavorites ?? 0 }}</span>
                             </a>
                         </div>
@@ -49,7 +49,7 @@
                         <!-- Cart Icon -->
                         <div class="icon-wrapper ms-3">
                             <a href="{{ route('user.shoppingCart') }}" class="nav-icon">
-                                <i class="fa-solid fa-cart-shopping" id="cart-icon"></i>
+                                <i class="fa-solid fa-cart-shopping" id="cart-icon" title="View Cart"></i>
                                 <span class="notification-badge" id="cart-badge">{{ $userCart ?? 0 }}</span>
                             </a>
                         </div>
@@ -115,9 +115,11 @@
                             <i class="fa-solid fa-phone me-2"></i> 0945 839 3794
                         </div>
                         <div class="icons d-flex align-items-center gap-4 mt-4">
-                            <div class="rounded-circle">
-                                <i class="fa-brands fa-facebook"></i>
-                            </div>
+                            <a href="https://www.facebook.com/@piscesCH" title="Go to Pisces Facebook Page" target="_blank" class="social-link">
+                                <div class="rounded-circle">
+                                    <i class="fa-brands fa-facebook"></i>
+                                </div>
+                            </a>
                             <div class="rounded-circle">
                                 <i class="fa-brands fa-instagram"></i>
                             </div>

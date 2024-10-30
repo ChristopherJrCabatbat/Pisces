@@ -68,6 +68,8 @@ Route::group([
     Route::get('/shoppingCart', [UserController::class, 'shoppingCart'])->name('shoppingCart');
     Route::delete('/removeCart/{cartItemId}', [UserController::class, 'removeCart'])->name('removeCart');
 
+    Route::get('/favorites', [UserController::class, 'favorites'])->name('favorites');
+
     Route::get('/order', [UserController::class, 'order'])->name('order');
 
 
