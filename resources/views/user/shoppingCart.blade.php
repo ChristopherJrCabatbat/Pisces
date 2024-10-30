@@ -72,6 +72,7 @@
                             <!-- Name, Category, Description -->
                             <td>{{ $menu->name }}</td>
                             <td>{{ $menu->category }}</td>
+
                             <!-- Price (Remove trailing .00 if present) -->
                             <td>
                                 @if (floor($menu->price) == $menu->price)
@@ -80,6 +81,7 @@
                                     ₱{{ number_format($menu->price, 2) }} <!-- Show with decimals -->
                                 @endif
                             </td>
+
                             <td class="text-center">
                                 <form action="" method="POST">
                                     <div class="d-flex align-items-center justify-content-center">
@@ -128,18 +130,56 @@
             {{-- Cart Totals --}}
             <div class="cart-totals-container mb-5 p-4 text-black" style="border: 1px solid #ddd; width: 400px;">
                 <h5 class="fw-bold mb-3 border-bottom pb-2">Cart Totals</h5>
-                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                    <span>Subtotal</span>
-                    <span>$862.00</span> <!-- Replace with dynamic subtotal value -->
+
+                {{-- Display each menu item and its price --}}
+                @php
+                    $totalPrice = 0;
+                @endphp
+
+                @foreach ($menus as $menu)
+                    @php
+                        $quantity = $menu->pivot->quantity ?? 1; // Get quantity from pivot or default to 1
+                        $itemTotal = $menu->price * $quantity; // Calculate item total
+                        $totalPrice += $itemTotal; // Add to total
+                    @endphp
+                    <div class="d-flex justify-content-between mb-2 pb-2 border-bottom cart-item-{{ $menu->id }}">
+                        <span>
+                            {{ $menu->name }}
+                            <span class="cart-item-quantity">
+                                @if ($quantity > 1)
+                                    ({{ $quantity }})
+                                @endif
+                            </span>
+                        </span>
+                        <span class="cart-item-total">
+                            @if (floor($itemTotal) == $itemTotal)
+                                ₱{{ number_format($itemTotal, 0) }}
+                            @else
+                                ₱{{ number_format($itemTotal, 2) }}
+                            @endif
+                        </span>
+                    </div>
+                @endforeach
+
+                {{-- Display the total price --}}
+                <div class="fw-bold d-flex justify-content-between font-weight-bold border-bottom pb-2">
+                    <span>Total</span>
+                    <span id="total-price">
+                        @if (floor($totalPrice) == $totalPrice)
+                            ₱{{ number_format($totalPrice, 0) }}
+                        @else
+                            ₱{{ number_format($totalPrice, 2) }}
+                        @endif
+                    </span>
                 </div>
-                <div class="d-flex justify-content-between font-weight-bold border-bottom pb-2">
-                    <span>Total (Shipping fees not included)</span>
-                    <span>$948.20</span> <!-- Replace with dynamic total value -->
-                </div>
+
                 <a href="{{ route('user.order') }}" class="btn btn-danger order rounded-1 checkout-btn mt-4 px-4"
                     style="font-size: 1em;">Check out</a>
             </div>
 
+
+
+            {{-- Divider --}}
             <hr class="mb-5">
 
         </div>

@@ -60,11 +60,41 @@ function previewImage(event) {
 function incrementQuantity(button) {
     let input = button.previousElementSibling;
     input.value = parseInt(input.value) + 1;
+    updateCartTotals();
 }
 
 function decrementQuantity(button) {
     let input = button.nextElementSibling;
     if (parseInt(input.value) > 1) {
         input.value = parseInt(input.value) - 1;
+        updateCartTotals();
     }
 }
+
+function updateCartTotals() {
+    let rows = document.querySelectorAll('.menu-row');
+    let totalPrice = 0;
+
+    rows.forEach(row => {
+        let price = parseFloat(row.querySelector('.menu-price').dataset.price); // Get original price
+        let quantity = parseInt(row.querySelector('.quantity-input').value); // Get updated quantity
+        let itemTotal = price * quantity; // Calculate item total
+
+        row.querySelector('.item-total').textContent = formatPrice(itemTotal); // Update item total display
+
+        // Update the quantity in Cart Totals display
+        let cartItem = document.querySelector(`.cart-item-${row.dataset.menuId}`);
+        cartItem.querySelector('.cart-item-quantity').textContent = quantity > 1 ? `(${quantity})` : ''; // Show quantity if more than 1
+        cartItem.querySelector('.cart-item-total').textContent = formatPrice(itemTotal);
+
+        totalPrice += itemTotal;
+    });
+
+    document.querySelector('#total-price').textContent = formatPrice(totalPrice); // Update total price
+}
+
+// Helper function to format price
+function formatPrice(price) {
+    return price % 1 === 0 ? `₱${price}` : `₱${price.toFixed(2)}`;
+}
+
