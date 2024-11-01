@@ -66,6 +66,7 @@ Route::group([
     Route::put('addToFavorites/{id}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
 
     Route::get('/shoppingCart', [UserController::class, 'shoppingCart'])->name('shoppingCart');
+    Route::post('/updateQuantity', [UserController::class, 'updateQuantity'])->name('updateQuantity');
     Route::delete('/removeCart/{cartItemId}', [UserController::class, 'removeCart'])->name('removeCart');
 
     Route::get('/favorites', [UserController::class, 'favorites'])->name('favorites');

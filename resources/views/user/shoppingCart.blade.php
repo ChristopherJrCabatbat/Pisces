@@ -57,9 +57,10 @@
                         <th scope="col">Delete</th>
                     </tr>
                 </thead>
+                <!-- Update the table rows with data attributes for menu-id and price -->
                 <tbody id="menu-table-body">
                     @forelse ($menus as $menu)
-                        <tr class="menu-row">
+                        <tr class="menu-row" data-menu-id="{{ $menu->id }}" data-price="{{ $menu->price }}">
                             <!-- Image Column -->
                             <td>
                                 @if ($menu->image)
@@ -69,37 +70,38 @@
                                     <span>No Image</span>
                                 @endif
                             </td>
-                            <!-- Name, Category, Description -->
                             <td>{{ $menu->name }}</td>
                             <td>{{ $menu->category }}</td>
 
-                            <!-- Price (Remove trailing .00 if present) -->
-                            <td>
-                                @if (floor($menu->price) == $menu->price)
-                                    ₱{{ number_format($menu->price, 0) }} <!-- Show without decimals -->
-                                @else
-                                    ₱{{ number_format($menu->price, 2) }} <!-- Show with decimals -->
-                                @endif
+                            <!-- Price Column with Item Price -->
+                            <td class="menu-price">
+                                ₱{{ number_format($menu->price, 2) }}
                             </td>
 
+                            <!-- Quantity Column -->
                             <td class="text-center">
-                                <form action="" method="POST">
-                                    <div class="d-flex align-items-center justify-content-center">
-                                        <button type="button" class="btn qty-btn rounded-circle"
-                                            onclick="decrementQuantity(this)">
-                                            <i class="fa fa-minus"></i>
-                                        </button>
-                                        <input type="text" name="quantity" value="{{ $menu->pivot->quantity ?? 1 }}"
-                                            min="1" class="form-control text-center mx-2 quantity-input"
-                                            style="width: 60px;">
-                                        <button type="button" class="btn qty-btn rounded-circle"
-                                            onclick="incrementQuantity(this)">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </form>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <button type="button" class="btn qty-btn rounded-circle"
+                                        onclick="decrementQuantity(this)">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+
+                                    <input type="text" readonly name="quantity" value="{{ $menu->quantity ?? 1 }}"
+                                        min="1" class="form-control text-center mx-2 quantity-input"
+                                        style="width: 60px;" data-menu-id="{{ $menu->id }}">
+
+
+
+                                    <!-- Add data-menu-id here -->
+                                    <button type="button" class="btn qty-btn rounded-circle"
+                                        onclick="incrementQuantity(this)">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
                             </td>
 
+
+                            <!-- Delete Button -->
                             <td>
                                 <form action="{{ route('user.removeCart', $menu->cart_item_id) }}" method="POST"
                                     style="display:inline;"
@@ -118,6 +120,7 @@
                         </tr>
                     @endforelse
                 </tbody>
+
             </table>
 
             {{-- Divider with Cart Icon --}}
@@ -174,7 +177,7 @@
                 </div>
 
                 <a href="{{ route('user.order') }}" class="btn btn-danger order rounded-1 checkout-btn mt-4 px-4"
-                    style="font-size: 1em;">Check out</a>
+                    style="font-size: 1em;">Check Out</a>
             </div>
 
 

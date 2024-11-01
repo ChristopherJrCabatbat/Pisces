@@ -89,7 +89,7 @@
                             <div><button class="btn btn-danger order" type="submit">
                                     Order now <i class="fa-solid fa-cart-shopping ms-1"></i></button></div>
                         </div>
-                        
+
                     </form>
                 </div>
 
@@ -99,40 +99,61 @@
             {{-- Right --}}
             <div class="right d-flex flex-column py-5 ps-5">
 
+                {{-- Products --}}
                 <div class="products border-bottom pb-4 mb-4">
-                    <div class="mb-3">Product(s):</div>
-                    <div class="d-flex gap-3 justify-content-between">
-                        <div class="picture border border-3">
-                            <img src="{{ asset('images/logo.jpg') }}" class="image-fluid" width="70" height=""
-                                alt="Picture">
+                    <div class="mb-3">Menu(s):</div>
+
+                    @php
+                        $totalPrice = 0;
+                    @endphp
+
+                    @foreach ($menus as $menu)
+                        @php
+                            $quantity = $menu->pivot->quantity ?? 1; // Get quantity from pivot
+                            $itemTotal = $menu->price * $quantity; // Calculate item total
+                            $totalPrice += $itemTotal; // Add to total
+                        @endphp
+
+                        <div class="d-flex gap-3 justify-content-between align-items-center">
+                            <div class="picture border border-3">
+                                <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid" width="70"
+                                    alt="Picture">
+                            </div>
+                            <div class="menu-name d-flex flex-column align-items-center">
+                                <div class="name">{{ $menu->name }}</div>
+                                <div class="size">
+                                    @if ($quantity > 1)
+                                        ({{ $quantity }})
+                                        {{-- Show quantity if more than 1 --}}
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="price fw-bold">
+                                @if (floor($itemTotal) == $itemTotal)
+                                    ₱{{ number_format($itemTotal, 0) }}
+                                @else
+                                    ₱{{ number_format($itemTotal, 2) }}
+                                @endif
+                            </div>
                         </div>
-                        <div class="menu-name d-flex flex-column">
-                            <div class="name">Smart Home Speaker</div>
-                            <div class="size">(Color: Black, Size: S)</div>
-                        </div>
-                        <div class="price">430</div>
-                    </div>
+                    @endforeach
                 </div>
 
+                {{-- Cart Totals --}}
                 <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
-                    <div class="d-flex justify-content-between">
-                        <div class="">Subtotal:</div>
-                        <div class="fw-bold">862</div>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <div class="">Subtotal:</div>
-                        <div class="fw-bold">862</div>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <div class="">Subtotal:</div>
-                        <div class="fw-bold">862</div>
-                    </div>
-                    <div class="d-flex justify-content-between fw-bold">
-                        <div class="">Total:</div>
-                        <div class="fs-4">862</div>
+                    <div class="d-flex justify-content-between fw-bold align-items-center">
+                        <div>Total:</div>
+                        <div class="fs-4">
+                            @if (floor($totalPrice) == $totalPrice)
+                                ₱{{ number_format($totalPrice, 0) }}
+                            @else
+                                ₱{{ number_format($totalPrice, 2) }}
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
+
 
         </div>
     </div>

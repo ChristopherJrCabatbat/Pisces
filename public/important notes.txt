@@ -265,3 +265,95 @@ public function menu(Request $request)
 
         return redirect()->route('user.shoppingCart')->with('error', 'Item not found in cart.');
     }
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+       {{-- Right --}}
+            <div class="right d-flex flex-column py-5 ps-5">
+
+                <div class="products border-bottom pb-4 mb-4">
+                    <div class="mb-3">Product(s):</div>
+                    <div class="d-flex gap-3 justify-content-between">
+                        <div class="picture border border-3">
+                            <img src="{{ asset('images/logo.jpg') }}" class="image-fluid" width="70" height=""
+                                alt="Picture">
+                        </div>
+                        <div class="menu-name d-flex flex-column">
+                            <div class="name">Smart Home Speaker</div>
+                            <div class="size">(Color: Black, Size: S)</div>
+                        </div>
+                        <div class="price">430</div>
+                    </div>
+                </div>
+
+                <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
+                    <div class="d-flex justify-content-between">
+                        <div class="">Subtotal:</div>
+                        <div class="fw-bold">862</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="">Subtotal:</div>
+                        <div class="fw-bold">862</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="">Subtotal:</div>
+                        <div class="fw-bold">862</div>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <div class="">Total:</div>
+                        <div class="fs-4">862</div>
+                    </div>
+                </div>
+            </div>
+
+
+            // Shopping Cart Plus Minus Quantity
+function incrementQuantity(button) {
+    let input = button.previousElementSibling;
+    input.value = parseInt(input.value) + 1;
+    updateCartTotals();
+}
+
+function decrementQuantity(button) {
+    let input = button.nextElementSibling;
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+        updateCartTotals();
+    }
+}
+
+function updateCartTotals() {
+    let rows = document.querySelectorAll('.menu-row');
+    let totalPrice = 0;
+
+    rows.forEach(row => {
+        let price = parseFloat(row.dataset.price); // Get original price from data attribute
+        let quantity = parseInt(row.querySelector('.quantity-input').value); // Get updated quantity
+        let itemTotal = price * quantity; // Calculate item total
+
+        // Update the quantity in Cart Totals display
+        let cartItem = document.querySelector(`.cart-item-${row.dataset.menuId}`);
+        cartItem.querySelector('.cart-item-quantity').textContent = quantity > 1 ? `(${quantity})` : ''; // Show quantity if more than 1
+        cartItem.querySelector('.cart-item-total').textContent = formatPrice(itemTotal);
+
+        totalPrice += itemTotal; // Add to total price
+    });
+
+    document.querySelector('#total-price').textContent = formatPrice(totalPrice); // Update total price
+}
+
+// Helper function to format price
+function formatPrice(price) {
+    return price % 1 === 0 ? `₱${price}` : `₱${price.toFixed(2)}`;
+}

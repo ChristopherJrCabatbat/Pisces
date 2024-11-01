@@ -68,21 +68,21 @@ class UserController extends Controller
     }
 
     public function shoppingCart()
-    {
-        /** @var User $user */
-        $user = Auth::user();
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
+{
+    /** @var User $user */
+    $user = Auth::user();
+    $userCart = $user->cart;
+    $userFavorites = $user->favoriteItems()->count();
 
-        // Get menus added to cart by the current user along with their cart_items IDs
-        $menus = DB::table('menus')
-            ->join('cart_items', 'menus.id', '=', 'cart_items.menu_id')
-            ->where('cart_items.user_id', $user->id)
-            ->select('menus.*', 'cart_items.id as cart_item_id')
-            ->get();
+    // Get menus added to cart by the current user along with their cart_items IDs and quantities
+    $menus = DB::table('menus')
+        ->join('cart_items', 'menus.id', '=', 'cart_items.menu_id')
+        ->where('cart_items.user_id', $user->id)
+        ->select('menus.*', 'cart_items.id as cart_item_id', 'cart_items.quantity') // Include quantity here
+        ->get();
 
-        return view('user.shoppingCart', compact('user', 'menus', 'userCart', 'userFavorites'));
-    }
+    return view('user.shoppingCart', compact('user', 'menus', 'userCart', 'userFavorites'));
+}
 
 
     public function addToFavorites(Request $request, $menuId)
@@ -109,14 +109,14 @@ class UserController extends Controller
         $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
             ->groupBy('category')
             ->get();
-    
+
         $selectedCategory = $request->input('category', 'All Menus');
-    
+
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-    
+
         // Retrieve favorite menus, excluding items already in the cart
         if ($selectedCategory == 'All Menus') {
             $menus = $user->favoriteItems()
@@ -128,10 +128,37 @@ class UserController extends Controller
                 ->whereNotIn('menus.id', $user->cartItems->pluck('id'))
                 ->get();
         }
-    
+
         return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
-    
+
+
+    public function updateQuantity(Request $request)
+    {
+        $request->validate([
+            'menu_id' => 'required|exists:menus,id',
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $userId = Auth::id();
+
+        // Find the cart item and update quantity directly
+        $cartItem = DB::table('cart_items')
+            ->where('user_id', $userId)
+            ->where('menu_id', $request->menu_id)
+            ->first();
+
+        if ($cartItem) {
+            DB::table('cart_items')
+                ->where('user_id', $userId)
+                ->where('menu_id', $request->menu_id)
+                ->update(['quantity' => $request->quantity]);
+
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Cart item not found']);
+        }
+    }
 
 
 
@@ -155,9 +182,15 @@ class UserController extends Controller
 
     public function order()
     {
+        /** @var User $user */
         $user = Auth::user();
-        return view('user.order', compact('user'));
+
+        // Fetch the user's cart items with pivot data (quantity) and menu details (price, name, image)
+        $menus = $user->cartItems()->withPivot('quantity')->get();
+
+        return view('user.order', compact('user', 'menus'));
     }
+
 
 
 

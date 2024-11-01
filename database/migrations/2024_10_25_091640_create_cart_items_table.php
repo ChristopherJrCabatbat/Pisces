@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
+            $table->integer('quantity')->default(1); // Add quantity column with default value of 1
             $table->timestamps();
         });
     }

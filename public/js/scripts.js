@@ -56,10 +56,13 @@ function previewImage(event) {
     }
 }
 
+
+
 // Shopping Cart Plus Minus Quantity
 function incrementQuantity(button) {
     let input = button.previousElementSibling;
     input.value = parseInt(input.value) + 1;
+    updateCartItemQuantity(input.dataset.menuId, input.value);
     updateCartTotals();
 }
 
@@ -67,27 +70,48 @@ function decrementQuantity(button) {
     let input = button.nextElementSibling;
     if (parseInt(input.value) > 1) {
         input.value = parseInt(input.value) - 1;
+        updateCartItemQuantity(input.dataset.menuId, input.value);
         updateCartTotals();
     }
 }
+
+function updateCartItemQuantity(menuId, quantity) {
+    fetch('/user/updateQuantity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            menu_id: menuId,
+            quantity: quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            console.error(data.message);
+        }
+    })
+    .catch(error => console.error('Error updating cart item:', error));
+}
+
 
 function updateCartTotals() {
     let rows = document.querySelectorAll('.menu-row');
     let totalPrice = 0;
 
     rows.forEach(row => {
-        let price = parseFloat(row.querySelector('.menu-price').dataset.price); // Get original price
+        let price = parseFloat(row.dataset.price); // Get original price from data attribute
         let quantity = parseInt(row.querySelector('.quantity-input').value); // Get updated quantity
         let itemTotal = price * quantity; // Calculate item total
-
-        row.querySelector('.item-total').textContent = formatPrice(itemTotal); // Update item total display
 
         // Update the quantity in Cart Totals display
         let cartItem = document.querySelector(`.cart-item-${row.dataset.menuId}`);
         cartItem.querySelector('.cart-item-quantity').textContent = quantity > 1 ? `(${quantity})` : ''; // Show quantity if more than 1
         cartItem.querySelector('.cart-item-total').textContent = formatPrice(itemTotal);
 
-        totalPrice += itemTotal;
+        totalPrice += itemTotal; // Add to total price
     });
 
     document.querySelector('#total-price').textContent = formatPrice(totalPrice); // Update total price
@@ -97,4 +121,3 @@ function updateCartTotals() {
 function formatPrice(price) {
     return price % 1 === 0 ? `₱${price}` : `₱${price.toFixed(2)}`;
 }
-
