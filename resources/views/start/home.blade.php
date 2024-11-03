@@ -150,12 +150,12 @@
 
                         <img src="./home-assets/images/hero-banner.png" width="680" height="720" alt="hero banner"
                             class="w-100">
-
+                        {{-- 
                         <img src="./home-assets/images/hero-shape-1.svg" width="338" height="138" alt="shape"
                             class="shape shape-1">
 
                         <img src="./home-assets/images/hero-shape-2.svg" width="237" height="80" alt="shape"
-                            class="shape shape-2">
+                            class="shape shape-2"> --}}
 
                     </figure>
 
@@ -186,21 +186,21 @@
                             <div class="instruction-card">
 
                                 <figure class="card-banner">
-                                    <img src="./home-assets/images/instructuion-1.png" width="300" height="154"
-                                        loading="lazy" alt="Select Restaurant" class="w-100">
+                                    {{-- <img src="./home-assets/images/instructuion-2.png" width="300" height="154" --}}
+                                    <img src="{{ asset('images/pansit.jpg') }}" width="300" height="154"
+                                        loading="lazy" alt="Select menu" class="w-100">
                                 </figure>
 
                                 <div class="card-content">
 
                                     <h3 class="h5 card-title">
                                         <span class="span">01</span>
-                                        Select Restaurant
+                                        {{-- Select Restaurant --}}
+                                        Pansit Sisig
                                     </h3>
 
                                     <p class="card-text">
-                                        Non enim praesent elementum facilisis leo vel fringilla. Lectus proin nibh nisl
-                                        condimentum id. Quis
-                                        varius quam quisque id diam vel.
+                                        Enjoy a unique twist on two Filipino favorites—stir-fried noodles topped with crispy, savory sisig. Perfect for any craving
                                     </p>
 
                                 </div>
@@ -212,21 +212,21 @@
                             <div class="instruction-card">
 
                                 <figure class="card-banner">
-                                    <img src="./home-assets/images/instructuion-2.png" width="300" height="154"
-                                        loading="lazy" alt="Select menu" class="w-100">
+                                    {{-- <img src="./home-assets/images/instructuion-1.png" width="300" height="154" --}}
+                                    <img src="{{ asset('images/pizza.jpg') }}" width="300" height="154"
+                                        loading="lazy" alt="Select Restaurant" class="w-100">
                                 </figure>
 
                                 <div class="card-content">
 
                                     <h3 class="h5 card-title">
                                         <span class="span">02</span>
-                                        Select menu
+                                        {{-- Select menu --}}
+                                        Special Pisces Pizza
                                     </h3>
 
                                     <p class="card-text">
-                                        Eu mi bibendum neque egestas congue quisque. Nulla facilisi morbi tempus iaculis
-                                        urna id volutpat
-                                        lacus. Odio ut sem nulla pharetra diam sit amet.
+                                        A delicious pizza topped with a blend of fresh seafood and herbs, making every bite full of flavor.
                                     </p>
 
                                 </div>
@@ -238,7 +238,7 @@
                             <div class="instruction-card">
 
                                 <figure class="card-banner">
-                                    <img src="./home-assets/images/instructuion-3.png" width="300" height="154"
+                                    <img src="{{ asset('images/pasta.jpg') }}" width="300" height="154"
                                         loading="lazy" alt="Wait for delivery" class="w-100">
                                 </figure>
 
@@ -246,13 +246,12 @@
 
                                     <h3 class="h5 card-title">
                                         <span class="span">03</span>
-                                        Wait for delivery
+                                        {{-- Wait for delivery --}}
+                                        Filipino Style Spaghetti
                                     </h3>
 
                                     <p class="card-text">
-                                        Nunc lobortis mattis aliquam faucibus. Nibh ipsum consequat nisl vel pretium
-                                        lectus quam id leo. A
-                                        scelerisque purus semper eget. Tincidunt arcu non.
+                                        Sweet, savory, and loaded with meaty goodness. A classic Filipino comfort food loved by all ages.
                                     </p>
 
                                 </div>
@@ -648,7 +647,8 @@
 
                     <a href="#" class="logo">
                         {{-- <img src="./home-assets/images/logo-footer.svg" width="148" height="38" alt="fasteat home"> --}}
-                        <img src="{{ asset('images/logo-name.png') }}" width="148" height="38" alt="Fasteat home">
+                        <img src="{{ asset('images/logo-name.png') }}" width="148" height="38"
+                            alt="Fasteat home">
                     </a>
 
                     <h2 class="h2 section-title">Pisces Coffee Hub</h2>
