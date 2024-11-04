@@ -1,6 +1,6 @@
 @extends('admin.layout')
 
-@section('title', 'Add Menu')
+@section('title', 'Add Category')
 
 @section('styles-links')
 
@@ -10,7 +10,7 @@
     <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a>
     </li>
     <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
-    <li class="add-categ"><a href="{{ route('admin.menuCreateCategory') }}" class="sidebar-font"><i class="fa-solid fa-plus me-2"></i> Add Category</a></li>
+    <li class="add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-plus me-2"></i> Add Category</a></li>
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
@@ -48,13 +48,13 @@
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
                     class="navigation">Dashboard</a> / <a href="/admin/menu" class="navigation">Menu</a> /</div>
-            <span class="faded-white ms-1">Add Menu</span>
+            <span class="faded-white ms-1">Add Category</span>
         </div>
 
         <div class="table-container p-4 text-black mb-4">
 
             <div class="taas-table d-flex justify-content-center align-items-center">
-                <div class="h2"><i class="fa-solid fa-plus me-2"></i>Add Menu</div>
+                <div class="h2"><i class="fa-solid fa-plus me-2"></i>Add Category</div>
             </div>
 
             <form action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data">

@@ -39,6 +39,7 @@ Route::group([
     // Route::get('/menu', [AdminController::class, 'menu'])->name('menu');
     Route::resource('menu', MenuController::class);
     Route::get('/menuSearch', [MenuController::class, 'menuSearch'])->name('menuSearch');
+    Route::get('/menuCreateCategory', [MenuController::class, 'menuCreateCategory'])->name('menuCreateCategory');
 
 
     // Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');

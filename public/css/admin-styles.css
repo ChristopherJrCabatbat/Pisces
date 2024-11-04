@@ -144,6 +144,20 @@ li.sidebar-item a.customers.active:hover {
     display: block;
 }
 
+.add-categ {
+    padding-left: 20px;
+    background-color: #c4c4c4;
+}
+
+li.add-categ:hover {
+    background-color: #989898 !important;
+} 
+
+.add-categ a {
+    font-size: 0.94rem;
+    /* padding-left: 20px; */
+}
+
 .fa-users-gear {
     margin-top: .9rem;
     position: absolute;

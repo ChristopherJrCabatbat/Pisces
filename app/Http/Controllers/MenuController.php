@@ -58,6 +58,12 @@ class MenuController extends Controller
         return view('admin.menuCreate');
     }
 
+    public function menuCreateCategory()
+    {
+        return view('admin.menuCreateCategory');
+    }
+    
+
     /**
      * Store a newly created resource in storage.
      */

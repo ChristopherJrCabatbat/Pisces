@@ -32,6 +32,7 @@ class RoleMiddleware
                 'admin.menu.edit',
                 'admin.menu.update',
                 'admin.menu.destroy',
+                'admin.menuCreateCategory',
 
                 'admin.delivery.index',
                 'admin.delivery.create',
