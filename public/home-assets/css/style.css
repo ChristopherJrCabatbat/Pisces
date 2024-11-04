@@ -300,6 +300,10 @@ body.active {
     gap: 60px;
 }
 
+.grid-list-menus {
+    gap: 20px;
+}
+
 .rating-wrapper {
     display: flex;
     gap: 2px;

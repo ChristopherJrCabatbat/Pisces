@@ -200,7 +200,8 @@
                                     </h3>
 
                                     <p class="card-text">
-                                        Enjoy a unique twist on two Filipino favorites—stir-fried noodles topped with crispy, savory sisig. Perfect for any craving
+                                        Enjoy a unique twist on two Filipino favorites—stir-fried noodles topped with
+                                        crispy, savory sisig. Perfect for any craving
                                     </p>
 
                                 </div>
@@ -226,7 +227,8 @@
                                     </h3>
 
                                     <p class="card-text">
-                                        A delicious pizza topped with a blend of fresh seafood and herbs, making every bite full of flavor.
+                                        A delicious pizza topped with a blend of fresh seafood and herbs, making every
+                                        bite full of flavor.
                                     </p>
 
                                 </div>
@@ -251,7 +253,8 @@
                                     </h3>
 
                                     <p class="card-text">
-                                        Sweet, savory, and loaded with meaty goodness. A classic Filipino comfort food loved by all ages.
+                                        Sweet, savory, and loaded with meaty goodness. A classic Filipino comfort food
+                                        loved by all ages.
                                     </p>
 
                                 </div>
@@ -275,7 +278,7 @@
             <section class="section top-restaurant" aria-labelledby="top-restaurent-label">
                 <div class="container">
 
-                    <ul class="grid-list">
+                    <ul class="grid-list grid-list-menus">
 
                         <li data-reveal="left">
                             <h2 class="h2 section-title" id="top-restaurent-label">
@@ -293,11 +296,15 @@
                             <div class="restaurant-card">
 
                                 <div class="card-icon">
-                                    <img src="./home-assets/images/rest-1.jpg" width="100" height="100"
+                                    {{-- <img src="./home-assets/images/rest-1.jpg" width="100" height="100" --}}
+                                    <img src="{{ asset('images/pansit.jpg') }}" width="100" height="100"
                                         loading="lazy" alt="Kennington Lane Cafe" class="w-100">
                                 </div>
 
-                                <h3 class="h5 card-title">Kennington Lane Cafe</h3>
+                                <h3 class="h5 card-title">
+                                    {{-- Kennington Lane Cafe --}}
+                                    Pansit Sisig
+                                </h3>
 
                                 <div class="rating-wrapper">
                                     <ion-icon name="star" aria-hidden="true"></ion-icon>
@@ -313,9 +320,8 @@
                                 </div>
 
                                 <p class="card-text">
-                                    Non enim praesent elementum facilisis leo vel fringilla. Lectus proin nibh nisl
-                                    condimentum id. Quis
-                                    varius quam quisque id diam vel.
+                                    Enjoy a unique twist on two Filipino favorites—stir-fried noodles topped with
+                                    crispy, savory sisig. Perfect for any craving
                                 </p>
 
                             </div>
@@ -325,11 +331,15 @@
                             <div class="restaurant-card">
 
                                 <div class="card-icon">
-                                    <img src="./home-assets/images/rest-2.jpg" width="100" height="100"
+                                    {{-- <img src="./home-assets/images/rest-2.jpg" width="100" height="100" --}}
+                                    <img src="{{ asset('images/pizza.jpg') }}" width="100" height="100"
                                         loading="lazy" alt="The Wilmington" class="w-100">
                                 </div>
 
-                                <h3 class="h5 card-title">The Wilmington</h3>
+                                <h3 class="h5 card-title">
+                                    {{-- The Wilmington --}}
+                                    Special Pisces Pizza
+                                </h3>
 
                                 <div class="rating-wrapper">
                                     <ion-icon name="star" aria-hidden="true"></ion-icon>
@@ -345,9 +355,8 @@
                                 </div>
 
                                 <p class="card-text">
-                                    Vulputate enim nulla aliquet porttitor lacus luctus. Suscipit adipiscing bibendum
-                                    est ultricies
-                                    integer. Sed adipiscing diam donec adipiscing tristique.
+                                    A delicious pizza topped with a blend of fresh seafood and herbs, making every bite
+                                    full of flavor.
                                 </p>
 
                             </div>
@@ -357,11 +366,15 @@
                             <div class="restaurant-card">
 
                                 <div class="card-icon">
-                                    <img src="./home-assets/images/rest-3.jpg" width="100" height="100"
+                                    {{-- <img src="./home-assets/images/rest-3.jpg" width="100" height="100" --}}
+                                    <img src="{{ asset('images/pasta.jpg') }}" width="100" height="100"
                                         loading="lazy" alt="Kings Arms" class="w-100">
                                 </div>
 
-                                <h3 class="h5 card-title">Kings Arms</h3>
+                                <h3 class="h5 card-title">
+                                    {{-- Kings Arms --}}
+                                    Filipino Style Spaghetti
+                                </h3>
 
                                 <div class="rating-wrapper">
                                     <ion-icon name="star" aria-hidden="true"></ion-icon>
@@ -377,9 +390,8 @@
                                 </div>
 
                                 <p class="card-text">
-                                    Tortor at risus viverra adipiscing at in tellus. Cras semper auctor neque vitae
-                                    tempus. Dui accumsan
-                                    sit amet nulla facilisi. Sed adipiscing diam donec adipiscing tristique.
+                                    Sweet, savory, and loaded with meaty goodness. A classic Filipino comfort food loved
+                                    by all ages.
                                 </p>
 
                             </div>
@@ -387,18 +399,57 @@
 
                     </ul>
 
-                    <a href="#" class="btn btn-secondary has-after">
+                    {{-- <a href="#" class="btn btn-secondary has-after">
                         <span class="span">See All</span>
-
+                        <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
+                    </a> --}}
+                    <!-- Modal Trigger Button -->
+                    <a href="#" class="btn btn-secondary has-after" data-bs-toggle="modal"
+                        data-bs-target="#menuModal">
+                        <span class="span">See All</span>
                         <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
                     </a>
 
+                    <!-- Modal Structure -->
+                    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="menuModalLabel">All Menus</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                                        @foreach ($menus as $menu)
+                                            <div class="col">
+                                                <div class="card h-100">
+                                                    <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}"
+                                                        class="card-img-top" alt="{{ $menu->name }}">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ $menu->name }}</h5>
+                                                        <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
+                                                        <div class="d-flex justify-content-between">
+                                                            <button class="btn btn-outline-primary"
+                                                                onclick="showLoginAlert()">Add to Cart</button>
+                                                            <button class="btn btn-outline-secondary"
+                                                                onclick="showLoginAlert()">Favorites</button>
+                                                            <button class="btn btn-outline-info"
+                                                                onclick="showLoginAlert()">View</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </section>
-
-
-
-
 
             <!--
         - #CTA
@@ -430,9 +481,6 @@
 
                 </div>
             </section>
-
-
-
 
 
             <!--
@@ -479,8 +527,6 @@
 
                 </div>
             </section>
-
-
 
 
 
@@ -784,6 +830,12 @@
   -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        function showLoginAlert() {
+            alert('Please log in to continue.');
+        }
+    </script>
 
 </body>
 

@@ -6,11 +6,15 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\HomeController;
 
 Route::get('/', function () {
     // return view('welcome');
     return view('start.home');
 });
+
+Route::get('/', [HomeController::class, 'home'])->name('home');
+
 Route::get('/welcome', function () {
     return view('welcome');
 });
