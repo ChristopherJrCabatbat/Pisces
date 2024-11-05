@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use App\Models\User;
 use App\Models\Menu;
+use App\Models\Category;
 
 
 class MenuController extends Controller
@@ -55,7 +57,8 @@ class MenuController extends Controller
      */
     public function create()
     {
-        return view('admin.menuCreate');
+        $categories = Category::all(); // Fetch all categories from the database
+        return view('admin.menuCreate', compact('categories'));
     }
 
     public function menuCreateCategory()
@@ -95,6 +98,23 @@ class MenuController extends Controller
 
         // Redirect back with a success message
         return redirect()->route('admin.menu.index')->with('success', 'Menu item added successfully.');
+    }
+
+    public function storeCategory(Request $request)
+    {
+        // Validate the form data
+        $validated = $request->validate([
+            'category' => 'required|string', // Add validation for category
+        ]);
+
+
+        // Create a new menu entry in the database
+        Category::create([
+            'category' => $validated['category'], // Store the category
+        ]);
+
+        // Redirect back with a success message
+        return redirect()->route('admin.menu.index')->with('success', 'Category item added successfully.');
     }
 
 

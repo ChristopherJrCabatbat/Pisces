@@ -44,7 +44,7 @@ Route::group([
     Route::resource('menu', MenuController::class);
     Route::get('/menuSearch', [MenuController::class, 'menuSearch'])->name('menuSearch');
     Route::get('/menuCreateCategory', [MenuController::class, 'menuCreateCategory'])->name('menuCreateCategory');
-
+    Route::post('/storeCategory', [MenuController::class, 'storeCategory'])->name('storeCategory');
 
     // Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');
     Route::resource('delivery', DeliveryController::class);

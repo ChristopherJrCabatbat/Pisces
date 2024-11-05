@@ -57,59 +57,19 @@
                 <div class="h2"><i class="fa-solid fa-plus me-2"></i>Add Category</div>
             </div>
 
-            <form action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.storeCategory') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-
-                <!-- Name -->
-                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="name" class="form-label">Name:</label>
-                    <input type="text" name="name" class="form-control" id="name" value="{{ old('name') }}"
-                        required placeholder="e.g. Pisces Pizza" autofocus>
-                </div>
-
-                <!-- Price -->
-                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="price" class="form-label">Price:</label>
-                    <input type="text" name="price" class="form-control" id="price" value="{{ old('price') }}"
-                        required placeholder="e.g. 199">
-                    @error('price')
-                        <div class="error alert alert-danger">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
 
                 <!-- Category -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="category" class="form-label">Category:</label>
-                    <select class="form-select" required name="category" id="category">
-                        <option value="" disabled selected>Select Category</option>
-                        <option value="Pizza" {{ old('category') === 'Pizza' ? 'selected' : '' }}>Pizza</option>
-                        <option value="Pasta" {{ old('category') === 'Pasta' ? 'selected' : '' }}>Pasta</option>
-                    </select>
+                    <label for="category" class="form-label">Category Name:</label>
+                    <input type="text" name="category" class="form-control" id="category" value="{{ old('category') }}"
+                        required placeholder="e.g. Coffee" autofocus>
                 </div>
 
-                <!-- Image -->
-                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="image" class="form-label">Image:</label>
-                    <input type="file" name="image" class="form-control" id="image" accept="image/*"
-                        onchange="previewImage(event)" required>
-                    <img id="imagePreview" src="#" alt="Selected Image Preview"
-                        style="display:none; width:150px; margin-top:10px;">
-                    @error('image')
-                        <div class="error alert alert-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Description -->
-                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="description" class="form-label">Description:</label>
-                    <textarea name="description" id="description" cols="30" rows="5" class="form-control" required
-                        placeholder="Enter menu description here...">{{ old('description') }}</textarea>
-                </div>
-
+                
                 <div class="d-grid my-2">
-                    <button class="btn btn-primary dark-blue" type="submit">Add Menu</button>
+                    <button class="btn btn-primary dark-blue" type="submit">Add Category</button>
                 </div>
             </form>
 
