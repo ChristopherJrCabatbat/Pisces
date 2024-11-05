@@ -403,46 +403,42 @@
                         <span class="span">See All</span>
                         <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
                     </a> --}}
+
                     <!-- Modal Trigger Button -->
-                    <a href="#" class="btn btn-secondary has-after" data-bs-toggle="modal"
-                        data-bs-target="#menuModal">
+                    <a href="#" class="btn btn-secondary has-after" onclick="showModal()">
                         <span class="span">See All</span>
                         <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
                     </a>
 
                     <!-- Modal Structure -->
-                    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="menuModalLabel">All Menus</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row row-cols-1 row-cols-md-3 g-4">
-                                        @foreach ($menus as $menu)
-                                            <div class="col">
-                                                <div class="card h-100">
-                                                    <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}"
-                                                        class="card-img-top" alt="{{ $menu->name }}">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">{{ $menu->name }}</h5>
-                                                        <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
-                                                        <div class="d-flex justify-content-between">
-                                                            <button class="btn btn-outline-primary"
-                                                                onclick="showLoginAlert()">Add to Cart</button>
-                                                            <button class="btn btn-outline-secondary"
-                                                                onclick="showLoginAlert()">Favorites</button>
-                                                            <button class="btn btn-outline-info"
-                                                                onclick="showLoginAlert()">View</button>
-                                                        </div>
-                                                    </div>
+                    <div class="custom-modal" id="menuModal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">All Menus</h5>
+                                <button type="button" class="close-button" onclick="closeModal()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="menu-grid">
+                                    @foreach ($menus as $menu)
+                                        <div class="menu-card">
+                                            <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}"
+                                                alt="{{ $menu->name }}">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ $menu->name }}</h5>
+                                                <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
+                                                <div class="button-group">
+                                                    <button class="custom-button" onclick="showLoginAlert()">Add to
+                                                        Cart</button>
+                                                    <button class="custom-button"
+                                                        onclick="showLoginAlert()">Favorites</button>
+                                                    <button class="custom-button"
+                                                        onclick="showLoginAlert()">Share</button>
+                                                    <button class="custom-button"
+                                                        onclick="showLoginAlert()">View</button>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>
@@ -832,8 +828,16 @@
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
     <script>
+        function showModal() {
+            document.getElementById('menuModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('menuModal').style.display = 'none';
+        }
+
         function showLoginAlert() {
-            alert('Please log in to continue.');
+            alert("You must log in first to continue.");
         }
     </script>
 
