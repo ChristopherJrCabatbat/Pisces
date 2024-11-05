@@ -13,20 +13,26 @@ use App\Models\Menu;
 class HomeController extends Controller
 {
     public function home(Request $request)
-{
-    $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-        ->groupBy('category')
-        ->get();
-
-    $selectedCategory = $request->input('category', 'All Menus');
-
-    // Retrieve all menus based on the selected category
-    if ($selectedCategory == 'All Menus') {
-        $menus = Menu::all();
-    } else {
-        $menus = Menu::where('category', $selectedCategory)->get();
+    {
+        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+            ->groupBy('category')
+            ->get();
+    
+        $selectedCategory = $request->input('category', 'All Menus');
+    
+        if ($selectedCategory == 'All Menus') {
+            $menus = Menu::all();
+        } else {
+            $menus = Menu::where('category', $selectedCategory)->get();
+        }
+    
+        // If request is AJAX, return only the menu cards HTML
+        if ($request->ajax()) {
+            return view('start.partials.menu_grid', compact('menus'))->render();
+        }
+    
+        return view('start.home', compact('menus', 'categories', 'selectedCategory'));
     }
-
-    return view('start.home', compact('menus', 'categories', 'selectedCategory'));
-}
+    
+    
 }

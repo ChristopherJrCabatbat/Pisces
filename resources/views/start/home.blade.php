@@ -107,7 +107,7 @@
                     <ion-icon name="bag" aria-hidden="true"></ion-icon>
                 </button>
 
-                <a href="{{ route('login') }}" class="btn btn-primary has-after">Order Now</a>
+                <a href="{{ route('login') }}" class="btn btn-primary has-after">LOG IN</a>
             </div>
 
             <button class="nav-open-btn" aria-label="open menu" data-nav-toggler>
@@ -405,14 +405,14 @@
                     </a> --}}
 
                     <!-- Modal Trigger Button -->
-                    <a href="#" class="btn btn-secondary has-after" onclick="showModal()">
+                    <a href="javascript:void(0);" class="btn btn-secondary has-after" onclick="showModal()">
                         <span class="span">See All</span>
                         <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
                     </a>
 
-                    <!-- Modal Structure -->
-                    <div class="custom-modal" id="menuModal">
-                        <div class="modal-content">
+                    <!-- Menu Modal Structure -->
+                    {{-- <div class="modal" id="menuModal">
+                        <div class="modal-dialog">
                             <div class="modal-header">
                                 <h5 class="modal-title">All Menus</h5>
                                 <button type="button" class="close-button" onclick="closeModal()">×</button>
@@ -440,6 +440,61 @@
                                         </div>
                                     @endforeach
                                 </div>
+                            </div>
+                        </div>
+                    </div> --}}
+
+                    <!-- Menu Modal Structure -->
+                    <div class="modal" id="menuModal">
+                        <div class="modal-dialog">
+                            <div class="modal-header">
+                                <h4 class="modal-title">{{ $selectedCategory }}</h4>
+                                <button type="button" class="close-button" onclick="closeModal()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Category Filter Dropdown -->
+                                <div class="lable-select">
+                                    {{-- <label for="categorySelect">Filter by Category:</label> --}}
+                                    <select id="categorySelect" onchange="filterByCategory()">
+                                        <option value="All Menus"
+                                            {{ $selectedCategory == 'All Menus' ? 'selected' : '' }}>
+                                            All Menus
+                                        </option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->category }}"
+                                                {{ $selectedCategory == $category->category ? 'selected' : '' }}>
+                                                {{ $category->category }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="menu-grid" id="menuGrid">
+                                    @foreach ($menus as $menu)
+                                        <div class="menu-card">
+                                            <div class="img-container">
+                                                <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}" alt="{{ $menu->name }}">
+                                                
+                                                <!-- Darken overlay div -->
+                                                <div class="darken"></div>
+                                                
+                                                <!-- Icon overlay with centered icons -->
+                                                <div class="icon-overlay">
+                                                    <button onclick="showLoginAlert()" title="Add to Cart"><i class="fa-solid fa-cart-plus"></i></button>
+                                                    <button onclick="showLoginAlert()" title="Favorites"><i class="fa-solid fa-heart"></i></button>
+                                                    <button onclick="showLoginAlert()" title="Share"><i class="fa-solid fa-share"></i></button>
+                                                    <button onclick="showLoginAlert()" title="View"><i class="fa-solid fa-search"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ $menu->name }}</h5>
+                                                <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                
+
                             </div>
                         </div>
                     </div>
@@ -838,6 +893,27 @@
 
         function showLoginAlert() {
             alert("You must log in first to continue.");
+        }
+
+        function filterByCategory() {
+            const categorySelect = document.getElementById('categorySelect');
+            const selectedCategory = categorySelect.value;
+
+            // Update modal title to the selected category
+            document.querySelector('.modal-title').textContent = selectedCategory;
+
+            // Use AJAX to fetch filtered menus
+            fetch(`${location.pathname}?category=${selectedCategory}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(data => {
+                    // Replace the content of menuGrid with the updated menus
+                    document.getElementById('menuGrid').innerHTML = data;
+                })
+                .catch(error => console.error('Error fetching menus:', error));
         }
     </script>
 

@@ -1112,13 +1112,12 @@ body.active {
 
 
 /* Modal */
-/* Modal Styling */
 .modal {
     display: none; /* Hidden by default */
-    position: fixed;
     z-index: 1000;
-    left: 0;
+    position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
@@ -1127,77 +1126,11 @@ body.active {
 
 .modal-dialog {
     margin: 5% auto;
-    width: 80%;
-    max-width: 900px;
+    max-width: 90%; /* Maximum width for larger screens */
+    width: fit-content; /* Automatically adjusts width to fit content */
     background-color: #fff;
     border-radius: 8px;
     padding: 20px;
-}
-
-.modal-header,
-.modal-body {
-    padding: 10px 15px;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-title {
-    margin: 0;
-}
-
-.btn-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-/* Modal Trigger Button */
-.see-all-button {
-    display: inline-flex;
-    align-items: center;
-    background-color: #4a90e2;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-.see-all-button:hover {
-    background-color: #357ab7;
-}
-
-.see-all-button .span {
-    margin-right: 5px;
-}
-
-/* Custom Modal */
-.custom-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 800px;
-    width: 90%;
-    position: relative;
 }
 
 .modal-header {
@@ -1211,6 +1144,7 @@ body.active {
 .modal-title {
     font-size: 1.5em;
     margin: 0;
+    color: rgb(26, 26, 26);
 }
 
 .close-button {
@@ -1225,43 +1159,111 @@ body.active {
     padding: 20px 0;
 }
 
+
+
 /* Grid of Menus */
+/* Menu grid styling to arrange menu cards horizontally */
 .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping if there are many menu items */
     gap: 20px;
+    justify-content: center; /* Centers the menu items within the dialog */
 }
 
+/* Each menu card */
 .menu-card {
+    width: 200px; /* Fixed width for each menu card */
+    display: flex;
+    flex-direction: column; /* Stack contents vertically within the card */
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
-    background-color: #f9f9f9;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     text-align: center;
+    position: relative;
 }
 
-.menu-card img {
+/* Image container styling */
+.img-container {
+    position: relative;
     width: 100%;
-    height: 150px;
-    object-fit: cover;
+    height: 150px; /* Set height to keep images consistent */
+    overflow: hidden;
 }
 
+/* Image within the container */
+.img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the container */
+}
+
+/* Darken overlay on hover */
+.img-container:hover .darken {
+    filter: brightness(30%);
+}
+
+/* Darken overlay styling */
+.darken {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none; /* Initially hidden */
+}
+
+/* Show darken overlay on hover */
+.img-container:hover .darken {
+    display: block;
+}
+
+/* Icon overlay styles */
+.icon-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 15px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.img-container:hover .icon-overlay {
+    opacity: 1;
+}
+
+.icon-overlay button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.icon-overlay button:hover {
+    transform: scale(1.2);
+    color: #f81d0b; /* Optional hover color effect */
+}
+/* Card body with top border */
 .card-body {
     padding: 10px;
+    border-top: 1px solid #ddd; /* Border to separate from image */
 }
 
 .card-title {
     font-size: 1.2em;
-    margin: 10px 0;
+    /* margin: 10px 0; */
 }
 
 .card-text {
     font-size: 1em;
     color: #666;
 }
+
+
 
 /* Button Group */
 .button-group {
@@ -1283,4 +1285,35 @@ body.active {
 
 .custom-button:hover {
     background-color: #357ab7;
+}
+
+#categorySelect {
+    display: block;
+    /* width: 20%; */
+    padding: 0.375rem 0.75rem;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#categorySelect:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+#categorySelect option {
+    color: #495057;
+}
+
+.lable-select {
+    display: flex;
 }
