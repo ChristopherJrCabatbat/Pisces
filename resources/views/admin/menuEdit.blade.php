@@ -11,8 +11,7 @@
     </li>
     <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
     <li>
-        <a href="/admin/delivery" class="fs-5 sidebar-font"><i
-                class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
+        <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
 
     <li class="sidebar-item" id="customersDropdown">
@@ -80,12 +79,17 @@
                     <label for="category" class="form-label">Category:</label>
                     <select class="form-select" required name="category" id="category">
                         <option value="" disabled>Select Category</option>
-                        <option value="Pizza" {{ old('category', $menus->category) === 'Pizza' ? 'selected' : '' }}>Pizza
-                        </option>
-                        <option value="Pasta" {{ old('category', $menus->category) === 'Pasta' ? 'selected' : '' }}>Pasta
-                        </option>
+
+                        <!-- Loop through categories and create option elements -->
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->category }}"
+                                {{ old('category', $menus->category) === $category->category ? 'selected' : '' }}>
+                                {{ $category->category }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
+
 
                 <!-- Current Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
@@ -98,7 +102,7 @@
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="image" class="form-label">New Image (optional):</label>
                     <input type="file" name="image" class="form-control" id="image" accept="image/*"
-                        onchange="previewImage(event)" required>
+                        onchange="previewImage(event)">
                     <img id="imagePreview" src="#" alt="Selected Image Preview"
                         style="display:none; width:150px; margin-top:10px;">
                     @error('image')

@@ -27,13 +27,16 @@
         <!-- Dropdown menu -->
         <ul class="dropdown-customers" style="display: none;">
             <li><a href="{{ route('admin.updates') }}"
-                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
+                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
             </li>
             <li><a href="{{ route('admin.feedback') }}"
-                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-comments me-2"></i>Feedback
+                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-comments me-2"></i>Feedback
                     Collection</a></li>
             <li><a href="{{ route('admin.monitoring') }}"
-                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
+                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li>
         </ul>
     </li>
@@ -47,7 +50,63 @@
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i>Dashboard</div>
         </div>
 
-        <div class="table-container"></div>
+        <!-- Dashboard Cards -->
+        <div class="table-container">
+
+            {{-- Summary --}}
+            <div class="row summary">
+                <!-- Users Card -->
+                <div class="col-md-3">
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-body">
+                            <span class="icon-background"><i class="fas fa-users"></i></span>
+                            <h2 class="card-title">{{ $userCount ?? 0 }}</h2>
+                            <p class="card-text">Users</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deliveries Card -->
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary mb-3">
+                        <div class="card-body">
+                            <span class="icon-background"><i class="fas fa-truck"></i></span>
+                            <h2 class="card-title">{{ $deliveryCount ?? 0 }}</h2>
+                            <p class="card-text">Deliveries</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menus Card -->
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning mb-3">
+                        <div class="card-body">
+                            <span class="icon-background"><i class="fas fa-utensils"></i></span>
+                            <h2 class="card-title">{{ $menuCount ?? 0 }}</h2>
+                            <p class="card-text">Menus</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Card -->
+                <div class="col-md-3">
+                    <div class="card text-white bg-dark mb-3">
+                        <div class="card-body">
+                            <span class="icon-background"><i class="fas fa-list"></i></span>
+                            <h2 class="card-title">{{ $categoryCount ?? 0 }}</h2>
+                            <p class="card-text">Categories</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Analytics --}}
+            <div class="analytics text-black">
+                <h3 class="h3">Top Picks</h3>
+            </div>
+
+
+        </div>
 
     </div>
 @endsection

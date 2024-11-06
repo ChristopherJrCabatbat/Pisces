@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\User;
 use App\Models\Menu;
+use App\Models\Category;
 
 class UserController extends Controller
 {
@@ -22,6 +23,22 @@ class UserController extends Controller
 
         return view('user.dashboard', compact('userCart', 'userFavorites'));
     }
+
+    //     public function dashboard()
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Fetch top categories based on the number of menus
+    //     $topCategories = Category::withCount('menus')
+    //         ->orderBy('menus_count', 'desc')
+    //         ->take(5) // Limit to top 5 categories
+    //         ->get();
+
+    //     return view('user.dashboard', compact('userCart', 'userFavorites', 'topCategories'));
+    // }
 
 
     public function menu(Request $request)
@@ -68,21 +85,21 @@ class UserController extends Controller
     }
 
     public function shoppingCart()
-{
-    /** @var User $user */
-    $user = Auth::user();
-    $userCart = $user->cart;
-    $userFavorites = $user->favoriteItems()->count();
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
 
-    // Get menus added to cart by the current user along with their cart_items IDs and quantities
-    $menus = DB::table('menus')
-        ->join('cart_items', 'menus.id', '=', 'cart_items.menu_id')
-        ->where('cart_items.user_id', $user->id)
-        ->select('menus.*', 'cart_items.id as cart_item_id', 'cart_items.quantity') // Include quantity here
-        ->get();
+        // Get menus added to cart by the current user along with their cart_items IDs and quantities
+        $menus = DB::table('menus')
+            ->join('cart_items', 'menus.id', '=', 'cart_items.menu_id')
+            ->where('cart_items.user_id', $user->id)
+            ->select('menus.*', 'cart_items.id as cart_item_id', 'cart_items.quantity') // Include quantity here
+            ->get();
 
-    return view('user.shoppingCart', compact('user', 'menus', 'userCart', 'userFavorites'));
-}
+        return view('user.shoppingCart', compact('user', 'menus', 'userCart', 'userFavorites'));
+    }
 
 
     public function addToFavorites(Request $request, $menuId)

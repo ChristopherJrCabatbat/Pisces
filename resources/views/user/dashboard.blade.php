@@ -15,6 +15,25 @@
                 max-width: none;
             }
         }
+
+        .text-center h2 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .text-center p {
+            max-width: 500px;
+            margin: auto;
+        }
+
+        /* Top Categories styling for images */
+        .img-fluid.rounded-circle {
+            transition: transform 0.3s ease;
+        }
+
+        .img-fluid.rounded-circle:hover {
+            transform: scale(1.1);
+        }
     </style>
 @endsection
 
@@ -31,12 +50,38 @@
     <div class="container main-content d-flex flex-column justify-content-center align-items-center">
 
         {{-- Top Categories --}}
+        {{-- <div class="text-center mb-5">
+            <h2>Top Categories</h2>
+            <p class="w-75 mx-auto text-muted">
+                Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for
+                more.
+            </p>
+
+            <div class="container text-center mt-4">
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-4">
+                    @foreach ($topCategories as $category)
+                        <div class="col d-flex flex-column align-items-center">
+                            <div class="position-relative">
+                                <img src="{{ asset('images/' . $category->image) }}"
+                                    class="img-fluid rounded-circle shadow-sm mb-2"
+                                    style="width: 100px; height: 100px; object-fit: cover;" alt="{{ $category->name }}">
+                            </div>
+                            <div class="fw-bold">{{ $category->name }}</div>
+                            <small class="text-muted">{{ $category->menus_count }} Menus</small>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div> --}}
+        
+        {{-- Top Categories --}}
         <div class="text-center mb-5">
             <div class="h2">
                 Top Categories
             </div>
             <div class="w-50 text-center mx-auto">
-                Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for more.
+                Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for
+                more.
             </div>
             <div class="container text-center mt-4">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5">
@@ -64,6 +109,8 @@
                 </div>
             </div>
         </div>
+
+
 
         {{-- Best Deals For You --}}
         <div class="w-100 mb-5">

@@ -26,4 +26,9 @@ class Menu extends Model
     {
         return $this->belongsToMany(User::class, 'favorite_items');
     }
+
+    public function category()
+{
+    return $this->belongsTo(Category::class);
+}
 }

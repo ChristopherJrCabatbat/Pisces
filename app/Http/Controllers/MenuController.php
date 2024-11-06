@@ -134,7 +134,9 @@ class MenuController extends Controller
     public function edit(string $id)
     {
         $menus = Menu::findOrFail($id);
-        return view('admin.menuEdit', compact('menus'));
+        $categories = Category::all(); // Fetch all categories
+
+        return view('admin.menuEdit', compact('menus', 'categories'));
     }
 
     /**

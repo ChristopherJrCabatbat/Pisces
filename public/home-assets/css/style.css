@@ -1127,6 +1127,7 @@ body.active {
 .modal-dialog {
     margin: 5% auto;
     max-width: 90%; /* Maximum width for larger screens */
+    min-width: 30%;
     width: fit-content; /* Automatically adjusts width to fit content */
     background-color: #fff;
     border-radius: 8px;
@@ -1175,7 +1176,7 @@ body.active {
     width: 200px; /* Fixed width for each menu card */
     display: flex;
     flex-direction: column; /* Stack contents vertically within the card */
-    border: 1px solid #ddd;
+    border: 1px solid var(--marigold);
     border-radius: 8px;
     overflow: hidden;
     text-align: center;

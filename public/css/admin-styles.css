@@ -168,6 +168,33 @@ li.add-categ:hover {
     margin-left: 1.64rem;
 }
 
+
+/* Dashboard Styles */
+.card {
+    position: relative;
+    min-height: 100px;
+    border-radius: 8px;
+    overflow: hidden; /* Ensures icons don’t affect the layout */
+    border: none;
+}
+.icon-background {
+    position: absolute;
+    bottom: 10px; /* Adjust icon position within card */
+    left: 10px;
+    font-size: 50px;
+    opacity: 0.2;
+    pointer-events: none; /* Makes icon non-interactive */
+}
+.card-body h2 {
+    font-size: 2rem;
+    margin-bottom: 0;
+}
+.card-body {
+    text-align: end;
+}
+
+
+
 /* Main Content Styles */
 .main-content {
     margin-top: 16vh;
@@ -195,6 +222,7 @@ li.add-categ:hover {
     .sidebar {
         width: 230px;
         transform: translateX(0); /* Initially shown on smaller screens */
+        z-index: 100;
     }
 
     .sidebar.active {
