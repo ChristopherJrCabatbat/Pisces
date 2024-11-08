@@ -105,12 +105,19 @@ class MenuController extends Controller
         // Validate the form data
         $validated = $request->validate([
             'category' => 'required|string', // Add validation for category
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
         ]);
 
+         // Handle file upload
+         if ($request->hasFile('image')) {
+            // Store the uploaded image in the 'public/menu_images' directory
+            $imagePath = $request->file('image')->store('category_images', 'public');
+        }
 
         // Create a new menu entry in the database
         Category::create([
             'category' => $validated['category'], // Store the category
+            'image' => $imagePath ?? null, // Save image path
         ]);
 
         // Redirect back with a success message

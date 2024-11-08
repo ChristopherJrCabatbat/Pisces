@@ -13,32 +13,54 @@ use App\Models\Category;
 
 class UserController extends Controller
 {
-    public function dashboard()
-    {
-        // Retrieve the current logged-in user's cart and favorites values
-        /** @var User $user */
-        $user = Auth::user();
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
-
-        return view('user.dashboard', compact('userCart', 'userFavorites'));
-    }
-
-    //     public function dashboard()
+    // public function dashboard()
     // {
+    //     // Retrieve the current logged-in user's cart and favorites values
     //     /** @var User $user */
     //     $user = Auth::user();
     //     $userCart = $user->cart;
     //     $userFavorites = $user->favoriteItems()->count();
 
-    //     // Fetch top categories based on the number of menus
-    //     $topCategories = Category::withCount('menus')
-    //         ->orderBy('menus_count', 'desc')
-    //         ->take(5) // Limit to top 5 categories
-    //         ->get();
-
-    //     return view('user.dashboard', compact('userCart', 'userFavorites', 'topCategories'));
+    //     return view('user.dashboard', compact('userCart', 'userFavorites'));
     // }
+
+    public function dashboard()
+{
+    /** @var User $user */
+    $user = Auth::user();
+    $userCart = $user->cart;
+    $userFavorites = $user->favoriteItems()->count();
+
+    // Fetch categories with menu counts and prioritize those with at least one menu
+    $topCategoriesWithMenus = DB::table('menus')
+        ->join('categories', 'menus.category', '=', 'categories.category')
+        ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
+        ->groupBy('categories.category', 'categories.image')
+        ->orderBy('menu_count', 'desc')
+        ->get();
+
+    // Fetch remaining categories that have no menus, limited to complete the top 5 list
+    $remainingCategories = DB::table('categories')
+        ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+        ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
+        ->groupBy('categories.category', 'categories.image')
+        ->havingRaw('menu_count = 0')
+        ->take(5 - $topCategoriesWithMenus->count())
+        ->get();
+
+    // Merge both results, ensuring there are exactly 5 items
+    $topCategories = $topCategoriesWithMenus->merge($remainingCategories)->take(5);
+
+    // Fetch the 4 latest menus
+    $latestMenus = DB::table('menus')
+        ->orderBy('created_at', 'desc')
+        ->take(4)
+        ->get();
+
+    return view('user.dashboard', compact('userCart', 'userFavorites', 'topCategories', 'latestMenus'));
+}
+
+
 
 
     public function menu(Request $request)

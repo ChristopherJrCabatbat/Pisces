@@ -67,7 +67,19 @@
                         required placeholder="e.g. Coffee" autofocus>
                 </div>
 
-                
+                <!-- Image -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="image" class="form-label">Image:</label>
+                    <input type="file" name="image" class="form-control" id="image" accept="image/*"
+                        onchange="previewImage(event)" required>
+                    <img id="imagePreview" src="#" alt="Selected Image Preview"
+                        style="display:none; width:150px; margin-top:10px;">
+                    @error('image')
+                        <div class="error alert alert-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+
                 <div class="d-grid my-2">
                     <button class="btn btn-primary dark-blue" type="submit">Add Category</button>
                 </div>

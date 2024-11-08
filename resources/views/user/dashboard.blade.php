@@ -16,23 +16,26 @@
             }
         }
 
-        .text-center h2 {
-            font-size: 2rem;
-            font-weight: 600;
+        /* Margin adjustment for better spacing */
+        @media (max-width: 576px) {
+            .col-6 {
+                margin-bottom: 1rem;
+            }
+        }
+        @media (min-width: 990px) {
+            .gap-full-screen {
+                gap: 1rem;
+            }
         }
 
-        .text-center p {
-            max-width: 500px;
-            margin: auto;
+        /* Adjust image hover effect */
+        .rounded-circle {
+            transition: transform 0.2s ease, border-color 0.2s ease;
         }
 
-        /* Top Categories styling for images */
-        .img-fluid.rounded-circle {
-            transition: transform 0.3s ease;
-        }
-
-        .img-fluid.rounded-circle:hover {
+        .rounded-circle:hover {
             transform: scale(1.1);
+            border-color: #e74c3c;
         }
     </style>
 @endsection
@@ -49,66 +52,32 @@
 @section('main-content')
     <div class="container main-content d-flex flex-column justify-content-center align-items-center">
 
-        {{-- Top Categories --}}
-        {{-- <div class="text-center mb-5">
-            <h2>Top Categories</h2>
-            <p class="w-75 mx-auto text-muted">
+        <!-- Top Categories -->
+        <div class="text-center mb-5">
+            <h2 class="text-white">Top Categories</h2>
+            <p class="w-75 mx-auto text-white">
                 Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for
                 more.
             </p>
 
             <div class="container text-center mt-4">
-                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-4">
+                <div class="row gap-full-screen justify-content-center g-4">
                     @foreach ($topCategories as $category)
-                        <div class="col d-flex flex-column align-items-center">
-                            <div class="position-relative">
-                                <img src="{{ asset('images/' . $category->image) }}"
-                                    class="img-fluid rounded-circle shadow-sm mb-2"
-                                    style="width: 100px; height: 100px; object-fit: cover;" alt="{{ $category->name }}">
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex flex-column align-items-center">
+                            <div class="position-relative" style="width: 150px; height: 150px;"> <!-- Increased size -->
+                                <img src="{{ asset('storage/' . $category->image) }}" class="rounded-circle shadow mb-3"
+                                    style="width: 100%; height: 100%; object-fit: cover; border: 3px solid #f81d0b;"
+                                    alt="{{ $category->category }}">
                             </div>
-                            <div class="fw-bold">{{ $category->name }}</div>
-                            <small class="text-muted">{{ $category->menus_count }} Menus</small>
+                            <div class="fw-bold fs-5 text-white text-center mt-1">{{ $category->category }}</div>
+                            <small class="text-white text-center" style="font-size: 0.9rem;">{{ $category->menu_count }}
+                                Menus</small>
                         </div>
                     @endforeach
                 </div>
             </div>
-        </div> --}}
-        
-        {{-- Top Categories --}}
-        <div class="text-center mb-5">
-            <div class="h2">
-                Top Categories
-            </div>
-            <div class="w-50 text-center mx-auto">
-                Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for
-                more.
-            </div>
-            <div class="container text-center mt-4">
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5">
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <img src="{{ asset('images/logo.jpg') }}" width="130" height="" alt="Picture">
-                        <div>Coffee</div>
-                    </div>
-
-                </div>
-            </div>
         </div>
+
 
 
 
@@ -285,125 +254,46 @@
             </div>
         </div>
 
-        {{-- New Menus --}}
-        <div class="w-100 mb-5">
-            <div class="h2 border-baba pb-3 mb-4">
-                New Menus
-            </div>
-            <div>
-                <div class="row row-cols-1 row-cols-md-4 g-4">
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
+       <!-- New Menus -->
+<div class="w-100 mb-5">
+    <div class="h2 border-baba pb-3 mb-4">
+        New Menus
+    </div>
+    <div>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            @foreach ($latestMenus as $menu)
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="img-container">
+                            <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken" alt="{{ $menu->name }}">
+                            <div class="icon-overlay">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <i class="fa-solid fa-share"></i>
+                                <i class="fa-solid fa-search"></i>
+                                <i class="fa-solid fa-heart"></i>
                             </div>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $menu->name }}</h5>
+                            <div class="price fw-bold mb-2">${{ number_format($menu->price, 2) }}</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="stars d-flex">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
+                                <div>({{ $menu->rating_count ?? 0 }})</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
+            @endforeach
         </div>
+    </div>
+</div>
+
 
 
     </div>
