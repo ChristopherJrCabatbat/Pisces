@@ -297,3 +297,44 @@ select:hover {
     transform: translateY(-50%);
     color: #6c757d; /* Optional: Adjust icon color if needed */
 }
+
+/* Filter Button Width */
+.button-wid {
+    width: 85%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Image Modal Styles */
+.image-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    max-width: 80%;
+    max-height: 75%;
+    border-radius: 10px;
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-modal:hover {
+    color: #f81d0b;
+}
+/* End Image Modal Styles */

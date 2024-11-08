@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;  // Import DB facade
 
 use App\Models\User;
 use App\Models\Menu;
@@ -21,34 +22,39 @@ class MenuController extends Controller
     {
         // $menus = Menu::paginate(2);
         $menus = Menu::all();
-        return view('admin.menu', compact('menus'));
+
+        $categories = DB::table('categories')->select('category')->distinct()->get();
+
+        return view('admin.menu', compact('menus', 'categories'));
     }
 
     public function menuSearch(Request $request)
     {
-        // Get the search query from the request
-        $search = $request->input('search');
+        // // Get the search query from the request
+        // $search = $request->input('search');
 
-        // Check if a search query exists
-        if ($search) {
-            // Search the menus by name, category, price, or description
-            $menus = Menu::where('name', 'LIKE', '%' . $search . '%')
-                ->orWhere('category', 'LIKE', '%' . $search . '%')
-                ->orWhere('description', 'LIKE', '%' . $search . '%')
-                ->orWhere('price', 'LIKE', '%' . $search . '%')
-                ->paginate(2); // Adjust pagination size if needed
-        } else {
-            // No search query, return all menus paginated
-            $menus = Menu::paginate(2); // Adjust pagination size if needed
-        }
+        // // Check if a search query exists
+        // if ($search) {
+        //     // Search the menus by name, category, price, or description
+        //     $menus = Menu::where('name', 'LIKE', '%' . $search . '%')
+        //         ->orWhere('category', 'LIKE', '%' . $search . '%')
+        //         ->orWhere('description', 'LIKE', '%' . $search . '%')
+        //         ->orWhere('price', 'LIKE', '%' . $search . '%')
+        //         ->paginate(2); // Adjust pagination size if needed
+        // } else {
+        //     // No search query, return all menus paginated
+        //     $menus = Menu::paginate(2); // Adjust pagination size if needed
+        // }
 
-        // If the request is AJAX, return only the table rows
-        if ($request->ajax()) {
-            return view('admin.partials.menu_table_body', compact('menus'))->render();
-        }
+        // // If the request is AJAX, return only the table rows
+        // if ($request->ajax()) {
+        //     return view('admin.partials.menu_table_body', compact('menus'))->render();
+        // }
 
-        // Return the full view with the menus
-        return view('admin.menu', compact('menus', 'search')); // Pass search query for reuse in the view
+
+
+        // // Return the full view with the menus
+        // return view('admin.menu', compact('menus', 'search')); // Pass search query for reuse in the view
     }
 
 

@@ -44,6 +44,12 @@
 @endsection
 
 @section('main-content')
+    <!-- Image Modal -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
     <div class="main-content">
 
         <div class="current-file mb-3 d-flex">
@@ -57,15 +63,17 @@
                 <!-- Left Section -->
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
-                        <select class="form-select custom-select" aria-label="Default select example">
-                            <option selected>Open this select menu</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
+                        <!-- Category Filter Section -->
+                        <select id="categoryFilter" class="form-select custom-select" aria-label="Category select">
+                            <option value="" selected>Default</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->category }}">{{ $category->category }}</option>
+                            @endforeach
                         </select>
-                        <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
+                        <button id="filterButton" class="btn btn-primary custom-filter-btn button-wid">
                             <i class="fa-solid fa-sort me-2"></i>Filter
                         </button>
+
                     </div>
 
                     <!-- Search -->
@@ -83,7 +91,7 @@
                 <div class="right d-flex gap-3">
                     <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
-                        <form action="{{ route('admin.menuSearch') }}">
+                        <form action="">
                             <input type="search" placeholder="Search something..." class="form-control" id="search-input"
                                 value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
@@ -107,7 +115,7 @@
                     </tr>
                 </thead>
                 <tbody id="menu-table-body">
-                    @forelse ($menus as $menu)
+                    @foreach ($menus as $menu)
                         <tr class="menu-row">
                             <!-- Image Column -->
                             <td>
@@ -124,9 +132,9 @@
                             <!-- Price (Remove trailing .00 if present) -->
                             <td>
                                 @if (floor($menu->price) == $menu->price)
-                                    ₱{{ number_format($menu->price, 0) }} <!-- Show without decimals -->
+                                    ₱{{ number_format($menu->price, 0) }}
                                 @else
-                                    ₱{{ number_format($menu->price, 2) }} <!-- Show with decimals -->
+                                    ₱{{ number_format($menu->price, 2) }}
                                 @endif
                             </td>
                             <td>{{ $menu->description }}</td>
@@ -151,12 +159,15 @@
                                 </form>
                             </td>
                         </tr>
-                    @empty
-                        <tr id="no-menus-row">
-                            <td colspan="6">There are no menus available.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
+                    <!-- Always include the "No menus" row, but hide it initially -->
+                    <tr id="no-menus-row" style="display: none;">
+                        <td colspan="6"></td>
+                    </tr>
+
                 </tbody>
+
+
             </table>
 
             {{-- Pagination --}}
@@ -169,49 +180,52 @@
 
 @section('scripts')
 
-    <!-- Updated Script -->
+    {{-- Search / Filter Script --}}
     <script>
-        document.getElementById('search-input').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const tableRows = document.querySelectorAll('#menu-table-body tr.menu-row');
-            let rowCount = 0; // To track visible rows
+        // Function to filter table based on category and search term
+        function filterTable() {
+            const selectedCategory = document.getElementById('categoryFilter').value.toLowerCase();
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const menuRows = document.querySelectorAll('#menu-table-body .menu-row');
+            let hasVisibleRow = false;
 
-            // Loop through all rows
-            tableRows.forEach(row => {
-                // Get the text from the columns (Name, Category, Price, Description)
+            menuRows.forEach(row => {
+                const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
                 const name = row.cells[1].textContent.toLowerCase();
-                const category = row.cells[2].textContent.toLowerCase();
                 const price = row.cells[3].textContent.toLowerCase();
                 const description = row.cells[4].textContent.toLowerCase();
 
-                // Check if the search term matches any column
-                if (name.includes(searchTerm) || category.includes(searchTerm) || description.includes(
-                        searchTerm) || price.includes(searchTerm)) {
-                    row.style.display = ''; // Show matching row
-                    rowCount++;
+                // Determine if the row matches the filter and search term
+                const matchesCategory = selectedCategory === "" || category === selectedCategory;
+                const matchesSearch = name.includes(searchTerm) || price.includes(searchTerm) || description
+                    .includes(searchTerm);
+
+                // Show the row if it matches both the selected category and the search term
+                if (matchesCategory && matchesSearch) {
+                    row.style.display = "";
+                    hasVisibleRow = true;
                 } else {
-                    row.style.display = 'none'; // Hide non-matching row
+                    row.style.display = "none";
                 }
             });
 
-            // Handle "No results found"
-            const noResultsRow = document.getElementById('no-results-row');
-            if (rowCount === 0) {
-                // If no "No results" row exists, create one
-                if (!noResultsRow) {
-                    const newRow = document.createElement('tr');
-                    newRow.id = 'no-results-row';
-                    newRow.innerHTML = `<td colspan="6">No results found</td>`;
-                    document.getElementById('menu-table-body').appendChild(newRow);
-                }
+            // Handle the unified "No menus" or "No results" message
+            const noMenusRow = document.getElementById('no-menus-row');
+            if (hasVisibleRow) {
+                noMenusRow.style.display = "none";
             } else {
-                // If there are results, remove "No results" row
-                if (noResultsRow) {
-                    noResultsRow.remove();
-                }
+                noMenusRow.style.display = "";
+                noMenusRow.innerHTML =
+                    `<td colspan="6">There are no menu found.</td>`;
             }
-        });
+        }
+
+        // Event listeners for category filter and search input
+        document.getElementById('filterButton').addEventListener('click', filterTable);
+        document.getElementById('search-input').addEventListener('input', filterTable);
     </script>
+
+
 
 
 @endsection

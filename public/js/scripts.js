@@ -121,3 +121,30 @@ function updateCartTotals() {
 function formatPrice(price) {
     return price % 1 === 0 ? `₱${price}` : `₱${price.toFixed(2)}`;
 }
+
+
+// Function to open the image modal
+function enlargeImage(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    modal.style.display = 'flex';
+    modalImg.src = imageSrc;
+}
+
+// Close the modal when the user clicks the close button
+document.querySelector('.close-modal').onclick = function () {
+    document.getElementById('imageModal').style.display = 'none';
+};
+
+// Close the modal when clicking outside the image
+document.getElementById('imageModal').onclick = function (event) {
+    if (event.target === this) {
+        this.style.display = 'none';
+    }
+};
+
+// Attach click event to all images in the menu table
+document.querySelectorAll('#menu-table-body img').forEach(img => {
+    img.style.cursor = 'pointer';
+    img.addEventListener('click', () => enlargeImage(img.src));
+});
