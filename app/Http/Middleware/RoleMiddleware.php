@@ -70,6 +70,10 @@ class RoleMiddleware
                 'user.updateQuantity',
 
                 'user.order',
+
+                'user.orders',
+
+                'user.messages',
             ],
         ];
 

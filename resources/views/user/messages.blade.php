@@ -19,13 +19,13 @@
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.dashboard') }}">HOME</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link fw-bold active" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
+        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">ORDERS</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES</a>
+        <a class="nav-link fw-bold active" aria-current="page" href="#">MESSAGES</a>
     </li>
 @endsection
 

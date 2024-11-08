@@ -78,6 +78,9 @@ Route::group([
 
     Route::get('/order', [UserController::class, 'order'])->name('order');
 
+    Route::get('/orders', [UserController::class, 'orders'])->name('orders');
+    Route::get('/messages', [UserController::class, 'messages'])->name('messages');
+
 
     // Route for viewing menu details
     Route::get('/menu-detail/{menuId}', [UserController::class, 'menuDetail'])->name('menuDetail');

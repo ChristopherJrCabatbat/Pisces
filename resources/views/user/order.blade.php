@@ -69,11 +69,17 @@
                         </div>
 
                         {{-- Payment Method --}}
-                        <label for="paymentMethod" class="form-label">Payment Method</label>
-                        <div class="form-check form-control p-2 ps-5 mb-3">
+                        <label for="paymentMethod" class="form-label">Mode of Payment</label>
+                        <div class="form-check form-control p-2 ps-5 mb-1">
                             <input class="form-check-input" type="radio" name="paymentMethod" id="cod" checked>
                             <label class="form-check-label" for="cod">
                                 Cash on Delivery (COD)
+                            </label>
+                        </div>
+                        <div class="form-check form-control p-2 ps-5 mb-3">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="gcash">
+                            <label class="form-check-label" for="gcash">
+                                GCash
                             </label>
                         </div>
 

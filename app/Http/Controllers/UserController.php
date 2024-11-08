@@ -25,40 +25,40 @@ class UserController extends Controller
     // }
 
     public function dashboard()
-{
-    /** @var User $user */
-    $user = Auth::user();
-    $userCart = $user->cart;
-    $userFavorites = $user->favoriteItems()->count();
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
 
-    // Fetch categories with menu counts and prioritize those with at least one menu
-    $topCategoriesWithMenus = DB::table('menus')
-        ->join('categories', 'menus.category', '=', 'categories.category')
-        ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
-        ->groupBy('categories.category', 'categories.image')
-        ->orderBy('menu_count', 'desc')
-        ->get();
+        // Fetch categories with menu counts and prioritize those with at least one menu
+        $topCategoriesWithMenus = DB::table('menus')
+            ->join('categories', 'menus.category', '=', 'categories.category')
+            ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
+            ->groupBy('categories.category', 'categories.image')
+            ->orderBy('menu_count', 'desc')
+            ->get();
 
-    // Fetch remaining categories that have no menus, limited to complete the top 5 list
-    $remainingCategories = DB::table('categories')
-        ->leftJoin('menus', 'categories.category', '=', 'menus.category')
-        ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
-        ->groupBy('categories.category', 'categories.image')
-        ->havingRaw('menu_count = 0')
-        ->take(5 - $topCategoriesWithMenus->count())
-        ->get();
+        // Fetch remaining categories that have no menus, limited to complete the top 5 list
+        $remainingCategories = DB::table('categories')
+            ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+            ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
+            ->groupBy('categories.category', 'categories.image')
+            ->havingRaw('menu_count = 0')
+            ->take(5 - $topCategoriesWithMenus->count())
+            ->get();
 
-    // Merge both results, ensuring there are exactly 5 items
-    $topCategories = $topCategoriesWithMenus->merge($remainingCategories)->take(5);
+        // Merge both results, ensuring there are exactly 5 items
+        $topCategories = $topCategoriesWithMenus->merge($remainingCategories)->take(5);
 
-    // Fetch the 4 latest menus
-    $latestMenus = DB::table('menus')
-        ->orderBy('created_at', 'desc')
-        ->take(4)
-        ->get();
+        // Fetch the 4 latest menus
+        $latestMenus = DB::table('menus')
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
 
-    return view('user.dashboard', compact('userCart', 'userFavorites', 'topCategories', 'latestMenus'));
-}
+        return view('user.dashboard', compact('userCart', 'userFavorites', 'topCategories', 'latestMenus'));
+    }
 
 
 
@@ -228,6 +228,56 @@ class UserController extends Controller
         $menus = $user->cartItems()->withPivot('quantity')->get();
 
         return view('user.order', compact('user', 'menus'));
+    }
+
+    public function orders(Request $request)
+    {
+        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+            ->groupBy('category')
+            ->get();
+
+        $selectedCategory = $request->input('category', 'All Menus');
+
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
+
+        // Retrieve menus based on selected category, excluding items in the cart
+        if ($selectedCategory == 'All Menus') {
+            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
+        } else {
+            $menus = Menu::where('category', $selectedCategory)
+                ->whereNotIn('id', $user->cartItems->pluck('id'))
+                ->get();
+        }
+
+        return view('user.orders', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    }
+
+    public function messages(Request $request)
+    {
+        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+            ->groupBy('category')
+            ->get();
+
+        $selectedCategory = $request->input('category', 'All Menus');
+
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
+
+        // Retrieve menus based on selected category, excluding items in the cart
+        if ($selectedCategory == 'All Menus') {
+            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
+        } else {
+            $menus = Menu::where('category', $selectedCategory)
+                ->whereNotIn('id', $user->cartItems->pluck('id'))
+                ->get();
+        }
+
+        return view('user.messages', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
 
 
