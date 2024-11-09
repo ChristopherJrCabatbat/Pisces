@@ -33,10 +33,57 @@ class DeliveryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(Request $request) 
+    
+    // public function store(Request $request)
     // {
+    //     $request->validate([
+    //         'fullName' => 'required|string|max:255',
+    //         'email' => 'required|email|max:255',
+    //         'contactNumber' => 'required|string|max:20',
+    //         'address' => 'required|string',
+    //         'shippingMethod' => 'required|string',
+    //         'paymentMethod' => 'required|string',
+    //         'note' => 'nullable|string',
+    //         'menu_names' => 'required|array',
+    //         'quantities' => 'required|array',
+    //     ]);
 
+    //     // Prepare the order and quantity fields as comma-separated strings
+    //     $orderNames = implode(', ', $request->menu_names);
+    //     $orderQuantities = implode(', ', $request->quantities);
+
+    //     // Calculate the total quantity
+    //     $totalQuantity = array_sum($request->quantities);
+
+    //     // Insert the order into the deliveries table
+    //     DB::table('deliveries')->insert([
+    //         'name' => $request->input('fullName'),
+    //         'email' => $request->input('email'),
+    //         'contact_number' => $request->input('contactNumber'),
+    //         'order' => $orderNames,
+    //         'address' => $request->input('address'),
+    //         'quantity' => $orderQuantities,
+    //         'shipping_method' => $request->input('shippingMethod'),
+    //         'mode_of_payment' => $request->input('paymentMethod'),
+    //         'note' => $request->input('note'),
+    //         'status' => 'Pending',
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Remove all cart items for the logged-in user
+    //     DB::table('cart_items')->where('user_id', $user->id)->delete();
+
+    //     // Reset the user's 'cart' field to 0
+    //     $user->cart = 0;
+    //     $user->save();
+
+    //     return redirect()->route('user.shoppingCart')->with('success', 'Your order has been placed successfully!');
     // }
+
 
     public function store(Request $request)
     {
@@ -51,25 +98,28 @@ class DeliveryController extends Controller
             'menu_names' => 'required|array',
             'quantities' => 'required|array',
         ]);
-
+    
         $orderItems = [];
         $totalQuantity = 0;
-
+        $orderQuantities = implode(', ', $request->quantities);
+    
+        // Construct the order string
         foreach ($request->menu_names as $index => $menuName) {
             $quantity = $request->quantities[$index];
             $orderItems[] = "{$menuName} (x{$quantity})";
             $totalQuantity += $quantity;
         }
-
+    
         $orderString = implode(', ', $orderItems);
-
-        DB::table('deliveries')->insert([
+    
+        // Insert the order into the deliveries table
+        $deliveryId = DB::table('deliveries')->insertGetId([
             'name' => $request->input('fullName'),
             'email' => $request->input('email'),
             'contact_number' => $request->input('contactNumber'),
             'order' => $orderString,
             'address' => $request->input('address'),
-            'quantity' => $totalQuantity,
+            'quantity' => $orderQuantities,
             'shipping_method' => $request->input('shippingMethod'),
             'mode_of_payment' => $request->input('paymentMethod'),
             'note' => $request->input('note'),
@@ -77,19 +127,32 @@ class DeliveryController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-
+    
+        // Store each order item in the orders table
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            DB::table('orders')->insert([
+                'delivery_id' => $deliveryId,
+                'menu_name' => $menuName,
+                'quantity' => $quantity,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    
         /** @var User $user */
         $user = Auth::user();
-
+    
         // Remove all cart items for the logged-in user
         DB::table('cart_items')->where('user_id', $user->id)->delete();
-
+    
         // Reset the user's 'cart' field to 0
         $user->cart = 0;
         $user->save();
-
+    
         return redirect()->route('user.shoppingCart')->with('success', 'Your order has been placed successfully!');
     }
+    
 
 
 
