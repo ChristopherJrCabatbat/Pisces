@@ -81,6 +81,7 @@ Route::group([
     Route::get('/orders', [UserController::class, 'orders'])->name('orders');
     Route::get('/messages', [UserController::class, 'messages'])->name('messages');
 
+    Route::resource('delivery', DeliveryController::class);
 
     // Route for viewing menu details
     Route::get('/menu-detail/{menuId}', [UserController::class, 'menuDetail'])->name('menuDetail');

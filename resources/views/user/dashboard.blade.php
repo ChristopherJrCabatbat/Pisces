@@ -10,6 +10,10 @@
             max-width: 50vw;
         }
 
+        .card-body {
+            border-top: 1px solid #484045;
+        }
+
         @media (max-width: 1244px) {
             .card-best {
                 max-width: none;

@@ -71,6 +71,14 @@ class RoleMiddleware
 
                 'user.order',
 
+                'user.delivery.index',
+                'user.delivery.create',
+                'user.delivery.store',
+                'user.delivery.show',
+                'user.delivery.edit',
+                'user.delivery.update',
+                'user.delivery.destroy',
+
                 'user.orders',
 
                 'user.messages',

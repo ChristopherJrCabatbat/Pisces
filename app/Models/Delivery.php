@@ -11,11 +11,14 @@ class Delivery extends Model
 
     protected $fillable = [
         'name', 
+        'email', 
         'contact_number', 
         'order',
         'address',
         'quantity',
+        'shipping_method',
         'mode_of_payment',
+        'note',
         'status'
     ];
 }
