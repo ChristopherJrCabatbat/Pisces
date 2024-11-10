@@ -58,7 +58,7 @@
                         <!-- Full Address -->
                         <div class="mb-3">
                             <label for="address" class="form-label">Full Address</label>
-                            <input type="text" class="form-control" id="address" name="address" placeholder="#123 Barangay ABC SCCP" required>
+                            <input type="text" class="form-control" id="address" name="address" autofocus placeholder="#123 Barangay ABC SCCP" required>
                         </div>
 
                         <!-- Shipping Method -->

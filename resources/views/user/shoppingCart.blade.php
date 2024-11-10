@@ -140,16 +140,15 @@
             <div class="cart-totals-container mb-5 p-4 text-black" style="border: 1px solid #ddd; width: 400px;">
                 <h5 class="fw-bold mb-3 border-bottom pb-2">Cart Totals</h5>
 
-                {{-- Display each menu item and its price --}}
                 @php
                     $totalPrice = 0;
                 @endphp
 
                 @foreach ($menus as $menu)
                     @php
-                        $quantity = $menu->pivot->quantity ?? 1; // Get quantity from pivot or default to 1
-                        $itemTotal = $menu->price * $quantity; // Calculate item total
-                        $totalPrice += $itemTotal; // Add to total
+                        $quantity = $menu->pivot->quantity ?? 1;
+                        $itemTotal = $menu->price * $quantity;
+                        $totalPrice += $itemTotal;
                     @endphp
                     <div class="d-flex justify-content-between mb-2 pb-2 border-bottom cart-item-{{ $menu->id }}">
                         <span>
@@ -170,7 +169,6 @@
                     </div>
                 @endforeach
 
-                {{-- Display the total price --}}
                 <div class="fw-bold d-flex justify-content-between font-weight-bold border-bottom pb-2">
                     <span>Total</span>
                     <span id="total-price">
@@ -182,10 +180,16 @@
                     </span>
                 </div>
 
-                <a href="{{ route('user.order') }}" class="btn btn-danger order rounded-1 checkout-btn mt-4 px-4"
-                    style="font-size: 1em;">Check Out</a>
-            </div>
+                {{-- Check if the menus collection is empty --}}
+                <form action="{{ route('user.order') }}" method="GET">
+                    @csrf
+                    <button type="submit" class="btn btn-danger order rounded-1 checkout-btn mt-4 px-4"
+                        style="font-size: 1em;" @if ($menus->isEmpty()) disabled  @endif>
+                        Check Out
+                    </button>
+                </form>
 
+            </div>
 
 
             {{-- Divider --}}

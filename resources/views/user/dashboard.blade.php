@@ -26,6 +26,7 @@
                 margin-bottom: 1rem;
             }
         }
+
         @media (min-width: 990px) {
             .gap-full-screen {
                 gap: 1rem;
@@ -151,158 +152,80 @@
             </div>
             <div>
                 <div class="row row-cols-1 row-cols-md-4 g-4">
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
+                    @foreach ($popularMenus as $menu)
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="img-container">
+                                    <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
+                                        alt="{{ $menu->name }}">
+                                    <div class="icon-overlay">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <i class="fa-solid fa-share"></i>
+                                        <i class="fa-solid fa-search"></i>
+                                        <i class="fa-solid fa-heart"></i>
                                     </div>
-                                    <div>(2)</div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $menu->name }}</h5>
+                                    <div class="price fw-bold mb-2">${{ number_format($menu->price, 2) }}</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <div>({{ $menu->order_count }})</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken" alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Special Pisces Pizza</h5>
-                                <div class="price fw-bold mb-2">$10.00</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
-                                    </div>
-                                    <div>(2)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
-
             </div>
         </div>
 
-       <!-- New Menus -->
-<div class="w-100 mb-5">
-    <div class="h2 border-baba pb-3 mb-4">
-        New Menus
-    </div>
-    <div>
-        <div class="row row-cols-1 row-cols-md-4 g-4">
-            @foreach ($latestMenus as $menu)
-                <div class="col">
-                    <div class="card h-100">
-                        <div class="img-container">
-                            <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken" alt="{{ $menu->name }}">
-                            <div class="icon-overlay">
-                                <i class="fa-solid fa-cart-plus"></i>
-                                <i class="fa-solid fa-share"></i>
-                                <i class="fa-solid fa-search"></i>
-                                <i class="fa-solid fa-heart"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $menu->name }}</h5>
-                            <div class="price fw-bold mb-2">${{ number_format($menu->price, 2) }}</div>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="stars d-flex">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
+        <!-- New Menus -->
+        <div class="w-100 mb-5">
+            <div class="h2 border-baba pb-3 mb-4">
+                New Menus
+            </div>
+            <div>
+                <div class="row row-cols-1 row-cols-md-4 g-4">
+                    @foreach ($latestMenus as $menu)
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="img-container">
+                                    <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
+                                        alt="{{ $menu->name }}">
+                                    <div class="icon-overlay">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <i class="fa-solid fa-share"></i>
+                                        <i class="fa-solid fa-search"></i>
+                                        <i class="fa-solid fa-heart"></i>
+                                    </div>
                                 </div>
-                                <div>({{ $menu->rating_count ?? 0 }})</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $menu->name }}</h5>
+                                    <div class="price fw-bold mb-2">${{ number_format($menu->price, 2) }}</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <div>({{ $menu->rating_count ?? 0 }})</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
-            @endforeach
+            </div>
         </div>
-    </div>
-</div>
 
 
 

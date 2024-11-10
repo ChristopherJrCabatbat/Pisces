@@ -57,10 +57,17 @@ class UserController extends Controller
             ->take(4)
             ->get();
 
-        return view('user.dashboard', compact('userCart', 'userFavorites', 'topCategories', 'latestMenus'));
+        // Fetch the 4 most popular menus based on order count, matching menu names
+        $popularMenus = DB::table('orders')
+            ->join('menus', 'orders.menu_name', '=', 'menus.name')
+            ->select('menus.name', 'menus.image', 'menus.price', DB::raw('COUNT(orders.id) as order_count'))
+            ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price')
+            ->orderByDesc('order_count')
+            ->take(4)
+            ->get();
+
+        return view('user.dashboard', compact('userCart', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus'));
     }
-
-
 
 
     public function menu(Request $request)
