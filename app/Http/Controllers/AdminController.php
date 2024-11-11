@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\User;
 use App\Models\Menu;
@@ -18,9 +19,27 @@ class AdminController extends Controller
         $deliveryCount = Delivery::count();
         $menuCount = Menu::count();
         $categoryCount = Category::count();
+    
+        // Fetch the top 5 most popular menus based on the total order count
+        $topPicks = DB::table('orders')
+            ->join('menus', 'orders.menu_name', '=', 'menus.name')
+            ->select(
+                'menus.id',
+                'menus.name',
+                'menus.image',
+                'menus.category',
+                'menus.price',
+                'menus.description',
+                DB::raw('SUM(orders.quantity) as total_order_count')
+            )
+            ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.category', 'menus.price', 'menus.description')
+            ->orderByDesc('total_order_count')
+            ->take(5)
+            ->get();
+    
+        return view('admin.dashboard', compact('userCount', 'deliveryCount', 'menuCount', 'categoryCount', 'topPicks'));
+    }    
 
-        return view('admin.dashboard', compact('userCount', 'deliveryCount', 'menuCount', 'categoryCount'));
-    }
 
     public function menu()
     {

@@ -59,6 +59,8 @@ class RoleMiddleware
 
                 'user.menu',
                 
+                'user.menuView',
+                
                 'user.addToFavorites',
                 'user.favorites',
                 
@@ -70,6 +72,7 @@ class RoleMiddleware
                 'user.updateQuantity',
 
                 'user.order',
+                'user.orderView',
 
                 'user.delivery.index',
                 'user.delivery.create',
@@ -80,6 +83,7 @@ class RoleMiddleware
                 'user.delivery.destroy',
 
                 'user.orders',
+                'user.orderStore',
 
                 'user.messages',
             ],

@@ -66,7 +66,8 @@ Route::group([
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/menu', [UserController::class, 'menu'])->name('menu');
-
+    
+    Route::get('/menuView/{id}', [UserController::class, 'menuView'])->name('menuView');
     Route::put('addToCart/{id}', [UserController::class, 'addToCart'])->name('addToCart');
     Route::put('addToFavorites/{id}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
 
@@ -77,11 +78,13 @@ Route::group([
     Route::get('/favorites', [UserController::class, 'favorites'])->name('favorites');
 
     Route::get('/order', [UserController::class, 'order'])->name('order');
+    Route::get('/orderView/{id}', [UserController::class, 'orderView'])->name('orderView');
 
     Route::get('/orders', [UserController::class, 'orders'])->name('orders');
     Route::get('/messages', [UserController::class, 'messages'])->name('messages');
 
     Route::resource('delivery', DeliveryController::class);
+    Route::post('/orderStore', [DeliveryController::class, 'orderStore'])->name('orderStore');
 
     // Route for viewing menu details
     Route::get('/menu-detail/{menuId}', [UserController::class, 'menuDetail'])->name('menuDetail');

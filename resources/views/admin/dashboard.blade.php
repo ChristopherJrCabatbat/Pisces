@@ -3,6 +3,17 @@
 @section('title', 'Dashboard')
 
 @section('styles-links')
+    <style>
+        /* Card hover effect */
+        .hover-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 @endsection
 
 @section('sidebar')
@@ -57,7 +68,7 @@
             <div class="row summary">
                 <!-- Users Card -->
                 <div class="col-md-3">
-                    <div class="card text-white bg-info mb-3">
+                    <div class="card text-white bg-info mb-3 hover-card">
                         <div class="card-body">
                             <span class="icon-background"><i class="fas fa-users"></i></span>
                             <h2 class="card-title">{{ $userCount ?? 0 }}</h2>
@@ -68,7 +79,7 @@
 
                 <!-- Deliveries Card -->
                 <div class="col-md-3">
-                    <div class="card text-white bg-primary mb-3">
+                    <div class="card text-white bg-primary mb-3 hover-card">
                         <div class="card-body">
                             <span class="icon-background"><i class="fas fa-truck"></i></span>
                             <h2 class="card-title">{{ $deliveryCount ?? 0 }}</h2>
@@ -79,7 +90,7 @@
 
                 <!-- Menus Card -->
                 <div class="col-md-3">
-                    <div class="card text-white bg-warning mb-3">
+                    <div class="card text-white bg-warning mb-3 hover-card">
                         <div class="card-body">
                             <span class="icon-background"><i class="fas fa-utensils"></i></span>
                             <h2 class="card-title">{{ $menuCount ?? 0 }}</h2>
@@ -90,7 +101,7 @@
 
                 <!-- Categories Card -->
                 <div class="col-md-3">
-                    <div class="card text-white bg-dark mb-3">
+                    <div class="card text-white bg-dark mb-3 hover-card">
                         <div class="card-body">
                             <span class="icon-background"><i class="fas fa-list"></i></span>
                             <h2 class="card-title">{{ $categoryCount ?? 0 }}</h2>
@@ -100,11 +111,57 @@
                 </div>
             </div>
 
+
             {{-- Analytics --}}
             <div class="analytics text-black">
-                <h3 class="h3">Top Picks</h3>
+                <h3 class="h3 mb-3">Top Picks</h3>
+                {{-- Table --}}
+                <table class="table text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Image</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Total Orders</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menu-table-body">
+                        @forelse ($topPicks as $menu)
+                            <tr class="menu-row">
+                                <!-- Image Column -->
+                                <td>
+                                    @if ($menu->image)
+                                        <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                            class="img-fluid" width="50">
+                                    @else
+                                        <span>No Image</span>
+                                    @endif
+                                </td>
+                                <!-- Name, Category, Description -->
+                                <td>{{ $menu->name }}</td>
+                                <td>{{ $menu->category }}</td>
+                                <!-- Price (Remove trailing .00 if present) -->
+                                <td>
+                                    @if (floor($menu->price) == $menu->price)
+                                        ₱{{ number_format($menu->price, 0) }}
+                                    @else
+                                        ₱{{ number_format($menu->price, 2) }}
+                                    @endif
+                                </td>
+                                <td>{{ $menu->description }}</td>
+                                <!-- Total Orders Column -->
+                                <td>{{ $menu->total_order_count }}</td>
+                            </tr>
+                        @empty
+                            <tr id="no-menus-row">
+                                <td colspan="6">No popular menus found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-
 
         </div>
 

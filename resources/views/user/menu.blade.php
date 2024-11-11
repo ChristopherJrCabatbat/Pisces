@@ -11,7 +11,164 @@
         select {
             width: 30% !important;
         }
+
+        /* Modal styles */
+        .product-page {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .product-images {
+            flex: 1;
+        }
+
+        .main-image {
+            /* width: 100%; */
+            max-width: 350px;
+        }
+
+        .thumbnails img {
+            width: 50px;
+            margin-right: 5px;
+        }
+
+        .product-details {
+            flex: 2;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .ratings {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pricing {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .discounted-price {
+            color: red;
+            font-weight: bold;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .discount {
+            color: green;
+        }
+
+        .return-shipping {
+            margin: 10px 0;
+        }
+
+        .brand-options button {
+            margin: 5px;
+            padding: 5px 10px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .extra-info {
+            margin-top: 10px;
+            display: flex;
+            gap: 20px;
+        }
     </style>
+@endsection
+
+@section('modals')
+    <!-- Product Details Modal -->
+    <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content text-black">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="menuDetailsModalLabel">Menu Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="product-page">
+                        <!-- Product Images -->
+                        <div class="product-images">
+                            <img src="" alt="Product Image" id="menuImage" class="main-image img-fluid">
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="product-details">
+                            <h1 id="menuName" class="h2"></h1>
+                            <div class="ratings mb-2">
+                                <span id="menuRating">⭐ 4.2</span>
+                                <span id="ratingCount">(4K Ratings)</span>
+                            </div>
+
+                            <!-- Pricing Section -->
+                            <div class="pricing mb-2">
+                                <span id="discountedPrice" class="discounted-price"></span>
+                                <span id="originalPrice" class="original-price"></span>
+                                <span id="discountPercentage" class="discount"></span>
+                            </div>
+
+                            <!-- Category and Description -->
+                            <p><strong>Category:</strong> <span id="menuCategory"></span></p>
+                            <p><strong>Description:</strong> <span id="menuDescription"></span></p>
+
+                            <!-- Quantity Selector -->
+                            <div class="quantity-selector mb-3">
+                                <button type="button" class="btn qty-btn rounded-circle" onclick="decrementQuantity(this)">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+
+                                <input type="text" readonly name="quantity" value="{{ $menu->quantity ?? 1 }}"
+                                    min="1" class="form-control text-center mx-2 quantity-input" style="width: 60px;"
+                                    {{-- data-menu-id="{{ $menu->id }}? --}}>
+
+
+
+                                <!-- Add data-menu-id here -->
+                                <button type="button" class="btn qty-btn rounded-circle" onclick="incrementQuantity(this)">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button class="btn btn-danger modal-button add-to-cart">Add To Cart</button>
+                                <button class="btn btn-danger modal-button order-now">Order Now</button>
+                            </div>
+
+                            <!-- Additional Info -->
+                            <div class="extra-info mt-3">
+                                <span>❤️ 1K Favorites</span>
+                                {{-- <span>Shopee Guarantee</span> --}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('topbar')
@@ -61,7 +218,7 @@
                         </div>
                     </div>
 
-                    <!-- Dynamically generated categories with counts -->
+                    <!-- Sorted Categories by Menu Count -->
                     @foreach ($categories as $category)
                         <div class="d-flex justify-content-between">
                             <div>
@@ -77,6 +234,7 @@
                     @endforeach
                 </div>
             </div>
+
 
             {{-- Menus --}}
             <div class="menus d-flex flex-column gap-4 mb-5 w-100">
@@ -120,7 +278,9 @@
                                                         title="Add to Cart"></i></button>
                                             </form>
                                             <i class="fa-solid fa-share" title="Share"></i>
-                                            <i class="fa-solid fa-search" title="View"></i>
+                                            {{-- <i class="fa-solid fa-search" title="View"></i> --}}
+                                            <i class="fa-solid fa-search view-menu-btn" title="View"
+                                                data-id="{{ $menu->id }}"></i>
                                             <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
                                                 enctype="multipart/form-data">
                                                 @csrf
@@ -179,4 +339,95 @@
 @endsection
 
 @section('scripts')
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewButtons = document.querySelectorAll('.view-menu-btn');
+
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const menuId = this.getAttribute('data-id');
+
+                    // Fetch menu details via AJAX
+                    fetch(`/user/menuView/${menuId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Populate the modal with menu details
+                            const modalContent = `
+                        <div class="text-center mb-3">
+                            <img src="${data.image ? '/storage/' + data.image : '/images/logo.jpg'}" 
+                                 alt="${data.name}" class="img-fluid" style="width: 150px;">
+                        </div>
+                        <h5>${data.name}</h5>
+                        <p><strong>Category:</strong> ${data.category}</p>
+                        <p><strong>Price:</strong> ₱${parseFloat(data.price).toLocaleString()}</p>
+                        <p><strong>Description:</strong> ${data.description}</p>
+                    `;
+                            document.getElementById('menuDetailsContent').innerHTML =
+                                modalContent;
+
+                            // Show the modal
+                            const menuDetailsModal = new bootstrap.Modal(document
+                                .getElementById('menuDetailsModal'));
+                            menuDetailsModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching menu details:', error);
+                            alert('Failed to fetch menu details. Please try again.');
+                        });
+                });
+            });
+        });
+    </script> --}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewButtons = document.querySelectorAll('.view-menu-btn');
+    
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const menuId = this.getAttribute('data-id');
+    
+                    // Fetch menu details via AJAX
+                    fetch(`/user/menuView/${menuId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Populate the modal with menu details
+                            document.getElementById('menuImage').src = data.image ?
+                                `/storage/${data.image}` : '/images/logo.jpg';
+                            document.getElementById('menuName').textContent = data.name;
+                            document.getElementById('menuCategory').textContent = data.category;
+                            document.getElementById('menuDescription').textContent = data.description;
+                            document.getElementById('discountedPrice').textContent =
+                                `₱${parseFloat(data.price).toLocaleString()}`;
+                            document.getElementById('menuRating').textContent = `⭐ ${data.rating}`;
+                            document.getElementById('ratingCount').textContent = `(${data.ratingCount} Ratings)`;
+    
+                            // Update the Order Now button to link to the order page for the specific item
+                            document.querySelector('.modal-button.order-now').onclick = function() {
+                                window.location.href = `/user/orderView/${menuId}`;
+                            };
+    
+                            // Show the modal
+                            const menuDetailsModal = new bootstrap.Modal(document.getElementById('menuDetailsModal'));
+                            menuDetailsModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching menu details:', error);
+                            alert('Failed to fetch menu details. Please try again.');
+                        });
+                });
+            });
+        });
+    </script>
+    
 @endsection

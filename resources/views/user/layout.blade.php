@@ -20,6 +20,7 @@
 </head>
 
 <body>
+    @yield('modals')
 
     <header>
         <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">
