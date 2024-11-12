@@ -77,8 +77,11 @@ Route::group([
 
     Route::get('/favorites', [UserController::class, 'favorites'])->name('favorites');
 
-    Route::get('/order', [UserController::class, 'order'])->name('order');
+    Route::post('/order', [UserController::class, 'order'])->name('order');
     Route::get('/orderView/{id}', [UserController::class, 'orderView'])->name('orderView');
+    
+    Route::post('/menuDetails/{id}', [UserController::class, 'menuDetails'])->name('menuDetails');
+    Route::post('/menuDetailsOrder/{id}', [UserController::class, 'menuDetailsOrder'])->name('menuDetailsOrder');
 
     Route::get('/orders', [UserController::class, 'orders'])->name('orders');
     Route::get('/messages', [UserController::class, 'messages'])->name('messages');

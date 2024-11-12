@@ -181,13 +181,14 @@
                 </div>
 
                 {{-- Check if the menus collection is empty --}}
-                <form action="{{ route('user.order') }}" method="GET">
+                <form action="{{ route('user.order') }}" method="POST">
                     @csrf
                     <button type="submit" class="btn btn-danger order rounded-1 checkout-btn mt-4 px-4"
-                        style="font-size: 1em;" @if ($menus->isEmpty()) disabled  @endif>
+                        style="font-size: 1em;" @if ($menus->isEmpty()) disabled @endif>
                         Check Out
                     </button>
                 </form>
+
 
             </div>
 

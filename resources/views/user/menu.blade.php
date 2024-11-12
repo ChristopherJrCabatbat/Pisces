@@ -135,21 +135,24 @@
 
                             <!-- Quantity Selector -->
                             <div class="quantity-selector mb-3">
-                                <button type="button" class="btn qty-btn rounded-circle" onclick="decrementQuantity(this)">
+                                <button type="button" class="btn qty-btn rounded-circle"
+                                    onclick="modalDecrementQuantity(this)">
                                     <i class="fa fa-minus"></i>
                                 </button>
 
-                                <input type="text" readonly name="quantity" value="{{ $menu->quantity ?? 1 }}"
-                                    min="1" class="form-control text-center mx-2 quantity-input" style="width: 60px;"
-                                    {{-- data-menu-id="{{ $menu->id }}? --}}>
+                                <input type="text" readonly name="display_quantity" value="1" min="1"
+                                    class="form-control text-center mx-2 quantity-input" style="width: 60px;"
+                                    id="modalQuantityInput">
 
+                                <!-- Hidden input to pass the quantity to the backend -->
+                                <input type="hidden" name="quantity" id="modalHiddenQuantity" value="1">
 
-
-                                <!-- Add data-menu-id here -->
-                                <button type="button" class="btn qty-btn rounded-circle" onclick="incrementQuantity(this)">
+                                <button type="button" class="btn qty-btn rounded-circle"
+                                    onclick="modalIncrementQuantity(this)">
                                     <i class="fa fa-plus"></i>
                                 </button>
                             </div>
+
 
                             <!-- Action Buttons -->
                             <div class="action-buttons">
@@ -168,7 +171,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @section('topbar')
@@ -278,9 +280,14 @@
                                                         title="Add to Cart"></i></button>
                                             </form>
                                             <i class="fa-solid fa-share" title="Share"></i>
-                                            {{-- <i class="fa-solid fa-search" title="View"></i> --}}
-                                            <i class="fa-solid fa-search view-menu-btn" title="View"
-                                                data-id="{{ $menu->id }}"></i>
+                                            <form action="{{ route('user.menuDetails', $menu->id) }}" method="POST">
+                                            {{-- <form action="" method="GET"> --}}
+                                                @csrf
+                                                <button style="background-color: transparent; border: none; padding: 0;"
+                                                    {{-- type="button"><i class="fa-solid fa-search view-menu-btn" --}}
+                                                    type="submit"><i class="fa-solid fa-search view-menu-btn"
+                                                        title="View menu" data-id="{{ $menu->id }}"></i></button>
+                                            </form>
                                             <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
                                                 enctype="multipart/form-data">
                                                 @csrf
@@ -339,59 +346,14 @@
 @endsection
 
 @section('scripts')
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const viewButtons = document.querySelectorAll('.view-menu-btn');
-
-            viewButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const menuId = this.getAttribute('data-id');
-
-                    // Fetch menu details via AJAX
-                    fetch(`/user/menuView/${menuId}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            // Populate the modal with menu details
-                            const modalContent = `
-                        <div class="text-center mb-3">
-                            <img src="${data.image ? '/storage/' + data.image : '/images/logo.jpg'}" 
-                                 alt="${data.name}" class="img-fluid" style="width: 150px;">
-                        </div>
-                        <h5>${data.name}</h5>
-                        <p><strong>Category:</strong> ${data.category}</p>
-                        <p><strong>Price:</strong> ₱${parseFloat(data.price).toLocaleString()}</p>
-                        <p><strong>Description:</strong> ${data.description}</p>
-                    `;
-                            document.getElementById('menuDetailsContent').innerHTML =
-                                modalContent;
-
-                            // Show the modal
-                            const menuDetailsModal = new bootstrap.Modal(document
-                                .getElementById('menuDetailsModal'));
-                            menuDetailsModal.show();
-                        })
-                        .catch(error => {
-                            console.error('Error fetching menu details:', error);
-                            alert('Failed to fetch menu details. Please try again.');
-                        });
-                });
-            });
-        });
-    </script> --}}
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const viewButtons = document.querySelectorAll('.view-menu-btn');
-    
+
             viewButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const menuId = this.getAttribute('data-id');
-    
+
                     // Fetch menu details via AJAX
                     fetch(`/user/menuView/${menuId}`)
                         .then(response => {
@@ -406,19 +368,31 @@
                                 `/storage/${data.image}` : '/images/logo.jpg';
                             document.getElementById('menuName').textContent = data.name;
                             document.getElementById('menuCategory').textContent = data.category;
-                            document.getElementById('menuDescription').textContent = data.description;
+                            document.getElementById('menuDescription').textContent = data
+                                .description;
                             document.getElementById('discountedPrice').textContent =
                                 `₱${parseFloat(data.price).toLocaleString()}`;
-                            document.getElementById('menuRating').textContent = `⭐ ${data.rating}`;
-                            document.getElementById('ratingCount').textContent = `(${data.ratingCount} Ratings)`;
-    
-                            // Update the Order Now button to link to the order page for the specific item
-                            document.querySelector('.modal-button.order-now').onclick = function() {
-                                window.location.href = `/user/orderView/${menuId}`;
-                            };
-    
+                            document.getElementById('menuRating').textContent =
+                                `⭐ ${data.rating}`;
+                            document.getElementById('ratingCount').textContent =
+                                `(${data.ratingCount} Ratings)`;
+
+                            // Reset the quantity input for each new modal view
+                            document.getElementById('modalQuantityInput').value = 1;
+                            document.getElementById('modalHiddenQuantity').value = 1;
+
+                            // Set button destination for "Order Now"
+                            document.querySelector('.modal-button.order-now').onclick =
+                                function() {
+                                    const quantity = document.getElementById(
+                                        'modalHiddenQuantity').value;
+                                    window.location.href =
+                                        `/user/orderView/${menuId}?quantity=${quantity}`;
+                                };
+
                             // Show the modal
-                            const menuDetailsModal = new bootstrap.Modal(document.getElementById('menuDetailsModal'));
+                            const menuDetailsModal = new bootstrap.Modal(document
+                                .getElementById('menuDetailsModal'));
                             menuDetailsModal.show();
                         })
                         .catch(error => {
@@ -428,6 +402,27 @@
                 });
             });
         });
+
+        // Modal-specific increment function
+        function modalIncrementQuantity(button) {
+            let input = document.getElementById('modalQuantityInput');
+            input.value = parseInt(input.value) + 1;
+
+            // Update the hidden input field for quantity
+            document.getElementById('modalHiddenQuantity').value = input.value;
+        }
+
+        // Modal-specific decrement function
+        function modalDecrementQuantity(button) {
+            let input = document.getElementById('modalQuantityInput');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+
+                // Update the hidden input field for quantity
+                document.getElementById('modalHiddenQuantity').value = input.value;
+            }
+        }
     </script>
-    
+
+
 @endsection

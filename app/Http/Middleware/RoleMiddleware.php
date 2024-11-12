@@ -73,6 +73,8 @@ class RoleMiddleware
 
                 'user.order',
                 'user.orderView',
+                'user.menuDetails',
+                'user.menuDetailsOrder',
 
                 'user.delivery.index',
                 'user.delivery.create',

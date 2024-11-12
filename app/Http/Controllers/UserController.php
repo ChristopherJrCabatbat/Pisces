@@ -291,20 +291,46 @@ class UserController extends Controller
     {
         // Get the current authenticated user
         $user = Auth::user();
-    
+
         // Retrieve the specific menu item by ID
         $menu = Menu::find($id);
-    
+
         // Check if the menu item exists
         if (!$menu) {
             return redirect()->route('user.menu')->with('error', 'Menu item not found');
         }
-    
+
         // Pass the menu item and user to the view
         return view('user.orderView', compact('menu', 'user'));
     }
-    
-    
+
+    public function menuDetails($id)
+    {
+        // Fetch the staff member details
+        $menus = Menu::findOrFail($id);
+
+        return view('user.menuDetails', compact('menus'));
+    }
+
+    public function menuDetailsOrder($id)
+    {
+         // Get the current authenticated user
+         $user = Auth::user();
+
+         // Retrieve the specific menu item by ID
+         $menu = Menu::find($id);
+ 
+         // Check if the menu item exists
+         if (!$menu) {
+             return redirect()->route('user.menu')->with('error', 'Menu item not found');
+         }
+ 
+         // Pass the menu item and user to the view
+         return view('user.menuDetailsOrder', compact('menu', 'user'));
+    }
+
+
+
 
 
     public function orders(Request $request)

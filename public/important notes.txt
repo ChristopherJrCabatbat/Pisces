@@ -532,3 +532,32 @@ function formatPrice(price) {
             });
         });
     </script>
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+      <!-- Product Images -->
+                <div class="product-images">
+                    <img src="{{ asset('storage/' . $menus->image) }}" id="menuImage" class="main-image"
+                        alt="Picture">
+                    <div class="thumbnails">
+                        <!-- Additional thumbnail images -->
+                        <img src="{{ asset('storage/' . $menus->image) }}" id="menuImage" class="main-image"
+                            alt="Picture">
+                        <img src="{{ asset('storage/' . $menus->image) }}" id="menuImage" class="main-image"
+                            alt="Picture">
+                        <img src="{{ asset('storage/' . $menus->image) }}" id="menuImage" class="main-image"
+                            alt="Picture">
+                    </div>
+                </div>
