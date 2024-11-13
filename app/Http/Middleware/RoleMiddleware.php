@@ -66,6 +66,7 @@ class RoleMiddleware
                 
                 'user.menuDetail',
                 'user.addToCart',
+                'user.addToCartModal',
                 'user.addToFavorites',
                 'user.shoppingCart',
                 'user.removeCart',

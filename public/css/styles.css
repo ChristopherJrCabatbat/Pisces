@@ -110,7 +110,6 @@ body {
 }
 /* End Icon overlay styles */
 
-
 /* Menu Styles */
 .top-container {
     background-color: rgb(122, 109, 117);
@@ -194,7 +193,6 @@ body {
 .footer-fs {
     font-size: 1.1rem;
 }
-
 
 /* Navigation sa Taas ng Table */
 .navigation {
@@ -294,7 +292,6 @@ th {
 
 /* End icon styles */
 
-
 /* Cart Styles */
 
 .qty-btn {
@@ -336,7 +333,6 @@ th {
 
 /* End of Cart Styles */
 
-
 /* Checkout button styles */
 .order {
     background-color: #f81d0b;
@@ -348,3 +344,19 @@ th {
     background-color: transparent !important;
     color: #f81d0b !important;
 }
+
+/* Success message styling */
+.copy-message {
+    display: none;
+    color: green;
+    position: absolute;
+    background-color: white;
+    padding: 10px 18px;
+    z-index: 200;
+    top: 20%;
+    /* left: 50%; */
+    /* transform: translate(-50%, -50%); */
+    border-radius: 10px;
+    text-align: center;
+}
+

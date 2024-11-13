@@ -153,10 +153,17 @@
                                 </button>
                             </div>
 
-
                             <!-- Action Buttons -->
                             <div class="action-buttons">
-                                <button class="btn btn-danger modal-button add-to-cart">Add To Cart</button>
+                                {{-- <form action="{{ route('user.addToCart', $menu->id) }}" method="POST" --}}
+                                <form action="" method="POST"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="btn btn-danger modal-button add-to-cart">Add To
+                                        Cart</button>
+                                </form>
+                                {{-- <button type="button" class="btn btn-danger add-to-cart" data-id="{{ $menu->id }}">Add To Cart</button> --}}
                                 <button class="btn btn-danger modal-button order-now">Order Now</button>
                             </div>
 
@@ -255,11 +262,12 @@
                     <div class="row row-cols-1 row-cols-md-3 g-4">
                         @forelse($menus as $menu)
                             <div class="col">
-                                <div class="card h-100">
+                                <div class="card h-100 position-relative">
+                                    <!-- Unique Placeholder for success message, positioned within each card -->
+                                    <div id="copyMessage-{{ $menu->id }}" class="copy-message"></div>
 
                                     {{-- Menu Image --}}
                                     <div class="img-container">
-
                                         @if ($menu->image)
                                             <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
                                                 alt="{{ $menu->name }}">
@@ -269,7 +277,7 @@
                                         @endif
 
                                         <div class="icon-overlay text-white">
-                                            {{-- <i class="fa-solid fa-cart-plus" title="Add to Cart"></i> --}}
+                                            {{-- Add to Cart --}}
                                             <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
                                                 enctype="multipart/form-data">
                                                 @csrf
@@ -279,15 +287,27 @@
                                                         class="fa-solid fa-cart-plus text-white"
                                                         title="Add to Cart"></i></button>
                                             </form>
-                                            <i class="fa-solid fa-share" title="Share"></i>
-                                            <form action="{{ route('user.menuDetails', $menu->id) }}" method="POST">
-                                            {{-- <form action="" method="GET"> --}}
+
+                                            {{-- Share Menu --}}
+                                            <form action="" method="GET">
+                                                @csrf
+                                                <button type="button"
+                                                    style="background-color: transparent; border: none; padding: 0;">
+                                                    <!-- Share Button -->
+                                                    <i class="fa-solid fa-share" title="Share Menu"
+                                                        onclick="copyMenuLink({{ $menu->id }})"></i>
+                                                </button>
+                                            </form>
+
+                                            {{-- View Menu --}}
+                                            <form action="" method="GET">
                                                 @csrf
                                                 <button style="background-color: transparent; border: none; padding: 0;"
-                                                    {{-- type="button"><i class="fa-solid fa-search view-menu-btn" --}}
-                                                    type="submit"><i class="fa-solid fa-search view-menu-btn"
-                                                        title="View menu" data-id="{{ $menu->id }}"></i></button>
+                                                    type="button"><i class="fa-solid fa-search view-menu-btn"
+                                                        title="View Menu" data-id="{{ $menu->id }}"></i></button>
                                             </form>
+
+                                            {{-- Add to Favorites --}}
                                             <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
                                                 enctype="multipart/form-data">
                                                 @csrf
@@ -302,8 +322,6 @@
                                             </form>
 
                                         </div>
-
-
                                     </div>
 
                                     {{-- Menu Body --}}
@@ -311,9 +329,9 @@
                                         <h5 class="card-title">{{ $menu->name }}</h5>
                                         <div class="price fw-bold mb-2">
                                             @if (floor($menu->price) == $menu->price)
-                                                ₱{{ number_format($menu->price, 0) }} <!-- Without decimals -->
+                                                ₱{{ number_format($menu->price, 0) }}
                                             @else
-                                                ₱{{ number_format($menu->price, 2) }} <!-- With decimals -->
+                                                ₱{{ number_format($menu->price, 2) }}
                                             @endif
                                         </div>
                                         <div class="d-flex align-items-center gap-2">
@@ -322,12 +340,11 @@
                                                 <i class="fa-solid fa-star"></i>
                                                 <i class="fa-solid fa-star"></i>
                                                 <i class="fa-solid fa-star"></i>
-                                                <i class="fa-regular fa-star"></i> <!-- Example rating -->
+                                                <i class="fa-regular fa-star"></i>
                                             </div>
-                                            <div>(2)</div> <!-- Example rating count -->
+                                            <div>(2)</div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         @empty
@@ -337,6 +354,7 @@
                         @endforelse
                     </div>
                 </div>
+
 
             </div>
 
@@ -424,5 +442,70 @@
         }
     </script>
 
+    {{-- Add To Cart Modal --}}
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const menuId = this.getAttribute('data-id');
 
+                fetch(`/user/addToCartModal/${menuId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+
+                            // Update the cart count in the navbar
+                            const cartCountElement = document.querySelector('#cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.textContent = data.cartCount;
+                            }
+                        } else {
+                            alert('Failed to add item to cart. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while adding the item to the cart.');
+                    });
+            });
+        });
+    </script>
+
+    {{-- Share Link Script --}}
+    <script>
+        function copyMenuLink(menuId) {
+            // Construct the menu link URL
+            const menuLink = `${window.location.origin}/user/menuDetails/${menuId}`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(menuLink)
+                .then(() => {
+                    // Check if the correct element is targeted
+                    console.log("Copy successful, targeting message element for menu ID:", menuId);
+                    const messageElement = document.getElementById(`copyMessage-${menuId}`);
+                    if (messageElement) {
+                        messageElement.textContent = "Menu link copied successfully";
+                        messageElement.style.display = 'block'; // Make it visible
+                        console.log("Message displayed for menu ID:", menuId);
+
+                        // Hide the message after 3 seconds
+                        setTimeout(() => {
+                            messageElement.style.display = 'none';
+                            console.log("Message hidden for menu ID:", menuId);
+                        }, 2000);
+                    } else {
+                        console.error("Message element not found for menu ID:", menuId);
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to copy the text: ', err);
+                });
+        }
+    </script>
 @endsection

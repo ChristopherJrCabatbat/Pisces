@@ -155,14 +155,14 @@
             <div class="product-page">
                 <!-- Product Images -->
                 <div class="product-images">
-                    <img src="{{ asset('storage/' . $menus->image) }}" id="menuImage" class="main-image" alt="Picture">
+                    <img src="{{ asset('storage/' . $menu->image) }}" id="menuImage" class="main-image" alt="Picture">
                     {{-- <div class="thumbnails">
                     <!-- Additional thumbnail images -->
-                    <img src="{{ asset('storage/' . $menus->image) }}" id="menuImage" class="main-image"
+                    <img src="{{ asset('storage/' . $menu->image) }}" id="menuImage" class="main-image"
                         alt="Picture">
-                    <img src="{{ asset('storage/' . $menus->image) }}" id="menuImage" class="main-image"
+                    <img src="{{ asset('storage/' . $menu->image) }}" id="menuImage" class="main-image"
                         alt="Picture">
-                    <img src="{{ asset('storage/' . $menus->image) }}" id="menuImage" class="main-image"
+                    <img src="{{ asset('storage/' . $menu->image) }}" id="menuImage" class="main-image"
                         alt="Picture">
                 </div> --}}
                 </div>
@@ -170,7 +170,7 @@
 
                 <!-- Product Details -->
                 <div class="product-details">
-                    <h1 id="menuName">{{ $menus->name }}</h1>
+                    <h1 id="menuName">{{ $menu->name }}</h1>
                     <div class="ratings">
                         <span id="menuRating">⭐ 4.2</span>
                         <span id="ratingCount">(4K Ratings)</span>
@@ -178,17 +178,17 @@
 
                     <!-- Pricing Section -->
                     <div class="pricing">
-                        <span id="discountedPrice" class="discounted-price">₱{{ $menus->price }}</span>
+                        <span id="discountedPrice" class="discounted-price">₱{{ $menu->price }}</span>
                         {{-- <span id="originalPrice" class="original-price">₱1000.00</span>
                         <span id="discountPercentage" class="discount">20% OFF</span> --}}
                     </div>
 
                     <!-- Category and Description -->
-                    <p><strong>Category:</strong> <span id="menuCategory">{{ $menus->category }}</span></p>
-                    <p><strong>Description:</strong> <span id="menuDescription">{{ $menus->description }}</span>
+                    <p><strong>Category:</strong> <span id="menuCategory">{{ $menu->category }}</span></p>
+                    <p><strong>Description:</strong> <span id="menuDescription">{{ $menu->description }}</span>
                     </p>
 
-                    <!-- Quantity Selector -->
+                    {{-- <!-- Quantity Selector -->
                     <div class="quantity-selector">
                         <button type="button" class="btn qty-btn rounded-circle" onclick="modalDecrementQuantity(this)">
                             <i class="fa fa-minus"></i>
@@ -206,10 +206,39 @@
                     <!-- Action Buttons -->
                     <div class="action-buttons">
                         <button class="btn btn-danger add-to-cart">Add To Cart</button>
-                        <form action="{{ route('user.menuDetailsOrder', $menus->id) }}" method="POST">
+
+                        <!-- Order Form with Quantity Input -->
+                        <form action="{{ route('user.menuDetailsOrder', $menu->id) }}" method="POST">
                             @csrf
-                            <button class="btn btn-danger order-now">Order Now</button>
+                            <!-- Hidden input to pass quantity -->
+                            <input type="hidden" name="quantity" id="modalHiddenQuantity" value="1">
+                            <button type="submit" class="btn btn-danger order-now">Order Now</button>
                         </form>
+                    </div> --}}
+
+                    <!-- Quantity Selector -->
+                    <div class="quantity-selector mb-3">
+                        <button type="button" class="btn qty-btn rounded-circle" onclick="modalDecrementQuantity(this)">
+                            <i class="fa fa-minus"></i>
+                        </button>
+
+                        <input type="text" readonly name="display_quantity" value="1" min="1"
+                            class="form-control text-center mx-2 quantity-input" style="width: 60px;"
+                            id="modalQuantityInput">
+
+                        <!-- Hidden input to track the quantity -->
+                        <input type="hidden" name="quantity" id="modalHiddenQuantity" value="1">
+
+                        <button type="button" class="btn qty-btn rounded-circle" onclick="modalIncrementQuantity(this)">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-danger modal-button add-to-cart">Add To Cart</button>
+                        <button class="btn btn-danger modal-button order-now" onclick="redirectToOrderNow()">Order
+                            Now</button>
                     </div>
 
                     <!-- Additional Info -->
@@ -225,8 +254,8 @@
 @endsection
 
 @section('scripts')
-    <script>
-        // Modal-specific increment function
+    {{-- <script>
+        // Increment quantity in modal
         function modalIncrementQuantity(button) {
             let input = document.getElementById('modalQuantityInput');
             input.value = parseInt(input.value) + 1;
@@ -235,7 +264,7 @@
             document.getElementById('modalHiddenQuantity').value = input.value;
         }
 
-        // Modal-specific decrement function
+        // Decrement quantity in modal
         function modalDecrementQuantity(button) {
             let input = document.getElementById('modalQuantityInput');
             if (parseInt(input.value) > 1) {
@@ -245,7 +274,33 @@
                 document.getElementById('modalHiddenQuantity').value = input.value;
             }
         }
+    </script> --}}
+    <script>
+        // Modal-specific increment function
+        function modalIncrementQuantity(button) {
+            let input = document.getElementById('modalQuantityInput');
+            input.value = parseInt(input.value) + 1;
+    
+            // Update the hidden input field for quantity
+            document.getElementById('modalHiddenQuantity').value = input.value;
+        }
+    
+        // Modal-specific decrement function
+        function modalDecrementQuantity(button) {
+            let input = document.getElementById('modalQuantityInput');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+    
+                // Update the hidden input field for quantity
+                document.getElementById('modalHiddenQuantity').value = input.value;
+            }
+        }
+    
+        // Redirect to menuDetailsOrder with quantity as a query parameter
+        function redirectToOrderNow() {
+            const quantity = document.getElementById('modalHiddenQuantity').value;
+            const menuId = {{ $menu->id }}; // Ensure the menu ID is available here
+            window.location.href = `/user/menuDetailsOrder/${menuId}?quantity=${quantity}`;
+        }
     </script>
-
-
 @endsection

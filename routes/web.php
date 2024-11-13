@@ -69,6 +69,7 @@ Route::group([
     
     Route::get('/menuView/{id}', [UserController::class, 'menuView'])->name('menuView');
     Route::put('addToCart/{id}', [UserController::class, 'addToCart'])->name('addToCart');
+    Route::put('addToCartModal/{id}', [UserController::class, 'addToCartModal'])->name('addToCartModal');
     Route::put('addToFavorites/{id}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
 
     Route::get('/shoppingCart', [UserController::class, 'shoppingCart'])->name('shoppingCart');
@@ -80,8 +81,9 @@ Route::group([
     Route::post('/order', [UserController::class, 'order'])->name('order');
     Route::get('/orderView/{id}', [UserController::class, 'orderView'])->name('orderView');
     
-    Route::post('/menuDetails/{id}', [UserController::class, 'menuDetails'])->name('menuDetails');
-    Route::post('/menuDetailsOrder/{id}', [UserController::class, 'menuDetailsOrder'])->name('menuDetailsOrder');
+    // Route::post('/menuDetails/{id}', [UserController::class, 'menuDetails'])->name('menuDetails');
+    Route::get('/menuDetails/{id}', [UserController::class, 'menuDetails'])->name('menuDetails');
+    Route::get('/menuDetailsOrder/{id}', [UserController::class, 'menuDetailsOrder'])->name('menuDetailsOrder');
 
     Route::get('/orders', [UserController::class, 'orders'])->name('orders');
     Route::get('/messages', [UserController::class, 'messages'])->name('messages');

@@ -164,6 +164,40 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Item added to cart!');
     }
 
+    public function addToCartModal(Request $request, $menuId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Check if the menu item is already in the user's cart
+        $cartItem = $user->cartItems()->where('menu_id', $menuId)->first();
+
+        if ($cartItem) {
+            // Increment the quantity if the item already exists
+            $cartItem->pivot->quantity += 1;
+            $cartItem->pivot->save();
+        } else {
+            // Attach the menu item to the user's cart with an initial quantity of 1
+            $user->cartItems()->attach($menuId, ['quantity' => 1]);
+        }
+
+        // Increment the cart count in the user's profile
+        $user->increment('cart');
+
+        // Check if the request is via AJAX (JavaScript fetch or Axios)
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Item added to cart!',
+                'cartCount' => $user->cart, // Return the updated cart count
+            ]);
+        }
+
+        // For normal form submission, redirect back with a success message
+        return redirect()->back()->with('success', 'Item added to cart!');
+    }
+
+
     public function shoppingCart()
     {
         /** @var User $user */
@@ -303,31 +337,53 @@ class UserController extends Controller
         // Pass the menu item and user to the view
         return view('user.orderView', compact('menu', 'user'));
     }
-
     public function menuDetails($id)
     {
-        // Fetch the staff member details
-        $menus = Menu::findOrFail($id);
+        // Fetch the single menu item based on the provided ID
+        $menu = Menu::findOrFail($id);
 
-        return view('user.menuDetails', compact('menus'));
+        return view('user.menuDetails', compact('menu'));
     }
+
+
+    // public function menuDetailsOrder($id)
+    // {
+    //     $user = Auth::user();
+    //     $menu = Menu::find($id);
+
+    //     if (!$menu) {
+    //         return redirect()->route('user.menu')->with('error', 'Menu item not found');
+    //     }
+
+    //     // Retrieve quantity from request, default to 1 if not provided
+    //     $quantity = request()->input('quantity', 1);
+    //     $itemTotal = $menu->price * $quantity;
+
+    //     // Pass the menu item, user, quantity, and total to the view
+    //     return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'itemTotal'));
+    // }
 
     public function menuDetailsOrder($id)
     {
-         // Get the current authenticated user
-         $user = Auth::user();
+        // Get the current authenticated user
+        $user = Auth::user();
 
-         // Retrieve the specific menu item by ID
-         $menu = Menu::find($id);
- 
-         // Check if the menu item exists
-         if (!$menu) {
-             return redirect()->route('user.menu')->with('error', 'Menu item not found');
-         }
- 
-         // Pass the menu item and user to the view
-         return view('user.menuDetailsOrder', compact('menu', 'user'));
+        // Retrieve the specific menu item by ID
+        $menu = Menu::find($id);
+
+        // Check if the menu item exists
+        if (!$menu) {
+            return redirect()->route('user.menu')->with('error', 'Menu item not found');
+        }
+
+        // Fetch the quantity from the request, default to 1 if not provided
+        $quantity = request()->input('quantity', 1);
+
+        // Pass the menu item, user, and quantity to the view
+        return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity'));
     }
+
+
 
 
 
