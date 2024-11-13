@@ -151,7 +151,7 @@ li.sidebar-item a.customers.active:hover {
 
 li.add-categ:hover {
     background-color: #989898 !important;
-} 
+}
 
 .add-categ a {
     font-size: 0.94rem;
@@ -159,7 +159,7 @@ li.add-categ:hover {
 }
 
 .fa-users-gear {
-    margin-top: .9rem;
+    margin-top: 0.9rem;
     position: absolute;
 }
 
@@ -167,7 +167,6 @@ li.add-categ:hover {
     /* margin-left: 1.64rem; */
     margin-left: 1.64rem;
 }
-
 
 /* Dashboard Styles */
 .card {
@@ -177,6 +176,11 @@ li.add-categ:hover {
     overflow: hidden; /* Ensures icons don’t affect the layout */
     border: none;
 }
+
+.card-body:hover {
+    color: white !important;
+}
+
 .icon-background {
     position: absolute;
     bottom: 10px; /* Adjust icon position within card */
@@ -191,9 +195,8 @@ li.add-categ:hover {
 }
 .card-body {
     text-align: end;
+    border-top: none;
 }
-
-
 
 /* Main Content Styles */
 .main-content {

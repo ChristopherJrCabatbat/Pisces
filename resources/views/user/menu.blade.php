@@ -46,6 +46,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
+            color: #f39c12;
         }
 
         .pricing {
@@ -156,8 +157,7 @@
                             <!-- Action Buttons -->
                             <div class="action-buttons">
                                 {{-- <form action="{{ route('user.addToCart', $menu->id) }}" method="POST" --}}
-                                <form action="" method="POST"
-                                    enctype="multipart/form-data">
+                                <form action="" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     @method('PUT')
                                     <button type="submit" class="btn btn-danger modal-button add-to-cart">Add To
@@ -262,7 +262,7 @@
                     <div class="row row-cols-1 row-cols-md-3 g-4">
                         @forelse($menus as $menu)
                             <div class="col">
-                                <div class="card h-100 position-relative">
+                                <div class="card card-hover h-100 position-relative">
                                     <!-- Unique Placeholder for success message, positioned within each card -->
                                     <div id="copyMessage-{{ $menu->id }}" class="copy-message"></div>
 
@@ -282,8 +282,7 @@
                                                 enctype="multipart/form-data">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit"
-                                                    style="background-color: transparent; border: none; padding: 0;"><i
+                                                <button type="submit" class="icon-buttons"><i
                                                         class="fa-solid fa-cart-plus text-white"
                                                         title="Add to Cart"></i></button>
                                             </form>
@@ -291,8 +290,7 @@
                                             {{-- Share Menu --}}
                                             <form action="" method="GET">
                                                 @csrf
-                                                <button type="button"
-                                                    style="background-color: transparent; border: none; padding: 0;">
+                                                <button type="button" class="icon-buttons">
                                                     <!-- Share Button -->
                                                     <i class="fa-solid fa-share" title="Share Menu"
                                                         onclick="copyMenuLink({{ $menu->id }})"></i>
@@ -302,8 +300,7 @@
                                             {{-- View Menu --}}
                                             <form action="" method="GET">
                                                 @csrf
-                                                <button style="background-color: transparent; border: none; padding: 0;"
-                                                    type="button"><i class="fa-solid fa-search view-menu-btn"
+                                                <button type="button" class="icon-buttons"><i class="fa-solid fa-search view-menu-btn"
                                                         title="View Menu" data-id="{{ $menu->id }}"></i></button>
                                             </form>
 
@@ -312,8 +309,7 @@
                                                 enctype="multipart/form-data">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit"
-                                                    style="background-color: transparent; border: none; padding: 0;">
+                                                <button type="submit" class="icon-buttons">
                                                     <i class="fa-solid fa-heart"
                                                         style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
                                                         title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
@@ -325,26 +321,30 @@
                                     </div>
 
                                     {{-- Menu Body --}}
-                                    <div class="card-body card-body-mt">
-                                        <h5 class="card-title">{{ $menu->name }}</h5>
-                                        <div class="price fw-bold mb-2">
-                                            @if (floor($menu->price) == $menu->price)
-                                                ₱{{ number_format($menu->price, 0) }}
-                                            @else
-                                                ₱{{ number_format($menu->price, 2) }}
-                                            @endif
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="stars d-flex">
-                                                <i class="fa-solid fa-star"></i>
-                                                <i class="fa-solid fa-star"></i>
-                                                <i class="fa-solid fa-star"></i>
-                                                <i class="fa-solid fa-star"></i>
-                                                <i class="fa-regular fa-star"></i>
+                                    <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
+                                        class="menu-body">
+                                        <div class="card-body card-body-mt">
+                                            <h5 class="card-title">{{ $menu->name }}</h5>
+                                            <div class="price fw-bold mb-2">
+                                                @if (floor($menu->price) == $menu->price)
+                                                    ₱{{ number_format($menu->price, 0) }}
+                                                @else
+                                                    ₱{{ number_format($menu->price, 2) }}
+                                                @endif
                                             </div>
-                                            <div>(2)</div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="stars d-flex">
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-regular fa-star"></i>
+                                                </div>
+                                                <div>(2)</div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </a>
+
                                 </div>
                             </div>
                         @empty

@@ -561,3 +561,13 @@ function formatPrice(price) {
                             alt="Picture">
                     </div>
                 </div>
+
+
+
+                   {{-- <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="btn btn-danger modal-button add-to-cart">Add To
+                                        Cart</button>
+                                </form> --}}
