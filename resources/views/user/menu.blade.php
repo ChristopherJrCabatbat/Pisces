@@ -157,13 +157,15 @@
                             <!-- Action Buttons -->
                             <div class="action-buttons">
                                 {{-- <form action="{{ route('user.addToCart', $menu->id) }}" method="POST" --}}
-                                    <form action="{{ route('user.addToCartModal', $menuId ?? '') }}" method="POST" enctype="multipart/form-data">
-                                        @csrf
-                                        <input type="hidden" name="quantity" id="modalHiddenQuantity" value="1">
-                                        <button type="submit" data-id="{{ $menuId ?? ''}}" class="btn btn-danger modal-button">Add To Cart</button>
-                                    </form>
-                                    
-                                {{-- <button type="button" class="btn btn-danger add-to-cart" data-id="{{ $menu->id }}">Add To Cart</button> --}}
+                                {{-- <form action="{{ route('user.addToCartModal', $menuId ?? '') }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" name="quantity" id="modalHiddenQuantity" value="1">
+                                    <button type="submit" data-id="{{ $menuId ?? '' }}"
+                                        class="btn btn-danger modal-button">Add To Cart</button>
+                                </form> --}}
+
+                                <button type="button" class="btn btn-danger modal-button add-to-cart">Add To Cart</button>
                                 <button class="btn btn-danger modal-button order-now">Order Now</button>
                             </div>
 
@@ -300,8 +302,9 @@
                                             {{-- View Menu --}}
                                             <form action="" method="GET">
                                                 @csrf
-                                                <button type="button" class="icon-buttons"><i class="fa-solid fa-search view-menu-btn"
-                                                        title="View Menu" data-id="{{ $menu->id }}"></i></button>
+                                                <button type="button" class="icon-buttons"><i
+                                                        class="fa-solid fa-search view-menu-btn" title="View Menu"
+                                                        data-id="{{ $menu->id }}"></i></button>
                                             </form>
 
                                             {{-- Add to Favorites --}}
@@ -408,6 +411,45 @@
                                         `/user/orderView/${menuId}?quantity=${quantity}`;
                                 };
 
+                            // // Set button destination for "Add to Cart"
+                            // document.querySelector('.modal-button.add-to-cart').onclick =
+                            //     function() {
+                            //         window.location.href =
+                            //             `/user/addToCart/${menuId}`;
+                            //     };
+
+                            document.querySelector('.modal-button.add-to-cart').onclick =
+                                function() {
+                                    const quantity = document.getElementById(
+                                        'modalHiddenQuantity').value;
+
+                                    fetch(`/user/addToCart/${menuId}`, {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-Token': '{{ csrf_token() }}',
+                                            },
+                                            body: JSON.stringify({
+                                                quantity
+                                            }),
+                                        })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error(
+                                                    'Failed to add item to cart');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            alert('Item added to cart successfully!');
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            alert('Error adding item to cart.');
+                                        });
+                                };
+
+
                             // Show the modal
                             const menuDetailsModal = new bootstrap.Modal(document
                                 .getElementById('menuDetailsModal'));
@@ -441,41 +483,6 @@
             }
         }
     </script>
-
- <script>
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-    button.addEventListener('click', function() {
-        const menuId = this.getAttribute('data-id');
-        const quantity = document.getElementById('modalHiddenQuantity').value;
-
-        fetch(`/user/addToCartModal/${menuId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ quantity: quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                const cartCountElement = document.querySelector('#cart-count');
-                if (cartCountElement) {
-                    cartCountElement.textContent = data.cartCount;
-                }
-            } else {
-                alert('Failed to add item to cart. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while adding the item to the cart.');
-        });
-    });
-});
-
- </script>
 
     {{-- Share Link Script --}}
     <script>
