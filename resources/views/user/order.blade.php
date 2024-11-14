@@ -58,7 +58,8 @@
                         <!-- Full Address -->
                         <div class="mb-3">
                             <label for="address" class="form-label">Full Address</label>
-                            <input type="text" class="form-control" id="address" name="address" autofocus placeholder="#123 Barangay ABC SCCP" required>
+                            <input type="text" class="form-control" id="address" name="address" autofocus
+                                placeholder="#123 Barangay ABC SCCP" required>
                         </div>
 
                         <!-- Shipping Method -->
@@ -110,36 +111,37 @@
                         @php
                             $totalPrice = 0;
                         @endphp
+                        <div class="d-flex flex-column gap-3">
+                            @foreach ($menus as $menu)
+                                @php
+                                    $quantity = $menu->pivot->quantity ?? 1;
+                                    $itemTotal = $menu->price * $quantity;
+                                    $totalPrice += $itemTotal;
+                                @endphp
 
-                        @foreach ($menus as $menu)
-                            @php
-                                $quantity = $menu->pivot->quantity ?? 1;
-                                $itemTotal = $menu->price * $quantity;
-                                $totalPrice += $itemTotal;
-                            @endphp
-
-                            <div class="d-flex gap-3 justify-content-between align-items-center">
-                                <div class="picture border border-3">
-                                    <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid"
-                                        width="70" alt="Picture">
-                                </div>
-                                <div class="menu-name d-flex flex-column align-items-center">
-                                    <div class="name">{{ $menu->name }}</div>
-                                    <div class="size">
-                                        @if ($quantity > 1)
-                                            ({{ $quantity }})
-                                        @endif
+                                <div class="d-flex gap-3 justify-content-between align-items-center">
+                                    <div class="picture border border-1">
+                                        <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid"
+                                            width="70" alt="Picture">
                                     </div>
-                                </div>
-                                <div class="price fw-bold">
-                                    ₱{{ number_format($itemTotal, 2) }}
-                                </div>
+                                    <div class="menu-name d-flex flex-column align-items-center">
+                                        <div class="name">{{ $menu->name }} ({{ $quantity }})</div>
+                                        {{-- <div class="size">
+                                            @if ($quantity > 0)
+                                                ({{ $quantity }})
+                                            @endif
+                                        </div> --}}
+                                    </div>
+                                    <div class="price fw-bold">
+                                        ₱{{ number_format($itemTotal, 2) }}
+                                    </div>
 
-                                <!-- Hidden Inputs for Order Data -->
-                                <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
-                                <input type="hidden" name="quantities[]" value="{{ $quantity }}">
-                            </div>
-                        @endforeach
+                                    <!-- Hidden Inputs for Order Data -->
+                                    <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
+                                    <input type="hidden" name="quantities[]" value="{{ $quantity }}">
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">

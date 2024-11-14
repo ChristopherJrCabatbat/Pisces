@@ -13,17 +13,6 @@ use App\Models\Category;
 
 class UserController extends Controller
 {
-    // public function dashboard()
-    // {
-    //     // Retrieve the current logged-in user's cart and favorites values
-    //     /** @var User $user */
-    //     $user = Auth::user();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     return view('user.dashboard', compact('userCart', 'userFavorites'));
-    // }
-
     public function dashboard()
     {
         /** @var User $user */
@@ -161,41 +150,33 @@ class UserController extends Controller
         // Increment the cart count
         $user->increment('cart');
 
-        return redirect()->back()->with('success', 'Item added to cart!');
+        return redirect()->route('user.menu')->with('success', 'Item added from cart!');
     }
 
     public function addToCartModal(Request $request, $menuId)
     {
         /** @var User $user */
         $user = Auth::user();
-
-        // Check if the menu item is already in the user's cart
+        $quantity = $request->input('quantity', 1);
+    
+        // Check if the item is already in the cart
         $cartItem = $user->cartItems()->where('menu_id', $menuId)->first();
-
+    
         if ($cartItem) {
-            // Increment the quantity if the item already exists
-            $cartItem->pivot->quantity += 1;
-            $cartItem->pivot->save();
+            // Update the quantity if it already exists
+            $cartItem->quantity += $quantity;
+            $cartItem->save();
         } else {
-            // Attach the menu item to the user's cart with an initial quantity of 1
-            $user->cartItems()->attach($menuId, ['quantity' => 1]);
-        }
-
-        // Increment the cart count in the user's profile
-        $user->increment('cart');
-
-        // Check if the request is via AJAX (JavaScript fetch or Axios)
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Item added to cart!',
-                'cartCount' => $user->cart, // Return the updated cart count
+            // Add new item to the cart
+            $user->cartItems()->create([
+                'menu_id' => $menuId,
+                'quantity' => $quantity,
             ]);
         }
-
-        // For normal form submission, redirect back with a success message
-        return redirect()->back()->with('success', 'Item added to cart!');
+    
+        return redirect()->route('user.menu')->with('success', 'Item added from cart!');
     }
+    
 
 
     public function shoppingCart()
@@ -342,7 +323,12 @@ class UserController extends Controller
         // Fetch the single menu item based on the provided ID
         $menu = Menu::findOrFail($id);
 
-        return view('user.menuDetails', compact('menu'));
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
+
+        return view('user.menuDetails', compact('menu', 'userCart', 'userFavorites'));
     }
 
 
