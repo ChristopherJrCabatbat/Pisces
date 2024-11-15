@@ -20,7 +20,81 @@
 </head>
 
 <body>
+
     @yield('modals')
+    <!-- Product Details Modal -->
+    <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content text-black">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="menuDetailsModalLabel">Menu Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="product-page">
+                        <!-- Product Images -->
+                        <div class="product-images">
+                            <img src="" alt="Product Image" id="menuImage" class="main-image img-fluid">
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="product-details">
+                            <h1 id="menuName" class="h2"></h1>
+                            <div class="ratings mb-2">
+                                <span id="menuRating">⭐ 4.2</span>
+                                <span id="ratingCount">(4K Ratings)</span>
+                            </div>
+
+                            <!-- Pricing Section -->
+                            <div class="pricing mb-2">
+                                <span id="discountedPrice" class="discounted-price"></span>
+                                <span id="originalPrice" class="original-price"></span>
+                                <span id="discountPercentage" class="discount"></span>
+                            </div>
+
+                            <!-- Category and Description -->
+                            <p><strong>Category:</strong> <span id="menuCategory"></span></p>
+                            <p><strong>Description:</strong> <span id="menuDescription"></span></p>
+
+                            <!-- Quantity Selector -->
+                            <div class="quantity-selector mb-3">
+                                <button type="button" class="btn qty-btn rounded-circle"
+                                    onclick="modalDecrementQuantity(this)">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+
+                                <input type="text" readonly name="display_quantity" value="1" min="1"
+                                    class="form-control text-center mx-2 quantity-input" style="width: 60px;"
+                                    id="modalQuantityInput">
+
+                                <!-- Hidden input to pass the quantity to the backend -->
+                                <input type="hidden" name="quantity" id="modalHiddenQuantity" value="1">
+
+                                <button type="button" class="btn qty-btn rounded-circle"
+                                    onclick="modalIncrementQuantity(this)">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button type="button" class="btn btn-danger modal-button add-to-cart">Add To
+                                    Cart</button>
+                                <button class="btn btn-danger modal-button order-now">Order Now</button>
+                            </div>
+
+                            <!-- Additional Info -->
+                            <div class="extra-info mt-3">
+                                <span>❤️ 1K Favorites</span>
+                                {{-- <span>Shopee Guarantee</span> --}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <header>
         <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">
@@ -64,14 +138,16 @@
                                     {{ Auth::user()->first_name }}
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                                    <li><a class="dropdown-item" href="#"><i
+                                                class="fa-solid fa-user me-2"></i>Profile</a></li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
                                     <li>
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
-                                            <button class="dropdown-item" type="submit"><i class="fa-solid fa-right-from-bracket me-2"></i>Log out</button>
+                                            <button class="dropdown-item" type="submit"><i
+                                                    class="fa-solid fa-right-from-bracket me-2"></i>Log out</button>
                                         </form>
                                     </li>
                                 </ul>
@@ -116,7 +192,8 @@
                             <i class="fa-solid fa-phone me-2"></i> 0945 839 3794
                         </div>
                         <div class="icons d-flex align-items-center gap-4 mt-4">
-                            <a href="https://www.facebook.com/@piscesCH" title="Go to Pisces Facebook Page" target="_blank" class="social-link">
+                            <a href="https://www.facebook.com/@piscesCH" title="Go to Pisces Facebook Page"
+                                target="_blank" class="social-link">
                                 <div class="rounded-circle">
                                     <i class="fa-brands fa-facebook"></i>
                                 </div>
@@ -140,6 +217,153 @@
 
 
     @yield('scripts')
+
+    {{-- Modal Script --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewButtons = document.querySelectorAll('.view-menu-btn');
+
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const menuId = this.getAttribute('data-id');
+
+                    // Fetch menu details via AJAX
+                    fetch(`/user/menuView/${menuId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Populate the modal with menu details
+                            document.getElementById('menuImage').src = data.image ?
+                                `/storage/${data.image}` : '/images/logo.jpg';
+                            document.getElementById('menuName').textContent = data.name;
+                            document.getElementById('menuCategory').textContent = data.category;
+                            document.getElementById('menuDescription').textContent = data
+                                .description;
+                            document.getElementById('discountedPrice').textContent =
+                                `₱${parseFloat(data.price).toLocaleString()}`;
+                            document.getElementById('menuRating').textContent =
+                                `⭐ ${data.rating}`;
+                            document.getElementById('ratingCount').textContent =
+                                `(${data.ratingCount} Ratings)`;
+
+                            // Reset the quantity input for each new modal view
+                            document.getElementById('modalQuantityInput').value = 1;
+                            document.getElementById('modalHiddenQuantity').value = 1;
+
+                            // Set button destination for "Order Now"
+                            document.querySelector('.modal-button.order-now').onclick =
+                                function() {
+                                    const quantity = document.getElementById(
+                                        'modalHiddenQuantity').value;
+                                    window.location.href =
+                                        `/user/orderView/${menuId}?quantity=${quantity}`;
+                                };
+
+                            // Add To Cart
+                            document.querySelector('.modal-button.add-to-cart').onclick =
+                                function() {
+                                    const quantity = document.getElementById(
+                                        'modalHiddenQuantity').value;
+
+                                    fetch(`/user/addToCart/${menuId}`, {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-Token': '{{ csrf_token() }}',
+                                            },
+                                            body: JSON.stringify({
+                                                quantity
+                                            }),
+                                        })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error(
+                                                    'Failed to add item to cart');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            alert('Item added to cart successfully!');
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            alert('Item added to cart successfully!');
+                                            window.location
+                                                .reload(); // Reload the page after the alert in the catch block
+
+                                        });
+                                };
+
+
+                            // Show the modal
+                            const menuDetailsModal = new bootstrap.Modal(document
+                                .getElementById('menuDetailsModal'));
+                            menuDetailsModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching menu details:', error);
+                            alert('Failed to fetch menu details. Please try again.');
+                        });
+                });
+            });
+        });
+
+        // Modal-specific increment function
+        function modalIncrementQuantity(button) {
+            let input = document.getElementById('modalQuantityInput');
+            input.value = parseInt(input.value) + 1;
+
+            // Update the hidden input field for quantity
+            document.getElementById('modalHiddenQuantity').value = input.value;
+        }
+
+        // Modal-specific decrement function
+        function modalDecrementQuantity(button) {
+            let input = document.getElementById('modalQuantityInput');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+
+                // Update the hidden input field for quantity
+                document.getElementById('modalHiddenQuantity').value = input.value;
+            }
+        }
+    </script>
+
+    {{-- Share Link Script --}}
+    <script>
+        function copyMenuLink(menuId) {
+            // Construct the menu link URL
+            const menuLink = `${window.location.origin}/user/menuDetails/${menuId}`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(menuLink)
+                .then(() => {
+                    // Check if the correct element is targeted
+                    console.log("Copy successful, targeting message element for menu ID:", menuId);
+                    const messageElement = document.getElementById(`copyMessage-${menuId}`);
+                    if (messageElement) {
+                        messageElement.textContent = "Menu link copied successfully";
+                        messageElement.style.display = 'block'; // Make it visible
+                        console.log("Message displayed for menu ID:", menuId);
+
+                        // Hide the message after 3 seconds
+                        setTimeout(() => {
+                            messageElement.style.display = 'none';
+                            console.log("Message hidden for menu ID:", menuId);
+                        }, 2000);
+                    } else {
+                        console.error("Message element not found for menu ID:", menuId);
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to copy the text: ', err);
+                });
+        }
+    </script>
 
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>

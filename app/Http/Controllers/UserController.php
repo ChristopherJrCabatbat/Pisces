@@ -42,22 +42,23 @@ class UserController extends Controller
 
         // Fetch the 4 latest menus
         $latestMenus = DB::table('menus')
-            ->orderBy('created_at', 'desc')
-            ->take(4)
-            ->get();
+        ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.created_at')
+        ->orderBy('created_at', 'desc')
+        ->take(4)
+        ->get();
 
         // Fetch the 4 most popular menus based on order count, matching menu names
         $popularMenus = DB::table('orders')
-            ->join('menus', 'orders.menu_name', '=', 'menus.name')
-            ->select('menus.name', 'menus.image', 'menus.price', DB::raw('COUNT(orders.id) as order_count'))
-            ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price')
-            ->orderByDesc('order_count')
-            ->take(4)
-            ->get();
+        ->join('menus', 'orders.menu_name', '=', 'menus.name')
+        ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', DB::raw('COUNT(orders.id) as order_count'))
+        ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price')
+        ->orderByDesc('order_count')
+        ->take(4)
+        ->get();
+    
 
-        return view('user.dashboard', compact('userCart', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus'));
+        return view('user.dashboard', compact('userCart', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus'));
     }
-
 
     public function menu(Request $request)
     {
@@ -153,30 +154,25 @@ class UserController extends Controller
         return redirect()->route('user.menu')->with('success', 'Item added from cart!');
     }
 
-    public function addToCartModal(Request $request, $menuId)
-    {
-        /** @var User $user */
-        $user = Auth::user();
-        $quantity = $request->input('quantity', 1);
-    
-        // Check if the item is already in the cart
-        $cartItem = $user->cartItems()->where('menu_id', $menuId)->first();
-    
-        if ($cartItem) {
-            // Update the quantity if it already exists
-            $cartItem->quantity += $quantity;
-            $cartItem->save();
-        } else {
-            // Add new item to the cart
-            $user->cartItems()->create([
-                'menu_id' => $menuId,
-                'quantity' => $quantity,
-            ]);
-        }
-    
-        return redirect()->route('user.menu')->with('success', 'Item added from cart!');
-    }
-    
+    // public function addToCartModal(Request $request, $menuId)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Check if the menu item is already in the user's cart
+    //     if (!$user->cartItems()->where('menu_id', $menuId)->exists()) {
+    //         // Attach the menu item to the user's cart
+    //         $user->cartItems()->attach($menuId);
+    //     }
+
+    //     // Increment the cart count
+    //     $user->increment('cart');
+
+    //     // Return a JSON response instead of redirecting
+    //     return response()->json(['success' => true, 'message' => 'Item added to cart!']);
+    // }
+
+
 
 
     public function shoppingCart()
@@ -368,11 +364,6 @@ class UserController extends Controller
         // Pass the menu item, user, and quantity to the view
         return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity'));
     }
-
-
-
-
-
 
 
     public function orders(Request $request)

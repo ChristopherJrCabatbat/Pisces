@@ -564,6 +564,21 @@ function formatPrice(price) {
 
 
 
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
                    {{-- <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
@@ -571,3 +586,22 @@ function formatPrice(price) {
                                     <button type="submit" class="btn btn-danger modal-button add-to-cart">Add To
                                         Cart</button>
                                 </form> --}}
+
+                            {{-- <form action="{{ route('user.addToCart', $menu->id) }}" method="POST" --}}
+                        {{-- <form action="{{ route('user.addToCartModal', $menuId ?? '') }}" method="POST"
+                            enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="quantity" id="modalHiddenQuantity" value="1">
+                            <button type="submit" data-id="{{ $menuId ?? '' }}"
+                                class="btn btn-danger modal-button">Add To Cart</button>
+                        </form> --}}
+
+
+
+                          // // Set button destination for "Add to Cart"
+                            // document.querySelector('.modal-button.add-to-cart').onclick =
+                            //     function() {
+                            //         window.location.href =
+                            //             `/user/addToCart/${menuId}`;
+                            //     };
+

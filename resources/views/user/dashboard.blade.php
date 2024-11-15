@@ -143,8 +143,6 @@
             </div>
         </div>
 
-
-
         {{-- Popular Menus --}}
         <div class="w-100 mb-5">
             <div class="h2 border-baba pb-3 mb-4">
@@ -155,30 +153,85 @@
                     @foreach ($popularMenus as $menu)
                         <div class="col">
                             <div class="card h-100">
+
+                                <!-- Unique Placeholder for success message, positioned within each card -->
+                                <div id="copyMessage-{{ $menu->id }}" class="copy-message"></div>
+
                                 <div class="img-container">
                                     <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
                                         alt="{{ $menu->name }}">
-                                    <div class="icon-overlay">
-                                        <i class="fa-solid fa-cart-plus"></i>
-                                        <i class="fa-solid fa-share"></i>
-                                        <i class="fa-solid fa-search"></i>
-                                        <i class="fa-solid fa-heart"></i>
+
+                                    <div class="icon-overlay text-white">
+                                        {{-- Add to Cart --}}
+                                        <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="icon-buttons"><i
+                                                    class="fa-solid fa-cart-plus text-white"
+                                                    title="Add to Cart"></i></button>
+                                        </form>
+
+                                        {{-- Share Menu --}}
+                                        <form action="" method="GET">
+                                            @csrf
+                                            <button type="button" class="icon-buttons">
+                                                <!-- Share Button -->
+                                                <i class="fa-solid fa-share" title="Share Menu"
+                                                    onclick="copyMenuLink({{ $menu->id }})"></i>
+                                            </button>
+                                        </form>
+
+                                        {{-- View Menu --}}
+                                        <form action="" method="GET">
+                                            @csrf
+                                            <button type="button" class="icon-buttons"><i
+                                                    class="fa-solid fa-search view-menu-btn" title="View Menu"
+                                                    data-id="{{ $menu->id }}"></i></button>
+                                        </form>
+
+                                        {{-- Add to Favorites --}}
+                                        <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="icon-buttons">
+                                                <i class="fa-solid fa-heart"
+                                                    style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
+                                                    title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                                </i>
+                                            </button>
+                                        </form>
+
                                     </div>
+
                                 </div>
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $menu->name }}</h5>
-                                    <div class="price fw-bold mb-2">${{ number_format($menu->price, 2) }}</div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="stars d-flex">
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-regular fa-star"></i>
+
+                                    {{-- Menu Body --}}
+                                    <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
+                                        class="menu-body">
+                                        <div class="card-body card-body-mt">
+                                            <h5 class="card-title">{{ $menu->name }}</h5>
+                                            <div class="price fw-bold mb-2">
+                                                @if (floor($menu->price) == $menu->price)
+                                                    ₱{{ number_format($menu->price, 0) }}
+                                                @else
+                                                    ₱{{ number_format($menu->price, 2) }}
+                                                @endif
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="stars d-flex">
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-regular fa-star"></i>
+                                                </div>
+                                                <div>(2)</div>
+                                            </div>
                                         </div>
-                                        <div>({{ $menu->order_count }})</div>
-                                    </div>
-                                </div>
+                                    </a>
+
                             </div>
                         </div>
                     @endforeach
@@ -196,30 +249,85 @@
                     @foreach ($latestMenus as $menu)
                         <div class="col">
                             <div class="card h-100">
+
+                                <!-- Unique Placeholder for success message, positioned within each card -->
+                                <div id="copyMessage-new-{{ $menu->id }}" class="copy-message"></div>
+
                                 <div class="img-container">
                                     <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
                                         alt="{{ $menu->name }}">
-                                    <div class="icon-overlay">
-                                        <i class="fa-solid fa-cart-plus"></i>
-                                        <i class="fa-solid fa-share"></i>
-                                        <i class="fa-solid fa-search"></i>
-                                        <i class="fa-solid fa-heart"></i>
+
+                                    <div class="icon-overlay text-white">
+                                        {{-- Add to Cart --}}
+                                        <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="icon-buttons"><i
+                                                    class="fa-solid fa-cart-plus text-white"
+                                                    title="Add to Cart"></i></button>
+                                        </form>
+
+                                        {{-- Share Menu --}}
+                                        <form action="" method="GET">
+                                            @csrf
+                                            <button type="button" class="icon-buttons">
+                                                <!-- Share Button -->
+                                                <i class="fa-solid fa-share" title="Share Menu"
+                                                    onclick="copyMenuLinkNew('new-{{ $menu->id }}')"></i>
+                                            </button>
+                                        </form>
+
+                                        {{-- View Menu --}}
+                                        <form action="" method="GET">
+                                            @csrf
+                                            <button type="button" class="icon-buttons"><i
+                                                    class="fa-solid fa-search view-menu-btn" title="View Menu"
+                                                    data-id="{{ $menu->id }}"></i></button>
+                                        </form>
+
+                                        {{-- Add to Favorites --}}
+                                        <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="icon-buttons">
+                                                <i class="fa-solid fa-heart"
+                                                    style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
+                                                    title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                                </i>
+                                            </button>
+                                        </form>
+
                                     </div>
+
                                 </div>
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $menu->name }}</h5>
-                                    <div class="price fw-bold mb-2">${{ number_format($menu->price, 2) }}</div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="stars d-flex">
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-regular fa-star"></i>
+
+                                   {{-- Menu Body --}}
+                                   <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
+                                    class="menu-body">
+                                    <div class="card-body card-body-mt">
+                                        <h5 class="card-title">{{ $menu->name }}</h5>
+                                        <div class="price fw-bold mb-2">
+                                            @if (floor($menu->price) == $menu->price)
+                                                ₱{{ number_format($menu->price, 0) }}
+                                            @else
+                                                ₱{{ number_format($menu->price, 2) }}
+                                            @endif
                                         </div>
-                                        <div>({{ $menu->rating_count ?? 0 }})</div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="stars d-flex">
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-regular fa-star"></i>
+                                            </div>
+                                            <div>(2)</div>
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
+
                             </div>
                         </div>
                     @endforeach
@@ -227,11 +335,36 @@
             </div>
         </div>
 
-
-
     </div>
 
 @endsection
 
 @section('scripts')
+    {{-- New Menus Share Link Script --}}
+    <script>
+        function copyMenuLinkNew(menuIdentifier) {
+            // Extract the actual menu ID by splitting the identifier (e.g., "new-6" becomes "6")
+            const menuId = menuIdentifier.split('-')[1];
+            const menuLink = `${window.location.origin}/user/menuDetails/${menuId}`;
+
+            // Copy the link to the clipboard
+            navigator.clipboard.writeText(menuLink)
+                .then(() => {
+                    // Get the correct message element
+                    const messageElement = document.getElementById(`copyMessage-${menuIdentifier}`);
+
+                    // Display the success message
+                    messageElement.textContent = "Menu link copied successfully";
+                    messageElement.style.display = 'block';
+
+                    // Hide the message after 2 seconds
+                    setTimeout(() => {
+                        messageElement.style.display = 'none';
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy the text:', err);
+                });
+        }
+    </script>
 @endsection

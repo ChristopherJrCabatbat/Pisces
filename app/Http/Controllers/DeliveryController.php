@@ -22,6 +22,33 @@ class DeliveryController extends Controller
         return view('admin.delivery', compact('deliveries'));
     }
 
+    // public function deliveryView($id)
+    // {
+    //     $menu = Menu::find($id);
+
+    //     if (!$menu) {
+    //         return response()->json(['error' => 'Menu not found'], 404);
+    //     }
+
+    //     // Get the total favorite count for this menu
+    //     $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
+
+    //     // Mock rating data (adjust as needed)
+    //     $rating = 4.2;
+    //     $ratingCount = 4000;
+
+    //     return response()->json([
+    //         'name' => $menu->name,
+    //         'category' => $menu->category,
+    //         'price' => $menu->price,
+    //         'description' => $menu->description,
+    //         'image' => $menu->image,
+    //         'rating' => $rating,
+    //         'ratingCount' => $ratingCount,
+    //         'favoriteCount' => $favoriteCount,
+    //     ]);
+    // }
+
     /**
      * Show the form for creating a new resource.
      */

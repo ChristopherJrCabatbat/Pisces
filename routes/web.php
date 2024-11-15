@@ -69,7 +69,7 @@ Route::group([
     
     Route::get('/menuView/{id}', [UserController::class, 'menuView'])->name('menuView');
     Route::put('addToCart/{id}', [UserController::class, 'addToCart'])->name('addToCart');
-    Route::post('addToCartModal/{id}', [UserController::class, 'addToCartModal'])->name('addToCartModal');
+    Route::put('addToCartModal/{id}', [UserController::class, 'addToCartModal'])->name('addToCartModal');
     Route::put('addToFavorites/{id}', [UserController::class, 'addToFavorites'])->name('addToFavorites');
 
     Route::get('/shoppingCart', [UserController::class, 'shoppingCart'])->name('shoppingCart');
