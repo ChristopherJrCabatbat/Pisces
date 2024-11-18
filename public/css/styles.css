@@ -346,6 +346,7 @@ th {
 
 .qty-btn {
     background-color: #d3d4d5;
+    color: black !important;
 }
 
 .qty-btn:hover,
@@ -499,3 +500,21 @@ th {
     gap: 20px;
 }
 /* End Modal styles */
+
+
+/* Shopping Cart Table Duplicate Menu Styles */
+
+.duplicate-bg td {
+    /* background-color: rgba(139, 69, 19) !important; Softer brownish-red tone */
+    color: #ff9100;
+    /* color: #f81d0b; */
+}
+
+.duplicate-warning-icon {
+    position: absolute;
+    left: 14%;
+    top: 35%;
+}
+
+
+/* End Shopping Cart Table Duplicate Menu Styles */

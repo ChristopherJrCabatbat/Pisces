@@ -42,26 +42,59 @@ class UserController extends Controller
 
         // Fetch the 4 latest menus
         $latestMenus = DB::table('menus')
-        ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.created_at')
-        ->orderBy('created_at', 'desc')
-        ->take(4)
-        ->get();
+            ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.created_at')
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
 
         // Fetch the 4 most popular menus based on order count, matching menu names
         $popularMenus = DB::table('orders')
-        ->join('menus', 'orders.menu_name', '=', 'menus.name')
-        ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', DB::raw('COUNT(orders.id) as order_count'))
-        ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price')
-        ->orderByDesc('order_count')
-        ->take(4)
-        ->get();
-    
+            ->join('menus', 'orders.menu_name', '=', 'menus.name')
+            ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', DB::raw('COUNT(orders.id) as order_count'))
+            ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price')
+            ->orderByDesc('order_count')
+            ->take(4)
+            ->get();
+
 
         return view('user.dashboard', compact('userCart', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus'));
     }
 
+    // public function menu(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Fetch categories with menu counts and sort by menu_count in descending order
+    //     $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+    //         ->groupBy('category')
+    //         ->orderByDesc('menu_count')
+    //         ->get();
+
+    //     $selectedCategory = $request->input('category', 'All Menus');
+
+    //     // Retrieve menus based on selected category, excluding items in the cart
+    //     if ($selectedCategory == 'All Menus') {
+    //         $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
+    //     } else {
+    //         $menus = Menu::where('category', $selectedCategory)
+    //             ->whereNotIn('id', $user->cartItems->pluck('id'))
+    //             ->get();
+    //     }
+
+    //     // Pass the sorted categories list to the view
+    //     return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    // }
+
     public function menu(Request $request)
     {
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
+
         // Fetch categories with menu counts and sort by menu_count in descending order
         $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
             ->groupBy('category')
@@ -70,23 +103,17 @@ class UserController extends Controller
 
         $selectedCategory = $request->input('category', 'All Menus');
 
-        /** @var User $user */
-        $user = Auth::user();
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
-
-        // Retrieve menus based on selected category, excluding items in the cart
+        // Retrieve menus based on selected category, without excluding items in the cart
         if ($selectedCategory == 'All Menus') {
-            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
+            $menus = Menu::all();
         } else {
-            $menus = Menu::where('category', $selectedCategory)
-                ->whereNotIn('id', $user->cartItems->pluck('id'))
-                ->get();
+            $menus = Menu::where('category', $selectedCategory)->get();
         }
 
         // Pass the sorted categories list to the view
         return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
+
 
     public function menuView($id)
     {
@@ -115,44 +142,38 @@ class UserController extends Controller
         ]);
     }
 
+
     // public function addToCart(Request $request, $menuId)
     // {
     //     /** @var User $user */
     //     $user = Auth::user();
-    //     $quantity = $request->input('quantity', 1);
 
     //     // Check if the menu item is already in the user's cart
-    //     if ($user->cartItems()->where('menu_id', $menuId)->exists()) {
-    //         // Update the quantity if already present
-    //         $user->cartItems()->updateExistingPivot($menuId, ['quantity' => DB::raw("quantity + $quantity")]);
-    //     } else {
-    //         // Attach the menu item to the user's cart with the specified quantity
-    //         $user->cartItems()->attach($menuId, ['quantity' => $quantity]);
+    //     if (!$user->cartItems()->where('menu_id', $menuId)->exists()) {
+    //         // Attach the menu item to the user's cart
+    //         $user->cartItems()->attach($menuId);
     //     }
 
     //     // Increment the cart count
     //     $user->increment('cart');
 
-    //     return response()->json(['success' => true]);
+    //     return redirect()->route('user.menu')->with('success', 'Item added from cart!');
     // }
 
-
     public function addToCart(Request $request, $menuId)
-    {
-        /** @var User $user */
-        $user = Auth::user();
+{
+    /** @var User $user */
+    $user = Auth::user();
 
-        // Check if the menu item is already in the user's cart
-        if (!$user->cartItems()->where('menu_id', $menuId)->exists()) {
-            // Attach the menu item to the user's cart
-            $user->cartItems()->attach($menuId);
-        }
+    // Attach the menu item to the user's cart without checking for duplicates
+    $user->cartItems()->attach($menuId);
 
-        // Increment the cart count
-        $user->increment('cart');
+    // Increment the cart count
+    $user->increment('cart');
 
-        return redirect()->route('user.menu')->with('success', 'Item added from cart!');
-    }
+    return redirect()->route('user.menu')->with('success', 'Item added to cart!');
+}
+
 
     // public function addToCartModal(Request $request, $menuId)
     // {
@@ -171,8 +192,6 @@ class UserController extends Controller
     //     // Return a JSON response instead of redirecting
     //     return response()->json(['success' => true, 'message' => 'Item added to cart!']);
     // }
-
-
 
 
     public function shoppingCart()

@@ -63,8 +63,9 @@
                         <th scope="col">Delete</th>
                     </tr>
                 </thead>
+
                 <!-- Update the table rows with data attributes for menu-id and price -->
-                <tbody id="menu-table-body">
+                {{-- <tbody id="menu-table-body">
                     @forelse ($menus as $menu)
                         <tr class="menu-row" data-menu-id="{{ $menu->id }}" data-price="{{ $menu->price }}">
                             <!-- Image Column -->
@@ -125,7 +126,90 @@
                             <td colspan="6">There are no menus added to cart.</td>
                         </tr>
                     @endforelse
+                </tbody> --}}
+
+                <tbody id="menu-table-body">
+                    @php
+                        // Keep track of the count of each menu item by ID
+                        $menuCounts = [];
+                    @endphp
+
+                    @forelse ($menus as $menu)
+                        @php
+                            // Increment the count for this menu ID
+                            $menuCounts[$menu->id] = ($menuCounts[$menu->id] ?? 0) + 1;
+
+                            // Check if this is a duplicate (second or more occurrence)
+                            $isDuplicate = $menuCounts[$menu->id] > 1;
+                        @endphp
+
+                        <!-- Apply red background if it is a duplicate -->
+                        <tr class="menu-row {{ $isDuplicate ? 'duplicate-bg' : '' }}" data-menu-id="{{ $menu->id }}"
+                            data-price="{{ $menu->price }}">
+
+                            <!-- Image Column with Enhanced Warning Icon for Duplicates -->
+                            <td class="position-relative px-3">
+                                @if ($isDuplicate)
+                                    <i class="fa fa-exclamation-circle duplicate-warning-icon" title="Duplicate Menu"></i>
+                                @endif
+
+                                @if ($menu->image)
+                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                        class="img-fluid" width="50">
+                                @else
+                                    <span>No Image</span>
+                                @endif
+                            </td>
+
+
+                            <td>{{ $menu->name }}</td>
+                            <td>{{ $menu->category }}</td>
+
+                            <!-- Price Column with Item Price -->
+                            <td class="menu-price">
+                                ₱{{ number_format($menu->price, 2) }}
+                            </td>
+
+                            <!-- Quantity Column -->
+                            <td class="text-center">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <button type="button" class="btn qty-btn rounded-circle"
+                                        onclick="decrementQuantity(this)">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+
+                                    <input type="text" readonly name="quantity" value="{{ $menu->quantity ?? 1 }}"
+                                        min="1" class="form-control text-center mx-2 quantity-input"
+                                        style="width: 60px;" data-menu-id="{{ $menu->id }}">
+
+                                    <button type="button" class="btn qty-btn rounded-circle"
+                                        onclick="incrementQuantity(this)">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </td>
+
+                            <!-- Delete Button -->
+                            <td>
+                                <form action="{{ route('user.removeCart', $menu->cart_item_id) }}" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to remove this menu?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr id="no-menus-row">
+                            <td colspan="6">There are no menus added to cart.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
+
+
 
             </table>
 

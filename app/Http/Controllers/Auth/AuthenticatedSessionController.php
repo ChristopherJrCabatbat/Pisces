@@ -57,16 +57,16 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        // Retrieve the logged-in user
-        /** @var User $user */
-        $user = Auth::user();
+        // // Retrieve the logged-in user
+        // /** @var User $user */
+        // $user = Auth::user();
 
-        // Remove all cart items for the logged-in user
-        DB::table('cart_items')->where('user_id', $user->id)->delete();
+        // // Remove all cart items for the logged-in user
+        // DB::table('cart_items')->where('user_id', $user->id)->delete();
 
-        // Reset the user's 'cart' field to 0
-        $user->cart = 0;
-        $user->save();
+        // // Reset the user's 'cart' field to 0
+        // $user->cart = 0;
+        // $user->save();
 
         // Log out the user
         Auth::guard('web')->logout();

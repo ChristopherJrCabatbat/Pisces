@@ -196,17 +196,17 @@
 
                 <!-- Quantity Selector -->
                 <div class="quantity-selector mb-3">
-                    <button type="button" class="btn qty-btn rounded-circle" onclick="modalDecrementQuantity(this)">
+                    <button type="button" class="btn qty-btn rounded-circle" onclick="detailDecrementQuantity(this)">
                         <i class="fa fa-minus"></i>
                     </button>
 
                     <input type="text" readonly name="display_quantity" value="1" min="1"
-                        class="form-control text-center mx-2 quantity-input" style="width: 60px;" id="modalQuantityInput">
+                        class="form-control text-center mx-2 quantity-input" style="width: 60px;" id="detailQuantityInput">
 
                     <!-- Hidden input to track the quantity -->
-                    <input type="hidden" name="quantity" id="modalHiddenQuantity" value="1">
+                    <input type="hidden" name="quantity" id="detailHiddenQuantity" value="1">
 
-                    <button type="button" class="btn qty-btn rounded-circle" onclick="modalIncrementQuantity(this)">
+                    <button type="button" class="btn qty-btn rounded-circle" onclick="detailIncrementQuantity(this)">
                         <i class="fa fa-plus"></i>
                     </button>
                 </div>
@@ -236,29 +236,29 @@
 
 @section('scripts')
     <script>
-        // Modal-specific increment function
-        function modalIncrementQuantity(button) {
-            let input = document.getElementById('modalQuantityInput');
+        // Increment function
+        function detailIncrementQuantity(button) {
+            let input = document.getElementById('detailQuantityInput');
             input.value = parseInt(input.value) + 1;
 
             // Update the hidden input field for quantity
-            document.getElementById('modalHiddenQuantity').value = input.value;
+            document.getElementById('detailHiddenQuantity').value = input.value;
         }
 
-        // Modal-specific decrement function
-        function modalDecrementQuantity(button) {
-            let input = document.getElementById('modalQuantityInput');
+        // Decrement function
+        function detailDecrementQuantity(button) {
+            let input = document.getElementById('detailQuantityInput');
             if (parseInt(input.value) > 1) {
                 input.value = parseInt(input.value) - 1;
 
                 // Update the hidden input field for quantity
-                document.getElementById('modalHiddenQuantity').value = input.value;
+                document.getElementById('detailHiddenQuantity').value = input.value;
             }
         }
 
         // Redirect to menuDetailsOrder with quantity as a query parameter
         function redirectToOrderNow() {
-            const quantity = document.getElementById('modalHiddenQuantity').value;
+            const quantity = document.getElementById('detailHiddenQuantity').value;
             const menuId = {{ $menu->id }}; // Ensure the menu ID is available here
             window.location.href = `/user/menuDetailsOrder/${menuId}?quantity=${quantity}`;
         }

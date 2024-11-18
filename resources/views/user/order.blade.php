@@ -19,6 +19,7 @@
 
     <div class="container">
         <div class="d-flex">
+            
             {{-- Combined Form --}}
             <form action="{{ route('user.delivery.store') }}" method="POST" class="d-flex w-100">
                 @csrf
@@ -152,6 +153,7 @@
                     </div>
                 </div>
             </form>
+
         </div>
 
 
