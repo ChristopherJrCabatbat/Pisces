@@ -605,3 +605,189 @@ function formatPrice(price) {
                             //             `/user/addToCart/${menuId}`;
                             //     };
 
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+  <!-- Unique Placeholder for success message, positioned within each card -->
+                                    <div id="copyMessage-{{ $menu->id }}" class="copy-message"></div>
+
+
+
+                                     {{-- Share Menu --}}
+                                            {{-- <form action="" method="GET">
+                                                @csrf
+                                                <button type="button" class="icon-buttons">
+                                                    <!-- Share Button -->
+                                                    <i class="fa-solid fa-share" title="Share Menu"
+                                                        onclick="copyMenuLink({{ $menu->id }})"></i>
+                                                </button>
+                                            </form> --}}
+
+
+
+  {{-- Share Link Script --}}
+    {{-- <script>
+        function copyMenuLink(menuId) {
+            // Construct the menu link URL
+            const menuLink = `${window.location.origin}/user/menuDetails/${menuId}`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(menuLink)
+                .then(() => {
+                    // Check if the correct element is targeted
+                    console.log("Copy successful, targeting message element for menu ID:", menuId);
+                    const messageElement = document.getElementById(`copyMessage-${menuId}`);
+                    if (messageElement) {
+                        messageElement.textContent = "Menu link copied successfully";
+                        messageElement.style.display = 'block'; // Make it visible
+                        console.log("Message displayed for menu ID:", menuId);
+
+                        // Hide the message after 3 seconds
+                        setTimeout(() => {
+                            messageElement.style.display = 'none';
+                            console.log("Message hidden for menu ID:", menuId);
+                        }, 2000);
+                    } else {
+                        console.error("Message element not found for menu ID:", menuId);
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to copy the text: ', err);
+                });
+        }
+    </script> --}}
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
+    <script src="https://kit.fontawesome.com/f416851b63.js" crossorigin="anonymous"></script>
+
+    <style>
+        #customToastBox {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            align-items: flex-end;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .custom-toast {
+            width: 400px;
+            height: 80px;
+            background: #fff;
+            font-weight: 500;
+            margin: 15px 0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            position: relative;
+            transform: translateX(100%);
+            animation: moveleft 0.5s linear forwards;
+        }
+
+        @keyframes moveleft {
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .custom-toast i {
+            margin: 0 20px;
+            font-size: 35px;
+            color: green;
+        }
+
+        .custom-toast.error i {
+            color: red;
+        }
+
+        .custom-toast::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 5px;
+            background: green;
+            animation: anim 5s linear forwards;
+        }
+
+        @keyframes anim {
+            100% {
+                width: 0;
+            }
+        }
+        .custom-toast.error::after {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="buttons">
+        <button class="" onclick="showToast(successMsg)">Success</button>
+        <button class="" onclick="showToast(errorMsg)">Error</button>
+        <button class="" onclick="showToast(invalidMsg)">Invalid</button>
+    </div>
+
+    <div id="customToastBox"></div>
+
+    <script>
+        let customToastBox = document.getElementById('customToastBox');
+        let successMsg = '<i class="fa fa-circle-check"></i> Successfully submitted';
+        let errorMsg = '<i class="fa fa-circle-check"></i> Error';
+        let invalidMsg = '<i class="fa fa-circle-check"></i> Invalid';
+
+        function showToast(msg) {
+            let customToast = document.createElement('div');
+            customToast.classList.add('custom-toast');
+            customToast.innerHTML = msg;
+            customToastBox.appendChild(customToast);
+
+            if(msg.includes('Error')) {
+                customToast.classList.add('error');
+            }
+
+            setTimeout(() => {
+                customToast.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

@@ -64,7 +64,7 @@
     <div class="container main-content d-flex flex-column justify-content-center align-items-center">
 
         <!-- Top Categories -->
-        <div class="text-center mb-5">
+        {{-- <div class="text-center mb-5">
             <h2 class="text-white">Top Categories</h2>
             <p class="w-75 mx-auto text-white">
                 Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for
@@ -87,8 +87,38 @@
                     @endforeach
                 </div>
             </div>
-        </div>
+        </div> --}}
 
+        <!-- Top Categories -->
+        <div class="text-center mb-5">
+            <h2 class="text-white">Top Categories</h2>
+            <p class="w-75 mx-auto text-white">
+                Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for
+                more.
+            </p>
+
+            <div class="container text-center mt-4">
+                <div class="row gap-full-screen justify-content-center g-4">
+                    @foreach ($topCategories as $category)
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex flex-column align-items-center">
+                            <!-- Wrap the category image and text inside a link -->
+                            <a href="{{ route('user.menu', ['category' => $category->category]) }}"
+                                class="text-decoration-none">
+                                <div class="position-relative" style="width: 150px; height: 150px;">
+                                    <img src="{{ asset('storage/' . $category->image) }}" class="rounded-circle shadow mb-3"
+                                        style="width: 100%; height: 100%; object-fit: cover; border: 3px solid #f81d0b;"
+                                        alt="{{ $category->category }}">
+                                </div>
+                                <div class="fw-bold fs-5 text-white text-center mt-1">{{ $category->category }}</div>
+                                <small class="text-white text-center" style="font-size: 0.9rem;">
+                                    {{ $category->menu_count }} Menus
+                                </small>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
 
 
 
@@ -207,30 +237,30 @@
 
                                 </div>
 
-                                    {{-- Menu Body --}}
-                                    <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
-                                        class="menu-body">
-                                        <div class="card-body card-body-mt">
-                                            <h5 class="card-title">{{ $menu->name }}</h5>
-                                            <div class="price fw-bold mb-2">
-                                                @if (floor($menu->price) == $menu->price)
-                                                    ₱{{ number_format($menu->price, 0) }}
-                                                @else
-                                                    ₱{{ number_format($menu->price, 2) }}
-                                                @endif
-                                            </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="stars d-flex">
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-regular fa-star"></i>
-                                                </div>
-                                                <div>(2)</div>
-                                            </div>
+                                {{-- Menu Body --}}
+                                <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
+                                    class="menu-body">
+                                    <div class="card-body card-body-mt">
+                                        <h5 class="card-title">{{ $menu->name }}</h5>
+                                        <div class="price fw-bold mb-2">
+                                            @if (floor($menu->price) == $menu->price)
+                                                ₱{{ number_format($menu->price, 0) }}
+                                            @else
+                                                ₱{{ number_format($menu->price, 2) }}
+                                            @endif
                                         </div>
-                                    </a>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="stars d-flex">
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-regular fa-star"></i>
+                                            </div>
+                                            <div>(2)</div>
+                                        </div>
+                                    </div>
+                                </a>
 
                             </div>
                         </div>
@@ -303,8 +333,8 @@
 
                                 </div>
 
-                                   {{-- Menu Body --}}
-                                   <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
+                                {{-- Menu Body --}}
+                                <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
                                     class="menu-body">
                                     <div class="card-body card-body-mt">
                                         <h5 class="card-title">{{ $menu->name }}</h5>

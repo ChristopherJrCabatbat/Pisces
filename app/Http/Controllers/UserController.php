@@ -143,36 +143,48 @@ class UserController extends Controller
     }
 
 
+    // Add To Cart Bawal Duplicate
+    public function addToCart(Request $request, $menuId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Check if the menu item is already in the user's cart
+        if ($user->cartItems()->where('menu_id', $menuId)->exists()) {
+            return redirect()->route('user.menu')->with('toast', [
+                'type' => 'error',
+                'message' => 'Menu is already in the cart!'
+            ]);
+        }
+
+        // Attach the menu item to the user's cart
+        $user->cartItems()->attach($menuId);
+
+        // Increment the cart count
+        $user->increment('cart');
+
+        return redirect()->route('user.menu')->with('toast', [
+            'type' => 'success',
+            'message' => 'Menu added to cart!'
+        ]);
+    }
+
+
+
+    // Add To Cart Pwede Duplicate
     // public function addToCart(Request $request, $menuId)
     // {
     //     /** @var User $user */
     //     $user = Auth::user();
 
-    //     // Check if the menu item is already in the user's cart
-    //     if (!$user->cartItems()->where('menu_id', $menuId)->exists()) {
-    //         // Attach the menu item to the user's cart
-    //         $user->cartItems()->attach($menuId);
-    //     }
+    //     // Attach the menu item to the user's cart without checking for duplicates
+    //     $user->cartItems()->attach($menuId);
 
     //     // Increment the cart count
     //     $user->increment('cart');
 
-    //     return redirect()->route('user.menu')->with('success', 'Item added from cart!');
+    //     return redirect()->route('user.menu')->with('success', 'Item added to cart!');
     // }
-
-    public function addToCart(Request $request, $menuId)
-{
-    /** @var User $user */
-    $user = Auth::user();
-
-    // Attach the menu item to the user's cart without checking for duplicates
-    $user->cartItems()->attach($menuId);
-
-    // Increment the cart count
-    $user->increment('cart');
-
-    return redirect()->route('user.menu')->with('success', 'Item added to cart!');
-}
 
 
     // public function addToCartModal(Request $request, $menuId)
@@ -212,6 +224,25 @@ class UserController extends Controller
     }
 
 
+    // public function addToFavorites(Request $request, $menuId)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Check if the item is already in the user's favorites
+    //     if ($user->favoriteItems()->where('menu_id', $menuId)->exists()) {
+    //         // Remove from favorites if already present
+    //         $user->favoriteItems()->detach($menuId);
+    //         $user->decrement('favorites');
+    //     } else {
+    //         // Add to favorites if not present
+    //         $user->favoriteItems()->attach($menuId);
+    //         $user->increment('favorites');
+    //     }
+
+    //     return redirect()->back()->with('success', 'Item added to favorites!');
+    // }
+
     public function addToFavorites(Request $request, $menuId)
     {
         /** @var User $user */
@@ -222,14 +253,25 @@ class UserController extends Controller
             // Remove from favorites if already present
             $user->favoriteItems()->detach($menuId);
             $user->decrement('favorites');
-        } else {
-            // Add to favorites if not present
-            $user->favoriteItems()->attach($menuId);
-            $user->increment('favorites');
+
+            // Return toast for removal
+            return redirect()->back()->with('toast', [
+                'type' => 'success',
+                'message' => 'Menu removed from favorites!'
+            ]);
         }
 
-        return redirect()->back()->with('success', 'Item added to favorites!');
+        // Add to favorites if not present
+        $user->favoriteItems()->attach($menuId);
+        $user->increment('favorites');
+
+        // Return toast for addition
+        return redirect()->back()->with('toast', [
+            'type' => 'success',
+            'message' => 'Menu added to favorites!'
+        ]);
     }
+
 
     public function favorites(Request $request)
     {

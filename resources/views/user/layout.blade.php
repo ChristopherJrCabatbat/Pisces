@@ -218,6 +218,40 @@
 
     @yield('scripts')
 
+    <div id="customToastBox"></div>
+
+    <script>
+        let customToastBox = document.getElementById('customToastBox');
+
+        function showToast(msg, type) {
+            let customToast = document.createElement('div');
+            customToast.classList.add('custom-toast');
+
+            // Set the icon based on the type
+            let icon = type === 'error' ?
+                '<i class="fa fa-circle-xmark"></i>' :
+                '<i class="fa fa-circle-check"></i>';
+
+            customToast.innerHTML = `${icon} ${msg}`;
+            customToastBox.appendChild(customToast);
+
+            // Add class for error or success styles
+            if (type === 'error') {
+                customToast.classList.add('error');
+            }
+
+            setTimeout(() => {
+                customToast.remove();
+            }, 5000);
+        }
+
+        // Check if a toast message exists in the session
+        @if (session('toast'))
+            const toastData = @json(session('toast'));
+            showToast(toastData.message, toastData.type);
+        @endif
+    </script>
+
     {{-- Modal Script --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -342,28 +376,17 @@
             // Copy to clipboard
             navigator.clipboard.writeText(menuLink)
                 .then(() => {
-                    // Check if the correct element is targeted
-                    console.log("Copy successful, targeting message element for menu ID:", menuId);
-                    const messageElement = document.getElementById(`copyMessage-${menuId}`);
-                    if (messageElement) {
-                        messageElement.textContent = "Menu link copied successfully";
-                        messageElement.style.display = 'block'; // Make it visible
-                        console.log("Message displayed for menu ID:", menuId);
-
-                        // Hide the message after 3 seconds
-                        setTimeout(() => {
-                            messageElement.style.display = 'none';
-                            console.log("Message hidden for menu ID:", menuId);
-                        }, 2000);
-                    } else {
-                        console.error("Message element not found for menu ID:", menuId);
-                    }
+                    // Show success toast
+                    showToast('Menu link copied successfully!', 'success');
                 })
                 .catch(err => {
+                    // Show error toast
+                    showToast('Failed to copy the menu link!', 'error');
                     console.error('Failed to copy the text: ', err);
                 });
         }
     </script>
+
 
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>

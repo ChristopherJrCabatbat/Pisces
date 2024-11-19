@@ -100,8 +100,6 @@
                         @forelse($menus as $menu)
                             <div class="col">
                                 <div class="card card-hover h-100 position-relative">
-                                    <!-- Unique Placeholder for success message, positioned within each card -->
-                                    <div id="copyMessage-{{ $menu->id }}" class="copy-message"></div>
 
                                     {{-- Menu Image --}}
                                     <div class="img-container">
@@ -125,14 +123,10 @@
                                             </form>
 
                                             {{-- Share Menu --}}
-                                            <form action="" method="GET">
-                                                @csrf
-                                                <button type="button" class="icon-buttons">
-                                                    <!-- Share Button -->
-                                                    <i class="fa-solid fa-share" title="Share Menu"
-                                                        onclick="copyMenuLink({{ $menu->id }})"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="icon-buttons"
+                                                onclick="copyMenuLink({{ $menu->id }})">
+                                                <i class="fa-solid fa-share" title="Share Menu"></i>
+                                            </button>
 
                                             {{-- View Menu --}}
                                             <form action="" method="GET">
