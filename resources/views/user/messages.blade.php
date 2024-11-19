@@ -35,10 +35,11 @@
         {{-- Top Container --}}
         <div class="top-container d-flex w-100 p-4 mb-5 justify-content-between align-items-center">
             <div class="fw-bold h1">
-                {{ $selectedCategory }}
+                {{-- {{ $selectedCategory }} --}}
+                Messages
             </div>
             <div class="menu-chosen d-flex justify-content-center align-items-center gap-2 fs-5">
-                <div>Menu <i class="fa-solid fa-caret-right mx-1"></i></div>
+                <div>Messages <i class="fa-solid fa-caret-right mx-1"></i></div>
                 <div class="low-opacity-white">{{ $selectedCategory }}</div>
             </div>
         </div>
