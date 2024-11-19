@@ -220,6 +220,7 @@
 
     <div id="customToastBox"></div>
 
+    {{-- Icon Actions Toast Message --}}
     <script>
         let customToastBox = document.getElementById('customToastBox');
 
@@ -242,7 +243,7 @@
 
             setTimeout(() => {
                 customToast.remove();
-            }, 5000);
+            }, 3000);
         }
 
         // Check if a toast message exists in the session

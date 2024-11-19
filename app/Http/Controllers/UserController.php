@@ -151,7 +151,7 @@ class UserController extends Controller
 
         // Check if the menu item is already in the user's cart
         if ($user->cartItems()->where('menu_id', $menuId)->exists()) {
-            return redirect()->route('user.menu')->with('toast', [
+            return redirect()->back()->with('toast', [
                 'type' => 'error',
                 'message' => 'Menu is already in the cart!'
             ]);
@@ -163,7 +163,8 @@ class UserController extends Controller
         // Increment the cart count
         $user->increment('cart');
 
-        return redirect()->route('user.menu')->with('toast', [
+        // return redirect()->route('user.menu')->with('toast', [
+        return redirect()->back()->with('toast', [
             'type' => 'success',
             'message' => 'Menu added to cart!'
         ]);
@@ -275,8 +276,10 @@ class UserController extends Controller
 
     public function favorites(Request $request)
     {
+        // Fetch categories with menu counts and sort by menu_count in descending order
         $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
             ->groupBy('category')
+            ->orderByDesc('menu_count')
             ->get();
 
         $selectedCategory = $request->input('category', 'All Menus');
@@ -286,20 +289,18 @@ class UserController extends Controller
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        // Retrieve favorite menus, excluding items already in the cart
+        // Retrieve favorite menus without excluding items in the cart
         if ($selectedCategory == 'All Menus') {
-            $menus = $user->favoriteItems()
-                ->whereNotIn('menus.id', $user->cartItems->pluck('id'))
-                ->get();
+            $menus = $user->favoriteItems()->get();
         } else {
             $menus = $user->favoriteItems()
                 ->where('menus.category', $selectedCategory)
-                ->whereNotIn('menus.id', $user->cartItems->pluck('id'))
                 ->get();
         }
 
         return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
+
 
 
     public function updateQuantity(Request $request)
@@ -344,9 +345,10 @@ class UserController extends Controller
         // Decrement the user's cart count
         $user->decrement('cart');
 
-        return redirect()->route('user.shoppingCart')->with('success', 'Item removed from cart!');
+        return redirect()->route('user.shoppingCart')->with(  'toast', [
+            'type' => 'success',
+            'message' => 'Menu successfully removed from the cart!']);
     }
-
 
 
     public function order()
