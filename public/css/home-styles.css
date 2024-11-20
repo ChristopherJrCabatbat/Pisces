@@ -81,3 +81,7 @@ label {
 .register-link a:hover {
     text-decoration: underline;
 }
+
+select {
+    cursor: pointer !important;
+}

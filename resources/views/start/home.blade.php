@@ -411,40 +411,6 @@
                     </a>
 
                     <!-- Menu Modal Structure -->
-                    {{-- <div class="modal" id="menuModal">
-                        <div class="modal-dialog">
-                            <div class="modal-header">
-                                <h5 class="modal-title">All Menus</h5>
-                                <button type="button" class="close-button" onclick="closeModal()">×</button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="menu-grid">
-                                    @foreach ($menus as $menu)
-                                        <div class="menu-card">
-                                            <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}"
-                                                alt="{{ $menu->name }}">
-                                            <div class="card-body">
-                                                <h5 class="card-title">{{ $menu->name }}</h5>
-                                                <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
-                                                <div class="button-group">
-                                                    <button class="custom-button" onclick="showLoginAlert()">Add to
-                                                        Cart</button>
-                                                    <button class="custom-button"
-                                                        onclick="showLoginAlert()">Favorites</button>
-                                                    <button class="custom-button"
-                                                        onclick="showLoginAlert()">Share</button>
-                                                    <button class="custom-button"
-                                                        onclick="showLoginAlert()">View</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
-
-                    <!-- Menu Modal Structure -->
                     <div class="modal" id="menuModal">
                         <div class="modal-dialog">
                             <div class="modal-header">
