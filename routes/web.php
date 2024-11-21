@@ -8,10 +8,9 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\HomeController;
 
-Route::get('/', function () {
-    // return view('welcome');
-    return view('start.home');
-});
+// Route::get('/', function () {
+//     return view('start.home');
+// });
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
 

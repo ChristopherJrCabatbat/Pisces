@@ -170,10 +170,8 @@
         - #INSTRUCTION
       -->
 
-            <section class="section instruction" id="menu" aria-labelledby="">
+            <section class="section instruction whats-new-section" id="menu" aria-labelledby="">
                 <div class="container">
-
-                    {{-- <h2 class="h2 section-title" id="instruction-label" data-reveal>How It Works</h2> --}}
                     <h2 class="h2 section-title" id="instruction-label" data-reveal>What's New?</h2>
 
                     <p class="section-text" data-reveal>
@@ -181,89 +179,27 @@
                     </p>
 
                     <ul class="grid-list">
+                        @foreach ($latestMenus as $index => $menu)
+                            <li data-reveal="{{ $index % 2 == 0 ? 'left' : 'right' }}">
+                                <div class="instruction-card">
+                                    <figure class="card-banner">
+                                        <img src="{{ asset('storage/' . $menu->image) }}" width="300" height="154"
+                                            loading="lazy" alt="{{ $menu->name }}" class="w-100">
+                                    </figure>
 
-                        <li data-reveal="left">
-                            <div class="instruction-card">
-
-                                <figure class="card-banner">
-                                    {{-- <img src="./home-assets/images/instructuion-2.png" width="300" height="154" --}}
-                                    <img src="{{ asset('images/pansit.jpg') }}" width="300" height="154"
-                                        loading="lazy" alt="Select menu" class="w-100">
-                                </figure>
-
-                                <div class="card-content">
-
-                                    <h3 class="h5 card-title">
-                                        <span class="span">01</span>
-                                        {{-- Select Restaurant --}}
-                                        Pansit Sisig
-                                    </h3>
-
-                                    <p class="card-text">
-                                        Enjoy a unique twist on two Filipino favorites—stir-fried noodles topped with
-                                        crispy, savory sisig. Perfect for any craving
-                                    </p>
-
+                                    <div class="card-content">
+                                        <h3 class="h5 card-title">
+                                            <span class="span">{{ sprintf('%02d', $index + 1) }}</span>
+                                            {{ $menu->name }}
+                                        </h3>
+                                        <p class="card-text">
+                                            {{ $menu->description }}
+                                        </p>
+                                    </div>
                                 </div>
-
-                            </div>
-                        </li>
-
-                        <li data-reveal>
-                            <div class="instruction-card">
-
-                                <figure class="card-banner">
-                                    {{-- <img src="./home-assets/images/instructuion-1.png" width="300" height="154" --}}
-                                    <img src="{{ asset('images/pizza.jpg') }}" width="300" height="154"
-                                        loading="lazy" alt="Select Restaurant" class="w-100">
-                                </figure>
-
-                                <div class="card-content">
-
-                                    <h3 class="h5 card-title">
-                                        <span class="span">02</span>
-                                        {{-- Select menu --}}
-                                        Special Pisces Pizza
-                                    </h3>
-
-                                    <p class="card-text">
-                                        A delicious pizza topped with a blend of fresh seafood and herbs, making every
-                                        bite full of flavor.
-                                    </p>
-
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li data-reveal="right">
-                            <div class="instruction-card">
-
-                                <figure class="card-banner">
-                                    <img src="{{ asset('images/pasta.jpg') }}" width="300" height="154"
-                                        loading="lazy" alt="Wait for delivery" class="w-100">
-                                </figure>
-
-                                <div class="card-content">
-
-                                    <h3 class="h5 card-title">
-                                        <span class="span">03</span>
-                                        {{-- Wait for delivery --}}
-                                        Filipino Style Spaghetti
-                                    </h3>
-
-                                    <p class="card-text">
-                                        Sweet, savory, and loaded with meaty goodness. A classic Filipino comfort food
-                                        loved by all ages.
-                                    </p>
-
-                                </div>
-
-                            </div>
-                        </li>
-
+                            </li>
+                        @endforeach
                     </ul>
-
                 </div>
             </section>
 
@@ -275,198 +211,47 @@
         - #TOP RESTAURANT
       -->
 
-            <section class="section top-restaurant" aria-labelledby="top-restaurent-label">
-                <div class="container">
-
-                    <ul class="grid-list grid-list-menus">
-
-                        <li data-reveal="left">
-                            <h2 class="h2 section-title" id="top-restaurent-label">
-                                Explore Our Menu
-                            </h2>
-
-                            <p class="section-text">
-                                From handcrafted coffee to a variety of delicious dishes, our menu has something for
-                                everyone. Whether you're craving a light snack, a hearty meal, or the perfect brew,
-                                we’ve got you covered. Discover your next favorite bite!
-                            </p>
-                        </li>
-
-                        <li data-reveal="right">
-                            <div class="restaurant-card">
-
-                                <div class="card-icon">
-                                    {{-- <img src="./home-assets/images/rest-1.jpg" width="100" height="100" --}}
-                                    <img src="{{ asset('images/pansit.jpg') }}" width="100" height="100"
-                                        loading="lazy" alt="Kennington Lane Cafe" class="w-100">
-                                </div>
-
-                                <h3 class="h5 card-title">
-                                    {{-- Kennington Lane Cafe --}}
-                                    Pansit Sisig
-                                </h3>
-
-                                <div class="rating-wrapper">
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
-                                </div>
-
-                                <div class="card-meta-wrapper">
-                                    <a href="#" class="card-meta">american</a>
-                                    <a href="#" class="card-meta">steakhouse</a>
-                                </div>
-
-                                <p class="card-text">
-                                    Enjoy a unique twist on two Filipino favorites—stir-fried noodles topped with
-                                    crispy, savory sisig. Perfect for any craving
-                                </p>
-
+      <section class="section top-restaurant explore-menu-section" aria-labelledby="top-restaurent-label">
+        <div class="container">
+            <ul class="grid-list grid-list-menus">
+                <li data-reveal="left">
+                    <h2 class="h2 section-title" id="top-restaurent-label">
+                        Explore Our Menu
+                    </h2>
+                    <p class="section-text">
+                        From handcrafted coffee to a variety of delicious dishes, our menu has something for everyone.
+                        Whether you're craving a light snack, a hearty meal, or the perfect brew, we’ve got you covered.
+                        Discover your next favorite bite!
+                    </p>
+                </li>
+                @foreach ($popularMenus as $menu)
+                    <li data-reveal="right">
+                        <div class="restaurant-card">
+                            <div class="card-icon">
+                                <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}"
+                                    width="100" height="100" loading="lazy" alt="{{ $menu->name }}" class="w-100">
                             </div>
-                        </li>
-
-                        <li data-reveal="left">
-                            <div class="restaurant-card">
-
-                                <div class="card-icon">
-                                    {{-- <img src="./home-assets/images/rest-2.jpg" width="100" height="100" --}}
-                                    <img src="{{ asset('images/pizza.jpg') }}" width="100" height="100"
-                                        loading="lazy" alt="The Wilmington" class="w-100">
-                                </div>
-
-                                <h3 class="h5 card-title">
-                                    {{-- The Wilmington --}}
-                                    Special Pisces Pizza
-                                </h3>
-
-                                <div class="rating-wrapper">
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
-                                </div>
-
-                                <div class="card-meta-wrapper">
-                                    <a href="#" class="card-meta">american</a>
-                                    <a href="#" class="card-meta">steakhouse</a>
-                                </div>
-
-                                <p class="card-text">
-                                    A delicious pizza topped with a blend of fresh seafood and herbs, making every bite
-                                    full of flavor.
-                                </p>
-
+                            <h3 class="h5 card-title">{{ $menu->name }}</h3>
+                            <div class="rating-wrapper">
+                                <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
                             </div>
-                        </li>
-
-                        <li data-reveal="right">
-                            <div class="restaurant-card">
-
-                                <div class="card-icon">
-                                    {{-- <img src="./home-assets/images/rest-3.jpg" width="100" height="100" --}}
-                                    <img src="{{ asset('images/pasta.jpg') }}" width="100" height="100"
-                                        loading="lazy" alt="Kings Arms" class="w-100">
-                                </div>
-
-                                <h3 class="h5 card-title">
-                                    {{-- Kings Arms --}}
-                                    Filipino Style Spaghetti
-                                </h3>
-
-                                <div class="rating-wrapper">
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
-                                </div>
-
-                                <div class="card-meta-wrapper">
-                                    <a href="#" class="card-meta">american</a>
-                                    <a href="#" class="card-meta">healthy</a>
-                                </div>
-
-                                <p class="card-text">
-                                    Sweet, savory, and loaded with meaty goodness. A classic Filipino comfort food loved
-                                    by all ages.
-                                </p>
-
+                            <div class="card-meta-wrapper">
+                                <a href="#" class="card-meta">Popular</a>
+                                <a href="#" class="card-meta">{{ $menu->category }}</a>
                             </div>
-                        </li>
-
-                    </ul>
-
-                    {{-- <a href="#" class="btn btn-secondary has-after">
-                        <span class="span">See All</span>
-                        <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
-                    </a> --}}
-
-                    <!-- Modal Trigger Button -->
-                    <a href="javascript:void(0);" class="btn btn-secondary has-after" onclick="showModal()">
-                        <span class="span">See All</span>
-                        <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
-                    </a>
-
-                    <!-- Menu Modal Structure -->
-                    <div class="modal" id="menuModal">
-                        <div class="modal-dialog">
-                            <div class="modal-header">
-                                <h4 class="modal-title">{{ $selectedCategory }}</h4>
-                                <button type="button" class="close-button" onclick="closeModal()">×</button>
-                            </div>
-                            <div class="modal-body">
-                                <!-- Category Filter Dropdown -->
-                                <div class="lable-select">
-                                    {{-- <label for="categorySelect">Filter by Category:</label> --}}
-                                    <select id="categorySelect" onchange="filterByCategory()">
-                                        <option value="All Menus"
-                                            {{ $selectedCategory == 'All Menus' ? 'selected' : '' }}>
-                                            All Menus
-                                        </option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->category }}"
-                                                {{ $selectedCategory == $category->category ? 'selected' : '' }}>
-                                                {{ $category->category }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="menu-grid" id="menuGrid">
-                                    @foreach ($menus as $menu)
-                                        <div class="menu-card">
-                                            <div class="img-container">
-                                                <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}" alt="{{ $menu->name }}">
-                                                
-                                                <!-- Darken overlay div -->
-                                                <div class="darken"></div>
-                                                
-                                                <!-- Icon overlay with centered icons -->
-                                                <div class="icon-overlay">
-                                                    <button onclick="showLoginAlert()" title="Add to Cart"><i class="fa-solid fa-cart-plus"></i></button>
-                                                    <button onclick="showLoginAlert()" title="Favorites"><i class="fa-solid fa-heart"></i></button>
-                                                    <button onclick="showLoginAlert()" title="Share"><i class="fa-solid fa-share"></i></button>
-                                                    <button onclick="showLoginAlert()" title="View"><i class="fa-solid fa-search"></i></button>
-                                                </div>
-                                            </div>
-                                            <div class="card-body">
-                                                <h5 class="card-title">{{ $menu->name }}</h5>
-                                                <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                
-
-                            </div>
+                            <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
+                            <p class="card-text">{{ $menu->description }}</p>
                         </div>
-                    </div>
-
-                </div>
-            </section>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    </section>
+    
 
             <!--
         - #CTA

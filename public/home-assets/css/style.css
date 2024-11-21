@@ -139,7 +139,7 @@ address {
 html {
     font-family: var(--ff-poppins);
     font-size: 10px;
-    scroll-behavior: smooth;
+    scroll-behavior: smooth !important;
 }
 
 body {
@@ -1318,3 +1318,98 @@ body.active {
 .lable-select {
     display: flex;
 }
+
+
+
+
+/* Hover What's New Styles */
+.whats-new-section .instruction-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 8px;
+}
+
+.whats-new-section .instruction-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.whats-new-section .card-banner img {
+    border-radius: 8px 8px 0 0;
+    transition: transform 0.3s ease;
+}
+
+.whats-new-section .instruction-card:hover .card-banner img {
+    transform: scale(1.1);
+}
+
+.whats-new-section .card-content {
+    padding: 1rem;
+    text-align: left;
+}
+
+.whats-new-section .card-title .span {
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.whats-new-section .card-text {
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.whats-new-section .instruction-card:hover .card-title .span {
+    color: red;
+}
+
+.whats-new-section .instruction-card:hover .card-text {
+    color: black;
+}
+/* End Hover What's New Styles */
+
+
+
+/* Explore Menu Section */
+/* Hover Styles for Explore Our Menu Section */
+.explore-menu-section .restaurant-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.explore-menu-section .restaurant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-color: #e63946; /* Add a red border on hover */
+}
+
+.explore-menu-section .restaurant-card .card-icon img {
+    border-radius: 50%;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    border: 2px solid #ddd;
+}
+
+.explore-menu-section .restaurant-card .card-title {
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.explore-menu-section .restaurant-card:hover .card-title {
+    color: #e63946; /* Change the title color on hover */
+    font-size: 2.2rem;
+}
+
+.explore-menu-section .restaurant-card .card-text {
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.explore-menu-section .restaurant-card:hover .card-text {
+    color: #000;
+}
+

@@ -25,13 +25,24 @@ class HomeController extends Controller
         } else {
             $menus = Menu::where('category', $selectedCategory)->get();
         }
+
+        $latestMenus = Menu::orderBy('created_at', 'desc')->take(3)->get();
+    
+        // Fetch the 3 most popular menus based on order count
+        $popularMenus = DB::table('orders')
+            ->join('menus', 'orders.menu_name', '=', 'menus.name')
+            ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.description', 'menus.category', DB::raw('COUNT(orders.id) as order_count'))
+            ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.description', 'menus.category')
+            ->orderByDesc('order_count')
+            ->take(3)
+            ->get();
     
         // If request is AJAX, return only the menu cards HTML
         if ($request->ajax()) {
             return view('start.partials.menu_grid', compact('menus'))->render();
         }
     
-        return view('start.home', compact('menus', 'categories', 'selectedCategory'));
+        return view('start.home', compact('menus', 'categories', 'latestMenus', 'selectedCategory', 'popularMenus'));
     }
     
     
