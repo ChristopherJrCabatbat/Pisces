@@ -184,9 +184,6 @@
                         <div class="col">
                             <div class="card h-100">
 
-                                <!-- Unique Placeholder for success message, positioned within each card -->
-                                <div id="copyMessage-{{ $menu->id }}" class="copy-message"></div>
-
                                 <div class="img-container">
                                     <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
                                         alt="{{ $menu->name }}">
@@ -287,49 +284,50 @@
                                     <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
                                         alt="{{ $menu->name }}">
 
-                                    <div class="icon-overlay text-white">
-                                        {{-- Add to Cart --}}
-                                        <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="icon-buttons"><i
-                                                    class="fa-solid fa-cart-plus text-white"
-                                                    title="Add to Cart"></i></button>
-                                        </form>
-
-                                        {{-- Share Menu --}}
-                                        <form action="" method="GET">
-                                            @csrf
-                                            <button type="button" class="icon-buttons">
-                                                <!-- Share Button -->
-                                                <i class="fa-solid fa-share" title="Share Menu"
-                                                    onclick="copyMenuLinkNew('new-{{ $menu->id }}')"></i>
-                                            </button>
-                                        </form>
-
-                                        {{-- View Menu --}}
-                                        <form action="" method="GET">
-                                            @csrf
-                                            <button type="button" class="icon-buttons"><i
-                                                    class="fa-solid fa-search view-menu-btn" title="View Menu"
-                                                    data-id="{{ $menu->id }}"></i></button>
-                                        </form>
-
-                                        {{-- Add to Favorites --}}
-                                        <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="icon-buttons">
-                                                <i class="fa-solid fa-heart"
-                                                    style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
-                                                    title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
-                                                </i>
-                                            </button>
-                                        </form>
-
-                                    </div>
+                                        <div class="icon-overlay text-white">
+                                            {{-- Add to Cart --}}
+                                            <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                                enctype="multipart/form-data">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="icon-buttons"><i
+                                                        class="fa-solid fa-cart-plus text-white"
+                                                        title="Add to Cart"></i></button>
+                                            </form>
+    
+                                            {{-- Share Menu --}}
+                                            <form action="" method="GET">
+                                                @csrf
+                                                <button type="button" class="icon-buttons">
+                                                    <!-- Share Button -->
+                                                    <i class="fa-solid fa-share" title="Share Menu"
+                                                        onclick="copyMenuLink({{ $menu->id }})"></i>
+                                                </button>
+                                            </form>
+    
+                                            {{-- View Menu --}}
+                                            <form action="" method="GET">
+                                                @csrf
+                                                <button type="button" class="icon-buttons"><i
+                                                        class="fa-solid fa-search view-menu-btn" title="View Menu"
+                                                        data-id="{{ $menu->id }}"></i></button>
+                                            </form>
+    
+                                            {{-- Add to Favorites --}}
+                                            <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
+                                                enctype="multipart/form-data">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="icon-buttons">
+                                                    <i class="fa-solid fa-heart"
+                                                        style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
+                                                        title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                                    </i>
+                                                </button>
+                                            </form>
+    
+                                        </div>
+    
 
                                 </div>
 

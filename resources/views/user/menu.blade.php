@@ -71,8 +71,9 @@
                                 <i class="fa-solid fa-caret-right me-2"></i>
                                 <a href="{{ route('user.menu', ['category' => $category->category]) }}"
                                     class="white-underline">
-                                    <span
-                                        class="{{ $selectedCategory == $category->category ? 'active-category' : '' }}">{{ $category->category }}</span>
+                                    <span class="{{ $selectedCategory == $category->category ? 'active-category' : '' }}">
+                                        {{ $category->category }}
+                                    </span>
                                 </a>
                             </div>
                             <div>({{ $category->menu_count }})</div>

@@ -94,25 +94,27 @@ class UserController extends Controller
         $user = Auth::user();
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-
-        // Fetch categories with menu counts and sort by menu_count in descending order
-        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-            ->groupBy('category')
+    
+        // Fetch all categories, including those with zero menus
+        $categories = DB::table('categories')
+            ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+            ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
+            ->groupBy('categories.category')
             ->orderByDesc('menu_count')
             ->get();
-
+    
         $selectedCategory = $request->input('category', 'All Menus');
-
-        // Retrieve menus based on selected category, without excluding items in the cart
+    
+        // Retrieve menus based on selected category
         if ($selectedCategory == 'All Menus') {
             $menus = Menu::all();
         } else {
             $menus = Menu::where('category', $selectedCategory)->get();
         }
-
-        // Pass the sorted categories list to the view
+    
         return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
+    
 
 
     public function menuView($id)
@@ -276,11 +278,13 @@ class UserController extends Controller
 
     public function favorites(Request $request)
     {
-        // Fetch categories with menu counts and sort by menu_count in descending order
-        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-            ->groupBy('category')
-            ->orderByDesc('menu_count')
-            ->get();
+         // Fetch all categories, including those with zero menus
+         $categories = DB::table('categories')
+         ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+         ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
+         ->groupBy('categories.category')
+         ->orderByDesc('menu_count')
+         ->get();
 
         $selectedCategory = $request->input('category', 'All Menus');
 
@@ -345,9 +349,10 @@ class UserController extends Controller
         // Decrement the user's cart count
         $user->decrement('cart');
 
-        return redirect()->route('user.shoppingCart')->with(  'toast', [
+        return redirect()->route('user.shoppingCart')->with('toast', [
             'type' => 'success',
-            'message' => 'Menu successfully removed from the cart!']);
+            'message' => 'Menu successfully removed from the cart!'
+        ]);
     }
 
 
