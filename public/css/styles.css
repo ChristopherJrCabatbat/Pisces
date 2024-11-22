@@ -585,3 +585,22 @@ th {
 }
 
 /* End Menu Icon Toast Message */
+
+
+
+.shop-messages .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.shop-updates-body i {
+    font-size: 1.5rem;
+}
+
+a.more {
+    text-decoration: none;
+}
+
+a.more:hover {
+    text-decoration: underline;
+}
