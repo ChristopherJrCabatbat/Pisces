@@ -36,7 +36,7 @@
         <div class="top-container d-flex w-100 p-4 mb-5 justify-content-between align-items-center">
             <div class="fw-bold h1">
                 {{-- {{ $selectedCategory }} --}}
-                Shop Messages
+                Order Updates
             </div>
             <div class="menu-chosen d-flex justify-content-center align-items-center gap-2 fs-5">
                 <div>Messages <i class="fa-solid fa-caret-right mx-1"></i></div>
@@ -53,7 +53,7 @@
             <!-- Shop Updates Section -->
             <div class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 text-secondary">Shop updates</h5>
+                    <h5 class="m-0 text-secondary">Order Status</h5>
                     <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i class="fa-solid fa-caret-right ms-1"></i></a>
                 </div>
                 <div class="shop-updates-body p-3">
@@ -74,7 +74,7 @@
                         </div>
                         <div>
                             <p class="m-0 fw-bold">Order delivered</p>
-                            <p class="m-0 text-muted small">Your package 972437104315 was delivered. <span class="text-muted small">5d</span></p>
+                            <p class="m-0 text-muted small">Your order 972437104315 was delivered. <span class="text-muted small">5d</span></p>
                         </div>
                     </div>
                 </div>

@@ -45,21 +45,21 @@
                         <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all"
                             type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
                     </li>
-                    <li class="nav-item" role="presentation">
+                    {{-- <li class="nav-item" role="presentation">
                         <button class="nav-link" id="unpaid-tab" data-bs-toggle="tab" data-bs-target="#unpaid"
                             type="button" role="tab" aria-controls="unpaid" aria-selected="false">Unpaid</button>
-                    </li>
+                    </li> --}}
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="to-ship-tab" data-bs-toggle="tab" data-bs-target="#to-ship"
-                            type="button" role="tab" aria-controls="to-ship" aria-selected="false">To Ship</button>
+                            type="button" role="tab" aria-controls="to-ship" aria-selected="false">Preparing</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="shipped-tab" data-bs-toggle="tab" data-bs-target="#shipped"
-                            type="button" role="tab" aria-controls="shipped" aria-selected="false">Shipped</button>
+                            type="button" role="tab" aria-controls="shipped" aria-selected="false">Out for Delivery</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="to-review-tab" data-bs-toggle="tab" data-bs-target="#to-review"
-                            type="button" role="tab" aria-controls="to-review" aria-selected="false">To Review</button>
+                            type="button" role="tab" aria-controls="to-review" aria-selected="false">Delivered</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="returns-tab" data-bs-toggle="tab" data-bs-target="#returns"
@@ -118,31 +118,6 @@
                     </div>
                 </div>
 
-            </div>
-
-            {{-- Unpaid --}}
-            <div class="tab-pane fade" id="unpaid" role="tabpanel" aria-labelledby="unpaid-tab">
-                {{-- Example Order --}}
-                <div class="order-container border rounded mb-4 p-4 shadow-sm">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <p class="text-muted mb-1">Order Delivered</p>
-                            <p class="fw-bold mb-0">Nov 13</p>
-                        </div>
-                        <div>
-                            <span class="badge bg-success">Delivered</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        {{-- Menu Image --}}
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
-                            style="width: 80px; height: 80px; object-fit: cover;">
-                        <div>
-                            <p class="fw-bold mb-1">Pansit Sisig</p>
-                            <p class="text-muted mb-0">₱350</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {{-- To Ship --}}

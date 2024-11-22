@@ -421,14 +421,18 @@ class UserController extends Controller
     {
         // Fetch the single menu item based on the provided ID
         $menu = Menu::findOrFail($id);
-
+    
+        // Count the number of users who added this menu to their favorites
+        $favoritesCount = DB::table('favorite_items')->where('menu_id', $menu->id)->count();
+    
         /** @var User $user */
         $user = Auth::user();
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
-
-        return view('user.menuDetails', compact('menu', 'userCart', 'userFavorites'));
+        $userCart = $user ? $user->cart : 0;
+        $userFavorites = $user ? $user->favoriteItems()->count() : 0;
+    
+        return view('user.menuDetails', compact('menu', 'user', 'userCart', 'userFavorites', 'favoritesCount'));
     }
+    
 
 
     // public function menuDetailsOrder($id)
