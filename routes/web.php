@@ -85,7 +85,9 @@ Route::group([
     Route::get('/menuDetailsOrder/{id}', [UserController::class, 'menuDetailsOrder'])->name('menuDetailsOrder');
 
     Route::get('/orders', [UserController::class, 'orders'])->name('orders');
+
     Route::get('/messages', [UserController::class, 'messages'])->name('messages');
+    Route::get('/shopUpdates', [UserController::class, 'shopUpdates'])->name('shopUpdates');
 
     Route::resource('delivery', DeliveryController::class);
     Route::post('/orderStore', [DeliveryController::class, 'orderStore'])->name('orderStore');

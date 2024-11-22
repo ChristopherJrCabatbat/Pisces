@@ -89,6 +89,7 @@ class RoleMiddleware
                 'user.orderStore',
 
                 'user.messages',
+                'user.shopUpdates',
             ],
         ];
 

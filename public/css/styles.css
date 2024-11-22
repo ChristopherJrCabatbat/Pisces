@@ -604,3 +604,22 @@ a.more {
 a.more:hover {
     text-decoration: underline;
 }
+
+.nav-tabs .nav-link {
+    color: #6c757d;
+    color: white;
+    font-weight: bold;
+}
+.nav-tabs .nav-link.active {
+    color: #212529;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.order-container {
+    background-color: #fff;
+}
+
+.order-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s;
+}
