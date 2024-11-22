@@ -78,7 +78,7 @@
                                     </span>
                                 </a>
                             </div>
-                            {{-- <div>({{ $category->menu_count }})</div> --}}
+                            <div>({{ $category->menu_count }})</div>
                         </div>
                     @endforeach
 

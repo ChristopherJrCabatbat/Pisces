@@ -94,7 +94,7 @@ class UserController extends Controller
         $user = Auth::user();
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-    
+
         // Fetch all categories, including those with zero menus
         $categories = DB::table('categories')
             ->leftJoin('menus', 'categories.category', '=', 'menus.category')
@@ -102,19 +102,19 @@ class UserController extends Controller
             ->groupBy('categories.category')
             ->orderByDesc('menu_count')
             ->get();
-    
+
         $selectedCategory = $request->input('category', 'All Menus');
-    
+
         // Retrieve menus based on selected category
         if ($selectedCategory == 'All Menus') {
             $menus = Menu::all();
         } else {
             $menus = Menu::where('category', $selectedCategory)->get();
         }
-    
+
         return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
-    
+
 
 
     public function menuView($id)
@@ -276,34 +276,69 @@ class UserController extends Controller
     }
 
 
+    // public function favorites(Request $request)
+    // {
+    //      // Fetch all categories, including those with zero menus
+    //      $categories = DB::table('categories')
+    //      ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+    //      ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
+    //      ->groupBy('categories.category')
+    //      ->orderByDesc('menu_count')
+    //      ->get();
+
+    //     $selectedCategory = $request->input('category', 'All Menus');
+
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Retrieve favorite menus without excluding items in the cart
+    //     if ($selectedCategory == 'All Menus') {
+    //         $menus = $user->favoriteItems()->get();
+    //     } else {
+    //         $menus = $user->favoriteItems()
+    //             ->where('menus.category', $selectedCategory)
+    //             ->get();
+    //     }
+
+    //     return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    // }
+
     public function favorites(Request $request)
     {
-         // Fetch all categories, including those with zero menus
-         $categories = DB::table('categories')
-         ->leftJoin('menus', 'categories.category', '=', 'menus.category')
-         ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
-         ->groupBy('categories.category')
-         ->orderByDesc('menu_count')
-         ->get();
-
-        $selectedCategory = $request->input('category', 'All Menus');
-
         /** @var User $user */
         $user = Auth::user();
+    
+        // Fetch categories with counts of favorite menus for the logged-in user
+        $categories = DB::table('categories')
+            ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+            ->leftJoin('favorite_items', function ($join) use ($user) {
+                $join->on('menus.id', '=', 'favorite_items.menu_id')
+                    ->where('favorite_items.user_id', '=', $user->id);
+            })
+            ->select('categories.category as category', DB::raw('count(favorite_items.id) as menu_count'))
+            ->groupBy('categories.category')
+            ->orderByDesc('menu_count')
+            ->get();
+    
+        $selectedCategory = $request->input('category', 'All Menus');
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-
-        // Retrieve favorite menus without excluding items in the cart
+    
+        // Retrieve favorite menus filtered by the selected category
         if ($selectedCategory == 'All Menus') {
-            $menus = $user->favoriteItems()->get();
+            $menus = $user->favoriteItems; // Get all favorite items
         } else {
-            $menus = $user->favoriteItems()
-                ->where('menus.category', $selectedCategory)
-                ->get();
+            $menus = $user->favoriteItems
+                ->filter(function ($menu) use ($selectedCategory) {
+                    return $menu->category === $selectedCategory; // Filter by category
+                });
         }
-
+    
         return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
+    
 
 
 
