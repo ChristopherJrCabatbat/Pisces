@@ -90,7 +90,9 @@ class RoleMiddleware
                 'user.orderStore',
 
                 'user.messages',
+                'user.messagesPisces',
                 'user.shopUpdates',
+                'user.trackOrder',
             ],
         ];
 

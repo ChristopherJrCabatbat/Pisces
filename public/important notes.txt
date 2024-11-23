@@ -791,3 +791,11 @@ function formatPrice(price) {
 </body>
 
 </html>
+
+
+
+
+Messages
+
+ {{-- <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo"> --}}
+                        {{-- <h5 class="m-0 text-secondary"> Pisces</h5> --}}

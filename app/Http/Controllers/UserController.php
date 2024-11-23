@@ -526,6 +526,31 @@ class UserController extends Controller
         return view('user.messages', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
 
+    public function messagesPisces(Request $request)
+    {
+        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+            ->groupBy('category')
+            ->get();
+
+        $selectedCategory = $request->input('category', 'All Menus');
+
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
+
+        // Retrieve menus based on selected category, excluding items in the cart
+        if ($selectedCategory == 'All Menus') {
+            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
+        } else {
+            $menus = Menu::where('category', $selectedCategory)
+                ->whereNotIn('id', $user->cartItems->pluck('id'))
+                ->get();
+        }
+
+        return view('user.messagesPisces', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    }
+
     public function shopUpdates(Request $request)
     {
         $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
@@ -549,6 +574,31 @@ class UserController extends Controller
         }
 
         return view('user.shopUpdates', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    }
+    
+    public function trackOrder(Request $request)
+    {
+        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+            ->groupBy('category')
+            ->get();
+
+        $selectedCategory = $request->input('category', 'All Menus');
+
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
+
+        // Retrieve menus based on selected category, excluding items in the cart
+        if ($selectedCategory == 'All Menus') {
+            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
+        } else {
+            $menus = Menu::where('category', $selectedCategory)
+                ->whereNotIn('id', $user->cartItems->pluck('id'))
+                ->get();
+        }
+
+        return view('user.trackOrder', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
 
 

@@ -597,6 +597,15 @@ th {
     font-size: 1.5rem;
 }
 
+.shop-updates-body a {
+    text-decoration: none;
+    color: black;
+}
+.shop-updates-body a .a-container:hover {
+    cursor: pointer;
+    background-color: #bbbbbb;
+}
+
 a.more {
     text-decoration: none;
 }
@@ -622,4 +631,15 @@ a.more:hover {
 .order-container:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s;
+}
+
+.top {
+    border-bottom: 1px solid rgb(0, 0, 0, 0.2);
+}
+
+.timeline-item .time {
+    /* width: 120px; */
+    text-align: right;
+    font-size: 13px;
+    /* line-height: 1.5; */
 }

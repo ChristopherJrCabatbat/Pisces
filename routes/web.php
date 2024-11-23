@@ -88,7 +88,10 @@ Route::group([
     Route::get('/orders', [UserController::class, 'orders'])->name('orders');
 
     Route::get('/messages', [UserController::class, 'messages'])->name('messages');
+    Route::get('/messagesPisces', [UserController::class, 'messagesPisces'])->name('messagesPisces');
     Route::get('/shopUpdates', [UserController::class, 'shopUpdates'])->name('shopUpdates');
+    Route::get('/trackOrder', [UserController::class, 'trackOrder'])->name('trackOrder');
+    Route::get('/reviewOrder', [UserController::class, 'reviewOrder'])->name('reviewOrder');
 
     Route::resource('delivery', DeliveryController::class);
     Route::post('/orderStore', [DeliveryController::class, 'orderStore'])->name('orderStore');
