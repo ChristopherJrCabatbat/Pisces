@@ -88,6 +88,7 @@
                             <!-- Additional Info -->
                             <div class="extra-info mt-3">
                                 <span>❤️ 1K Favorites</span>
+                                {{-- <span><i class="fa-solid fa-heart me-1" style="color: red;"></i> {{ $favoritesCount }} Favorites</span> --}}
                                 {{-- <span>Shopee Guarantee</span> --}}
                             </div>
                         </div>
@@ -302,37 +303,48 @@
                             // Add To Cart
                             document.querySelector('.modal-button.add-to-cart').onclick =
                                 function() {
-                                    const quantity = document.getElementById(
-                                        'modalHiddenQuantity').value;
-
                                     fetch(`/user/addToCart/${menuId}`, {
-                                            method: 'PUT',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'X-CSRF-Token': '{{ csrf_token() }}',
-                                            },
-                                            body: JSON.stringify({
-                                                quantity
-                                            }),
-                                        })
-                                        .then(response => {
-                                            if (!response.ok) {
-                                                throw new Error(
-                                                    'Failed to add item to cart');
-                                            }
-                                            return response.json();
-                                        })
-                                        .then(data => {
-                                            alert('Item added to cart successfully!');
-                                        })
-                                        .catch(error => {
-                                            console.error('Error:', error);
-                                            alert('Item added to cart successfully!');
-                                            window.location
-                                                .reload(); // Reload the page after the alert in the catch block
-
-                                        });
+                                        method: 'PUT',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-Token': '{{ csrf_token() }}',
+                                        },
+                                    })
+                                    window.location.reload();
                                 };
+
+                            // // Add To Cart functionality with reload
+                            // document.querySelector('.modal-button.add-to-cart').onclick =
+                            //     function() {
+                            //         fetch(`/user/addToCart/${menuId}`, {
+                            //                 method: 'POST',
+                            //                 headers: {
+                            //                     'Content-Type': 'application/json',
+                            //                     'X-CSRF-Token': '{{ csrf_token() }}',
+                            //                 },
+                            //             })
+                            //             .then(response => {
+                            //                 if (!response.ok) {
+                            //                     throw new Error(
+                            //                         'Failed to add menu to the cart!');
+                            //                 }
+                            //                 return response.json();
+                            //             })
+                            //             .then(data => {
+                            //                 // Show a success message or toast (optional)
+                            //                 alert(data.message ||
+                            //                     'Menu added to cart successfully!');
+
+                            //                 // Reload the page after the menu is added
+                            //                 window.location.reload();
+                            //             })
+                            //             .catch(error => {
+                            //                 console.error('Error adding menu to cart:',
+                            //                     error);
+                            //                 alert(
+                            //                     'Failed to add menu to cart. Please try again.');
+                            //             });
+                            //     };
 
 
                             // Show the modal

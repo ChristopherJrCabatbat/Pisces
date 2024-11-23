@@ -105,6 +105,9 @@ class UserController extends Controller
 
         $selectedCategory = $request->input('category', 'All Menus');
 
+        // Count the number of users who added this menu to their favorites
+        // $favoritesCount = DB::table('favorite_items')->where('menu_id', $menu->id)->count();
+
         // Retrieve menus based on selected category
         if ($selectedCategory == 'All Menus') {
             $menus = Menu::all();
@@ -309,7 +312,7 @@ class UserController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-    
+
         // Fetch categories with counts of favorite menus for the logged-in user
         $categories = DB::table('categories')
             ->leftJoin('menus', 'categories.category', '=', 'menus.category')
@@ -321,11 +324,11 @@ class UserController extends Controller
             ->groupBy('categories.category')
             ->orderByDesc('menu_count')
             ->get();
-    
+
         $selectedCategory = $request->input('category', 'All Menus');
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-    
+
         // Retrieve favorite menus filtered by the selected category
         if ($selectedCategory == 'All Menus') {
             $menus = $user->favoriteItems; // Get all favorite items
@@ -335,10 +338,10 @@ class UserController extends Controller
                     return $menu->category === $selectedCategory; // Filter by category
                 });
         }
-    
+
         return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
-    
+
 
 
 
@@ -421,18 +424,18 @@ class UserController extends Controller
     {
         // Fetch the single menu item based on the provided ID
         $menu = Menu::findOrFail($id);
-    
+
         // Count the number of users who added this menu to their favorites
         $favoritesCount = DB::table('favorite_items')->where('menu_id', $menu->id)->count();
-    
+
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user ? $user->cart : 0;
         $userFavorites = $user ? $user->favoriteItems()->count() : 0;
-    
+
         return view('user.menuDetails', compact('menu', 'user', 'userCart', 'userFavorites', 'favoritesCount'));
     }
-    
+
 
 
     // public function menuDetailsOrder($id)

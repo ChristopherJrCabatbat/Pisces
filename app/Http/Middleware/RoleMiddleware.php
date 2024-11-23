@@ -34,6 +34,7 @@ class RoleMiddleware
                 'admin.menu.destroy',
 
                 'admin.menuCreateCategory',
+                'admin.menuEditCategory',
                 'admin.storeCategory',
 
                 'admin.delivery.index',

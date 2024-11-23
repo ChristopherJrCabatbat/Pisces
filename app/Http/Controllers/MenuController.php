@@ -69,9 +69,27 @@ class MenuController extends Controller
 
     public function menuCreateCategory()
     {
-        return view('admin.menuCreateCategory');
+        $categories = Category::all(); // Fetch all categories
+
+        return view('admin.menuCreateCategory', compact( 'categories'));
     }
-    
+
+    public function menuEditCategory(string $id)
+    {
+        $menus = Menu::findOrFail($id);
+        $categories = Category::all(); // Fetch all categories
+
+        return view('admin.menuEdit', compact('menus', 'categories'));
+    }
+
+    public function menuUpdateCategory(Request $request, string $id)
+    {
+        $menus = Menu::findOrFail($id);
+        $categories = Category::all(); // Fetch all categories
+        return view('admin.menuEdit', compact('menus', 'categories'));
+    }
+
+
 
     /**
      * Store a newly created resource in storage.

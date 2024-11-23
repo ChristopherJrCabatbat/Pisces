@@ -115,7 +115,7 @@
                     </tr>
                 </thead>
                 <tbody id="menu-table-body">
-                    @foreach ($menus as $menu)
+                    @forelse ($menus as $menu)
                         <tr class="menu-row">
                             <!-- Image Column -->
                             <td>
@@ -159,7 +159,11 @@
                                 </form>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr id="no-menus-row">
+                            <td colspan="6">No menus found.</td>
+                        </tr>
+                    @endforelse
                     <!-- Always include the "No menus" row, but hide it initially -->
                     <tr id="no-menus-row" style="display: none;">
                         <td colspan="6"></td>

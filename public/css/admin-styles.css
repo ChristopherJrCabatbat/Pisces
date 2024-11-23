@@ -149,6 +149,10 @@ li.sidebar-item a.customers.active:hover {
     background-color: #c4c4c4;
 }
 
+.edit-categ {
+    background-color: transparent;
+}
+
 li.add-categ:hover {
     background-color: #989898 !important;
 }

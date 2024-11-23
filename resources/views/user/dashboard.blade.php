@@ -29,7 +29,7 @@
 
         @media (min-width: 990px) {
             .gap-full-screen {
-                gap: 1rem;
+                gap: 2rem;
             }
         }
 
@@ -64,32 +64,6 @@
     <div class="container main-content d-flex flex-column justify-content-center align-items-center">
 
         <!-- Top Categories -->
-        {{-- <div class="text-center mb-5">
-            <h2 class="text-white">Top Categories</h2>
-            <p class="w-75 mx-auto text-white">
-                Explore the top categories our customers love, featuring a variety of dishes that keep them coming back for
-                more.
-            </p>
-
-            <div class="container text-center mt-4">
-                <div class="row gap-full-screen justify-content-center g-4">
-                    @foreach ($topCategories as $category)
-                        <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex flex-column align-items-center">
-                            <div class="position-relative" style="width: 150px; height: 150px;"> <!-- Increased size -->
-                                <img src="{{ asset('storage/' . $category->image) }}" class="rounded-circle shadow mb-3"
-                                    style="width: 100%; height: 100%; object-fit: cover; border: 3px solid #f81d0b;"
-                                    alt="{{ $category->category }}">
-                            </div>
-                            <div class="fw-bold fs-5 text-white text-center mt-1">{{ $category->category }}</div>
-                            <small class="text-white text-center" style="font-size: 0.9rem;">{{ $category->menu_count }}
-                                Menus</small>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div> --}}
-
-        <!-- Top Categories -->
         <div class="text-center mb-5">
             <h2 class="text-white">Top Categories</h2>
             <p class="w-75 mx-auto text-white">
@@ -99,7 +73,7 @@
 
             <div class="container text-center mt-4">
                 <div class="row gap-full-screen justify-content-center g-4">
-                    @foreach ($topCategories as $category)
+                    @forelse ($topCategories as $category)
                         <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex flex-column align-items-center">
                             <!-- Wrap the category image and text inside a link -->
                             <a href="{{ route('user.menu', ['category' => $category->category]) }}"
@@ -115,7 +89,11 @@
                                 </small>
                             </a>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="col">
+                            <p>No category available.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -180,7 +158,8 @@
             </div>
             <div>
                 <div class="row row-cols-1 row-cols-md-4 g-4">
-                    @foreach ($popularMenus as $menu)
+                    {{-- @foreach ($popularMenus as $menu) --}}
+                    @forelse ($popularMenus as $menu)
                         <div class="col">
                             <div class="card h-100">
 
@@ -261,7 +240,12 @@
 
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="col">
+                            <p>No menu available.</p>
+                        </div>
+                        {{-- @endforeach --}}
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -284,50 +268,50 @@
                                     <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
                                         alt="{{ $menu->name }}">
 
-                                        <div class="icon-overlay text-white">
-                                            {{-- Add to Cart --}}
-                                            <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
-                                                enctype="multipart/form-data">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="icon-buttons"><i
-                                                        class="fa-solid fa-cart-plus text-white"
-                                                        title="Add to Cart"></i></button>
-                                            </form>
-    
-                                            {{-- Share Menu --}}
-                                            <form action="" method="GET">
-                                                @csrf
-                                                <button type="button" class="icon-buttons">
-                                                    <!-- Share Button -->
-                                                    <i class="fa-solid fa-share" title="Share Menu"
-                                                        onclick="copyMenuLink({{ $menu->id }})"></i>
-                                                </button>
-                                            </form>
-    
-                                            {{-- View Menu --}}
-                                            <form action="" method="GET">
-                                                @csrf
-                                                <button type="button" class="icon-buttons"><i
-                                                        class="fa-solid fa-search view-menu-btn" title="View Menu"
-                                                        data-id="{{ $menu->id }}"></i></button>
-                                            </form>
-    
-                                            {{-- Add to Favorites --}}
-                                            <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
-                                                enctype="multipart/form-data">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="icon-buttons">
-                                                    <i class="fa-solid fa-heart"
-                                                        style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
-                                                        title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
-                                                    </i>
-                                                </button>
-                                            </form>
-    
-                                        </div>
-    
+                                    <div class="icon-overlay text-white">
+                                        {{-- Add to Cart --}}
+                                        <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="icon-buttons"><i
+                                                    class="fa-solid fa-cart-plus text-white"
+                                                    title="Add to Cart"></i></button>
+                                        </form>
+
+                                        {{-- Share Menu --}}
+                                        <form action="" method="GET">
+                                            @csrf
+                                            <button type="button" class="icon-buttons">
+                                                <!-- Share Button -->
+                                                <i class="fa-solid fa-share" title="Share Menu"
+                                                    onclick="copyMenuLink({{ $menu->id }})"></i>
+                                            </button>
+                                        </form>
+
+                                        {{-- View Menu --}}
+                                        <form action="" method="GET">
+                                            @csrf
+                                            <button type="button" class="icon-buttons"><i
+                                                    class="fa-solid fa-search view-menu-btn" title="View Menu"
+                                                    data-id="{{ $menu->id }}"></i></button>
+                                        </form>
+
+                                        {{-- Add to Favorites --}}
+                                        <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="icon-buttons">
+                                                <i class="fa-solid fa-heart"
+                                                    style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
+                                                    title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                                </i>
+                                            </button>
+                                        </form>
+
+                                    </div>
+
 
                                 </div>
 

@@ -11,6 +11,7 @@
     </li>
     <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
     <li class="add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-plus me-2"></i> Add Category</a></li>
+    {{-- <li class="edit-categ add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-edit me-2"></i> Edit Category</a></li> --}}
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
