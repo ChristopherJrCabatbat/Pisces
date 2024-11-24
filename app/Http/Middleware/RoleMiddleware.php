@@ -44,6 +44,8 @@ class RoleMiddleware
                 'admin.delivery.edit',
                 'admin.delivery.update',
                 'admin.delivery.destroy',
+                'admin.delivery.deliveryDetails',
+                'admin.delivery.updateStatus',
 
                 'admin.customers',
                 'admin.feedback',
@@ -93,6 +95,7 @@ class RoleMiddleware
                 'user.messagesPisces',
                 'user.shopUpdates',
                 'user.trackOrder',
+                'user.reviewOrder',
             ],
         ];
 

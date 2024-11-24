@@ -58,7 +58,7 @@
                     <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i class="fa-solid fa-caret-right ms-1"></i></a>
                 </div>
                 <div class="shop-updates-body my-2">
-                    <a href="{{ route('user.trackOrder') }}">
+                    <a href="{{ route('user.reviewOrder') }}">
                         <div class="d-flex a-container p-3">
                             <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
                                 style="width: 50px; height: 50px;">
@@ -72,7 +72,7 @@
                         </div>
                     </a>
 
-                    <a href="#">
+                    <a href="{{ route('user.trackOrder') }}">
                         <div class="d-flex a-container p-3">
                             <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
                                 style="width: 50px; height: 50px;">

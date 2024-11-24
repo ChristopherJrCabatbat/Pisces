@@ -48,6 +48,9 @@ Route::group([
 
     // Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');
     Route::resource('delivery', DeliveryController::class);
+    Route::post('/updateStatus/{id}', [DeliveryController::class, 'updateStatus'])->name('updateStatus');
+    Route::get('/deliveryDetails/{id}', [DeliveryController::class, 'deliveryDetails'])->name('deliveryDetails');
+
 
 
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
@@ -66,7 +69,7 @@ Route::group([
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/menu', [UserController::class, 'menu'])->name('menu');
-    
+
     Route::get('/menuView/{id}', [UserController::class, 'menuView'])->name('menuView');
     Route::put('addToCart/{id}', [UserController::class, 'addToCart'])->name('addToCart');
     Route::put('addToCartModal/{id}', [UserController::class, 'addToCartModal'])->name('addToCartModal');
@@ -80,7 +83,7 @@ Route::group([
 
     Route::post('/order', [UserController::class, 'order'])->name('order');
     Route::get('/orderView/{id}', [UserController::class, 'orderView'])->name('orderView');
-    
+
     // Route::post('/menuDetails/{id}', [UserController::class, 'menuDetails'])->name('menuDetails');
     Route::get('/menuDetails/{id}', [UserController::class, 'menuDetails'])->name('menuDetails');
     Route::get('/menuDetailsOrder/{id}', [UserController::class, 'menuDetailsOrder'])->name('menuDetailsOrder');

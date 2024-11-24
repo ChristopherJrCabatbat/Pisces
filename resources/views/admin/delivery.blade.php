@@ -45,7 +45,7 @@
 
 @section('modals')
     <!-- Product Details Modal -->
-    <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content text-black">
                 <div class="modal-header">
@@ -87,7 +87,24 @@
                 </div>
             </div>
         </div>
+    </div> --}}
+
+    <div class="modal fade" id="deliveryDetailsModal" tabindex="-1" aria-labelledby="deliveryDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deliveryDetailsModalLabel">Delivery Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="delivery-details"></div>
+                </div>
+            </div>
+        </div>
     </div>
+    
+
+
 @endsection
 
 @section('main-content')
@@ -103,31 +120,30 @@
                 <!-- Left Section -->
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
-                        <select class="form-select custom-select" aria-label="Default select example">
-                            <option selected>Open this select delivery</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
+                        <select id="delivery-filter" class="form-select custom-select" aria-label="Select delivery status">
+                            <option value="" selected>All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Preparing">Preparing</option>
+                            <option value="Out for Delivery">Out for Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Returned">Returned</option>
                         </select>
-                        <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
+                        <button type="button" id="filter-button" class="btn btn-primary custom-filter-btn button-wid">
                             <i class="fa-solid fa-sort me-2"></i>Filter
                         </button>
                     </div>
-
                 </div>
 
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
                     <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
-                        <form action="{{ route('admin.menuSearch') }}">
-                            <input type="search" placeholder="Search something..." class="form-control"
-                                id="search-input" value="{{ request('search') }}">
+                        <form action="">
+                            <input type="search" placeholder="Search something..." class="form-control" id="search-input"
+                                value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
                     </div>
-
-                    <div><a href="menu/create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</a></div>
                 </div>
             </div>
 
@@ -137,10 +153,6 @@
                     <tr>
                         <th scope="col">Name</th>
                         <th scope="col">Order</th>
-                        {{-- <th scope="col">Contact Number</th>
-                        <th scope="col">Address</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Mode of Payment</th> --}}
                         <th scope="col">Status</th>
                         <th scope="col">View Details</th>
                     </tr>
@@ -149,39 +161,50 @@
                     @forelse ($deliveries as $delivery)
                         <tr class="menu-row">
                             <td>{{ $delivery->name }}</td>
-                            <td>{{ $delivery->order }}</td>
-                            {{-- <td>{{ $delivery->contact_number }}</td>
-                            <td>{{ $delivery->address }}</td>
-                            <td>{{ $delivery->quantity }}</td>
-                            <td>{{ $delivery->mode_of_payment }}</td> --}}
-                            <td>{{ $delivery->status }}</td>
+                            <td style="max-width: 30vw">{{ $delivery->order }}</td>
                             <td>
-                                <form action="" method="GET">
-                                    @csrf
-                                    <button type="button" class="btn btn-primary"><i
-                                            class="fa-solid fa-eye view-details-btn" title="View Menu"
-                                            data-id="{{ $delivery->id }}"></i></button>
-                                </form>
+                                <select class="form-select delivery-status-select" data-id="{{ $delivery->id }}">
+                                    <option value="Pending" {{ $delivery->status === 'Pending' ? 'selected' : '' }}>Pending
+                                    </option>
+                                    <option value="Preparing" {{ $delivery->status === 'Preparing' ? 'selected' : '' }}>
+                                        Preparing</option>
+                                    <option value="Out for Delivery"
+                                        {{ $delivery->status === 'Out for Delivery' ? 'selected' : '' }}>Out for Delivery
+                                    </option>
+                                    <option value="Delivered" {{ $delivery->status === 'Delivered' ? 'selected' : '' }}>
+                                        Delivered</option>
+                                    <option value="Returned" {{ $delivery->status === 'Returned' ? 'selected' : '' }}>
+                                        Returned</option>
+                                </select>
                             </td>
+                            <td>
+                                <button type="button" class="btn btn-primary view-details-btn" data-id="{{ $delivery->id }}">
+                                    <i class="fa-solid fa-eye" title="View Delivery Details"></i>
+                                </button>
+                                
+                            </td>
+
                         </tr>
                     @empty
                         <tr id="no-menus-row">
-                            <td colspan="6">There are no delivery available.</td>
+                            <td colspan="6">There are no delivery records available.</td>
                         </tr>
                     @endforelse
+                    <!-- Always include the "No menus" row, but hide it initially -->
+                    <tr id="no-menus-row" style="display: none;">
+                        <td colspan="6"></td>
+                    </tr>
                 </tbody>
             </table>
-
-            {{-- Pagination --}}
-            {{-- @include('admin.components.pagination', ['menus' => $menus]) --}}
         </div>
+
 
     </div>
 @endsection
 
 @section('scripts')
     {{-- Modal Script --}}
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const viewButtons = document.querySelectorAll('.view-menu-btn');
 
@@ -237,5 +260,124 @@
                 });
             });
         });
+    </script> --}}
+
+    <script>
+        // Function to filter the delivery table based on status and search input
+        function filterTable() {
+            const selectedStatus = document.getElementById('delivery-filter').value.toLowerCase();
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const deliveryRows = document.querySelectorAll('#menu-table-body .menu-row');
+            let hasVisibleRow = false;
+
+            deliveryRows.forEach(row => {
+                const status = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                const order = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+                // Check if the row matches the selected status and search term
+                const matchesStatus = selectedStatus === "" || status === selectedStatus;
+                const matchesSearch = name.includes(searchTerm) || order.includes(searchTerm);
+
+                // Show or hide the row based on the matches
+                if (matchesStatus && matchesSearch) {
+                    row.style.display = "";
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Show or hide the "No deliveries found" row
+            const noDeliveriesRow = document.getElementById('no-menus-row');
+            if (hasVisibleRow) {
+                noDeliveriesRow.style.display = "none";
+            } else {
+                noDeliveriesRow.style.display = "";
+                noDeliveriesRow.innerHTML =
+                    `<td colspan="6">There are no delivery records matching your filters.</td>`;
+            }
+        }
+
+        // Add event listeners to filter and search inputs
+        document.getElementById('filter-button').addEventListener('click', filterTable);
+        document.getElementById('search-input').addEventListener('input', filterTable);
     </script>
+
+    <script>
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.classList.contains('delivery-status-select')) {
+                const select = e.target;
+                const deliveryId = select.getAttribute('data-id');
+                const newStatus = select.value;
+
+                fetch(`/admin/updateStatus/${deliveryId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                        },
+                        body: JSON.stringify({
+                            status: newStatus
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Status updated successfully!');
+                        } else {
+                            alert('Failed to update status.');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error updating status:', err);
+                    });
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('click', function (e) {
+    if (e.target && e.target.closest('.view-details-btn')) {
+        const button = e.target.closest('.view-details-btn');
+        const deliveryId = button.getAttribute('data-id');
+        const detailsDiv = document.getElementById('delivery-details');
+
+        // Clear existing content
+        detailsDiv.innerHTML = '<p>Loading...</p>';
+
+        // Fetch delivery details
+        fetch(`/admin/deliveryDetails/${deliveryId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    detailsDiv.innerHTML = `
+                        <p><strong>Name:</strong> ${data.name}</p>
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <p><strong>Contact Number:</strong> ${data.contact_number}</p>
+                        <p><strong>Address:</strong> ${data.address}</p>
+                        <p><strong>Order:</strong> ${data.order}</p>
+                        <p><strong>Quantity:</strong> ${data.quantity}</p>
+                        <p><strong>Shipping Method:</strong> ${data.shipping_method}</p>
+                        <p><strong>Mode of Payment:</strong> ${data.mode_of_payment}</p>
+                        <p><strong>Note:</strong> ${data.note || 'N/A'}</p>
+                        <p><strong>Status:</strong> ${data.status}</p>
+                    `;
+                } else {
+                    detailsDiv.innerHTML = '<p>Failed to load delivery details.</p>';
+                }
+            })
+            .catch(err => {
+                console.error('Error fetching delivery details:', err);
+                detailsDiv.innerHTML = '<p>Failed to load delivery details.</p>';
+            });
+    }
+});
+
+    </script>
+
+
+
+
 @endsection

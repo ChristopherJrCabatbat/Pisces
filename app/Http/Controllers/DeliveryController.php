@@ -22,6 +22,22 @@ class DeliveryController extends Controller
         return view('admin.delivery', compact('deliveries'));
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        $delivery = Delivery::findOrFail($id);
+        $delivery->status = $request->status;
+        $delivery->save();
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully']);
+    }
+
+
+    public function deliveryDetails($id)
+    {
+        $delivery = Delivery::findOrFail($id);
+        return response()->json($delivery);
+    }
+
     // public function deliveryView($id)
     // {
     //     $menu = Menu::find($id);
