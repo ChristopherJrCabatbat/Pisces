@@ -36,11 +36,28 @@
             line-height: 1.5;
         }
 
-        input.form-control {
+        input.form-control {}
+
+        .back-button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
         }
 
-        button.btn i {
-            margin-right: 0;
+        .back-button i {
+            font-size: 18px;
+            color: #000;
+        }
+
+        .back-button:hover {
+            background-color: #dedede;
+        }
+
+        .position-relative .back-button {
+            z-index: 10;
         }
     </style>
 
@@ -126,17 +143,26 @@
 
     <main>
         <div class="container main-content d-flex flex-column align-items-center mb-5">
-
             {{-- Content --}}
             <div class="d-flex flex-column content user-content p-0 w-100">
                 <!-- Messages Section -->
                 <div class="d-flex flex-column flex-grow-1 bg-light text-black rounded shadow-sm">
-                    <!-- Header -->
-                    <div class="py-3 d-flex justify-content-center align-items-center border-bottom">
-                        <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border" alt="Shop icon"
-                            style="width: 50px; height: 50px; object-fit: cover;">
-                        <h3 class="ms-2 h3 fw-bold mb-0">PISCES COFFEE HUB</h3>
+                    <!-- Header with Back Icon -->
+                    <div
+                        class="d-flex align-items-center justify-content-center position-relative py-3 px-3 border-bottom">
+                        <!-- Back Button -->
+                        <a href="{{ route('user.messages') }}" class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+
+                        <!-- Centered Header -->
+                        <div class="d-flex align-items-center">
+                            <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-2"
+                                alt="Shop icon" style="width: 50px; height: 50px; object-fit: cover;">
+                            <h3 class="ms-2 h3 fw-bold mb-0">PISCES COFFEE HUB</h3>
+                        </div>
                     </div>
+
 
                     <!-- Chat Body -->
                     <div class="shop-messages overflow-auto px-3 py-3">
@@ -171,11 +197,8 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
-
-
 
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>
