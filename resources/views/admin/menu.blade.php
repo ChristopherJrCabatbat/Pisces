@@ -100,7 +100,7 @@
 
                     <div><a href="menu/create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</a></div>
                 </div>
-                
+
             </div>
 
             {{-- Table --}}

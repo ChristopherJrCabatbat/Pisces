@@ -19,6 +19,13 @@ class Delivery extends Model
         'shipping_method',
         'mode_of_payment',
         'note',
-        'status'
+        'status',
+        'rider',
     ];
+
+    // Relationship with rider
+    public function rider()
+    {
+        return $this->belongsTo(Rider::class);
+    }
 }

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name'); // Customer or delivery recipient's name
             $table->string('email');
             $table->string('contact_number'); // Contact number of the customer or recipient
+
+            $table->string('rider')->nullable();
             $table->text('address'); // Delivery address
 
             $table->text('order');

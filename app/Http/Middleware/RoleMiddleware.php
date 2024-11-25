@@ -24,7 +24,6 @@ class RoleMiddleware
             'Admin' => [
                 'admin.dashboard',
 
-                // Allow all resource routes for 'menu'
                 'admin.menu.index',
                 'admin.menu.create',
                 'admin.menu.store',
@@ -47,7 +46,8 @@ class RoleMiddleware
 
                 'admin.deliveryDetails',
                 'admin.updateStatus',
-                'admin.deliveryUpdate',
+                'admin.deliveryCreateRider',
+                'admin.storeRider',
 
                 'admin.customers',
                 'admin.feedback',
@@ -55,8 +55,8 @@ class RoleMiddleware
                 'admin.monitoring',
             ],
 
-            'Staff' => [
-                'staff.patientRecord',
+            'Rider' => [
+                'rider.dashboard',
             ],
 
             'User'  => [

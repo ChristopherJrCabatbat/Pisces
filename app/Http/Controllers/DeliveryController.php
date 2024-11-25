@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
 use App\Models\Delivery;
+use App\Models\Rider;
 
 class DeliveryController extends Controller
 {
@@ -23,94 +24,75 @@ class DeliveryController extends Controller
         return view('admin.delivery', compact('deliveries'));
     }
 
-    // public function updateStatus(Request $request, string $id)
-    // {
-    //     // Log the request data for debugging
-    //     Log::info('Status update request:', $request->all());
-
-    //     // Validate the new status
-    //     $validatedData = $request->validate([
-    //         'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
-    //     ]);
-
-    //     // Find the delivery by ID and update the status
-    //     $delivery = Delivery::findOrFail($id);
-    //     $delivery->status = $validatedData['status'];
-
-    //     if ($delivery->save()) {
-    //         Log::info('Delivery updated successfully:', $delivery->toArray());
-
-    //         // Add dynamic success message to session
-    //         session()->flash('toast', [
-    //             'message' => "Delivery status changed to {$validatedData['status']}.",
-    //             'type' => 'success',
-    //         ]);
-    //     } else {
-    //         Log::error('Failed to save delivery status update.');
-
-    //         // Add error toast message to session
-    //         session()->flash('toast', [
-    //             'message' => 'Failed to update delivery status.',
-    //             'type' => 'error',
-    //         ]);
-    //     }
-
-    //     // Redirect back to the same page
-    //     return redirect()->back();
-    // }
-
-    public function updateStatus(Request $request, string $id)
-{
-    Log::info('Status update request:', $request->all());
-
-    // Validate the new status
-    $validatedData = $request->validate([
-        'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
-    ]);
-
-    // Find the delivery by ID and update the status
-    $delivery = Delivery::findOrFail($id);
-    $delivery->status = $validatedData['status'];
-
-    if ($delivery->save()) {
-        Log::info('Delivery updated successfully:', $delivery->toArray());
-        $message = "Delivery status changed to {$validatedData['status']}.";
-
-        // Return a JSON response for AJAX requests
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-            ]);
-        }
-
-        // Add success message to session for non-AJAX requests
-        session()->flash('toast', [
-            'message' => $message,
-            'type' => 'success',
+    public function deliveryCreateRider()
+    {
+        return view('admin.deliveryCreateRider');
+    }
+    public function storeRider(Request $request)
+    {
+        // Validate the form data
+        $validated = $request->validate([
+            'name' => 'required|string',
         ]);
-    } else {
-        Log::error('Failed to save delivery status update.');
-        $message = 'Failed to update delivery status.';
 
-        // Return a JSON response for AJAX requests
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => false,
-                'message' => $message,
-            ]);
-        }
-
-        // Add error message to session for non-AJAX requests
-        session()->flash('toast', [
-            'message' => $message,
-            'type' => 'error',
+        // Create a new menu entry in the database
+        Rider::create([
+            'name' => $validated['name'], // Store the category
+           
         ]);
+
+        // Redirect back with a success message
+        return redirect()->route('admin.delivery.index')->with('success', 'Rider added successfully.');
     }
 
-    // Redirect back for non-AJAX requests
-    return redirect()->back();
-}
+    public function updateStatus(Request $request, string $id)
+    {
+        // Validate the new status
+        $validatedData = $request->validate([
+            'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
+        ]);
+
+        // Find the delivery by ID and update the status
+        $delivery = Delivery::findOrFail($id);
+        $delivery->status = $validatedData['status'];
+
+        if ($delivery->save()) {
+            $message = "Delivery status changed to {$validatedData['status']}.";
+
+            // Return a JSON response for AJAX requests
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                ]);
+            }
+
+            // Add success message to session for non-AJAX requests
+            session()->flash('toast', [
+                'message' => $message,
+                'type' => 'success',
+            ]);
+        } else {
+            $message = 'Failed to update delivery status.';
+
+            // Return a JSON response for AJAX requests
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ]);
+            }
+
+            // Add error message to session for non-AJAX requests
+            session()->flash('toast', [
+                'message' => $message,
+                'type' => 'error',
+            ]);
+        }
+
+        // Redirect back for non-AJAX requests
+        return redirect()->back();
+    }
 
 
     public function deliveryUpdate(Request $request)

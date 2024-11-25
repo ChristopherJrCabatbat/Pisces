@@ -242,9 +242,8 @@
                         </div>
                     @empty
                         <div class="col">
-                            <p>No menu available.</p>
+                            <p>No popular menu available.</p>
                         </div>
-                        {{-- @endforeach --}}
                     @endforelse
                 </div>
             </div>
@@ -257,7 +256,7 @@
             </div>
             <div>
                 <div class="row row-cols-1 row-cols-md-4 g-4">
-                    @foreach ($latestMenus as $menu)
+                    @forelse ($latestMenus as $menu)
                         <div class="col">
                             <div class="card h-100">
 
@@ -342,7 +341,11 @@
 
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="col">
+                            <p>No new menu available.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>

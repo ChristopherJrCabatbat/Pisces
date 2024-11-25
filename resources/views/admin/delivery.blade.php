@@ -35,6 +35,8 @@
     <li>
         <a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
+    <li class="add-categ"><a href="{{ route('admin.deliveryCreateRider') }}" class="sidebar-font"><i
+        class="fa-solid fa-plus me-2"></i> Add Rider</a></li>
 
     <li class="sidebar-item" id="customersDropdown">
         <a href="javascript:void(0)"
@@ -68,7 +70,7 @@
     <div class="modal fade text-black" id="deliveryDetailsModal" tabindex="-1" aria-labelledby="deliveryDetailsModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg"> <!-- Add 'modal-lg' for wider modal -->
-            <div class="modal-content">
+            <div class="modal-content content-d">
                 <div class="modal-header bg-primary text-white"> <!-- Add some color to the header -->
                     <h5 class="modal-title" id="deliveryDetailsModalLabel">Delivery Details</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
@@ -194,34 +196,25 @@
 @section('scripts')
 
     {{-- Auto Update Status Script --}}
-    {{-- <script>
-        document.querySelectorAll('.delivery-status-select').forEach(select => {
-            select.addEventListener('change', function() {
-                console.log(`Status changed to: ${this.value}`);
-                this.form.submit();
-            });
-        });
-    </script> --}}
-
     <script>
         document.querySelectorAll('.delivery-status-select').forEach(select => {
-            select.addEventListener('change', function () {
+            select.addEventListener('change', function() {
                 const form = this.closest('form'); // Get the closest form
                 const formData = new FormData(form); // Prepare form data
                 const url = form.action; // Get the form's action URL
-    
+
                 // Show loading feedback (optional)
                 this.disabled = true;
-    
+
                 // Perform the AJAX request
                 fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                })
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -243,7 +236,7 @@
             });
         });
     </script>
-    
+
 
     {{-- Filter-Search Table --}}
     <script>

@@ -34,8 +34,8 @@ class AuthenticatedSessionController extends Controller
 
         if ($request->user()->role === 'Admin') {
             return redirect('admin/dashboard');
-        } elseif ($request->user()->role === 'Staff') {
-            return redirect('staff/dashboard');
+        } elseif ($request->user()->role === 'Rider') {
+            return redirect('rider/dashboard');
         } else {
             return redirect('user/dashboard');
         }
@@ -44,6 +44,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
+    
     // public function destroy(Request $request): RedirectResponse
     // {
     //     Auth::guard('web')->logout();
@@ -57,17 +58,6 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        // // Retrieve the logged-in user
-        // /** @var User $user */
-        // $user = Auth::user();
-
-        // // Remove all cart items for the logged-in user
-        // DB::table('cart_items')->where('user_id', $user->id)->delete();
-
-        // // Reset the user's 'cart' field to 0
-        // $user->cart = 0;
-        // $user->save();
-
         // Log out the user
         Auth::guard('web')->logout();
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RiderController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\HomeController;
@@ -46,13 +47,11 @@ Route::group([
     Route::get('/menuEditCategory', [MenuController::class, 'menuEditCategory'])->name('menuEditCategory');
     Route::post('/storeCategory', [MenuController::class, 'storeCategory'])->name('storeCategory');
 
-    // Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');
     Route::resource('delivery', DeliveryController::class);
     Route::put('/updateStatus/{id}', [DeliveryController::class, 'updateStatus'])->name('updateStatus');
-    Route::post('/deliveryUpdate', [AdminController::class, 'deliveryUpdate'])->name('deliveryUpdate');
     Route::get('/deliveryDetails/{id}', [DeliveryController::class, 'deliveryDetails'])->name('deliveryDetails');
-
-
+    Route::get('/deliveryCreateRider', [DeliveryController::class, 'deliveryCreateRider'])->name('deliveryCreateRider');
+    Route::post('/storeRider', [DeliveryController::class, 'storeRider'])->name('storeRider');
 
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
@@ -102,4 +101,15 @@ Route::group([
 
     // Route for viewing menu details
     Route::get('/menu-detail/{menuId}', [UserController::class, 'menuDetail'])->name('menuDetail');
+});
+
+// User Routes
+Route::group([
+    'prefix' => 'rider',
+    'as' => 'rider.',
+    'middleware' => ['auth', 'verified', 'login'],
+], function () {
+
+    Route::get('/dashboard', [RiderController::class, 'dashboard'])->name('dashboard');
+
 });
