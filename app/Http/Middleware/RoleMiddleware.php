@@ -46,6 +46,7 @@ class RoleMiddleware
                 'admin.delivery.destroy',
                 'admin.delivery.deliveryDetails',
                 'admin.delivery.updateStatus',
+                'admin.delivery.deliveryUpdate',
 
                 'admin.customers',
                 'admin.feedback',

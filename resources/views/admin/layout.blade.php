@@ -20,6 +20,7 @@
 </head>
 
 <body>
+    @yield('modals')
 
     <header>
         {{-- Top Nav --}}
@@ -69,6 +70,40 @@
     <main>
         @yield('main-content')
     </main>
+
+    <div id="customToastBox"></div>
+    <script>
+        let customToastBox = document.getElementById('customToastBox');
+
+        function showToast(msg, type) {
+            let customToast = document.createElement('div');
+            customToast.classList.add('custom-toast');
+
+            // Set the icon based on the type
+            let icon = type === 'error' ?
+                '<i class="fa fa-circle-xmark"></i>' :
+                '<i class="fa fa-circle-check"></i>';
+
+            customToast.innerHTML = `${icon} ${msg}`;
+            customToastBox.appendChild(customToast);
+
+            // Add class for error or success styles
+            if (type === 'error') {
+                customToast.classList.add('error');
+            }
+
+            // Remove the toast after 3 seconds
+            setTimeout(() => {
+                customToast.remove();
+            }, 3000);
+        }
+
+        // Optional: Check if a toast message exists in the session
+        @if (session('toast'))
+            const toastData = @json(session('toast'));
+            showToast(toastData.message, toastData.type);
+        @endif
+    </script>
 
     @yield('scripts')
 

@@ -280,7 +280,7 @@ table {
 }
 
 .custom-filter select {
-    width: 100% !important;
+    width: 190% !important;
     margin-right: 10px; /* Ensure proper spacing between the select and button */
 }
 
@@ -345,3 +345,85 @@ select:hover {
     color: #f81d0b;
 }
 /* End Image Modal Styles */
+
+.delivery-status-select {
+    width: auto; /* Adjust width dynamically based on content */
+    max-width: 200px; /* Optional: set a max width if needed */
+}
+
+/* Menu Icon Toast Message */
+#customToastBox {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.custom-toast {
+    width: 400px;
+    height: 80px;
+    background: #fff;
+    color: black;
+    font-weight: 500;
+    margin: 15px 0;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    position: relative;
+    transform: translateX(100%);
+    animation: moveleft 0.5s linear forwards;
+}
+
+@keyframes moveleft {
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.custom-toast i {
+    margin: 0 20px;
+    font-size: 35px;
+    color: green;
+}
+
+.custom-toast.error i {
+    color: red;
+}
+
+.custom-toast::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5px;
+    background: green;
+    animation: anim 2.8s linear forwards;
+}
+
+@keyframes anim {
+    100% {
+        width: 0;
+    }
+}
+.custom-toast.error::after {
+    background: red;
+}
+
+/* End Menu Icon Toast Message */
+
+
+td.td-select {
+    max-width: 110px;
+    padding: 0 30px;
+}
+
+/* Adjust the select element's width */
+.delivery-status-select {
+    width: auto; /* Automatically adjust based on the longest option */
+    margin-right: none;
+}

@@ -48,7 +48,8 @@ Route::group([
 
     // Route::get('/delivery', [AdminController::class, 'delivery'])->name('delivery');
     Route::resource('delivery', DeliveryController::class);
-    Route::post('/updateStatus/{id}', [DeliveryController::class, 'updateStatus'])->name('updateStatus');
+    Route::put('/updateStatus/{id}', [DeliveryController::class, 'updateStatus'])->name('updateStatus');
+    Route::post('/deliveryUpdate', [AdminController::class, 'deliveryUpdate'])->name('deliveryUpdate');
     Route::get('/deliveryDetails/{id}', [DeliveryController::class, 'deliveryDetails'])->name('deliveryDetails');
 
 

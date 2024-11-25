@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;  // Import DB facade
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
 use App\Models\Delivery;
@@ -22,62 +23,66 @@ class DeliveryController extends Controller
         return view('admin.delivery', compact('deliveries'));
     }
 
-    public function updateStatus(Request $request, $id)
-    {
-        $delivery = Delivery::findOrFail($id);
-        $delivery->status = $request->status;
-        $delivery->save();
-
-        return response()->json(['success' => true, 'message' => 'Status updated successfully']);
-    }
-
-
-    public function deliveryDetails($id)
-    {
-        $delivery = Delivery::findOrFail($id);
-        return response()->json($delivery);
-    }
-
-    // public function deliveryView($id)
+    // public function updateStatus(Request $request, $id)
     // {
-    //     $menu = Menu::find($id);
+    //     // Validate the incoming status
+    //     $validatedData = $request->validate([
+    //         'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
+    //     ]);
 
-    //     if (!$menu) {
-    //         return response()->json(['error' => 'Menu not found'], 404);
-    //     }
+    //     // Find the delivery record and update the status
+    //     $delivery = Delivery::findOrFail($id);
+    //     $delivery->status = $validatedData['status'];
+    //     $delivery->save();
 
-    //     // Get the total favorite count for this menu
-    //     $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
-
-    //     // Mock rating data (adjust as needed)
-    //     $rating = 4.2;
-    //     $ratingCount = 4000;
-
+    //     // Return a JSON response indicating success
     //     return response()->json([
-    //         'name' => $menu->name,
-    //         'category' => $menu->category,
-    //         'price' => $menu->price,
-    //         'description' => $menu->description,
-    //         'image' => $menu->image,
-    //         'rating' => $rating,
-    //         'ratingCount' => $ratingCount,
-    //         'favoriteCount' => $favoriteCount,
+    //         'success' => true,
+    //         'message' => 'Delivery status updated successfully.',
     //     ]);
     // }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function updateStatus(Request $request, string $id)
     {
-        //
+        // Log the request data for debugging
+        Log::info('Status update request:', $request->all());
+
+        // Validate the new status
+        $validatedData = $request->validate([
+            'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
+        ]);
+
+        // Find the delivery by ID and update the status
+        $delivery = Delivery::findOrFail($id);
+        $delivery->fill($delivery->getOriginal()); // Populate all fields
+        Log::info('Delivery before update:', $delivery->toArray());
+
+        $delivery->status = $validatedData['status'];
+        if ($delivery->save()) {
+            Log::info('Delivery updated successfully:', $delivery->toArray());
+        } else {
+            Log::error('Failed to save delivery status update.');
+        }
+
+        // Redirect back with a success message
+        return redirect()->route('admin.dashboard')->with('success', 'Delivery status updated successfully!');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // return redirect()->back()->with('success', 'Delivery status updated successfully.');
 
-    // public function store(Request $request)
+    public function deliveryUpdate(Request $request)
+    {
+        // Validate the request if needed
+
+        $delivery = Delivery::findOrFail($request->input('id'));
+        $delivery->status = $request->input('status');
+        $delivery->save();
+
+        return response()->json(['success' => true]);
+    }
+
+
+    // public function updateStatus(Request $request)
     // {
     //     $request->validate([
     //         'fullName' => 'required|string|max:255',
@@ -91,28 +96,46 @@ class DeliveryController extends Controller
     //         'quantities' => 'required|array',
     //     ]);
 
-    //     // Prepare the order and quantity fields as comma-separated strings
-    //     $orderNames = implode(', ', $request->menu_names);
+    //     $orderItems = [];
+    //     $totalQuantity = 0;
     //     $orderQuantities = implode(', ', $request->quantities);
 
-    //     // Calculate the total quantity
-    //     $totalQuantity = array_sum($request->quantities);
+    //     // Construct the order string
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         $orderItems[] = "{$menuName} (x{$quantity})";
+    //         $totalQuantity += $quantity;
+    //     }
+
+    //     $orderString = implode(', ', $orderItems);
 
     //     // Insert the order into the deliveries table
-    //     DB::table('deliveries')->insert([
+    //     $deliveryId = DB::table('deliveries')->insertGetId([
     //         'name' => $request->input('fullName'),
     //         'email' => $request->input('email'),
     //         'contact_number' => $request->input('contactNumber'),
-    //         'order' => $orderNames,
+    //         'order' => $orderString,
     //         'address' => $request->input('address'),
     //         'quantity' => $orderQuantities,
     //         'shipping_method' => $request->input('shippingMethod'),
     //         'mode_of_payment' => $request->input('paymentMethod'),
     //         'note' => $request->input('note'),
-    //         'status' => 'Pending',
+    //         'status' => $request->input('status'),
     //         'created_at' => now(),
     //         'updated_at' => now(),
     //     ]);
+
+    //     // Store each order item in the orders table
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         DB::table('orders')->insert([
+    //             'delivery_id' => $deliveryId,
+    //             'menu_name' => $menuName,
+    //             'quantity' => $quantity,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ]);
+    //     }
 
     //     /** @var User $user */
     //     $user = Auth::user();
@@ -124,8 +147,29 @@ class DeliveryController extends Controller
     //     $user->cart = 0;
     //     $user->save();
 
-    //     return redirect()->route('user.shoppingCart')->with('success', 'Your order has been placed successfully!');
+    //     return redirect()->back()->with('success', 'Your order has been placed successfully!');
     // }
+
+
+
+
+    public function deliveryDetails($id)
+    {
+        $delivery = Delivery::findOrFail($id);
+        return response()->json($delivery);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
 
 
     public function store(Request $request)
@@ -195,84 +239,6 @@ class DeliveryController extends Controller
 
         return redirect()->route('user.shoppingCart')->with('success', 'Your order has been placed successfully!');
     }
-
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'fullName' => 'required|string|max:255',
-    //         'email' => 'required|email|max:255',
-    //         'contactNumber' => 'required|string|max:20',
-    //         'address' => 'required|string',
-    //         'shippingMethod' => 'required|string',
-    //         'paymentMethod' => 'required|string',
-    //         'note' => 'nullable|string',
-    //         'menu_names' => 'required|array',
-    //         'quantities' => 'required|array',
-    //     ]);
-
-    //     $orderItems = [];
-    //     $totalQuantity = 0;
-    //     $orderQuantities = implode(', ', $request->quantities);
-
-    //     // Construct the order string
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         $orderItems[] = "{$menuName} (x{$quantity})";
-    //         $totalQuantity += $quantity;
-    //     }
-
-    //     $orderString = implode(', ', $orderItems);
-
-    //     // Insert the order into the deliveries table
-    //     $deliveryId = DB::table('deliveries')->insertGetId([
-    //         'name' => $request->input('fullName'),
-    //         'email' => $request->input('email'),
-    //         'contact_number' => $request->input('contactNumber'),
-    //         'order' => $orderString,
-    //         'address' => $request->input('address'),
-    //         'quantity' => $orderQuantities,
-    //         'shipping_method' => $request->input('shippingMethod'),
-    //         'mode_of_payment' => $request->input('paymentMethod'),
-    //         'note' => $request->input('note'),
-    //         'status' => 'Pending',
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     // Store each order item in the orders table
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         DB::table('orders')->insert([
-    //             'delivery_id' => $deliveryId,
-    //             'menu_name' => $menuName,
-    //             'quantity' => $quantity,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ]);
-    //     }
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Get the current user's cart items
-    //     $orderedMenus = $request->menu_names;
-    //     $orderedQuantities = $request->quantities;
-    //     $totalOrderedMenus = count($orderedMenus);
-
-    //     // Update the cart field by subtracting the total number of ordered menus
-    //     $user->cart -= $totalOrderedMenus;
-    //     $user->save();
-
-    //     // Remove only the ordered items from the cart_items table
-    //     foreach ($orderedMenus as $index => $menuName) {
-    //         DB::table('cart_items')
-    //             ->where('user_id', $user->id)
-    //             ->where('menu_name', $menuName)
-    //             ->delete();
-    //     }
-
-    //     return redirect()->route('user.shoppingCart')->with('success', 'Your order has been placed successfully!');
-    // }
 
 
     public function orderStore(Request $request)
