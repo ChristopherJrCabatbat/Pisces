@@ -3,6 +3,26 @@
 @section('title', 'Delivery')
 
 @section('styles-links')
+    <style>
+        .modal-header {
+            background-color: #0d6efd;
+            /* Bootstrap primary color */
+            color: white;
+        }
+
+        .table-bordered {
+            border-color: #dee2e6;
+        }
+
+        .modal-body {
+            font-size: 1rem;
+        }
+
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+    </style>
 @endsection
 
 @section('sidebar')
@@ -44,67 +64,25 @@
 @endsection
 
 @section('modals')
-    <!-- Product Details Modal -->
-    {{-- <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content text-black">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="menuDetailsModalLabel">Menu Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Delivery Details Modal -->
+    <div class="modal fade text-black" id="deliveryDetailsModal" tabindex="-1" aria-labelledby="deliveryDetailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <!-- Add 'modal-lg' for wider modal -->
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white"> <!-- Add some color to the header -->
+                    <h5 class="modal-title" id="deliveryDetailsModalLabel">Delivery Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+
                 </div>
                 <div class="modal-body">
-                    <div class="product-page">
-                        <form action="" method="POST" enctype="multipart/form-data">
-                            @csrf
-            
-                            <!-- Name -->
-                            <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                                <div>
-                                    <label for="name" class="form-label">Name:</label>
-                                    <input type="text" name="name" class="form-control-plaintext" id="category" value="{{ old('name') }}"
-                                        required placeholder="e.g. Coffee" autofocus>
-                                </div>
-                            </div>
-            
-                            <!-- Image -->
-                            <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                                <label for="image" class="form-label">Image:</label>
-                                <input type="file" name="image" class="form-control" id="image" accept="image/*"
-                                    onchange="previewImage(event)" required>
-                                <img id="imagePreview" src="#" alt="Selected Image Preview"
-                                    style="display:none; width:150px; margin-top:10px;">
-                                @error('image')
-                                    <div class="error alert alert-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-            
-            
-                            <div class="d-grid my-2">
-                                <button class="btn btn-primary dark-blue" type="submit">Add Category</button>
-                            </div>
-                        </form>
+                    <div id="delivery-details" class="table-responsive"> <!-- Add responsive table wrapper -->
+                        <p>Loading...</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div> --}}
-
-    <div class="modal fade text-black" id="deliveryDetailsModal" tabindex="-1" aria-labelledby="deliveryDetailsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deliveryDetailsModalLabel">Delivery Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="delivery-details"></div>
-                </div>
-            </div>
-        </div>
     </div>
-
-
 
 @endsection
 
@@ -166,7 +144,7 @@
 
                             <td class="td-select">
                                 <form action="{{ route('admin.updateStatus', $delivery->id) }}" method="POST"
-                                    class="status-form">
+                                    class="status-form d-flex justify-content-between">
                                     @csrf
                                     @method('PUT')
 
@@ -215,14 +193,57 @@
 
 @section('scripts')
 
-    <script>
+    {{-- Auto Update Status Script --}}
+    {{-- <script>
         document.querySelectorAll('.delivery-status-select').forEach(select => {
             select.addEventListener('change', function() {
                 console.log(`Status changed to: ${this.value}`);
                 this.form.submit();
             });
         });
+    </script> --}}
+
+    <script>
+        document.querySelectorAll('.delivery-status-select').forEach(select => {
+            select.addEventListener('change', function () {
+                const form = this.closest('form'); // Get the closest form
+                const formData = new FormData(form); // Prepare form data
+                const url = form.action; // Get the form's action URL
+    
+                // Show loading feedback (optional)
+                this.disabled = true;
+    
+                // Perform the AJAX request
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success toast
+                            showToast(data.message, 'success');
+                        } else {
+                            // Show error toast
+                            showToast(data.message || 'Failed to update status.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating status:', error);
+                        showToast('An error occurred while updating the status.', 'error');
+                    })
+                    .finally(() => {
+                        // Re-enable the select element
+                        this.disabled = false;
+                    });
+            });
+        });
     </script>
+    
 
     {{-- Filter-Search Table --}}
     <script>
@@ -266,69 +287,7 @@
         document.getElementById('search-input').addEventListener('input', filterTable);
     </script>
 
-    {{-- Auto Pending Status --}}
-    {{-- <script>
-        $(document).ready(function() {
-            $('.status-select').on('change', function() {
-                const deliveryId = $(this).data('delivery-id');
-                const selectedStatus = $(this).val();
-
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('admin.deliveryUpdate') }}', // Replace with your actual route
-                    data: {
-                        '_token': '{{ csrf_token() }}',
-                        'id': deliveryId,
-                        'status': selectedStatus
-                    },
-                    success: function(response) {
-                        // Handle success if needed
-                        console.log(response);
-                    },
-                    error: function(error) {
-                        // Handle error if needed
-                        console.log(error);
-                    }
-                });
-            });
-        });
-    </script> --}}
-
-    {{-- <script>
-        document.addEventListener('change', function(e) {
-            if (e.target && e.target.classList.contains('delivery-status-select')) {
-                const select = e.target;
-                const deliveryId = select.getAttribute('data-id');
-                const newStatus = select.value;
-
-                fetch(`/admin/updateStatus/${deliveryId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content'),
-                        },
-                        body: JSON.stringify({
-                            status: newStatus
-                        }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Display success toast with the updated status
-                            showToast(`Delivery status has been updated to ${newStatus}.`, 'success');
-                        } else {
-                            showToast('Failed to update delivery status.', 'error');
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Error updating status:', err);
-                        showToast('An error occurred while updating the status.', 'error');
-                    });
-            }
-        });
-    </script> --}}
-
+    {{-- Modal --}}
     <script>
         document.addEventListener('click', function(e) {
             if (e.target && e.target.closest('.view-details-btn')) {
@@ -341,34 +300,68 @@
 
                 // Fetch delivery details
                 fetch(`/admin/deliveryDetails/${deliveryId}`)
-                    .then(response => response.json())
-                    .then(data => {
+                    .then((response) => response.json())
+                    .then((data) => {
                         if (data) {
+                            // Parse the `order` and `quantity` strings
+                            const orders = data.order.split(', '); // Split orders by comma
+                            const quantities = data.quantity.split(', '); // Split quantities by comma
+
+                            // Construct the rows for each order and quantity
+                            const orderRows = orders.map((order, index) => `
+                                <tr>
+                                    <td>${order.replace(/\s\(x\d+\)/, '')}</td> <!-- Remove (x1) from the order name -->
+                                    <td>${quantities[index]}</td>
+                                </tr>
+                            `).join("");
+
+                            // Generate the modal content
                             detailsDiv.innerHTML = `
-                        <p><strong>Name:</strong> ${data.name}</p>
-                        <p><strong>Email:</strong> ${data.email}</p>
-                        <p><strong>Contact Number:</strong> ${data.contact_number}</p>
-                        <p><strong>Address:</strong> ${data.address}</p>
-                        <p><strong>Order:</strong> ${data.order}</p>
-                        <p><strong>Quantity:</strong> ${data.quantity}</p>
-                        <p><strong>Shipping Method:</strong> ${data.shipping_method}</p>
-                        <p><strong>Mode of Payment:</strong> ${data.mode_of_payment}</p>
-                        <p><strong>Note:</strong> ${data.note || 'N/A'}</p>
-                        <p><strong>Status:</strong> ${data.status}</p>
-                    `;
+                                <table class="table table-bordered text-center align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <td><strong>Name:</strong> ${data.name}</td>
+                                            <td><strong>Email:</strong> ${data.email}</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Contact Number:</strong> ${data.contact_number}</td>
+                                            <td><strong>Address:</strong> ${data.address}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Shipping Method:</strong> ${data.shipping_method}</td>
+                                            <td><strong>Mode of Payment:</strong> ${data.mode_of_payment}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><strong>Note:</strong> ${data.note || 'N/A'}</td>
+                                        </tr>
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Order</th>
+                                                <th>Quantity</th>
+                                            </tr>
+                                        </thead>
+                                        ${orderRows}
+                                        <thead class="table-light">
+                                            <tr>
+                                                <td colspan="2"><strong>Status:</strong> ${data.status}</td>
+                                            </tr>
+                                        </thead>
+                                    </tbody>
+                                </table>
+                            `;
                         } else {
                             detailsDiv.innerHTML = '<p>Failed to load delivery details.</p>';
                         }
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.error('Error fetching delivery details:', err);
                         detailsDiv.innerHTML = '<p>Failed to load delivery details.</p>';
                     });
             }
         });
     </script>
-
-
 
 
 @endsection

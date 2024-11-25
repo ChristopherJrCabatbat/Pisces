@@ -327,8 +327,8 @@ select:hover {
 }
 
 .modal-content {
-    max-width: 80%;
-    max-height: 75%;
+    /* max-width: 80%; */
+    /* max-height: 75%; */
     border-radius: 10px;
 }
 

@@ -23,52 +23,95 @@ class DeliveryController extends Controller
         return view('admin.delivery', compact('deliveries'));
     }
 
-    // public function updateStatus(Request $request, $id)
+    // public function updateStatus(Request $request, string $id)
     // {
-    //     // Validate the incoming status
+    //     // Log the request data for debugging
+    //     Log::info('Status update request:', $request->all());
+
+    //     // Validate the new status
     //     $validatedData = $request->validate([
     //         'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
     //     ]);
 
-    //     // Find the delivery record and update the status
+    //     // Find the delivery by ID and update the status
     //     $delivery = Delivery::findOrFail($id);
     //     $delivery->status = $validatedData['status'];
-    //     $delivery->save();
 
-    //     // Return a JSON response indicating success
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Delivery status updated successfully.',
-    //     ]);
+    //     if ($delivery->save()) {
+    //         Log::info('Delivery updated successfully:', $delivery->toArray());
+
+    //         // Add dynamic success message to session
+    //         session()->flash('toast', [
+    //             'message' => "Delivery status changed to {$validatedData['status']}.",
+    //             'type' => 'success',
+    //         ]);
+    //     } else {
+    //         Log::error('Failed to save delivery status update.');
+
+    //         // Add error toast message to session
+    //         session()->flash('toast', [
+    //             'message' => 'Failed to update delivery status.',
+    //             'type' => 'error',
+    //         ]);
+    //     }
+
+    //     // Redirect back to the same page
+    //     return redirect()->back();
     // }
 
     public function updateStatus(Request $request, string $id)
-    {
-        // Log the request data for debugging
-        Log::info('Status update request:', $request->all());
+{
+    Log::info('Status update request:', $request->all());
 
-        // Validate the new status
-        $validatedData = $request->validate([
-            'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
-        ]);
+    // Validate the new status
+    $validatedData = $request->validate([
+        'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
+    ]);
 
-        // Find the delivery by ID and update the status
-        $delivery = Delivery::findOrFail($id);
-        $delivery->fill($delivery->getOriginal()); // Populate all fields
-        Log::info('Delivery before update:', $delivery->toArray());
+    // Find the delivery by ID and update the status
+    $delivery = Delivery::findOrFail($id);
+    $delivery->status = $validatedData['status'];
 
-        $delivery->status = $validatedData['status'];
-        if ($delivery->save()) {
-            Log::info('Delivery updated successfully:', $delivery->toArray());
-        } else {
-            Log::error('Failed to save delivery status update.');
+    if ($delivery->save()) {
+        Log::info('Delivery updated successfully:', $delivery->toArray());
+        $message = "Delivery status changed to {$validatedData['status']}.";
+
+        // Return a JSON response for AJAX requests
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
         }
 
-        // Redirect back with a success message
-        return redirect()->route('admin.dashboard')->with('success', 'Delivery status updated successfully!');
+        // Add success message to session for non-AJAX requests
+        session()->flash('toast', [
+            'message' => $message,
+            'type' => 'success',
+        ]);
+    } else {
+        Log::error('Failed to save delivery status update.');
+        $message = 'Failed to update delivery status.';
+
+        // Return a JSON response for AJAX requests
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ]);
+        }
+
+        // Add error message to session for non-AJAX requests
+        session()->flash('toast', [
+            'message' => $message,
+            'type' => 'error',
+        ]);
     }
 
-    // return redirect()->back()->with('success', 'Delivery status updated successfully.');
+    // Redirect back for non-AJAX requests
+    return redirect()->back();
+}
+
 
     public function deliveryUpdate(Request $request)
     {
@@ -80,76 +123,6 @@ class DeliveryController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-
-    // public function updateStatus(Request $request)
-    // {
-    //     $request->validate([
-    //         'fullName' => 'required|string|max:255',
-    //         'email' => 'required|email|max:255',
-    //         'contactNumber' => 'required|string|max:20',
-    //         'address' => 'required|string',
-    //         'shippingMethod' => 'required|string',
-    //         'paymentMethod' => 'required|string',
-    //         'note' => 'nullable|string',
-    //         'menu_names' => 'required|array',
-    //         'quantities' => 'required|array',
-    //     ]);
-
-    //     $orderItems = [];
-    //     $totalQuantity = 0;
-    //     $orderQuantities = implode(', ', $request->quantities);
-
-    //     // Construct the order string
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         $orderItems[] = "{$menuName} (x{$quantity})";
-    //         $totalQuantity += $quantity;
-    //     }
-
-    //     $orderString = implode(', ', $orderItems);
-
-    //     // Insert the order into the deliveries table
-    //     $deliveryId = DB::table('deliveries')->insertGetId([
-    //         'name' => $request->input('fullName'),
-    //         'email' => $request->input('email'),
-    //         'contact_number' => $request->input('contactNumber'),
-    //         'order' => $orderString,
-    //         'address' => $request->input('address'),
-    //         'quantity' => $orderQuantities,
-    //         'shipping_method' => $request->input('shippingMethod'),
-    //         'mode_of_payment' => $request->input('paymentMethod'),
-    //         'note' => $request->input('note'),
-    //         'status' => $request->input('status'),
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     // Store each order item in the orders table
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         DB::table('orders')->insert([
-    //             'delivery_id' => $deliveryId,
-    //             'menu_name' => $menuName,
-    //             'quantity' => $quantity,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ]);
-    //     }
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Remove all cart items for the logged-in user
-    //     DB::table('cart_items')->where('user_id', $user->id)->delete();
-
-    //     // Reset the user's 'cart' field to 0
-    //     $user->cart = 0;
-    //     $user->save();
-
-    //     return redirect()->back()->with('success', 'Your order has been placed successfully!');
-    // }
-
 
 
 

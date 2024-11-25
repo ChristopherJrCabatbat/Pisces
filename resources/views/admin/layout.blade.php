@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     {{-- <title>@yield('title')</title> --}}
     <title>Pisces Coffee Hub</title>
 
@@ -74,36 +76,37 @@
     <div id="customToastBox"></div>
     <script>
         let customToastBox = document.getElementById('customToastBox');
-
+    
         function showToast(msg, type) {
             let customToast = document.createElement('div');
             customToast.classList.add('custom-toast');
-
+    
             // Set the icon based on the type
-            let icon = type === 'error' ?
-                '<i class="fa fa-circle-xmark"></i>' :
-                '<i class="fa fa-circle-check"></i>';
-
+            let icon = type === 'error'
+                ? '<i class="fa fa-circle-xmark"></i>'
+                : '<i class="fa fa-circle-check"></i>';
+    
             customToast.innerHTML = `${icon} ${msg}`;
             customToastBox.appendChild(customToast);
-
+    
             // Add class for error or success styles
             if (type === 'error') {
                 customToast.classList.add('error');
             }
-
+    
             // Remove the toast after 3 seconds
             setTimeout(() => {
                 customToast.remove();
             }, 3000);
         }
-
-        // Optional: Check if a toast message exists in the session
+    
+        // Check if a toast message exists in the session
         @if (session('toast'))
             const toastData = @json(session('toast'));
             showToast(toastData.message, toastData.type);
         @endif
     </script>
+    
 
     @yield('scripts')
 
