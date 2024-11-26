@@ -130,7 +130,7 @@
                             <p class="fw-bold mb-0">Nov 13</p>
                         </div>
                         <div>
-                            <span class="badge bg-success">Delivered</span>
+                            <span class="badge bg-success">Preparing</span>
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
@@ -155,7 +155,7 @@
                             <p class="fw-bold mb-0">Nov 13</p>
                         </div>
                         <div>
-                            <span class="badge bg-success">Delivered</span>
+                            <span class="badge bg-success">Out for Delivery</span>
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
@@ -205,7 +205,7 @@
                             <p class="fw-bold mb-0">Nov 13</p>
                         </div>
                         <div>
-                            <span class="badge bg-success">Delivered</span>
+                            <span class="badge bg-danger">Returned</span>
                         </div>
                     </div>
                     <div class="d-flex align-items-center">

@@ -57,74 +57,92 @@
                 class="track-order d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
                 <!-- Header -->
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 text-secondary">Review Order</h5>
+                    <h5 class="m-0 text-secondary">Order Completed</h5>
                 </div>
 
                 <!-- Order Status Body -->
-                <div class="track-order-body px-3 py-3">
+                <div class="track-order-body px-4 py-3">
                     <!-- Top Section -->
                     <div class="top fw-bold pb-3">
-                        Delivered Nov 13
+                        Your order has been delivered on Nov 13.
                     </div>
 
                     <!-- Shipping Details -->
-                    {{-- <div class="shipping-details mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <img src="path_to_jt_express_logo.png" alt="J&T Express" class="me-2" style="height: 30px;">
-                            <div>
-                                <div>J&T Express Standard shipping</div>
-                                <div class="tracking-number text-muted small">972437104315</div>
-                            </div>
-                        </div>
-                    </div> --}}
+               
 
                     <!-- Timeline -->
                     <div class="timeline">
                         <!-- Delivered Section -->
-                        <div class="timeline-item d-flex align-items-start py-3">
-                            <!-- Time and Date -->
-                            <div class="time text-end pe-4">
-                                Nov 3<br>3:15 PM
-                            </div>
-                            <!-- Icon -->
-                            <div class="icon-container">
-                                <div class="icon bg-success rounded-circle text-white d-flex align-items-center justify-content-center"
-                                    style="width: 24px; height: 24px;">
-                                    <i class="fa-solid fa-check"></i>
+                        <div class="timeline-item d-flex align-items-start py-3 top">
+                            <div class="order-width d-flex">
+                                <div class="">
+                                    <img src="{{ asset('images/logo.jpg') }}" alt="Delivery Image" class=""
+                                        style="max-height: 100px; width: auto;">
+                                </div>
+                                <div class="content ms-3">
+                                    <div class="status fs-5">Pisces Pizza</div>
+                                    <div class="location text-muted small">Pizza</div>
+                                    <div class="location fs-5 flex-between">
+                                        <div class="fw-bold">₱199</div>
+                                        <div>x1</div>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                      
+                        <!-- Order Summary -->
+                        <div class="timeline-item py-3 d-flex align-items-start top">
                             <!-- Content -->
-                            <div class="content ms-3">
-                                <div class="status fw-bold">Delivered</div>
-                                <div class="details text-muted small">Your order has been delivered.<br>Recipient:
-                                    Customer</div>
-                                <div class="location text-muted small">PANGASINAN-SAN-CARLOS-CITY</div>
-                                <img src="{{ asset('images/logo.jpg') }}" alt="Delivery Image" class="mt-2"
-                                    style="max-height: 100px; width: auto;">
+                            <div class="content order-width d-flex flex-column gap-2">
+                                <div class="status fw-bold">Order summary</div>
+                                <div class="details text-muted flex-between">
+                                    <div>Subtotal</div>
+                                    <div>₱199</div>
+                                </div>
+                                <div class="details text-muted flex-between">
+                                    <div>Shipping</div>
+                                    <div>₱0</div>
+                                </div>
+                                <div class="details text-muted flex-between">
+                                    <div>Coupons</div>
+                                    <div>₱0</div>
+                                </div>
+                                <div class="details fw-bold flex-between">
+                                    <div>Total</div>
+                                    <div>₱199</div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Out for Delivery Section -->
-                        <div class="timeline-item py-3 d-flex align-items-start">
-                            <!-- Time and Date -->
-                            <div class="time text-end pe-4">
-                                Nov 3<br>1:03 PM
-                            </div>
-                            <!-- Icon -->
-                            <div class="icon-container">
-                                <div class="icon bg-secondary rounded-circle text-white d-flex align-items-center justify-content-center"
-                                    style="width: 24px; height: 24px;">
-                                    <i class="fa-solid fa-truck"></i>
+                          <!-- Order Details -->
+                          <div class="timeline-item py-3 d-flex align-items-start top">
+                            <!-- Content -->
+                            <div class="content order-width d-flex flex-column gap-2">
+                                <div class="status fw-bold">Order details</div>
+                                <div class="details text-muted flex-between">
+                                    <div>Order date</div>
+                                    <div>Nov. 12 1:00 PM</div>
+                                </div>
+                                <div class="details text-muted flex-between">
+                                    <div>Payment Method</div>
+                                    <div>GCash</div>
+                                </div>
+                                <div class="details text-muted flex-between">
+                                    <div>Delivery date</div>
+                                    <div>Nov. 12 2:00 PM</div>
                                 </div>
                             </div>
+                        </div>
+                        
+                        <!-- Order Details -->
+                          <div class="timeline-item py-3 d-flex align-items-start">
                             <!-- Content -->
-                            <div class="content ms-3">
-                                <div class="status fw-bold">Out for delivery</div>
-                                <div class="details text-muted small">Your order is out for delivery.</div>
-                                <div class="location text-muted small">PANGASINAN-SAN-CARLOS-CITY</div>
-                                <div class="carrier text-muted small">Carrier: OCW Gian Carlo S. Doria<br>639927569649</div>
+                            <div class="content order-width d-flex gap-2">
+                                <button type="button" class="btn btn-outline-dark w-50">Buy Again</button>
+                                <button type="button" class="btn btn-outline-dark w-50">View Review</button>
                             </div>
                         </div>
+
                     </div>
 
 

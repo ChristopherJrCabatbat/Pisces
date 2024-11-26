@@ -643,3 +643,12 @@ a.more:hover {
     font-size: 13px;
     /* line-height: 1.5; */
 }
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+}
+
+.order-width {
+    min-width: 30%;
+}
