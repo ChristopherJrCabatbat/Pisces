@@ -51,6 +51,14 @@ class RoleMiddleware
                 'admin.category.edit',
                 'admin.category.update',
                 'admin.category.destroy',
+               
+                'admin.rider.index',
+                'admin.rider.create',
+                'admin.rider.store',
+                'admin.rider.show',
+                'admin.rider.edit',
+                'admin.rider.update',
+                'admin.rider.destroy',
 
                 'admin.deliveryDetails',
                 'admin.updateStatus',

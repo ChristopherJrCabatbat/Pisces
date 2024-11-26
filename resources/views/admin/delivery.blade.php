@@ -35,8 +35,8 @@
     <li>
         <a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
-    <li class="add-categ"><a href="{{ route('admin.deliveryCreateRider') }}" class="sidebar-font"><i
-        class="fa-solid fa-plus me-2"></i> Add Rider</a></li>
+    <li class="add-categ"><a href="/admin/rider" class="sidebar-font"><i
+        class="fa-solid fa-motorcycle me-2"></i> Riders</a></li>
 
     <li class="sidebar-item" id="customersDropdown">
         <a href="javascript:void(0)"
