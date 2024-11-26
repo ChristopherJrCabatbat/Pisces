@@ -9,8 +9,8 @@
 @section('sidebar')
     <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a>
     </li>
-    <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
-    <li class="add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-plus me-2"></i> Add Category</a></li>
+    <li><a href="/admin/menu" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
+    <li class="add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-list me-2"></i> Category</a></li>
     {{-- <li class="edit-categ add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-edit me-2"></i> Edit Category</a></li> --}}
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
@@ -48,31 +48,40 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                    class="navigation">Dashboard</a> / <a href="/admin/menu" class="navigation">Menu</a> /</div>
-            <span class="faded-white ms-1">Add Category</span>
+                    class="navigation">Dashboard</a> / <a href="/admin/menu" class="navigation">Menu</a> / <a
+                    href="/admin/category" class="navigation">Category</a> /</div>
+            <span class="faded-white ms-1">Edit Category</span>
         </div>
 
         <div class="table-container p-4 text-black mb-4">
 
             <div class="taas-table d-flex justify-content-center align-items-center">
-                <div class="h2"><i class="fa-solid fa-plus me-2"></i>Add Category</div>
+                <div class="h2"><i class="fa-solid fa-plus me-2"></i>Edit Category</div>
             </div>
 
-            <form action="{{ route('admin.storeCategory') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.category.update', $category->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
 
                 <!-- Category -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="category" class="form-label">Category Name:</label>
-                    <input type="text" name="category" class="form-control" id="category" value="{{ old('category') }}"
-                        required placeholder="e.g. Coffee" autofocus>
+                    <input type="text" name="category" class="form-control" id="category"
+                        value="{{ old('name', $category->category) }}" required placeholder="e.g. Coffee" autofocus>
                 </div>
 
-                <!-- Image -->
+                <!-- Current Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="image" class="form-label">Image:</label>
+                    <label for="current_image" class="form-label">Image:</label>
+                    <img src="{{ Storage::url($category->image) }}" alt="{{ $category->category }}" class="img-fluid"
+                        width="150">
+                </div>
+
+                <!-- New Image -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="image" class="form-label">New Image (optional):</label>
                     <input type="file" name="image" class="form-control" id="image" accept="image/*"
-                        onchange="previewImage(event)" required>
+                        onchange="previewImage(event)">
                     <img id="imagePreview" src="#" alt="Selected Image Preview"
                         style="display:none; width:150px; margin-top:10px;">
                     @error('image')
@@ -82,7 +91,7 @@
 
 
                 <div class="d-grid my-2">
-                    <button class="btn btn-primary dark-blue" type="submit">Add Category</button>
+                    <button class="btn btn-primary dark-blue" type="submit">Update</button>
                 </div>
             </form>
 

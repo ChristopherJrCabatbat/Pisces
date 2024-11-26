@@ -8,6 +8,7 @@ use App\Http\Controllers\RiderController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CategoryController;
 
 // Route::get('/', function () {
 //     return view('start.home');
@@ -46,6 +47,8 @@ Route::group([
     Route::get('/menuCreateCategory', [MenuController::class, 'menuCreateCategory'])->name('menuCreateCategory');
     Route::get('/menuEditCategory', [MenuController::class, 'menuEditCategory'])->name('menuEditCategory');
     Route::post('/storeCategory', [MenuController::class, 'storeCategory'])->name('storeCategory');
+
+    Route::resource('category', CategoryController::class);
 
     Route::resource('delivery', DeliveryController::class);
     Route::put('/updateStatus/{id}', [DeliveryController::class, 'updateStatus'])->name('updateStatus');

@@ -43,6 +43,14 @@ class RoleMiddleware
                 'admin.delivery.edit',
                 'admin.delivery.update',
                 'admin.delivery.destroy',
+               
+                'admin.category.index',
+                'admin.category.create',
+                'admin.category.store',
+                'admin.category.show',
+                'admin.category.edit',
+                'admin.category.update',
+                'admin.category.destroy',
 
                 'admin.deliveryDetails',
                 'admin.updateStatus',

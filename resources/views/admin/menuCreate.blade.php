@@ -10,8 +10,9 @@
     <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a>
     </li>
     <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
-    <li class="add-categ"><a href="{{ route('admin.menuCreateCategory') }}" class="sidebar-font"><i
-                class="fa-solid fa-plus me-2"></i> Add Category</a></li>
+    <li class="add-categ"><a href="/admin/category" class="sidebar-font"><i
+                class="fa-solid fa-list me-2"></i> Category</a></li>
+
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
@@ -36,7 +37,7 @@
                     Collection</a></li>
             <li><a href="{{ route('admin.monitoring') }}"
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-users-gear me-2"></i>Customer Activity
+                        class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li>
         </ul>
     </li>
