@@ -24,6 +24,12 @@
 <body>
     @yield('modals')
 
+    <!-- Image Modal -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
     <header>
         {{-- Top Nav --}}
         <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">

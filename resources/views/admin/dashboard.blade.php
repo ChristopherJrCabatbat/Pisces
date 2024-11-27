@@ -123,7 +123,7 @@
                             <th scope="col">Name</th>
                             <th scope="col">Category</th>
                             <th scope="col">Price</th>
-                            <th scope="col">Description</th>
+                            {{-- <th scope="col">Description</th> --}}
                             <th scope="col">Total Orders</th>
                         </tr>
                     </thead>
@@ -150,7 +150,7 @@
                                         ₱{{ number_format($menu->price, 2) }}
                                     @endif
                                 </td>
-                                <td>{{ $menu->description }}</td>
+                                {{-- <td>{{ $menu->description }}</td> --}}
                                 <!-- Total Orders Column -->
                                 <td>{{ $menu->total_order_count }}</td>
                             </tr>

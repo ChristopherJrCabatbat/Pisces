@@ -23,6 +23,7 @@
 <body>
 
     @yield('modals')
+    
     <!-- Product Details Modal -->
     <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel"
         aria-hidden="true">
