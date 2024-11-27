@@ -38,28 +38,28 @@
             <div class="fw-bold h1">Orders</div>
 
             {{-- Sub-Tabs --}}
-            {{-- lagyan mb-4 --}}
             <div class="sub-tabs-container">
                 <ul class="nav nav-tabs justify-content-center" id="ordersTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all"
                             type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
                     </li>
-                    {{-- <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="unpaid-tab" data-bs-toggle="tab" data-bs-target="#unpaid"
-                            type="button" role="tab" aria-controls="unpaid" aria-selected="false">Unpaid</button>
-                    </li> --}}
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="to-ship-tab" data-bs-toggle="tab" data-bs-target="#to-ship"
-                            type="button" role="tab" aria-controls="to-ship" aria-selected="false">Preparing</button>
+                        <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
+                            type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="shipped-tab" data-bs-toggle="tab" data-bs-target="#shipped"
-                            type="button" role="tab" aria-controls="shipped" aria-selected="false">Out for Delivery</button>
+                        <button class="nav-link" id="preparing-tab" data-bs-toggle="tab" data-bs-target="#preparing"
+                            type="button" role="tab" aria-controls="preparing" aria-selected="false">Preparing</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="to-review-tab" data-bs-toggle="tab" data-bs-target="#to-review"
-                            type="button" role="tab" aria-controls="to-review" aria-selected="false">Delivered</button>
+                        <button class="nav-link" id="out-for-delivery-tab" data-bs-toggle="tab"
+                            data-bs-target="#out-for-delivery" type="button" role="tab"
+                            aria-controls="out-for-delivery" aria-selected="false">Out for Delivery</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered"
+                            type="button" role="tab" aria-controls="delivered" aria-selected="false">Delivered</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="returns-tab" data-bs-toggle="tab" data-bs-target="#returns"
@@ -73,151 +73,105 @@
         <div class="tab-content container content user-content p-0 text-black" id="ordersTabContent">
             {{-- All Orders --}}
             <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
-
-                {{-- Example Order --}}
-                <div class="order-container border rounded mb-4 p-4 shadow-sm">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <p class="text-muted mb-1">Order Delivered</p>
-                            <p class="fw-bold mb-0">Nov 13</p>
+                @forelse ($statuses['all'] as $order)
+                    <div class="order-container border rounded mb-4 p-4 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <p class="text-muted mb-1">Order Date</p>
+                                <p class="fw-bold mb-0">{{ $order->created_at->format('M d') }}</p>
+                            </div>
+                            <div>
+                                <span class="badge bg-secondary">{{ $order->status }}</span>
+                            </div>
                         </div>
-                        <div>
-                            <span class="badge bg-success">Delivered</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        {{-- Menu Image --}}
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
-                            style="width: 80px; height: 80px; object-fit: cover;">
-                        <div>
-                            <p class="fw-bold mb-1">Pansit Sisig</p>
-                            <p class="text-muted mb-0">₱350</p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Repeat for another order --}}
-                <div class="order-container border rounded mb-4 p-4 shadow-sm">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <p class="text-muted mb-1">Order Delivered</p>
-                            <p class="fw-bold mb-0">Nov 10</p>
-                        </div>
-                        <div>
-                            <span class="badge bg-warning text-dark">To Review</span>
+                        <div class="d-flex align-items-center">
+                            {{-- Menu Image --}}
+                            <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
+                                style="width: 80px; height: 80px; object-fit: cover;">
+                            <div>
+                                <p class="fw-bold mb-1">{{ $order->order }}</p>
+                                <p class="text-muted mb-0">₱{{ number_format($order->total_price, 2) }}</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center">
-                        {{-- Menu Image --}}
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
-                            style="width: 80px; height: 80px; object-fit: cover;">
-                        <div>
-                            <p class="fw-bold mb-1">Adobo Rice Meal</p>
-                            <p class="text-muted mb-0">₱180</p>
-                        </div>
+                @empty
+                <div class="order-container border rounded p-4 shadow-sm">
+                    <div class="d-flex align-items-center fs-5">
+                        <i class="fa-regular fa-circle-question me-2"></i> There are no orders available.
                     </div>
                 </div>
-
+                @endforelse
             </div>
 
-            {{-- To Ship --}}
-            <div class="tab-pane fade" id="to-ship" role="tabpanel" aria-labelledby="to-ship-tab">
-                {{-- Example Order --}}
-                <div class="order-container border rounded mb-4 p-4 shadow-sm">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <p class="text-muted mb-1">Order Delivered</p>
-                            <p class="fw-bold mb-0">Nov 13</p>
-                        </div>
-                        <div>
-                            <span class="badge bg-success">Preparing</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        {{-- Menu Image --}}
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
-                            style="width: 80px; height: 80px; object-fit: cover;">
-                        <div>
-                            <p class="fw-bold mb-1">Pansit Sisig</p>
-                            <p class="text-muted mb-0">₱350</p>
-                        </div>
+            {{-- Pending --}}
+            <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                @forelse ($statuses['pending'] as $order)
+                    @include('user.orders-partial', [
+                        'order' => $order,
+                        'statusClass' => 'bg-secondary',
+                    ])
+                @empty
+                <div class="order-container border rounded p-4 shadow-sm">
+                    <div class="d-flex align-items-center fs-5">
+                        <i class="fa-regular fa-circle-question me-2"></i> There are no pending orders.
                     </div>
                 </div>
+                @endforelse
             </div>
 
-            {{-- Shipped --}}
-            <div class="tab-pane fade" id="shipped" role="tabpanel" aria-labelledby="shipped-tab">
-                {{-- Example Order --}}
-                <div class="order-container border rounded mb-4 p-4 shadow-sm">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <p class="text-muted mb-1">Order Delivered</p>
-                            <p class="fw-bold mb-0">Nov 13</p>
-                        </div>
-                        <div>
-                            <span class="badge bg-success">Out for Delivery</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        {{-- Menu Image --}}
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
-                            style="width: 80px; height: 80px; object-fit: cover;">
-                        <div>
-                            <p class="fw-bold mb-1">Pansit Sisig</p>
-                            <p class="text-muted mb-0">₱350</p>
-                        </div>
+            {{-- Preparing --}}
+            <div class="tab-pane fade" id="preparing" role="tabpanel" aria-labelledby="preparing-tab">
+                @forelse ($statuses['preparing'] as $order)
+                    @include('user.orders-partial', [
+                        'order' => $order,
+                        'statusClass' => 'bg-warning text-dark',
+                    ])
+                @empty
+                <div class="order-container border rounded p-4 shadow-sm">
+                    <div class="d-flex align-items-center fs-5">
+                        <i class="fa-regular fa-circle-question me-2"></i> There are no orders being prepared.
                     </div>
                 </div>
+                @endforelse
             </div>
 
-            {{-- To Review --}}
-            <div class="tab-pane fade" id="to-review" role="tabpanel" aria-labelledby="to-review-tab">
-                {{-- Repeat for another order --}}
-                <div class="order-container border rounded mb-4 p-4 shadow-sm">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <p class="text-muted mb-1">Order Delivered</p>
-                            <p class="fw-bold mb-0">Nov 10</p>
-                        </div>
-                        <div>
-                            <span class="badge bg-warning text-dark">To Review</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        {{-- Menu Image --}}
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
-                            style="width: 80px; height: 80px; object-fit: cover;">
-                        <div>
-                            <p class="fw-bold mb-1">Adobo Rice Meal</p>
-                            <p class="text-muted mb-0">₱180</p>
-                        </div>
+            {{-- Out for Delivery --}}
+            <div class="tab-pane fade" id="out-for-delivery" role="tabpanel" aria-labelledby="out-for-delivery-tab">
+                @forelse ($statuses['out_for_delivery'] as $order)
+                    @include('user.orders-partial', ['order' => $order, 'statusClass' => 'bg-info'])
+                @empty
+                <div class="order-container border rounded p-4 shadow-sm">
+                    <div class="d-flex align-items-center fs-5">
+                        <i class="fa-regular fa-circle-question me-2"></i> There are no orders out for delivery.
                     </div>
                 </div>
+                @endforelse
+            </div>
+
+            {{-- Delivered --}}
+            <div class="tab-pane fade" id="delivered" role="tabpanel" aria-labelledby="delivered-tab">
+                @forelse ($statuses['delivered'] as $order)
+                    @include('user.orders-partial', ['order' => $order, 'statusClass' => 'bg-success'])
+                @empty
+                <div class="order-container border rounded p-4 shadow-sm">
+                    <div class="d-flex align-items-center fs-5">
+                        <i class="fa-regular fa-circle-question me-2"></i> There are no delivered orders.
+                    </div>
+                </div>
+                @endforelse
             </div>
 
             {{-- Returns --}}
             <div class="tab-pane fade" id="returns" role="tabpanel" aria-labelledby="returns-tab">
-                {{-- Example Order --}}
-                <div class="order-container border rounded mb-4 p-4 shadow-sm">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <p class="text-muted mb-1">Order Delivered</p>
-                            <p class="fw-bold mb-0">Nov 13</p>
-                        </div>
-                        <div>
-                            <span class="badge bg-danger">Returned</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        {{-- Menu Image --}}
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
-                            style="width: 80px; height: 80px; object-fit: cover;">
-                        <div>
-                            <p class="fw-bold mb-1">Pansit Sisig</p>
-                            <p class="text-muted mb-0">₱350</p>
-                        </div>
+                @forelse ($statuses['returns'] as $order)
+                    @include('user.orders-partial', ['order' => $order, 'statusClass' => 'bg-danger'])
+                @empty
+                <div class="order-container border rounded p-4 shadow-sm">
+                    <div class="d-flex align-items-center fs-5">
+                        <i class="fa-regular fa-circle-question me-2"></i> There are no returned orders.
                     </div>
                 </div>
+                @endforelse
             </div>
         </div>
 

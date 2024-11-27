@@ -106,9 +106,9 @@
                 </div>
 
                 {{-- Right Section (Product Summary) --}}
-                @php
+                {{-- @php
                     $itemTotal = $menu->price * $quantity;
-                @endphp
+                @endphp --}}
 
                 <div class="right d-flex flex-column py-5 ps-5">
                     <div class="products border-bottom pb-4 mb-4">
@@ -124,7 +124,7 @@
                                 <div class="size">({{ $quantity }})</div>
                             </div>
                             <div class="price fw-bold">
-                                ₱{{ number_format($itemTotal, 2) }}
+                                ₱{{ number_format($totalPrice, 2) }}
                             </div>
 
                             <!-- Hidden Inputs for Order Data -->
@@ -133,12 +133,20 @@
                         </div>
                     </div>
 
-                    <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
+                    {{-- <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Total:</div>
                             <div class="fs-4">₱{{ number_format($itemTotal, 2) }}</div>
                         </div>
+                    </div> --}}
+                    <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
+                        <div class="d-flex justify-content-between fw-bold align-items-center">
+                            <div>Total:</div>
+                            <div class="fs-4">₱{{ number_format($totalPrice, 2) }}</div>
+                        </div>
                     </div>
+                    <input type="hidden" name="total_price" value="{{ $totalPrice }}">
+                    
                 </div>
 
 

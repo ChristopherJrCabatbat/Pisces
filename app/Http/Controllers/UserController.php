@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;  // Import DB facade
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 use App\Models\User;
 use App\Models\Menu;
@@ -403,6 +404,9 @@ class UserController extends Controller
         // Fetch the user's cart items with pivot data (quantity) and menu details (price, name, image)
         $menus = $user->cartItems()->withPivot('quantity')->get();
 
+        // Calculate total price
+        // $totalPrice = $menu->price * $quantity;
+
         return view('user.order', compact('user', 'menus'));
     }
     public function orderView($id)
@@ -418,8 +422,14 @@ class UserController extends Controller
             return redirect()->route('user.menu')->with('error', 'Menu item not found');
         }
 
+        // Fetch the quantity from the request, default to 1
+        $quantity = request()->input('quantity', 1);
+
+         // Calculate total price
+        $totalPrice = $menu->price * $quantity;
+
         // Pass the menu item and user to the view
-        return view('user.orderView', compact('menu', 'user'));
+        return view('user.orderView', compact('menu', 'totalPrice', 'user'));
     }
     public function menuDetails($id)
     {
@@ -441,24 +451,27 @@ class UserController extends Controller
 
     // public function menuDetailsOrder($id)
     // {
+    //     // Get the current authenticated user
     //     $user = Auth::user();
+
+    //     // Retrieve the specific menu item by ID
     //     $menu = Menu::find($id);
 
+    //     // Check if the menu item exists
     //     if (!$menu) {
     //         return redirect()->route('user.menu')->with('error', 'Menu item not found');
     //     }
 
-    //     // Retrieve quantity from request, default to 1 if not provided
+    //     // Fetch the quantity from the request, default to 1 if not provided
     //     $quantity = request()->input('quantity', 1);
-    //     $itemTotal = $menu->price * $quantity;
 
-    //     // Pass the menu item, user, quantity, and total to the view
-    //     return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'itemTotal'));
+    //     // Pass the menu item, user, and quantity to the view
+    //     return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity'));
     // }
 
     public function menuDetailsOrder($id)
     {
-        // Get the current authenticated user
+        // Get the authenticated user
         $user = Auth::user();
 
         // Retrieve the specific menu item by ID
@@ -469,38 +482,48 @@ class UserController extends Controller
             return redirect()->route('user.menu')->with('error', 'Menu item not found');
         }
 
-        // Fetch the quantity from the request, default to 1 if not provided
+        // Fetch the quantity from the request, default to 1
         $quantity = request()->input('quantity', 1);
 
-        // Pass the menu item, user, and quantity to the view
-        return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity'));
+        // Calculate total price
+        $totalPrice = $menu->price * $quantity;
+
+        // Pass the menu item, user, quantity, and total price to the view
+        return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'totalPrice'));
     }
 
 
     public function orders(Request $request)
     {
-        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-            ->groupBy('category')
-            ->get();
-
-        $selectedCategory = $request->input('category', 'All Menus');
-
         /** @var User $user */
         $user = Auth::user();
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
-
-        // Retrieve menus based on selected category, excluding items in the cart
-        if ($selectedCategory == 'All Menus') {
-            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
-        } else {
-            $menus = Menu::where('category', $selectedCategory)
-                ->whereNotIn('id', $user->cartItems->pluck('id'))
-                ->get();
-        }
-
-        return view('user.orders', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    
+        // Fetch user-specific orders
+        $orders = DB::table('deliveries')
+            ->where('email', $user->email) // Filter by user's email
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        // Convert `created_at` to Carbon instance for each order
+        $orders = $orders->map(function ($order) {
+            $order->created_at = Carbon::parse($order->created_at);
+            return $order;
+        });
+    
+        // Categorize orders by status
+        $statuses = [
+            'all' => $orders,
+            'pending' => $orders->where('status', 'Pending'),
+            'preparing' => $orders->where('status', 'Preparing'),
+            'out_for_delivery' => $orders->where('status', 'Out for Delivery'),
+            'delivered' => $orders->where('status', 'Delivered'),
+            'returns' => $orders->where('status', 'Returned'),
+        ];
+    
+        return view('user.orders', compact('statuses'));
     }
+    
+    
 
     public function messages(Request $request)
     {
@@ -526,31 +549,31 @@ class UserController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-    
+
         // Fetch all messages exchanged with the admin
         $messages = Message::where(function ($query) use ($user) {
             $query->where('user_id', $user->id) // Sender is the user
-                  ->orWhere('receiver_id', $user->id); // Receiver is the user
+                ->orWhere('receiver_id', $user->id); // Receiver is the user
         })
-        ->orderBy('created_at', 'asc')
-        ->get();
-    
+            ->orderBy('created_at', 'asc')
+            ->get();
+
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-    
+
         return view('user.messagesPisces', compact('messages', 'userCart', 'user', 'userFavorites'));
     }
-    
+
 
     public function sendMessage(Request $request, $userId)
     {
         /** @var User $user */
         $user = Auth::user();
-    
+
         $validated = $request->validate([
             'message_text' => 'required|string',
         ]);
-    
+
         // Create the message with the specified user as the receiver
         Message::create([
             'user_id' => $user->id, // Sender is the authenticated user
@@ -558,10 +581,10 @@ class UserController extends Controller
             'sender_role' => 'User',
             'message_text' => $validated['message_text'],
         ]);
-    
+
         return redirect()->route('user.messagesPisces')->with('success', 'Message sent successfully');
     }
-    
+
 
 
 

@@ -21,6 +21,7 @@ class Delivery extends Model
         'note',
         'status',
         'rider',
+        'total_price',
     ];
 
     // Relationship with rider

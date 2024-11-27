@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Delivery;
 use App\Models\Rider;
+use App\Models\Menu;
 
 class DeliveryController extends Controller
 {
@@ -38,7 +39,7 @@ class DeliveryController extends Controller
         // Create a new menu entry in the database
         Rider::create([
             'name' => $validated['name'], // Store the category
-           
+
         ]);
 
         // Redirect back with a success message
@@ -196,6 +197,64 @@ class DeliveryController extends Controller
     }
 
 
+    // public function orderStore(Request $request)
+    // {
+    //     $request->validate([
+    //         'fullName' => 'required|string|max:255',
+    //         'email' => 'required|email|max:255',
+    //         'contactNumber' => 'required|string|max:20',
+    //         'address' => 'required|string',
+    //         'shippingMethod' => 'required|string',
+    //         'paymentMethod' => 'required|string',
+    //         'note' => 'nullable|string',
+    //         'menu_names' => 'required|array',
+    //         'quantities' => 'required|array',
+    //     ]);
+
+    //     $orderItems = [];
+    //     $totalQuantity = 0;
+    //     $orderQuantities = implode(', ', $request->quantities);
+
+    //     // Construct the order string for the delivery table
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         $orderItems[] = "{$menuName} (x{$quantity})";
+    //         $totalQuantity += $quantity;
+    //     }
+
+    //     $orderString = implode(', ', $orderItems);
+
+    //     // Insert the order into the deliveries table
+    //     $deliveryId = DB::table('deliveries')->insertGetId([
+    //         'name' => $request->input('fullName'),
+    //         'email' => $request->input('email'),
+    //         'contact_number' => $request->input('contactNumber'),
+    //         'order' => $orderString,
+    //         'address' => $request->input('address'),
+    //         'quantity' => $orderQuantities,
+    //         'shipping_method' => $request->input('shippingMethod'),
+    //         'mode_of_payment' => $request->input('paymentMethod'),
+    //         'note' => $request->input('note'),
+    //         'status' => 'Pending',
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+
+    //     // Store each order item in the orders table
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         DB::table('orders')->insert([
+    //             'delivery_id' => $deliveryId,
+    //             'menu_name' => $menuName,
+    //             'quantity' => $quantity,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ]);
+    //     }
+
+    //     return redirect()->route('user.menu')->with('success', 'Order placed successfully.');
+    // }
+
     public function orderStore(Request $request)
     {
         $request->validate([
@@ -212,13 +271,17 @@ class DeliveryController extends Controller
 
         $orderItems = [];
         $totalQuantity = 0;
+        $totalPrice = 0; // Initialize total price
         $orderQuantities = implode(', ', $request->quantities);
 
-        // Construct the order string for the delivery table
+        // Construct the order string and calculate total price
         foreach ($request->menu_names as $index => $menuName) {
             $quantity = $request->quantities[$index];
+            $menu = Menu::where('name', $menuName)->firstOrFail();
+            $itemTotal = $menu->price * $quantity; // Calculate total for each item
             $orderItems[] = "{$menuName} (x{$quantity})";
             $totalQuantity += $quantity;
+            $totalPrice += $itemTotal; // Add to total price
         }
 
         $orderString = implode(', ', $orderItems);
@@ -235,6 +298,7 @@ class DeliveryController extends Controller
             'mode_of_payment' => $request->input('paymentMethod'),
             'note' => $request->input('note'),
             'status' => 'Pending',
+            'total_price' => $totalPrice, // Save total price
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -251,8 +315,16 @@ class DeliveryController extends Controller
             ]);
         }
 
+        // Clear the cart for the user
+        /** @var User $user */
+        $user = Auth::user();
+        DB::table('cart_items')->where('user_id', $user->id)->delete();
+        $user->cart = 0;
+        $user->save();
+
         return redirect()->route('user.menu')->with('success', 'Order placed successfully.');
     }
+
 
 
     /**

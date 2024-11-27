@@ -139,9 +139,11 @@
                     <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Total:</div>
-                            <div class="fs-4">₱{{ number_format($itemTotal, 2) }}</div>
+                            <div class="fs-4">₱{{ number_format($totalPrice, 2) }}</div>
                         </div>
                     </div>
+                    <input type="hidden" name="total_price" value="{{ $totalPrice }}">
+                    
                 </div>
             </form>
 

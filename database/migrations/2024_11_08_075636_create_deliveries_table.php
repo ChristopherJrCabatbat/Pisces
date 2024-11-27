@@ -27,6 +27,8 @@ return new class extends Migration
             $table->string('mode_of_payment');
             $table->string('note')->nullable();
             $table->string('status');
+            $table->decimal('total_price', 8, 2);
+
             $table->timestamps();
         });
     }
