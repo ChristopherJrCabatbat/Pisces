@@ -50,8 +50,8 @@
         {{-- Content --}}
         <div class="d-flex container flex-column content user-content p-0">
 
-            <!-- Shop Updates Section -->
-            <div
+            <!-- Order Updates Section -->
+            {{-- <div
                 class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="m-0 text-secondary">Order updates</h5>
@@ -88,42 +88,55 @@
                     </a>
 
                 </div>
+            </div> --}}
+
+            <div
+            class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
+            <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="m-0 text-secondary">Order Updates</h5>
+                <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i
+                        class="fa-solid fa-caret-right ms-1"></i></a>
             </div>
+            <div class="shop-updates-body my-2">
+                @foreach ($deliveries as $delivery)
+                    <!-- Review Order -->
+                    <a href="{{ route('user.reviewOrder', ['delivery' => $delivery->id]) }}">
+                        <div class="d-flex a-container p-3">
+                            <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
+                                style="width: 50px; height: 50px;">
+                                <i class="fa-solid fa-bag-shopping text-primary"></i>
+                            </div>
+                            <div>
+                                <p class="m-0 fw-bold">Review your order</p>
+                                <p class="m-0 text-muted small">Order #{{ $delivery->id }} - {{ $delivery->created_at->diffForHumans() }}</p>
+                            </div>
+                        </div>
+                    </a>
+        
+                    <!-- Track Order -->
+                    <a href="{{ route('user.trackOrder', ['delivery' => $delivery->id]) }}">
+                        <div class="d-flex a-container p-3">
+                            <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
+                                style="width: 50px; height: 50px;">
+                                <i class="fa-solid fa-box text-success"></i>
+                            </div>
+                            <div>
+                                <p class="m-0 fw-bold">Track order</p>
+                                <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span></p>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+        
+            
 
             <!-- Messages Section -->
             <div class="d-flex shop-messages flex-column flex-grow-1 bg-light text-black rounded shadow-sm">
                 <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
                     <h5 class="m-0 text-secondary">Messages</h5>
                 </div>
-
-                {{-- <div class="shop-updates-body my-2">
-                    <a href="{{ route('user.messagesPisces') }}">
-                        <div class="d-flex align-items-center p-3 a-container">
-                            <div class="me-3 position-relative">
-                                <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border" alt="Shop icon"
-                                    style="width: 50px; height: 50px; object-fit: cover;">
-                                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">1</span>
-                            </div>
-                            <div>
-                                <p class="m-0 fw-bold">Pisces Coffee Hub</p>
-                                @if ($latestMessage)
-                                    <p class="m-0 text-muted small">
-                                        @if ($latestMessage->user_id === $user->id)
-                                            You: {{ $latestMessage->message_text }}
-                                        @else
-                                            {{ $latestMessage->message_text }}
-                                        @endif
-                                        <span
-                                            class="text-muted small">{{ $latestMessage->created_at->diffForHumans() }}</span>
-                                    </p>
-                                @else
-                                    <p class="m-0 text-muted small">No messages yet</p>
-                                @endif
-
-                            </div>
-                        </div>
-                    </a>
-                </div> --}}
 
                 <div class="shop-updates-body my-2">
                     <a href="{{ route('user.messagesPisces') }}">

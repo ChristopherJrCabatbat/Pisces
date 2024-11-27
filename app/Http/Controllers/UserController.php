@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Menu;
 use App\Models\Category;
 use App\Models\Message;
+use App\Models\Delivery;
 
 class UserController extends Controller
 {
@@ -576,95 +577,59 @@ class UserController extends Controller
     }
 
 
-
-
     // public function messages(Request $request)
     // {
     //     /** @var User $user */
     //     $user = Auth::user();
 
-    //     // Fetch the latest message between the user and the admin
+    //     // Fetch the latest message exchanged between the user and the admin
     //     $latestMessage = Message::where(function ($query) use ($user) {
-    //         $query->where('user_id', $user->id) // Sender is the user
-    //             ->orWhere('receiver_id', $user->id); // Receiver is the user
+    //         $query->where('user_id', $user->id)
+    //             ->orWhere('receiver_id', $user->id);
     //     })
-    //         ->orderBy('created_at', 'desc')
-    //         ->first();
+    //         ->latest('created_at') // Order by most recent message
+    //         ->first(); // Get the latest message
 
     //     $userCart = $user->cart;
     //     $userFavorites = $user->favoriteItems()->count();
-
-    //     return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage'));
-    // }
-
-    public function messages(Request $request)
-    {
-        /** @var User $user */
-        $user = Auth::user();
-
-        // Fetch the latest message exchanged between the user and the admin
-        $latestMessage = Message::where(function ($query) use ($user) {
-            $query->where('user_id', $user->id)
-                ->orWhere('receiver_id', $user->id);
-        })
-            ->latest('created_at') // Order by most recent message
-            ->first(); // Get the latest message
-
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
-
-        // Count unread messages from the admin
-        $unreadCount = Message::where('receiver_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount'));
-    }
-
-    // public function messages(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Fetch the latest message between the user and the admin
-    //     $latestMessage = Message::where(function ($query) use ($user) {
-    //         $query->where('receiver_id', $user->id) // Messages received by the user
-    //             ->where('is_read', false); // Unread messages only
-    //     })
-    //         ->orderBy('created_at', 'desc')
-    //         ->first();
 
     //     // Count unread messages from the admin
     //     $unreadCount = Message::where('receiver_id', $user->id)
     //         ->where('is_read', false)
     //         ->count();
 
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
     //     return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount'));
     // }
 
+    public function messages(Request $request)
+{
+    /** @var User $user */
+    $user = Auth::user();
 
+    // Fetch the latest message exchanged between the user and the admin
+    $latestMessage = Message::where(function ($query) use ($user) {
+        $query->where('user_id', $user->id)
+            ->orWhere('receiver_id', $user->id);
+    })
+        ->latest('created_at') // Order by most recent message
+        ->first(); // Get the latest message
 
-    // public function messagesPisces(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
+    $userCart = $user->cart;
+    $userFavorites = $user->favoriteItems()->count();
 
-    //     // Fetch all messages exchanged with the admin
-    //     $messages = Message::where(function ($query) use ($user) {
-    //         $query->where('user_id', $user->id) // Sender is the user
-    //             ->orWhere('receiver_id', $user->id); // Receiver is the user
-    //     })
-    //         ->orderBy('created_at', 'asc')
-    //         ->get();
+    // Count unread messages from the admin
+    $unreadCount = Message::where('receiver_id', $user->id)
+        ->where('is_read', false)
+        ->count();
 
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
+    // Fetch deliveries for the current user
+    $deliveries = Delivery::where('email', $user->email)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-    //     return view('user.messagesPisces', compact('messages', 'userCart', 'user', 'userFavorites'));
-    // }
+    return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
+}
+
 
     public function messagesPisces(Request $request)
     {
@@ -691,27 +656,27 @@ class UserController extends Controller
     }
 
     public function sendMessage(Request $request, $userId)
-{
-    $validated = $request->validate([
-        'message_text' => 'required|string',
-    ]);
+    {
+        $validated = $request->validate([
+            'message_text' => 'required|string',
+        ]);
 
-    // Create the message
-    $message = Message::create([
-        'user_id' => Auth::id(), // Sender is the authenticated user
-        'receiver_id' => $userId, // Receiver is the admin or target user
-        'sender_role' => 'User',
-        'message_text' => $validated['message_text'],
-    ]);
+        // Create the message
+        $message = Message::create([
+            'user_id' => Auth::id(), // Sender is the authenticated user
+            'receiver_id' => $userId, // Receiver is the admin or target user
+            'sender_role' => 'User',
+            'message_text' => $validated['message_text'],
+        ]);
 
-    // Return only the new message
-    return response()->json([
-        'success' => true,
-        'message' => $message,
-    ]);
-}
+        // Return only the new message
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+        ]);
+    }
 
-    
+
 
 
     public function markMessagesAsRead($userId)
@@ -776,30 +741,33 @@ class UserController extends Controller
         return view('user.trackOrder', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
 
+    // public function reviewOrder(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     return view('user.reviewOrder', compact('userCart', 'user', 'userFavorites'));
+    // }
+
     public function reviewOrder(Request $request)
     {
-        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-            ->groupBy('category')
-            ->get();
-
-        $selectedCategory = $request->input('category', 'All Menus');
-
         /** @var User $user */
         $user = Auth::user();
+
+        // Fetch user's completed orders
+        $completedOrders = Delivery::where('user_id', $user->id)
+            ->where('status', 'completed') // Assuming 'completed' indicates delivered orders
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        // Retrieve menus based on selected category, excluding items in the cart
-        if ($selectedCategory == 'All Menus') {
-            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
-        } else {
-            $menus = Menu::where('category', $selectedCategory)
-                ->whereNotIn('id', $user->cartItems->pluck('id'))
-                ->get();
-        }
-
-        return view('user.reviewOrder', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+        return view('user.reviewOrder', compact('userCart', 'user', 'userFavorites', 'completedOrders'));
     }
+
 
 
 

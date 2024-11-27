@@ -108,8 +108,8 @@ Route::group([
     Route::post('/markAsRead/{userId}', [UserController::class, 'markMessagesAsRead'])->name('markAsRead');
 
     Route::get('/shopUpdates', [UserController::class, 'shopUpdates'])->name('shopUpdates');
-    Route::get('/trackOrder', [UserController::class, 'trackOrder'])->name('trackOrder');
-    Route::get('/reviewOrder', [UserController::class, 'reviewOrder'])->name('reviewOrder');
+    Route::get('/trackOrder/{delivery}', [UserController::class, 'trackOrder'])->name('trackOrder');
+    Route::get('/reviewOrder/{delivery}', [UserController::class, 'reviewOrder'])->name('reviewOrder');
 
     Route::resource('delivery', DeliveryController::class);
     Route::post('/orderStore', [DeliveryController::class, 'orderStore'])->name('orderStore');
