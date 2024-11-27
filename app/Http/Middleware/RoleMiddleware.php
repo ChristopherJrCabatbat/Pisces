@@ -113,6 +113,8 @@ class RoleMiddleware
 
                 'user.messages',
                 'user.messagesPisces',
+                'user.sendMessage',
+                
                 'user.shopUpdates',
                 'user.trackOrder',
                 'user.reviewOrder',

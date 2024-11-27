@@ -60,8 +60,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Menu::class, 'favorite_items');
     }
 
-    public function messages()
+    public function sentMessages()
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Message::class, 'user_id'); // 'user_id' is the sender
+    }
+
+    // Relationship for messages received by the user
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id'); // 'receiver_id' is the recipient
     }
 }

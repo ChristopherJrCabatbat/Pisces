@@ -102,6 +102,8 @@ Route::group([
 
     Route::get('/messages', [UserController::class, 'messages'])->name('messages');
     Route::get('/messagesPisces', [UserController::class, 'messagesPisces'])->name('messagesPisces');
+    Route::post('/messageUser/{userId}/send', [UserController::class, 'sendMessage'])->name('sendMessage');
+
     Route::get('/shopUpdates', [UserController::class, 'shopUpdates'])->name('shopUpdates');
     Route::get('/trackOrder', [UserController::class, 'trackOrder'])->name('trackOrder');
     Route::get('/reviewOrder', [UserController::class, 'reviewOrder'])->name('reviewOrder');

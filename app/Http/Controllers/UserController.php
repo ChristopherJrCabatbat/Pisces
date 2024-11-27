@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Menu;
 use App\Models\Category;
+use App\Models\Message;
 
 class UserController extends Controller
 {
@@ -503,53 +504,66 @@ class UserController extends Controller
 
     public function messages(Request $request)
     {
-        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-            ->groupBy('category')
-            ->get();
-
-        $selectedCategory = $request->input('category', 'All Menus');
-
         /** @var User $user */
         $user = Auth::user();
+
+        // Fetch the latest message between the user and the admin
+        $latestMessage = Message::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id) // Sender is the user
+                ->orWhere('receiver_id', $user->id); // Receiver is the user
+        })
+            ->orderBy('created_at', 'desc')
+            ->first();
+
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        // Retrieve menus based on selected category, excluding items in the cart
-        if ($selectedCategory == 'All Menus') {
-            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
-        } else {
-            $menus = Menu::where('category', $selectedCategory)
-                ->whereNotIn('id', $user->cartItems->pluck('id'))
-                ->get();
-        }
-
-        return view('user.messages', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+        return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage'));
     }
+
 
     public function messagesPisces(Request $request)
     {
-        $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-            ->groupBy('category')
-            ->get();
-
-        $selectedCategory = $request->input('category', 'All Menus');
-
         /** @var User $user */
         $user = Auth::user();
+    
+        // Fetch all messages exchanged with the admin
+        $messages = Message::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id) // Sender is the user
+                  ->orWhere('receiver_id', $user->id); // Receiver is the user
+        })
+        ->orderBy('created_at', 'asc')
+        ->get();
+    
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-
-        // Retrieve menus based on selected category, excluding items in the cart
-        if ($selectedCategory == 'All Menus') {
-            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
-        } else {
-            $menus = Menu::where('category', $selectedCategory)
-                ->whereNotIn('id', $user->cartItems->pluck('id'))
-                ->get();
-        }
-
-        return view('user.messagesPisces', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    
+        return view('user.messagesPisces', compact('messages', 'userCart', 'user', 'userFavorites'));
     }
+    
+
+    public function sendMessage(Request $request, $userId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+    
+        $validated = $request->validate([
+            'message_text' => 'required|string',
+        ]);
+    
+        // Create the message with the specified user as the receiver
+        Message::create([
+            'user_id' => $user->id, // Sender is the authenticated user
+            'receiver_id' => $userId, // Receiver is the admin or target user
+            'sender_role' => 'User',
+            'message_text' => $validated['message_text'],
+        ]);
+    
+        return redirect()->route('user.messagesPisces')->with('success', 'Message sent successfully');
+    }
+    
+
+
 
     public function shopUpdates(Request $request)
     {
@@ -575,7 +589,7 @@ class UserController extends Controller
 
         return view('user.shopUpdates', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
-    
+
     public function trackOrder(Request $request)
     {
         $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
@@ -600,7 +614,7 @@ class UserController extends Controller
 
         return view('user.trackOrder', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
-   
+
     public function reviewOrder(Request $request)
     {
         $categories = Menu::select('category', DB::raw('count(*) as menu_count'))

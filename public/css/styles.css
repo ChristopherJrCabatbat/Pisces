@@ -412,9 +412,6 @@ th {
 }
 /* End Success Copy Link message styling */
 
-
-
-
 /* Modal styles */
 .product-page {
     display: flex;
@@ -501,7 +498,6 @@ th {
 }
 /* End Modal styles */
 
-
 /* Shopping Cart Table Duplicate Menu Styles */
 
 .duplicate-bg td {
@@ -516,10 +512,7 @@ th {
     top: 35%;
 }
 
-
 /* End Shopping Cart Table Duplicate Menu Styles */
-
-
 
 /* Menu Icon Toast Message */
 #customToastBox {
@@ -565,7 +558,7 @@ th {
 }
 
 .custom-toast::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     bottom: 0;
@@ -585,8 +578,6 @@ th {
 }
 
 /* End Menu Icon Toast Message */
-
-
 
 .shop-messages .badge {
     font-size: 0.75rem;
@@ -651,4 +642,45 @@ a.more:hover {
 
 .order-width {
     min-width: 30%;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 1rem;
+    font-size: 1rem; /* Icon size */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure the message background expands for long content */
+.message {
+    word-wrap: break-word; /* Wrap long words to the next line */
+    white-space: normal;   /* Allow multi-line text */
+    overflow-wrap: break-word; /* Compatibility for older browsers */
+    display: inline-block;
+    max-width: 70%; /* Prevent the message from exceeding 70% of the container width */
+}
+
+/* Styling for long messages */
+.message p {
+    margin: 0;
+    line-height: 1.5; /* Adjust line height for better readability */
+}
+
+/* Prevent message bubble content from breaking layout */
+.shop-messages {
+    display: flex;
+    flex-direction: column; /* Ensure vertical stacking of messages */
+    overflow-y: auto; /* Allow vertical scrolling for long chat history */
+}
+
+/* Responsive Adjustment */
+@media (max-width: 768px) {
+    .message {
+        max-width: 90%; /* Adjust bubble width for smaller screens */
+    }
 }

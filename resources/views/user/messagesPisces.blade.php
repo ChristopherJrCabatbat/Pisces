@@ -26,6 +26,7 @@
 
         .shop-messages {
             height: 56vh;
+            overflow-x: hidden !important;
         }
 
         html {
@@ -88,7 +89,8 @@
                             <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">ORDERS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-bold active" aria-current="page" href="#">MESSAGES</a>
+                            <a class="nav-link fw-bold active" aria-current="page"
+                                href="{{ route('user.messages') }}">MESSAGES</a>
                         </li>
                     </ul>
 
@@ -145,17 +147,16 @@
         <div class="container main-content d-flex flex-column align-items-center mb-5">
             {{-- Content --}}
             <div class="d-flex flex-column content user-content p-0 w-100">
+
                 <!-- Messages Section -->
                 <div class="d-flex flex-column flex-grow-1 bg-light text-black rounded shadow-sm">
                     <!-- Header with Back Icon -->
                     <div
                         class="d-flex align-items-center justify-content-center position-relative py-3 px-3 border-bottom">
-                        <!-- Back Button -->
-                        <a href="{{ route('user.messages') }}" class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3">
+                        <a href="{{ route('user.messages') }}"
+                            class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3">
                             <i class="fa-solid fa-arrow-left"></i>
                         </a>
-
-                        <!-- Centered Header -->
                         <div class="d-flex align-items-center">
                             <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-2"
                                 alt="Shop icon" style="width: 50px; height: 50px; object-fit: cover;">
@@ -163,39 +164,53 @@
                         </div>
                     </div>
 
-
                     <!-- Chat Body -->
                     <div class="shop-messages overflow-auto px-3 py-3">
-                        <!-- Message from Shop -->
-                        <div class="d-flex align-items-start mb-4">
-                            <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3"
-                                alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
-                            <div class="message bg-white border p-3 rounded shadow-sm" style="max-width: 70%;">
-                                <p class="m-0 fw-bold">Pisces Coffee Hub</p>
-                                <p class="m-0">Hello! Welcome to Pisces Coffee Hub. Let us know how we can assist
-                                    you today!</p>
-                            </div>
-                        </div>
-
-                        <!-- Message from User -->
-                        <div class="d-flex align-items-start justify-content-end mb-4">
-                            <div class="message bg-primary text-white p-3 rounded shadow-sm" style="max-width: 70%;">
-                                <p class="m-0">Thank you so much! 😊</p>
-                            </div>
-                            <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
-                                alt="User icon" style="width: 40px; height: 40px; object-fit: cover;">
-                        </div>
+                        @foreach ($messages as $message)
+                            @if ($message->user_id === $user->id)
+                                <!-- Message from User -->
+                                <div class="d-flex align-items-start justify-content-end mb-4">
+                                    <span class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
+                                        style="max-width: 70%;">
+                                        <p class="m-0">{{ $message->message_text }}</p>
+                                    </div>
+                                    <!-- Updated User Icon -->
+                                    <div class="message-avatar bg-primary text-white">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                </div>
+                            @else
+                                <!-- Message from Shop -->
+                                <div class="d-flex align-items-start mb-4">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3"
+                                        alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div class="message bg-white border px-3 py-2 rounded shadow-sm"
+                                        style="max-width: 70%;">
+                                        <p class="m-0">{{ $message->message_text }}</p>
+                                    </div>
+                                    <span class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
 
                     <!-- Input Section -->
                     <div class="d-flex border-top p-3 align-items-center">
-                        <input type="text" class="form-control me-2 rounded-pill"
-                            placeholder="Type your message here..." />
-                        <button class="btn btn-primary rounded-pill px-4">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
+                        <form action="{{ route('user.sendMessage', ['userId' => 1]) }}" method="POST"
+                            class="d-flex w-100">
+                            @csrf
+                            <input type="text" name="message_text" class="form-control me-2 rounded-pill"
+                                placeholder="Type your message here..." required autofocus />
+                            <button class="btn btn-primary rounded-pill px-4">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
                     </div>
+
+
                 </div>
+
             </div>
         </div>
     </main>

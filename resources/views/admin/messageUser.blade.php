@@ -3,7 +3,22 @@
 @section('title', 'Customers')
 
 @section('styles-links')
-    <style></style>
+    <style>
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #e0e0e0;
+            color: #555;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1rem;
+            /* Icon size */
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 @endsection
 
 @section('sidebar')
@@ -62,64 +77,67 @@
             <span class="faded-white ms-1">Message User</span>
         </div>
 
-       <!-- Chat Interface -->
-<div class="messages-section-m mb-3">
-    <div class="d-flex flex-column flex-grow-1 bg-light text-black rounded shadow-sm">
-        <!-- Header with Back Icon -->
-        <div class="d-flex align-items-center justify-content-center position-relative py-3 border-bottom">
-            <a href="{{ route('admin.feedback') }}"
-                class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <div class="d-flex align-items-center">
-                <h3 class="ms-2 h3 fw-bold mb-0">{{ $user->first_name }} {{ $user->last_name }}</h3>
+        <!-- Chat Interface -->
+        <div class="messages-section-m mb-3">
+            <div class="d-flex flex-column flex-grow-1 bg-light text-black rounded shadow-sm">
+                <!-- Header with Back Icon -->
+                <div class="d-flex align-items-center justify-content-center position-relative py-3 border-bottom">
+                    <a href="{{ route('admin.feedback') }}"
+                        class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                    <div class="d-flex align-items-center">
+                        <h3 class="ms-2 h3 fw-bold mb-0">{{ $user->first_name }} {{ $user->last_name }}</h3>
+                    </div>
+                </div>
+
+                <!-- Chat Body -->
+                <div class="shop-messages overflow-auto px-3 py-3">
+                    @foreach ($messages as $message)
+                        @if ($message->user_id === $user->id)
+                            <!-- Message from User -->
+                            <div class="d-flex align-items-start mb-4">
+                                <!-- Updated User Icon -->
+                                <div class="message-avatar">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div class="message bg-white border px-3 py-2 rounded shadow-sm" style="max-width: 70%;">
+                                    <p class="m-0">{{ $message->message_text }}</p>
+                                </div>
+                                <span
+                                    class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
+                            </div>
+                        @else
+                            <!-- Message from Shop -->
+                            <div class="d-flex align-items-start justify-content-end mb-4">
+                                <span
+                                    class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
+                                <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
+                                    style="max-width: 70%;">
+                                    <p class="m-0">{{ $message->message_text }}</p>
+                                </div>
+
+                                <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
+                                    alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+
+                <!-- Input Section -->
+                <div class="d-flex border-top p-3 align-items-center">
+                    <form action="{{ route('admin.sendMessage', $user->id) }}" method="POST" class="d-flex w-100">
+                        @csrf
+                        <input type="text" name="message_text" class="form-control me-2 rounded-pill"
+                            placeholder="Type your message here..." required autofocus />
+                        <button class="btn btn-primary rounded-pill px-4">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <!-- Chat Body -->
-        <div class="shop-messages overflow-auto px-3 py-3">
-            @foreach ($messages as $message)
-                @if ($message->sender_role === 'Admin')
-                    <!-- Message from Admin -->
-                    <div class="d-flex align-items-start justify-content-end mb-4">
-                        <!-- Admin Message -->
-                        <div class="message bg-primary d-flex flex-column align-items-end text-white p-3 rounded shadow-sm"
-                            style="max-width: 70%;">
-                            <p class="m-0">{{ $message->message_text }}</p>
-                        </div>
-                        <!-- Admin Icon -->
-                        <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3" alt="Admin icon"
-                            style="width: 40px; height: 40px; object-fit: cover;">
-                    </div>
-                @else
-                    <!-- Message from User -->
-                    <div class="d-flex align-items-start mb-4">
-                        <!-- User Icon -->
-                        <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3" alt="User icon"
-                            style="width: 40px; height: 40px; object-fit: cover;">
-                        <!-- User Message -->
-                        <div class="message d-flex flex-column align-items-start bg-white border p-3 rounded shadow-sm"
-                            style="max-width: 70%;">
-                            <p class="m-0">{{ $message->message_text }}</p>
-                        </div>
-                    </div>
-                @endif
-            @endforeach
-        </div>
-
-        <!-- Input Section -->
-        <div class="d-flex border-top p-3 align-items-center">
-            <form action="{{ route('admin.sendMessage', $user->id) }}" method="POST" class="d-flex w-100">
-                @csrf
-                <input type="text" name="message_text" class="form-control me-2 rounded-pill"
-                    placeholder="Type your message here..." required />
-                <button class="btn btn-primary rounded-pill px-4">
-                    <i class="fa-solid fa-paper-plane"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
 
 
 

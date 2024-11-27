@@ -456,7 +456,7 @@ td.td-select {
     color: black;
 }
 
-.message {
+.message-f {
     display: flex;
     align-items: center;
     padding: 10px;
@@ -466,13 +466,14 @@ td.td-select {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+
+.message-f:hover {
+    background-color: #e8f4fd;
+}
+
 .message-a {
     text-decoration: none;
     color: black;
-}
-
-.message:hover {
-    background-color: #e8f4fd;
 }
 
 .message-avatar {
@@ -520,5 +521,6 @@ td.td-select {
 
 .shop-messages {
     height: 55vh;
+    overflow-x: hidden !important;
     /* height: 48vh; */
 }

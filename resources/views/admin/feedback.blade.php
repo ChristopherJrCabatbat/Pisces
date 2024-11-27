@@ -100,15 +100,15 @@
             <div class="messages-section">
                 <div class="message-container">
                     <h2 class="h2 text-center">User Messages</h2>
-            
+
                     @foreach ($userMessages as $data)
                         @php
                             $user = $data['user'];
                             $latestMessage = $data['latestMessage'];
                         @endphp
-            
+
                         <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a">
-                            <div class="message">
+                            <div class="message-f">
                                 <div class="message-avatar">
                                     <i class="fa-solid fa-user"></i>
                                 </div>
@@ -116,7 +116,7 @@
                                     <h5 class="message-name">{{ $user->first_name }} {{ $user->last_name }}</h5>
                                     <p class="message-text">
                                         @if ($latestMessage)
-                                            @if ($latestMessage->sender_role === 'Admin')
+                                            @if ($latestMessage->user_id === auth()->id())
                                                 You: {{ $latestMessage->message_text }}
                                             @else
                                                 {{ $latestMessage->message_text }}
@@ -136,7 +136,6 @@
                     @endforeach
                 </div>
             </div>
-            
 
 
         </div>
