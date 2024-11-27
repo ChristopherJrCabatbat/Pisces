@@ -55,7 +55,7 @@
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
                     class="navigation">Dashboard</a> / <a href="#" class="navigation">Customers</a>
                 / </div>
-            <span class="faded-white ms-1">Category</span>
+            <span class="faded-white ms-1">Feedback Collection</span>
         </div>
 
         <div class="table-container">
@@ -96,10 +96,51 @@
 
             </div>
 
+            <!-- Messenger-Style Messages Section -->
+            <div class="messages-section">
+                <div class="message-container">
+                    <h2 class="h2 text-center">User Messages</h2>
+            
+                    @foreach ($userMessages as $data)
+                        @php
+                            $user = $data['user'];
+                            $latestMessage = $data['latestMessage'];
+                        @endphp
+            
+                        <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a">
+                            <div class="message">
+                                <div class="message-avatar">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div class="message-content">
+                                    <h5 class="message-name">{{ $user->first_name }} {{ $user->last_name }}</h5>
+                                    <p class="message-text">
+                                        @if ($latestMessage)
+                                            @if ($latestMessage->sender_role === 'Admin')
+                                                You: {{ $latestMessage->message_text }}
+                                            @else
+                                                {{ $latestMessage->message_text }}
+                                            @endif
+                                        @else
+                                            No messages yet
+                                        @endif
+                                    </p>
+                                    <span class="message-time">
+                                        @if ($latestMessage)
+                                            {{ $latestMessage->created_at->diffForHumans() }}
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+            
+
+
         </div>
+    @endsection
 
-    </div>
-@endsection
-
-@section('scripts')
-@endsection
+    @section('scripts')
+    @endsection

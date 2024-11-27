@@ -62,6 +62,11 @@ Route::group([
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
     Route::get('/updates', [AdminController::class, 'updates'])->name('updates');
     Route::get('/monitoring', [AdminController::class, 'monitoring'])->name('monitoring');
+
+    Route::get('/messageUser', [AdminController::class, 'messageUser'])->name('messageUser');
+    Route::get('/messageUser/{userId}', [AdminController::class, 'messageUser'])->name('messageUser');
+    Route::post('/messageUser/{userId}/send', [AdminController::class, 'sendMessage'])->name('sendMessage');
+
 });
 
 // User Routes

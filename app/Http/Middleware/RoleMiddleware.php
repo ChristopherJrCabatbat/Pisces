@@ -69,6 +69,8 @@ class RoleMiddleware
                 'admin.feedback',
                 'admin.updates',
                 'admin.monitoring',
+                'admin.messageUser',
+                'admin.sendMessage',
             ],
 
             'Rider' => [
