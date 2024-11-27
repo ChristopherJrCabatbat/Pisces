@@ -89,53 +89,62 @@
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
                     </div>
-
-                    {{-- <div><a href="{{ route('admin.category.create') }}" class="btn btn-primary"><i
-                                class="fa-solid fa-plus me-2"></i>Add</a></div> --}}
                 </div>
 
             </div>
 
-            <!-- Messenger-Style Messages Section -->
-            <div class="messages-section">
-                <div class="message-container">
-                    <h2 class="h2 text-center">User Messages</h2>
+           <!-- Messenger-Style Messages Section -->
+<div class="messages-section">
+    <div class="message-container">
+        <h2 class="h2 text-center">User Messages</h2>
 
-                    @foreach ($userMessages as $data)
-                        @php
-                            $user = $data['user'];
-                            $latestMessage = $data['latestMessage'];
-                        @endphp
+        @foreach ($userMessages as $data)
+            @php
+                $user = $data['user'];
+                $latestMessage = $data['latestMessage'];
+                $unreadCount = $data['unreadCount'];
+            @endphp
 
-                        <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a">
-                            <div class="message-f">
-                                <div class="message-avatar">
-                                    <i class="fa-solid fa-user"></i>
-                                </div>
-                                <div class="message-content">
-                                    <h5 class="message-name">{{ $user->first_name }} {{ $user->last_name }}</h5>
-                                    <p class="message-text">
-                                        @if ($latestMessage)
-                                            @if ($latestMessage->user_id === auth()->id())
-                                                You: {{ $latestMessage->message_text }}
-                                            @else
-                                                {{ $latestMessage->message_text }}
-                                            @endif
-                                        @else
-                                            No messages yet
-                                        @endif
-                                    </p>
-                                    <span class="message-time">
-                                        @if ($latestMessage)
-                                            {{ $latestMessage->created_at->diffForHumans() }}
-                                        @endif
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    @endforeach
+            <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a">
+                <div class="message-f">
+                    <div class="message-avatar position-relative">
+                        <i class="fa-solid fa-user"></i>
+                        <!-- Unread Badge -->
+                        @if ($unreadCount > 0)
+                            <span
+                                class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
+                        @endif
+                    </div>
+
+                    <div class="message-content">
+                        <!-- Add fw-bold if there are unread messages -->
+                        <h5 class="message-name {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
+                            {{ $user->first_name }} {{ $user->last_name }}
+                        </h5>
+                        <p class="message-text {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
+                            @if ($latestMessage)
+                                @if ($latestMessage->user_id === auth()->id())
+                                    You: {{ $latestMessage->message_text }}
+                                @else
+                                    {{ $latestMessage->message_text }}
+                                @endif
+                            @else
+                                No messages yet
+                            @endif
+                        </p>
+                        <span class="message-time">
+                            @if ($latestMessage)
+                                {{ $latestMessage->created_at->diffForHumans() }}
+                            @endif
+                        </span>
+                    </div>
                 </div>
-            </div>
+            </a>
+        @endforeach
+    </div>
+</div>
+
+
 
         </div>
     @endsection

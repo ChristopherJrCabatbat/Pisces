@@ -168,6 +168,7 @@
                     <div id="chatBody" class="shop-messages overflow-auto px-3 py-3">
                         @foreach ($messages as $message)
                             @if ($message->user_id === $user->id)
+                                {{-- User --}}
                                 <div class="d-flex align-items-start justify-content-end mb-4">
                                     <span
                                         class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
@@ -180,12 +181,13 @@
                                     </div>
                                 </div>
                             @else
+                                {{-- Pisces --}}
                                 <div class="d-flex align-items-start mb-4">
                                     <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3"
                                         alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
                                     <div class="message bg-white border px-3 py-2 rounded shadow-sm"
                                         style="max-width: 70%;">
-                                        <p class="m-0">
+                                        <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
                                             {{ $message->message_text }}
                                         </p>
                                     </div>
@@ -215,15 +217,18 @@
         </div>
     </main>
 
-    {{-- Submit message no reload --}}
+    {{-- Submit message no reload and scroll bottom --}}
     <script>
         document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const messageInput = document.getElementById('messageInput');
-            const messageText = messageInput.value;
+            const chatBody = document.getElementById('chatBody');
+            const messageText = messageInput.value.trim(); // Trim to avoid sending empty spaces
 
-            // Send the message using fetch
+            if (!messageText) return; // Prevent sending empty messages
+
+            // Send the message via fetch
             const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
                 method: 'POST',
                 headers: {
@@ -231,7 +236,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    message_text: messageText
+                    message_text: messageText,
                 }),
             });
 
@@ -239,7 +244,6 @@
                 const result = await response.json();
                 if (result.success) {
                     // Update the chat UI with the new message
-                    const chatBody = document.querySelector('.shop-messages');
                     const newMessage = `
                         <div class="d-flex align-items-start justify-content-end mb-4">
                             <span class="text-muted align-self-center small me-3">Just now</span>
@@ -255,58 +259,21 @@
 
                     // Clear the input field
                     messageInput.value = '';
+
+                    // Scroll to bottom after DOM update
+                    setTimeout(() => {
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }, 100); // Slight delay to ensure DOM updates
                 }
             } else {
                 alert('Failed to send the message. Please try again.');
             }
         });
-    </script>
 
-    {{-- scroll bottom --}}
-    <script>
-        // Function to scroll to the bottom of the chat body
-        function scrollToBottom() {
+        // Ensure scrolling to the bottom on page load
+        window.addEventListener('load', () => {
             const chatBody = document.getElementById('chatBody');
             chatBody.scrollTop = chatBody.scrollHeight;
-        }
-
-        // Scroll to the bottom on page load
-        window.onload = scrollToBottom;
-
-        // Scroll to the bottom after sending a message
-        document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Prevent form submission from reloading the page
-
-            const messageInput = document.getElementById('messageInput');
-            const messageText = messageInput.value;
-
-            if (messageText.trim() === '') return; // Prevent empty submissions
-
-            // Send message via fetch
-            const response = await fetch("{{ route('user.sendMessage', ['userId' => 1]) }}", {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message_text: messageText
-                })
-            });
-
-            if (response.ok) {
-                // Clear input field
-                messageInput.value = '';
-
-                // Optionally, fetch new messages and append to the chat
-                const newMessages = await response.json(); // Ensure the route returns messages
-                // Refresh the chat content dynamically here if needed
-
-                // Scroll to bottom
-                scrollToBottom();
-            } else {
-                alert('Failed to send message. Please try again.');
-            }
         });
     </script>
 
