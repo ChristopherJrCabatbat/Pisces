@@ -66,6 +66,8 @@ Route::group([
     Route::get('/messageUser', [AdminController::class, 'messageUser'])->name('messageUser');
     Route::get('/messageUser/{userId}', [AdminController::class, 'messageUser'])->name('messageUser');
     Route::post('/messageUser/{userId}/send', [AdminController::class, 'sendMessage'])->name('sendMessage');
+    Route::post('/markAsRead/{userId}', [AdminController::class, 'markMessagesAsRead'])->name('markAsRead');
+
 
 });
 
@@ -103,6 +105,7 @@ Route::group([
     Route::get('/messages', [UserController::class, 'messages'])->name('messages');
     Route::get('/messagesPisces', [UserController::class, 'messagesPisces'])->name('messagesPisces');
     Route::post('/messageUser/{userId}/send', [UserController::class, 'sendMessage'])->name('sendMessage');
+    Route::post('/markAsRead/{userId}', [UserController::class, 'markMessagesAsRead'])->name('markAsRead');
 
     Route::get('/shopUpdates', [UserController::class, 'shopUpdates'])->name('shopUpdates');
     Route::get('/trackOrder', [UserController::class, 'trackOrder'])->name('trackOrder');

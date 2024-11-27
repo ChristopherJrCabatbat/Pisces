@@ -10,7 +10,7 @@
     </div>
     <div class="d-flex align-items-center">
         {{-- Menu Image --}}
-        <img src="{{ asset('images/logo.jpg') }}" alt="Menu Image" class="rounded me-3"
+        <img src="{{ $order->image }}" alt="Menu Image" class="rounded me-3"
             style="width: 80px; height: 80px; object-fit: cover;">
         <div>
             <p class="fw-bold mb-1">{{ $order->order }}</p>

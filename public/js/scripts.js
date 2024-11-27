@@ -56,8 +56,6 @@ function previewImage(event) {
     }
 }
 
-
-
 // Shopping Cart Plus Minus Quantity
 function incrementQuantity(button) {
     let input = button.previousElementSibling;
@@ -76,45 +74,51 @@ function decrementQuantity(button) {
 }
 
 function updateCartItemQuantity(menuId, quantity) {
-    fetch('/user/updateQuantity', {
-        method: 'POST',
+    fetch("/user/updateQuantity", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content"),
         },
         body: JSON.stringify({
             menu_id: menuId,
-            quantity: quantity
+            quantity: quantity,
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (!data.success) {
+                console.error(data.message);
+            }
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            console.error(data.message);
-        }
-    })
-    .catch(error => console.error('Error updating cart item:', error));
+        .catch((error) => console.error("Error updating cart item:", error));
 }
 
-
 function updateCartTotals() {
-    let rows = document.querySelectorAll('.menu-row');
+    let rows = document.querySelectorAll(".menu-row");
     let totalPrice = 0;
 
-    rows.forEach(row => {
+    rows.forEach((row) => {
         let price = parseFloat(row.dataset.price); // Get original price from data attribute
-        let quantity = parseInt(row.querySelector('.quantity-input').value); // Get updated quantity
+        let quantity = parseInt(row.querySelector(".quantity-input").value); // Get updated quantity
         let itemTotal = price * quantity; // Calculate item total
 
         // Update the quantity in Cart Totals display
-        let cartItem = document.querySelector(`.cart-item-${row.dataset.menuId}`);
-        cartItem.querySelector('.cart-item-quantity').textContent = quantity > 1 ? `(${quantity})` : ''; // Show quantity if more than 1
-        cartItem.querySelector('.cart-item-total').textContent = formatPrice(itemTotal);
+        let cartItem = document.querySelector(
+            `.cart-item-${row.dataset.menuId}`
+        );
+        cartItem.querySelector(".cart-item-quantity").textContent =
+            quantity > 1 ? `(${quantity})` : ""; // Show quantity if more than 1
+        cartItem.querySelector(".cart-item-total").textContent =
+            formatPrice(itemTotal);
 
         totalPrice += itemTotal; // Add to total price
     });
 
-    document.querySelector('#total-price').textContent = formatPrice(totalPrice); // Update total price
+    document.querySelector("#total-price").textContent =
+        formatPrice(totalPrice); // Update total price
 }
 
 // Helper function to format price
@@ -122,29 +126,56 @@ function formatPrice(price) {
     return price % 1 === 0 ? `₱${price}` : `₱${price.toFixed(2)}`;
 }
 
-
 // Function to open the image modal
 function enlargeImage(imageSrc) {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    modal.style.display = 'flex';
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    modal.style.display = "flex";
     modalImg.src = imageSrc;
 }
 
 // Close the modal when the user clicks the close button
-document.querySelector('.close-modal').onclick = function () {
-    document.getElementById('imageModal').style.display = 'none';
+document.querySelector(".close-modal").onclick = function () {
+    document.getElementById("imageModal").style.display = "none";
 };
 
 // Close the modal when clicking outside the image
-document.getElementById('imageModal').onclick = function (event) {
+document.getElementById("imageModal").onclick = function (event) {
     if (event.target === this) {
-        this.style.display = 'none';
+        this.style.display = "none";
     }
 };
 
 // Attach click event to all images in the menu table
-document.querySelectorAll('#menu-table-body img').forEach(img => {
-    img.style.cursor = 'pointer';
-    img.addEventListener('click', () => enlargeImage(img.src));
+document.querySelectorAll("#menu-table-body img").forEach((img) => {
+    img.style.cursor = "pointer";
+    img.addEventListener("click", () => enlargeImage(img.src));
 });
+
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     const messageLinks = document.querySelectorAll('.message-a');
+
+//     messageLinks.forEach(link => {
+//         link.addEventListener('click', function (e) {
+//             e.preventDefault();
+//             const userId = this.dataset.userId; // Attach userId to <a>
+
+//             // Mark messages as read via AJAX
+//             fetch(`/admin/markAsRead/${userId}`, {
+//                 method: 'POST',
+//                 headers: {
+//                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
+//                     'Content-Type': 'application/json',
+//                 },
+//             }).then(response => {
+//                 if (response.ok) {
+//                     // Update styling dynamically
+//                     this.querySelector('.message-name').classList.remove('fw-bold');
+//                     this.querySelector('.message-text').classList.remove('fw-bold');
+//                 }
+//                 window.location.href = this.href; // Redirect after marking as read
+//             });
+//         });
+//     });
+// });

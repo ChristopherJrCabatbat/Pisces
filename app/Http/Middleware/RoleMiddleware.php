@@ -66,11 +66,13 @@ class RoleMiddleware
                 'admin.storeRider',
 
                 'admin.customers',
-                'admin.feedback',
                 'admin.updates',
                 'admin.monitoring',
+
+                'admin.feedback',
                 'admin.messageUser',
                 'admin.sendMessage',
+                'admin.markAsRead',
             ],
 
             'Rider' => [
@@ -114,6 +116,7 @@ class RoleMiddleware
                 'user.messages',
                 'user.messagesPisces',
                 'user.sendMessage',
+                'user.markAsRead',
                 
                 'user.shopUpdates',
                 'user.trackOrder',

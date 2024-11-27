@@ -165,31 +165,32 @@
                     </div>
 
                     <!-- Chat Body -->
-                    <div class="shop-messages overflow-auto px-3 py-3">
+                    <div id="chatBody" class="shop-messages overflow-auto px-3 py-3">
                         @foreach ($messages as $message)
                             @if ($message->user_id === $user->id)
-                                <!-- Message from User -->
                                 <div class="d-flex align-items-start justify-content-end mb-4">
-                                    <span class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    <span
+                                        class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
                                     <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
                                         style="max-width: 70%;">
                                         <p class="m-0">{{ $message->message_text }}</p>
                                     </div>
-                                    <!-- Updated User Icon -->
                                     <div class="message-avatar bg-primary text-white">
                                         <i class="fa-solid fa-user"></i>
                                     </div>
                                 </div>
                             @else
-                                <!-- Message from Shop -->
                                 <div class="d-flex align-items-start mb-4">
                                     <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3"
                                         alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
                                     <div class="message bg-white border px-3 py-2 rounded shadow-sm"
                                         style="max-width: 70%;">
-                                        <p class="m-0">{{ $message->message_text }}</p>
+                                        <p class="m-0">
+                                            {{ $message->message_text }}
+                                        </p>
                                     </div>
-                                    <span class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    <span
+                                        class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
                                 </div>
                             @endif
                         @endforeach
@@ -197,23 +198,117 @@
 
                     <!-- Input Section -->
                     <div class="d-flex border-top p-3 align-items-center">
-                        <form action="{{ route('user.sendMessage', ['userId' => 1]) }}" method="POST"
-                            class="d-flex w-100">
+                        <form id="sendMessageForm" class="d-flex w-100">
                             @csrf
-                            <input type="text" name="message_text" class="form-control me-2 rounded-pill"
-                                placeholder="Type your message here..." required autofocus />
-                            <button class="btn btn-primary rounded-pill px-4">
+                            <input type="text" id="messageInput" name="message_text"
+                                class="form-control me-2 rounded-pill" placeholder="Type your message here..."
+                                required autofocus />
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
                                 <i class="fa-solid fa-paper-plane"></i>
                             </button>
                         </form>
                     </div>
-
 
                 </div>
 
             </div>
         </div>
     </main>
+
+    {{-- Submit message no reload --}}
+    <script>
+        document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value;
+
+            // Send the message using fetch
+            const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message_text: messageText
+                }),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    // Update the chat UI with the new message
+                    const chatBody = document.querySelector('.shop-messages');
+                    const newMessage = `
+                        <div class="d-flex align-items-start justify-content-end mb-4">
+                            <span class="text-muted align-self-center small me-3">Just now</span>
+                            <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm" style="max-width: 70%;">
+                                <p class="m-0">${result.message.message_text}</p>
+                            </div>
+                            <div class="message-avatar bg-primary text-white">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
+                    `;
+                    chatBody.insertAdjacentHTML('beforeend', newMessage);
+
+                    // Clear the input field
+                    messageInput.value = '';
+                }
+            } else {
+                alert('Failed to send the message. Please try again.');
+            }
+        });
+    </script>
+
+    {{-- scroll bottom --}}
+    <script>
+        // Function to scroll to the bottom of the chat body
+        function scrollToBottom() {
+            const chatBody = document.getElementById('chatBody');
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Scroll to the bottom on page load
+        window.onload = scrollToBottom;
+
+        // Scroll to the bottom after sending a message
+        document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent form submission from reloading the page
+
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value;
+
+            if (messageText.trim() === '') return; // Prevent empty submissions
+
+            // Send message via fetch
+            const response = await fetch("{{ route('user.sendMessage', ['userId' => 1]) }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message_text: messageText
+                })
+            });
+
+            if (response.ok) {
+                // Clear input field
+                messageInput.value = '';
+
+                // Optionally, fetch new messages and append to the chat
+                const newMessages = await response.json(); // Ensure the route returns messages
+                // Refresh the chat content dynamically here if needed
+
+                // Scroll to bottom
+                scrollToBottom();
+            } else {
+                alert('Failed to send message. Please try again.');
+            }
+        });
+    </script>
 
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>

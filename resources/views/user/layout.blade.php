@@ -401,6 +401,37 @@
         }
     </script>
 
+{{-- no need reload unread  --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const messageLinks = document.querySelectorAll('.message-a');
+
+        messageLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const userId = this.dataset.userId; // Attach userId to <a>
+
+                // Mark messages as read via AJAX
+                fetch(`/admin/markAsRead/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        // Update styling dynamically
+                        this.querySelector('.message-name').classList.remove('fw-bold');
+                        this.querySelector('.message-text').classList.remove('fw-bold');
+                    }
+                    window.location.href = this.href; // Redirect after marking as read
+                });
+            });
+        });
+    });
+</script>
+
+
 
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>

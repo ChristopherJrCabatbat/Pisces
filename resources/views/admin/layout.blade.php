@@ -40,24 +40,28 @@
                 <div class="" id="">
                     <ul class="navbar-nav me-auto my-2 my-lg-0">
                         <li class="nav-item dropdown position-relative">
-                            <a class="nav-link dropdown-toggle" href="#" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
                                 {{ Auth::user()->first_name }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i
+                                            class="fa-solid fa-user me-2"></i>Profile</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
-                                        <button class="dropdown-item" type="submit"><i class="fa-solid fa-right-from-bracket me-2"></i>Log out</button>
+                                        <button class="dropdown-item" type="submit"><i
+                                                class="fa-solid fa-right-from-bracket me-2"></i>Log out</button>
                                     </form>
                                 </li>
                             </ul>
                         </li>
                     </ul>
                 </div>
-                
+
             </div>
         </nav>
 
@@ -76,37 +80,68 @@
     <div id="customToastBox"></div>
     <script>
         let customToastBox = document.getElementById('customToastBox');
-    
+
         function showToast(msg, type) {
             let customToast = document.createElement('div');
             customToast.classList.add('custom-toast');
-    
+
             // Set the icon based on the type
-            let icon = type === 'error'
-                ? '<i class="fa fa-circle-xmark"></i>'
-                : '<i class="fa fa-circle-check"></i>';
-    
+            let icon = type === 'error' ?
+                '<i class="fa fa-circle-xmark"></i>' :
+                '<i class="fa fa-circle-check"></i>';
+
             customToast.innerHTML = `${icon} ${msg}`;
             customToastBox.appendChild(customToast);
-    
+
             // Add class for error or success styles
             if (type === 'error') {
                 customToast.classList.add('error');
             }
-    
+
             // Remove the toast after 3 seconds
             setTimeout(() => {
                 customToast.remove();
             }, 3000);
         }
-    
+
         // Check if a toast message exists in the session
         @if (session('toast'))
             const toastData = @json(session('toast'));
             showToast(toastData.message, toastData.type);
         @endif
     </script>
-    
+
+    {{-- auto change style unread --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageLinks = document.querySelectorAll('.message-a');
+
+            messageLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const userId = this.dataset.userId; // Attach userId to <a>
+
+                    // Mark messages as read via AJAX
+                    fetch(`/admin/markAsRead/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                        },
+                    }).then(response => {
+                        if (response.ok) {
+                            // Update styling dynamically
+                            this.querySelector('.message-name').classList.remove('fw-bold');
+                            this.querySelector('.message-text').classList.remove('fw-bold');
+                        }
+                        window.location.href = this.href; // Redirect after marking as read
+                    });
+                });
+            });
+        });
+    </script>
+
+
 
     @yield('scripts')
 

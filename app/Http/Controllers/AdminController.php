@@ -98,19 +98,29 @@ class AdminController extends Controller
         return view('admin.messageUser', compact('user', 'messages'));
     }
 
+    public function markMessagesAsRead($userId)
+    {
+        Message::where('user_id', $userId)
+            ->orWhere('receiver_id', $userId)
+            ->update(['is_read' => true]); // Add is_read column
+
+        return response()->json(['status' => 'success']);
+    }
+
+
 
     public function sendMessage(Request $request, $userId)
     {
         $validated = $request->validate([
             'message_text' => 'required|string',
         ]);
-    
+
         // Ensure the admin is authenticated
         $authUser = Auth::user();
         if (!$authUser) {
             return response()->json(['error' => 'Admin not authenticated'], 403);
         }
-    
+
         // Create the message
         Message::create([
             'user_id' => $authUser->id, // Admin is the sender

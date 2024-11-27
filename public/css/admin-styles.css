@@ -503,7 +503,7 @@ td.td-select {
 
 .message-name {
     font-size: 1rem;
-    font-weight: bold;
+    /* font-weight: bold; */
     margin: 0;
 }
 

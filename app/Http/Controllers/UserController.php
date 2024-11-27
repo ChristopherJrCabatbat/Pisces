@@ -425,7 +425,7 @@ class UserController extends Controller
         // Fetch the quantity from the request, default to 1
         $quantity = request()->input('quantity', 1);
 
-         // Calculate total price
+        // Calculate total price
         $totalPrice = $menu->price * $quantity;
 
         // Pass the menu item and user to the view
@@ -493,23 +493,75 @@ class UserController extends Controller
     }
 
 
+    // public function orders(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch user-specific orders
+    //     $orders = DB::table('deliveries')
+    //         ->where('email', $user->email) // Filter by user's email
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
+
+    //     // Convert `created_at` to Carbon instance for each order
+    //     $orders = $orders->map(function ($order) {
+    //         $order->created_at = Carbon::parse($order->created_at);
+    //         return $order;
+    //     });
+
+    //     // Categorize orders by status
+    //     $statuses = [
+    //         'all' => $orders,
+    //         'pending' => $orders->where('status', 'Pending'),
+    //         'preparing' => $orders->where('status', 'Preparing'),
+    //         'out_for_delivery' => $orders->where('status', 'Out for Delivery'),
+    //         'delivered' => $orders->where('status', 'Delivered'),
+    //         'returns' => $orders->where('status', 'Returned'),
+    //     ];
+
+    //     return view('user.orders', compact('statuses'));
+    // }
+
     public function orders(Request $request)
     {
         /** @var User $user */
         $user = Auth::user();
-    
+
         // Fetch user-specific orders
         $orders = DB::table('deliveries')
             ->where('email', $user->email) // Filter by user's email
             ->orderBy('created_at', 'desc')
             ->get();
-    
-        // Convert `created_at` to Carbon instance for each order
+
+        // Process each order to determine the appropriate image
         $orders = $orders->map(function ($order) {
             $order->created_at = Carbon::parse($order->created_at);
+
+            // Parse the order string and quantities
+            $orderItems = explode(', ', $order->order);
+            $quantities = explode(', ', $order->quantity);
+
+            // Determine the menu item with the highest quantity or the first item
+            $mostOrderedIndex = 0;
+            $maxQuantity = 0;
+            foreach ($quantities as $index => $quantity) {
+                if ((int)$quantity > $maxQuantity) {
+                    $mostOrderedIndex = $index;
+                    $maxQuantity = (int)$quantity;
+                }
+            }
+
+            // Extract menu name for the image
+            $menuName = explode(' (', $orderItems[$mostOrderedIndex])[0];
+            $menu = DB::table('menus')->where('name', $menuName)->first();
+
+            // Assign the image URL or default to logo
+            $order->image = $menu ? asset('storage/' . $menu->image) : asset('images/logo.jpg');
+
             return $order;
         });
-    
+
         // Categorize orders by status
         $statuses = [
             'all' => $orders,
@@ -519,31 +571,100 @@ class UserController extends Controller
             'delivered' => $orders->where('status', 'Delivered'),
             'returns' => $orders->where('status', 'Returned'),
         ];
-    
+
         return view('user.orders', compact('statuses'));
     }
-    
-    
+
+
+
+
+    // public function messages(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch the latest message between the user and the admin
+    //     $latestMessage = Message::where(function ($query) use ($user) {
+    //         $query->where('user_id', $user->id) // Sender is the user
+    //             ->orWhere('receiver_id', $user->id); // Receiver is the user
+    //     })
+    //         ->orderBy('created_at', 'desc')
+    //         ->first();
+
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage'));
+    // }
 
     public function messages(Request $request)
     {
         /** @var User $user */
         $user = Auth::user();
 
-        // Fetch the latest message between the user and the admin
+        // Fetch the latest message exchanged between the user and the admin
         $latestMessage = Message::where(function ($query) use ($user) {
-            $query->where('user_id', $user->id) // Sender is the user
-                ->orWhere('receiver_id', $user->id); // Receiver is the user
+            $query->where('user_id', $user->id)
+                ->orWhere('receiver_id', $user->id);
         })
-            ->orderBy('created_at', 'desc')
-            ->first();
+            ->latest('created_at') // Order by most recent message
+            ->first(); // Get the latest message
 
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage'));
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount'));
     }
 
+    // public function messages(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch the latest message between the user and the admin
+    //     $latestMessage = Message::where(function ($query) use ($user) {
+    //         $query->where('receiver_id', $user->id) // Messages received by the user
+    //             ->where('is_read', false); // Unread messages only
+    //     })
+    //         ->orderBy('created_at', 'desc')
+    //         ->first();
+
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
+    //         ->count();
+
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount'));
+    // }
+
+
+
+    // public function messagesPisces(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch all messages exchanged with the admin
+    //     $messages = Message::where(function ($query) use ($user) {
+    //         $query->where('user_id', $user->id) // Sender is the user
+    //             ->orWhere('receiver_id', $user->id); // Receiver is the user
+    //     })
+    //         ->orderBy('created_at', 'asc')
+    //         ->get();
+
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     return view('user.messagesPisces', compact('messages', 'userCart', 'user', 'userFavorites'));
+    // }
 
     public function messagesPisces(Request $request)
     {
@@ -552,11 +673,16 @@ class UserController extends Controller
 
         // Fetch all messages exchanged with the admin
         $messages = Message::where(function ($query) use ($user) {
-            $query->where('user_id', $user->id) // Sender is the user
-                ->orWhere('receiver_id', $user->id); // Receiver is the user
+            $query->where('user_id', $user->id) // Sent by the user
+                ->orWhere('receiver_id', $user->id); // Received by the user
         })
             ->orderBy('created_at', 'asc')
             ->get();
+
+        // Mark unread messages as read
+        Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
 
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
@@ -564,25 +690,35 @@ class UserController extends Controller
         return view('user.messagesPisces', compact('messages', 'userCart', 'user', 'userFavorites'));
     }
 
-
     public function sendMessage(Request $request, $userId)
     {
-        /** @var User $user */
-        $user = Auth::user();
-
         $validated = $request->validate([
             'message_text' => 'required|string',
         ]);
-
-        // Create the message with the specified user as the receiver
-        Message::create([
-            'user_id' => $user->id, // Sender is the authenticated user
+    
+        // Create the message
+        $message = Message::create([
+            'user_id' => Auth::id(), // Sender is the authenticated user
             'receiver_id' => $userId, // Receiver is the admin or target user
             'sender_role' => 'User',
             'message_text' => $validated['message_text'],
         ]);
+    
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+        ]);
+    }
+    
 
-        return redirect()->route('user.messagesPisces')->with('success', 'Message sent successfully');
+
+    public function markMessagesAsRead($userId)
+    {
+        Message::where('user_id', $userId)
+            ->orWhere('receiver_id', $userId)
+            ->update(['is_read' => true]); // Add is_read column
+
+        return response()->json(['status' => 'success']);
     }
 
 
