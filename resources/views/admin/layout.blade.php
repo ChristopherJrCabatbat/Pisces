@@ -83,7 +83,7 @@
         @yield('main-content')
     </main>
 
-    <div id="customToastBox"></div>
+    {{-- <div id="customToastBox"></div>
     <script>
         let customToastBox = document.getElementById('customToastBox');
 
@@ -115,7 +115,36 @@
             const toastData = @json(session('toast'));
             showToast(toastData.message, toastData.type);
         @endif
+    </script> --}}
+
+    <div id="customToastBox"></div>
+    <script>
+        let customToastBox = document.getElementById('customToastBox');
+    
+        function showToast(msg, type) {
+            let customToast = document.createElement('div');
+            customToast.classList.add('custom-toast');
+            let icon = type === 'error' ? '<i class="fa fa-circle-xmark"></i>' : '<i class="fa fa-circle-check"></i>';
+            customToast.innerHTML = `${icon} ${msg}`;
+            customToastBox.appendChild(customToast);
+    
+            if (type === 'error') {
+                customToast.classList.add('error');
+            }
+    
+            setTimeout(() => {
+                customToast.remove();
+            }, 3000);
+        }
+    
+        @if (session('toast'))
+            const toastData = @json(session('toast'));
+            showToast(toastData.message, toastData.type);
+            {{ session()->forget('toast') }} // Clear toast session to prevent persistence
+        @endif
     </script>
+    
+
 
     {{-- auto change style unread --}}
     <script>

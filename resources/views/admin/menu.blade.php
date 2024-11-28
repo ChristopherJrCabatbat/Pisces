@@ -213,31 +213,42 @@
                 <div class="left d-flex">
 
                     <!-- Filter Section -->
-                    <div class="filter-section d-flex align-items-center mb-3">
-                        <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter"
+                    <div class="filter-section d-flex align-items-center">
+                        {{-- <div class="text-black me-2 fw-bold" style="white-space: nowrap;">Filter By:</div> --}}
+                        {{-- <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter"
                             onchange="applyFilter(this.value)">
-                            <option value="" selected disabled>Filter By</option>
-                            <option value="default">Default</option>
+                            <option value="default" selected>Default</option>
                             <option value="categoriesModal">Categories</option>
                             <option value="priceModal">Price</option>
                             <option value="dateModal">Date</option>
                             <option value="analyticsModal">Analytics</option>
+                        </select> --}}
+
+                        <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter"
+                            onchange="applyFilter(this.value)">
+                            <option value="filterBy" selected disabled>Filter by</option>
+                            <option value="default">Default</option>
+                            <option value="categoriesModal">
+                                Categories</option>
+                            <option value="priceModal">Price
+                            </option>
+                            <option value="dateModal">Date</option>
+                            <option value="analyticsModal">
+                                Analytics</option>
                         </select>
+
                     </div>
 
 
-                    {{-- <div class="filter-section d-flex align-items-center mb-3">
-                        <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter"
-                            onchange="openFilterModal(this.value)">
-                            <option value="" selected>Filter By</option>
-                            <option value="categoriesModal">Categories</option>
-                            <option value="priceModal">Price</option>
-                            <option value="dateModal">Date</option>
-                            <option value="analyticsModal">Analytics</option>
-                        </select>
-                    </div> --}}
-
                 </div>
+
+                @if ($activeFilter !== 'Default view')
+                    <div class="mid text-black">
+                        <span class="fw-bold">Table filtered by</span>
+                        <span>{{ $activeFilter }}</span>
+                    </div>
+                @endif
+
 
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
@@ -292,7 +303,7 @@
                                     ₱{{ number_format($menu->price, 2) }}
                                 @endif
                             </td>
-                            <td>{{ $menu->description }}</td>
+                            <td style="width: 25vw !important;">{{ $menu->description }}</td>
                             <!-- Action Column (View, Edit, Delete) -->
                             <td>
                                 <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info"
@@ -352,11 +363,9 @@
         function applyFilter(value) {
             switch (value) {
                 case "default":
-                    // Redirect to the Default view
-                    window.location.href = "/admin/menu?default=true";
+                    window.location.href = "/admin/menu?mainFilter=default&default=true";
                     break;
                 case "categoriesModal":
-                    // Open the categories modal (placeholder, implement modal logic if needed)
                     $('#categoriesModal').modal('show');
                     break;
                 case "priceModal":
@@ -373,6 +382,13 @@
             }
         }
 
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('hidden.bs.modal', () => {
+                document.getElementById('mainFilter').value = 'filterBy';
+            });
+        });
+
+
         // Toast notification
         function showToast(message) {
             const toastElement = document.getElementById('toast');
@@ -381,7 +397,6 @@
             toast.show();
         }
 
-        // Apply Analytics Filters
         document.querySelectorAll('.apply-filter').forEach(button => {
             button.addEventListener('click', function() {
                 const filterType = this.getAttribute('data-filter');
@@ -391,11 +406,13 @@
                     selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
                 }
 
-                bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
+                // Redirect with filter parameter
+                if (selectedValue) {
+                    window.location.href = `/admin/menu?analyticsFilter=${selectedValue}`;
+                }
             });
         });
     </script>
-
 
     <script>
         function filterTable(searchTerm, categoryFilter, priceFilter, dateFilter, analyticsFilter) {
