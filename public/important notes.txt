@@ -799,3 +799,86 @@ Messages
 
  {{-- <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo"> --}}
                         {{-- <h5 class="m-0 text-secondary"> Pisces</h5> --}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        {{-- Orders Page --}}
+<div class="top-container d-flex w-100 p-4 mb-5 justify-content-between align-items-center">
+    <div class="fw-bold h1">Orders</div>
+
+    {{-- Sub-Tabs --}}
+    <div class="sub-tabs-container">
+        <ul class="nav nav-tabs justify-content-center" id="ordersTab" role="tablist">
+            @foreach (['all' => 'All', 'pending' => 'Pending', 'preparing' => 'Preparing', 'out_for_delivery' => 'Out for Delivery', 'delivered' => 'Delivered', 'returns' => 'Returns'] as $key => $label)
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="{{ $key }}-tab"
+                        data-bs-toggle="tab" data-bs-target="#{{ $key }}" type="button" role="tab"
+                        aria-controls="{{ $key }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+                        {{ $label }}
+                    </button>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+
+{{-- Content --}}
+<div class="tab-content container content user-content p-0 text-black" id="ordersTabContent">
+    @foreach (['all', 'pending', 'preparing', 'out_for_delivery', 'delivered', 'returns'] as $key)
+        <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="{{ $key }}" role="tabpanel"
+            aria-labelledby="{{ $key }}-tab">
+            @forelse ($statuses[$key] as $order)
+                @include('user.orders-partial', [
+                    'order' => $order,
+                    'statusClass' => match($order->status) {
+                        'Pending' => 'bg-secondary',
+                        'Preparing' => 'bg-warning text-dark',
+                        'Out for Delivery' => 'bg-info',
+                        'Delivered' => 'bg-success',
+                        'Returned' => 'bg-danger',
+                        default => 'bg-light',
+                    },
+                ])
+            @empty
+                <div class="order-container border rounded p-4 shadow-sm">
+                    <div class="d-flex align-items-center fs-5">
+                        <i class="fa-regular fa-circle-question me-2"></i> There are no orders available in this category.
+                    </div>
+                </div>
+            @endforelse
+        </div>
+    @endforeach
+</div>

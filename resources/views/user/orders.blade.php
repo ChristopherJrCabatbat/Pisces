@@ -113,111 +113,25 @@
 
         {{-- Content --}}
         <div class="tab-content container content user-content p-0 text-black" id="ordersTabContent">
-            {{-- All Orders --}}
-            <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
-                @forelse ($statuses['all'] as $order)
-                    <a href="">
-                        <div class="a-container order-container border rounded mb-4 p-4 shadow-sm">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <p class="text-muted mb-1">Order Date</p>
-                                    <p class="fw-bold mb-0">{{ $order->created_at->format('M d, Y') }}</p>
-                                </div>
-                                <div>
-                                    <span class="badge bg-secondary">{{ $order->status }}</span>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                {{-- Menu Image --}}
-                                <img src="{{ $order->image }}" alt="Menu Image" class="rounded me-3"
-                                    style="width: 80px; height: 80px; object-fit: cover;">
-                                <div>
-                                    <p class="fw-bold mb-1">{{ $order->order }}</p>
-                                    <p class="text-muted mb-0">₱{{ number_format($order->total_price, 2) }}</p>
-                                </div>
+            @foreach (['all', 'pending', 'preparing', 'out-for-delivery', 'delivered', 'returns'] as $status)
+                <div class="tab-pane fade {{ $status === 'all' ? 'show active' : '' }}" id="{{ $status }}"
+                    role="tabpanel" aria-labelledby="{{ $status }}-tab">
+                    @forelse ($statuses[$status] as $order)
+                        @include('user.orders-partial', [
+                            'order' => $order,
+                        ])
+                    @empty
+                        <div class="order-container border rounded p-4 shadow-sm">
+                            <div class="d-flex align-items-center fs-5">
+                                <i class="fa-regular fa-circle-question me-2"></i> There are no
+                                {{ str_replace('_', ' ', $status) }} orders.
                             </div>
                         </div>
-                    </a>
-                @empty
-                    <div class="order-container border rounded p-4 shadow-sm">
-                        <div class="d-flex align-items-center fs-5">
-                            <i class="fa-regular fa-circle-question me-2"></i> There are no orders available.
-                        </div>
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- Pending --}}
-            <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
-                @forelse ($statuses['pending'] as $order)
-                    @include('user.orders-partial', [
-                        'order' => $order,
-                        'statusClass' => 'bg-secondary',
-                    ])
-                @empty
-                    <div class="order-container border rounded p-4 shadow-sm">
-                        <div class="d-flex align-items-center fs-5">
-                            <i class="fa-regular fa-circle-question me-2"></i> There are no pending orders.
-                        </div>
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- Preparing --}}
-            <div class="tab-pane fade" id="preparing" role="tabpanel" aria-labelledby="preparing-tab">
-                @forelse ($statuses['preparing'] as $order)
-                    @include('user.orders-partial', [
-                        'order' => $order,
-                        'statusClass' => 'bg-warning text-dark',
-                    ])
-                @empty
-                    <div class="order-container border rounded p-4 shadow-sm">
-                        <div class="d-flex align-items-center fs-5">
-                            <i class="fa-regular fa-circle-question me-2"></i> There are no orders being prepared.
-                        </div>
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- Out for Delivery --}}
-            <div class="tab-pane fade" id="out-for-delivery" role="tabpanel" aria-labelledby="out-for-delivery-tab">
-                @forelse ($statuses['out_for_delivery'] as $order)
-                    @include('user.orders-partial', ['order' => $order, 'statusClass' => 'bg-info'])
-                @empty
-                    <div class="order-container border rounded p-4 shadow-sm">
-                        <div class="d-flex align-items-center fs-5">
-                            <i class="fa-regular fa-circle-question me-2"></i> There are no orders out for delivery.
-                        </div>
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- Delivered --}}
-            <div class="tab-pane fade" id="delivered" role="tabpanel" aria-labelledby="delivered-tab">
-                @forelse ($statuses['delivered'] as $order)
-                    @include('user.orders-partial', ['order' => $order, 'statusClass' => 'bg-success'])
-                @empty
-                    <div class="order-container border rounded p-4 shadow-sm">
-                        <div class="d-flex align-items-center fs-5">
-                            <i class="fa-regular fa-circle-question me-2"></i> There are no delivered orders.
-                        </div>
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- Returns --}}
-            <div class="tab-pane fade" id="returns" role="tabpanel" aria-labelledby="returns-tab">
-                @forelse ($statuses['returns'] as $order)
-                    @include('user.orders-partial', ['order' => $order, 'statusClass' => 'bg-danger'])
-                @empty
-                    <div class="order-container border rounded p-4 shadow-sm">
-                        <div class="d-flex align-items-center fs-5">
-                            <i class="fa-regular fa-circle-question me-2"></i> There are no returned orders.
-                        </div>
-                    </div>
-                @endforelse
-            </div>
+                    @endforelse
+                </div>
+            @endforeach
         </div>
+
 
     </div>
 

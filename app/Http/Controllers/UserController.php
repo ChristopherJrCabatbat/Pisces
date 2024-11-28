@@ -494,6 +494,61 @@ class UserController extends Controller
     }
 
 
+    // public function orders(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Fetch user-specific orders
+    //     $orders = DB::table('deliveries')
+    //         ->where('email', $user->email) // Filter by user's email
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
+
+    //     // Process each order to determine the appropriate image
+    //     $orders = $orders->map(function ($order) {
+    //         $order->created_at = Carbon::parse($order->created_at);
+
+    //         // Parse the order string and quantities
+    //         $orderItems = explode(', ', $order->order);
+    //         $quantities = explode(', ', $order->quantity);
+
+    //         // Determine the menu item with the highest quantity or the first item
+    //         $mostOrderedIndex = 0;
+    //         $maxQuantity = 0;
+    //         foreach ($quantities as $index => $quantity) {
+    //             if ((int)$quantity > $maxQuantity) {
+    //                 $mostOrderedIndex = $index;
+    //                 $maxQuantity = (int)$quantity;
+    //             }
+    //         }
+
+    //         // Extract menu name for the image
+    //         $menuName = explode(' (', $orderItems[$mostOrderedIndex])[0];
+    //         $menu = DB::table('menus')->where('name', $menuName)->first();
+
+    //         // Assign the image URL or default to logo
+    //         $order->image = $menu ? asset('storage/' . $menu->image) : asset('images/logo.jpg');
+
+    //         return $order;
+    //     });
+
+    //     // Categorize orders by status
+    //     $statuses = [
+    //         'all' => $orders,
+    //         'pending' => $orders->where('status', 'Pending'),
+    //         'preparing' => $orders->where('status', 'Preparing'),
+    //         'out_for_delivery' => $orders->where('status', 'Out for Delivery'),
+    //         'delivered' => $orders->where('status', 'Delivered'),
+    //         'returns' => $orders->where('status', 'Returned'),
+    //     ];
+
+    //     return view('user.orders', compact('statuses', 'userCart', 'userFavorites'));
+    // }
+
+
     public function orders(Request $request)
     {
         /** @var User $user */
@@ -507,7 +562,7 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Process each order to determine the appropriate image
+        // Process each order to include all menu items
         $orders = $orders->map(function ($order) {
             $order->created_at = Carbon::parse($order->created_at);
 
@@ -515,23 +570,23 @@ class UserController extends Controller
             $orderItems = explode(', ', $order->order);
             $quantities = explode(', ', $order->quantity);
 
-            // Determine the menu item with the highest quantity or the first item
-            $mostOrderedIndex = 0;
-            $maxQuantity = 0;
-            foreach ($quantities as $index => $quantity) {
-                if ((int)$quantity > $maxQuantity) {
-                    $mostOrderedIndex = $index;
-                    $maxQuantity = (int)$quantity;
+            // Fetch all menu details for the order
+            $menuDetails = [];
+            foreach ($orderItems as $index => $item) {
+                $menuName = explode(' (', $item)[0]; // Extract menu name
+                $menu = DB::table('menus')->where('name', $menuName)->first();
+
+                if ($menu) {
+                    $menuDetails[] = [
+                        'name' => $menuName,
+                        'quantity' => $quantities[$index] ?? 1,
+                        'image' => asset('storage/' . $menu->image),
+                        'price' => $menu->price
+                    ];
                 }
             }
 
-            // Extract menu name for the image
-            $menuName = explode(' (', $orderItems[$mostOrderedIndex])[0];
-            $menu = DB::table('menus')->where('name', $menuName)->first();
-
-            // Assign the image URL or default to logo
-            $order->image = $menu ? asset('storage/' . $menu->image) : asset('images/logo.jpg');
-
+            $order->menuDetails = $menuDetails;
             return $order;
         });
 
@@ -540,13 +595,14 @@ class UserController extends Controller
             'all' => $orders,
             'pending' => $orders->where('status', 'Pending'),
             'preparing' => $orders->where('status', 'Preparing'),
-            'out_for_delivery' => $orders->where('status', 'Out for Delivery'),
+            'out-for-delivery' => $orders->where('status', 'Out for Delivery'),
             'delivered' => $orders->where('status', 'Delivered'),
             'returns' => $orders->where('status', 'Returned'),
         ];
 
         return view('user.orders', compact('statuses', 'userCart', 'userFavorites'));
     }
+
 
 
     public function messages(Request $request)
