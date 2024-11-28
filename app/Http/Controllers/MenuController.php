@@ -18,15 +18,146 @@ class MenuController extends Controller
      * Display a listing of the resource.
      */
 
-    public function index()
-    {
-        // $menus = Menu::paginate(2);
-        $menus = Menu::all();
+     public function index(Request $request)
+     {
+         $query = Menu::query();
+         $toastMessage = null; // Default to null
+     
+         // Handle Default Filter
+         if ($request->has('default') && $request->default === 'true') {
+             $toastMessage = 'Default view applied. Showing all menus!';
+         }
+     
+         // Apply other filters
+         if ($request->has('categoryFilter') && $request->categoryFilter) {
+             $query->where('category', $request->categoryFilter);
+             $toastMessage = 'Successfully filtered by Category: ' . $request->categoryFilter;
+         }
+     
+         if ($request->has('priceFilter')) {
+             $query->when($request->priceFilter === 'expensive', function ($q) {
+                 $q->orderBy('price', 'desc');
+             })->when($request->priceFilter === 'cheap', function ($q) {
+                 $q->orderBy('price', 'asc');
+             });
+     
+             $toastMessage = 'Successfully filtered by Price: ' . ucfirst($request->priceFilter);
+         }
+     
+         if ($request->has('dateFilter')) {
+             $query->when($request->dateFilter === 'recent', function ($q) {
+                 $q->orderBy('created_at', 'desc');
+             })->when($request->dateFilter === 'oldest', function ($q) {
+                 $q->orderBy('created_at', 'asc');
+             });
+     
+             $toastMessage = 'Successfully filtered by Date: ' . ucfirst($request->dateFilter);
+         }
+     
+         if ($request->has('analyticsFilter')) {
+             $query->when($request->analyticsFilter === 'best-sellers', function ($q) {
+                 $q->whereIn('name', DB::table('orders')
+                     ->select('menu_name')
+                     ->groupBy('menu_name')
+                     ->orderByRaw('SUM(quantity) DESC')
+                     ->pluck('menu_name'));
+             })->when($request->analyticsFilter === 'customer-favorites', function ($q) {
+                 $q->whereIn('id', DB::table('favorite_items')
+                     ->select('menu_id')
+                     ->groupBy('menu_id')
+                     ->orderByRaw('COUNT(user_id) DESC')
+                     ->pluck('menu_id'));
+             });
+     
+             $toastMessage = 'Successfully filtered by Analytics: ' . ucfirst(str_replace('-', ' ', $request->analyticsFilter));
+         }
+     
+         // Fetch menus, categories, best sellers, and customer favorites
+         $menus = $query->get();
+         $categories = DB::table('categories')->select('category')->distinct()->get();
+     
+         $bestSellers = DB::table('orders')
+             ->select('menu_name', DB::raw('SUM(quantity) as total_quantity'))
+             ->groupBy('menu_name')
+             ->orderByDesc('total_quantity')
+             ->take(5)
+             ->get();
+     
+         $customerFavorites = DB::table('favorite_items')
+             ->select('menu_id', DB::raw('COUNT(user_id) as total_favorites'))
+             ->groupBy('menu_id')
+             ->orderByDesc('total_favorites')
+             ->take(5)
+             ->get();
+     
+         // Set toast only if a message exists
+         if (!is_null($toastMessage)) {
+             session()->flash('toast', [
+                 'message' => $toastMessage,
+                 'type' => 'success',
+             ]);
+         }
+     
+         return view('admin.menu', compact('menus', 'categories', 'bestSellers', 'customerFavorites'));
+     }
+     
 
-        $categories = DB::table('categories')->select('category')->distinct()->get();
 
-        return view('admin.menu', compact('menus', 'categories'));
-    }
+
+
+    // public function index(Request $request)
+    // {
+    //     $query = Menu::query();
+
+    //     // Apply Category Filter
+    //     if ($request->has('categoryFilter') && $request->categoryFilter) {
+    //         $query->where('category', $request->categoryFilter);
+    //     }
+
+    //     // Apply Price Filter
+    //     if ($request->has('priceFilter')) {
+    //         if ($request->priceFilter === 'expensive') {
+    //             $query->orderBy('price', 'desc');
+    //         } elseif ($request->priceFilter === 'cheap') {
+    //             $query->orderBy('price', 'asc');
+    //         }
+    //     }
+
+    //     // Apply Date Filter
+    //     if ($request->has('dateFilter')) {
+    //         if ($request->dateFilter === 'recent') {
+    //             $query->orderBy('created_at', 'desc');
+    //         } elseif ($request->dateFilter === 'oldest') {
+    //             $query->orderBy('created_at', 'asc');
+    //         }
+    //     }
+
+    //     // Apply Analytics Filter
+    //     if ($request->has('analyticsFilter')) {
+    //         if ($request->analyticsFilter === 'best-sellers') {
+    //             $query->whereIn('name', function ($subquery) {
+    //                 $subquery->select('menu_name')
+    //                     ->from('orders')
+    //                     ->groupBy('menu_name')
+    //                     ->orderByRaw('SUM(quantity) DESC');
+    //             });
+    //         } elseif ($request->analyticsFilter === 'customer-favorites') {
+    //             $query->whereIn('id', function ($subquery) {
+    //                 $subquery->select('menu_id')
+    //                     ->from('favorite_items')
+    //                     ->groupBy('menu_id')
+    //                     ->orderByRaw('COUNT(user_id) DESC');
+    //             });
+    //         }
+    //     }
+
+    //     // Fetch data for menus and categories
+    //     $menus = $query->get();
+    //     $categories = DB::table('categories')->select('category')->distinct()->get();
+
+    //     return view('admin.menu', compact('menus', 'categories'));
+    // }
+
 
     public function menuSearch(Request $request)
     {
@@ -71,7 +202,7 @@ class MenuController extends Controller
     {
         $categories = Category::all(); // Fetch all categories
 
-        return view('admin.menuCreateCategory', compact( 'categories'));
+        return view('admin.menuCreateCategory', compact('categories'));
     }
 
     public function menuEditCategory(string $id)
@@ -132,8 +263,8 @@ class MenuController extends Controller
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
         ]);
 
-         // Handle file upload
-         if ($request->hasFile('image')) {
+        // Handle file upload
+        if ($request->hasFile('image')) {
             // Store the uploaded image in the 'public/menu_images' directory
             $imagePath = $request->file('image')->store('category_images', 'public');
         }

@@ -3,11 +3,11 @@
 @section('title', 'Menu')
 
 @section('styles-links')
-<style>
-    .modal-content {
-        color: black;
-    }
-</style>
+    <style>
+        .modal-content {
+            color: black;
+        }
+    </style>
 @endsection
 
 @section('sidebar')
@@ -48,86 +48,105 @@
 @endsection
 
 @section('modals')
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
+            aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Categories Modal -->
     <div class="modal fade" id="categoriesModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="categoriesModalLabel">Filter by Categories</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <form method="GET" action="{{ route('admin.menu.index') }}">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="categoriesModalLabel">Filter by Categories</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @foreach ($categories as $category)
+                            <div class="form-check">
+                                <input class="form-check-input category-option" type="radio" name="categoryFilter"
+                                    id="category-{{ $category->category }}" value="{{ $category->category }}">
+                                <label class="form-check-label" for="category-{{ $category->category }}">
+                                    {{ $category->category }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary apply-filter" data-filter="categories">Apply</button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    @foreach ($categories as $category)
-                        <div class="form-check">
-                            <input class="form-check-input category-option" type="radio" name="categoryFilter"
-                                id="category-{{ $category->category }}" value="{{ $category->category }}">
-                            <label class="form-check-label" for="category-{{ $category->category }}">
-                                {{ $category->category }}
-                            </label>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary apply-filter" data-filter="categories">Apply</button>
-                </div>
-            </div>
+            </form>
+
         </div>
     </div>
 
     <!-- Price Modal -->
     <div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="priceModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="priceModalLabel">Filter by Price</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-check">
-                        <input class="form-check-input price-option" type="radio" name="priceFilter" id="price-expensive"
-                            value="expensive">
-                        <label class="form-check-label" for="price-expensive">Most Expensive</label>
+
+            <form method="GET" action="{{ route('admin.menu.index') }}">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="priceModalLabel">Filter by Price</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input price-option" type="radio" name="priceFilter" id="price-cheap"
-                            value="cheap">
-                        <label class="form-check-label" for="price-cheap">Cheapest</label>
+                    <div class="modal-body">
+                        <div class="form-check">
+                            <input class="form-check-input price-option" type="radio" name="priceFilter"
+                                id="price-expensive" value="expensive">
+                            <label class="form-check-label" for="price-expensive">Most Expensive</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input price-option" type="radio" name="priceFilter"
+                                id="price-cheap" value="cheap">
+                            <label class="form-check-label" for="price-cheap">Cheapest</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary apply-filter" data-filter="price">Apply</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary apply-filter" data-filter="price">Apply</button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
     <!-- Date Modal -->
     <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="dateModalLabel">Filter by Date</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-check">
-                        <input class="form-check-input date-option" type="radio" name="dateFilter" id="date-recent"
-                            value="recent">
-                        <label class="form-check-label" for="date-recent">Recently Added</label>
+            <form method="GET" action="{{ route('admin.menu.index') }}">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dateModalLabel">Filter by Date</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input date-option" type="radio" name="dateFilter" id="date-oldest"
-                            value="oldest">
-                        <label class="form-check-label" for="date-oldest">Oldest Added</label>
+                    <div class="modal-body">
+                        <div class="form-check">
+                            <input class="form-check-input date-option" type="radio" name="dateFilter"
+                                id="date-recent" value="recent">
+                            <label class="form-check-label" for="date-recent">Recently Added</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input date-option" type="radio" name="dateFilter"
+                                id="date-oldest" value="oldest">
+                            <label class="form-check-label" for="date-oldest">Oldest Added</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary apply-filter" data-filter="date">Apply</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary apply-filter" data-filter="date">Apply</button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -141,24 +160,24 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-check">
-                        <input class="form-check-input analytics-option" type="radio" name="analyticsFilter"
-                            id="analytics-best-sellers" value="best_sellers">
-                        <label class="form-check-label" for="analytics-best-sellers">Best Sellers</label>
+                    <div>
+                        <input type="radio" id="best-sellers" name="analyticsFilter" class="analytics-option"
+                            value="best-sellers">
+                        <label for="best-sellers">Best Sellers</label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input analytics-option" type="radio" name="analyticsFilter"
-                            id="analytics-customer-favorites" value="customer_favorites">
-                        <label class="form-check-label" for="analytics-customer-favorites">Customer Favorites</label>
+                    <div>
+                        <input type="radio" id="customer-favorites" name="analyticsFilter" class="analytics-option"
+                            value="customer-favorites">
+                        <label for="customer-favorites">Customer Favorites</label>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary apply-filter" data-filter="analytics">Apply</button>
                 </div>
             </div>
         </div>
     </div>
+
 
 @endsection
 
@@ -192,16 +211,32 @@
 
                 <!-- Left Section -->
                 <div class="left d-flex">
+
                     <!-- Filter Section -->
                     <div class="filter-section d-flex align-items-center mb-3">
-                        <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter">
-                            <option value="" selected>Filter By</option>
-                            <option value="categories">Categories</option>
-                            <option value="price">Price</option>
-                            <option value="date">Date</option>
-                            <option value="analytics">Analytics</option>
+                        <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter"
+                            onchange="applyFilter(this.value)">
+                            <option value="" selected disabled>Filter By</option>
+                            <option value="default">Default</option>
+                            <option value="categoriesModal">Categories</option>
+                            <option value="priceModal">Price</option>
+                            <option value="dateModal">Date</option>
+                            <option value="analyticsModal">Analytics</option>
                         </select>
                     </div>
+
+
+                    {{-- <div class="filter-section d-flex align-items-center mb-3">
+                        <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter"
+                            onchange="openFilterModal(this.value)">
+                            <option value="" selected>Filter By</option>
+                            <option value="categoriesModal">Categories</option>
+                            <option value="priceModal">Price</option>
+                            <option value="dateModal">Date</option>
+                            <option value="analyticsModal">Analytics</option>
+                        </select>
+                    </div> --}}
+
                 </div>
 
                 <!-- Right Section -->
@@ -209,8 +244,10 @@
                     <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
                         <form action="">
-                            <input type="search" placeholder="Search something..." class="form-control"
-                                id="search-input" value="{{ request('search') }}">
+                            {{-- <input type="search" placeholder="Search something..." class="form-control"
+                                id="search-input" value="{{ request('search') }}"> --}}
+                            <input type="text" id="search-input" class="form-control"
+                                placeholder="Search menus..." />
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
                     </div>
@@ -303,52 +340,64 @@
 @section('scripts')
 
     {{-- Search / Filter Script --}}
-    {{-- <script>
-        // Function to filter table based on category and search term
-        function filterTable() {
-            const selectedCategory = document.getElementById('categoryFilter').value.toLowerCase();
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const menuRows = document.querySelectorAll('#menu-table-body .menu-row');
-            let hasVisibleRow = false;
+    <script>
+        function openFilterModal(modalId) {
+            if (modalId) {
+                new bootstrap.Modal(document.getElementById(modalId)).show();
+            }
+        }
+    </script>
 
-            menuRows.forEach(row => {
-                const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-                const name = row.cells[1].textContent.toLowerCase();
-                const price = row.cells[3].textContent.toLowerCase();
-                const description = row.cells[4].textContent.toLowerCase();
-
-                // Determine if the row matches the filter and search term
-                const matchesCategory = selectedCategory === "" || category === selectedCategory;
-                const matchesSearch = name.includes(searchTerm) || price.includes(searchTerm) || description
-                    .includes(searchTerm);
-
-                // Show the row if it matches both the selected category and the search term
-                if (matchesCategory && matchesSearch) {
-                    row.style.display = "";
-                    hasVisibleRow = true;
-                } else {
-                    row.style.display = "none";
-                }
-            });
-
-            // Handle the unified "No menus" or "No results" message
-            const noMenusRow = document.getElementById('no-menus-row');
-            if (hasVisibleRow) {
-                noMenusRow.style.display = "none";
-            } else {
-                noMenusRow.style.display = "";
-                noMenusRow.innerHTML =
-                    `<td colspan="6">There are no menu found.</td>`;
+    <script>
+        function applyFilter(value) {
+            switch (value) {
+                case "default":
+                    // Redirect to the Default view
+                    window.location.href = "/admin/menu?default=true";
+                    break;
+                case "categoriesModal":
+                    // Open the categories modal (placeholder, implement modal logic if needed)
+                    $('#categoriesModal').modal('show');
+                    break;
+                case "priceModal":
+                    $('#priceModal').modal('show');
+                    break;
+                case "dateModal":
+                    $('#dateModal').modal('show');
+                    break;
+                case "analyticsModal":
+                    $('#analyticsModal').modal('show');
+                    break;
+                default:
+                    break;
             }
         }
 
-        // Event listeners for category filter and search input
-        document.getElementById('filterButton').addEventListener('click', filterTable);
-        document.getElementById('search-input').addEventListener('input', filterTable);
-    </script> --}}
+        // Toast notification
+        function showToast(message) {
+            const toastElement = document.getElementById('toast');
+            toastElement.textContent = message;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+
+        // Apply Analytics Filters
+        document.querySelectorAll('.apply-filter').forEach(button => {
+            button.addEventListener('click', function() {
+                const filterType = this.getAttribute('data-filter');
+                let selectedValue = '';
+
+                if (filterType === 'analytics') {
+                    selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
+            });
+        });
+    </script>
+
 
     <script>
-        // Filter Table Function
         function filterTable(searchTerm, categoryFilter, priceFilter, dateFilter, analyticsFilter) {
             const menuRows = document.querySelectorAll('#menu-table-body .menu-row');
             let hasVisibleRow = false;
@@ -359,15 +408,11 @@
                 const price = row.cells[3].textContent.toLowerCase();
                 const description = row.cells[4].textContent.toLowerCase();
 
-                // Conditions for matching filters
                 const matchesCategory = !categoryFilter || category === categoryFilter.toLowerCase();
                 const matchesSearch = !searchTerm || name.includes(searchTerm) || description.includes(
                     searchTerm) || price.includes(searchTerm);
-                const matchesPrice = !priceFilter; // You can expand for price logic
-                const matchesDate = !dateFilter; // Expand for date logic
-                const matchesAnalytics = !analyticsFilter; // Expand for analytics logic
 
-                if (matchesCategory && matchesSearch && matchesPrice && matchesDate && matchesAnalytics) {
+                if (matchesCategory && matchesSearch) {
                     row.style.display = '';
                     hasVisibleRow = true;
                 } else {
@@ -375,22 +420,22 @@
                 }
             });
 
-            // Show 'No menus found' row if no rows match
             const noMenusRow = document.getElementById('no-menus-row');
             noMenusRow.style.display = hasVisibleRow ? 'none' : '';
         }
 
-        // Open modal on filter selection
         document.getElementById('mainFilter').addEventListener('change', function() {
-            const selectedFilter = this.value;
+            const filterType = this.value;
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
 
-            if (selectedFilter) {
-                const modalId = `${selectedFilter}Modal`;
+            if (filterType) {
+                const modalId = `${filterType}`;
                 new bootstrap.Modal(document.getElementById(modalId)).show();
+            } else {
+                filterTable(searchTerm);
             }
         });
 
-        // Apply filter and close modal
         document.querySelectorAll('.apply-filter').forEach(button => {
             button.addEventListener('click', function() {
                 const filterType = this.getAttribute('data-filter');
@@ -406,22 +451,18 @@
                     selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
                 }
 
-                // Close modal
                 bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
 
-                // Update table
-                const searchTerm = document.getElementById('search-input').value.toLowerCase();
-                const categoryFilter = filterType === 'categories' ? selectedValue : '';
-                filterTable(searchTerm, categoryFilter);
+                filterTable(document.getElementById('search-input').value.toLowerCase(), selectedValue);
+
             });
         });
 
-        // Search input event listener
         document.getElementById('search-input').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const categoryFilter = document.querySelector('.category-option:checked')?.value || '';
-            filterTable(searchTerm, categoryFilter);
+            filterTable(this.value.toLowerCase());
         });
     </script>
+
+
 
 @endsection
