@@ -51,56 +51,47 @@
         {{-- Content --}}
         <div class="d-flex container flex-column content user-content p-0">
 
-            <!-- Shop Updates Section -->
+         <!-- Order Updates Section -->
             <div
                 class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 text-secondary">Order updates</h5>
-                    {{-- <a href="#" class="text-muted small more">More<i class="fa-solid fa-caret-right ms-1"></i></a> --}}
+                    <h5 class="m-0 text-secondary">Order Updates</h5>
+                    <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i
+                            class="fa-solid fa-caret-right ms-1"></i></a>
                 </div>
+                
                 <div class="shop-updates-body my-2">
-                    <a href="{{ route('user.trackOrder') }}">
-                        <div class="d-flex a-container p-3">
-                            <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
-                                style="width: 50px; height: 50px;">
-                                <i class="fa-solid fa-bag-shopping text-primary"></i>
+                    @foreach ($deliveries as $delivery)
+                        <!-- Review Order -->
+                        <a href="{{ route('user.reviewOrder', ['delivery' => $delivery->id]) }}">
+                            <div class="d-flex a-container p-3">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fa-solid fa-bag-shopping text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="m-0 fw-bold">Review your order</p>
+                                    <p class="m-0 text-muted small">Order #{{ $delivery->id }} -
+                                        {{ $delivery->created_at->diffForHumans() }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="m-0 fw-bold">Review your order</p>
-                                <p class="m-0 text-muted small">Enjoying your recent purchase? Share your thoughts to help
-                                    other shoppers. <span class="text-muted small">4d</span></p>
-                            </div>
-                        </div>
-                    </a>
+                        </a>
 
-                    <a href="#">
-                        <div class="d-flex a-container p-3">
-                            <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
-                                style="width: 50px; height: 50px;">
-                                <i class="fa-solid fa-box text-success"></i>
+                        <!--    Track Order -->
+                        <a href="{{ route('user.trackOrder', ['delivery' => $delivery->id]) }}">
+                            <div class="d-flex a-container p-3">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fa-solid fa-box text-success"></i>
+                                </div>
+                                <div>
+                                    <p class="m-0 fw-bold">Track order</p>
+                                    <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span
+                                            class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span></p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="m-0 fw-bold">Order delivered</p>
-                                <p class="m-0 text-muted small">Your order 972437104315 was delivered. <span
-                                        class="text-muted small">5d</span></p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="#" class="mb-2">
-                        <div class="d-flex a-container p-3">
-                            <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
-                                style="width: 50px; height: 50px;">
-                                <i class="fa-solid fa-bag-shopping text-primary"></i>
-                            </div>
-                            <div>
-                                <p class="m-0 fw-bold">Review your order</p>
-                                <p class="m-0 text-muted small">Enjoying your recent purchase? Share your thoughts to help
-                                    other shoppers. <span class="text-muted small">4d</span></p>
-                            </div>
-                        </div>
-                    </a>
-
+                        </a>
+                    @endforeach
                 </div>
             </div>
 

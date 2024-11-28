@@ -7,6 +7,10 @@
         .modal-content {
             color: black;
         }
+
+        .table-container {
+            min-width: 681px;
+        }
     </style>
 @endsection
 

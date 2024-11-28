@@ -326,10 +326,11 @@ select:hover {
     justify-content: center;
 }
 
-.modal-content {
-    max-width: 80%;
-    max-height: 75%;
+#modalImage {
+    width: auto;
+    height: 80%;
     border-radius: 10px;
+    object-fit: cover;
 }
 .content-d {
     max-width: none;

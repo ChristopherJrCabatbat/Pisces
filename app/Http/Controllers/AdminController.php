@@ -58,50 +58,38 @@ class AdminController extends Controller
         return view('admin.customers');
     }
 
-
-    // public function feedback()
-    // {
-    //     // Fetch all users with role "User"
-    //     $users = User::where('role', 'User')->get();
-
-    //     // Fetch the latest message for each user and sort them by the time of the latest message
-    //     $userMessages = $users->map(function ($user) {
-    //         $latestMessage = Message::where('user_id', $user->id)
-    //             ->orWhere('receiver_id', $user->id)
-    //             ->orderBy('created_at', 'desc')
-    //             ->first();
-
-    //         return [
-    //             'user' => $user,
-    //             'latestMessage' => $latestMessage,
-    //         ];
-    //     })->sortByDesc(function ($data) {
-    //         return optional($data['latestMessage'])->created_at;
-    //     });
-
-    //     return view('admin.feedback', compact('userMessages'));
-    // }
-
     public function feedback()
     {
-        // Fetch all users with role "User"
+        /** @var User $authenticatedUser */
+        $authenticatedUser = Auth::user();
+
+        if (!$authenticatedUser) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        // Fetch all users with the role "User"
         $users = User::where('role', 'User')->get();
-    
+
         // Fetch the latest message and unread message count for each user
-        $userMessages = $users->map(function ($user) {
-            $latestMessage = Message::where(function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->orWhere('receiver_id', $user->id);
+        $userMessages = $users->map(function ($user) use ($authenticatedUser) {
+            $latestMessage = Message::where(function ($query) use ($user, $authenticatedUser) {
+                $query->where(function ($q) use ($user, $authenticatedUser) {
+                    $q->where('user_id', $authenticatedUser->id)
+                        ->where('receiver_id', $user->id);
+                })->orWhere(function ($q) use ($user, $authenticatedUser) {
+                    $q->where('user_id', $user->id)
+                        ->where('receiver_id', $authenticatedUser->id);
+                });
             })
                 ->orderBy('created_at', 'desc')
                 ->first();
-    
+
             // Count unread messages sent by the user to the admin
             $unreadCount = Message::where('user_id', $user->id)
-                ->where('receiver_id', auth()->id()) // Admin is the receiver
+                ->where('receiver_id', $authenticatedUser->id)
                 ->where('is_read', false)
                 ->count();
-    
+
             return [
                 'user' => $user,
                 'latestMessage' => $latestMessage,
@@ -111,46 +99,45 @@ class AdminController extends Controller
             ->sortByDesc(function ($data) {
                 return optional($data['latestMessage'])->created_at;
             });
-    
+
         return view('admin.feedback', compact('userMessages'));
     }
-    
 
-
-    // public function messageUser($userId)
-    // {
-    //     $user = User::findOrFail($userId);
-
-    //     // Fetch messages between Admin and the user
-    //     $messages = Message::where(function ($query) use ($userId) {
-    //         $query->where('user_id', $userId)
-    //             ->orWhere('receiver_id', $userId);
-    //     })->orderBy('created_at', 'asc')->get();
-
-    //     return view('admin.messageUser', compact('user', 'messages'));
-    // }
 
     public function messageUser($userId)
     {
+        /** @var User $authenticatedUser */
+        $authenticatedUser = Auth::user();
+
+        if (!$authenticatedUser) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $user = User::findOrFail($userId);
-    
-        // Fetch messages between Admin and the user
-        $messages = Message::where(function ($query) use ($userId) {
-            $query->where('user_id', $userId)
-                ->orWhere('receiver_id', $userId);
+
+        // Fetch messages between the authenticated user (Admin) and the specified user
+        $messages = Message::where(function ($query) use ($userId, $authenticatedUser) {
+            $query->where(function ($q) use ($userId, $authenticatedUser) {
+                $q->where('user_id', $authenticatedUser->id)
+                    ->where('receiver_id', $userId);
+            })->orWhere(function ($q) use ($userId, $authenticatedUser) {
+                $q->where('user_id', $userId)
+                    ->where('receiver_id', $authenticatedUser->id);
+            });
         })
             ->orderBy('created_at', 'asc')
             ->get();
-    
-        // Mark all unread messages sent by the user to the admin as read
+
+        // Mark all unread messages sent by the specified user to the admin as read
         Message::where('user_id', $userId)
-            ->where('receiver_id', auth()->id()) // Admin is the receiver
+            ->where('receiver_id', $authenticatedUser->id)
             ->where('is_read', false)
             ->update(['is_read' => true]);
-    
+
         return view('admin.messageUser', compact('user', 'messages'));
     }
-    
+
+
 
 
 
@@ -189,32 +176,32 @@ class AdminController extends Controller
     // }
 
     public function sendMessage(Request $request, $userId)
-{
-    $validated = $request->validate([
-        'message_text' => 'required|string',
-    ]);
+    {
+        $validated = $request->validate([
+            'message_text' => 'required|string',
+        ]);
 
-    $authUser = Auth::user();
-    if (!$authUser) {
-        return response()->json(['error' => 'Admin not authenticated'], 403);
+        $authUser = Auth::user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Admin not authenticated'], 403);
+        }
+
+        // Create the message
+        $message = Message::create([
+            'user_id' => $authUser->id, // Admin is the sender
+            'receiver_id' => $userId, // User is the recipient
+            'sender_role' => 'Admin',
+            'message_text' => $validated['message_text'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => [
+                'message_text' => $message->message_text,
+                'created_at' => $message->created_at->diffForHumans(),
+            ],
+        ]);
     }
-
-    // Create the message
-    $message = Message::create([
-        'user_id' => $authUser->id, // Admin is the sender
-        'receiver_id' => $userId, // User is the recipient
-        'sender_role' => 'Admin',
-        'message_text' => $validated['message_text'],
-    ]);
-
-    return response()->json([
-        'success' => true,
-        'message' => [
-            'message_text' => $message->message_text,
-            'created_at' => $message->created_at->diffForHumans(),
-        ],
-    ]);
-}
 
 
 
