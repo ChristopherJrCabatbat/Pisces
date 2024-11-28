@@ -66,8 +66,9 @@ class RoleMiddleware
                 'admin.storeRider',
 
                 'admin.customers',
-                'admin.updates',
                 'admin.monitoring',
+                'admin.updates',
+                'admin.viewOrders',
 
                 'admin.feedback',
                 'admin.messageUser',
@@ -109,9 +110,17 @@ class RoleMiddleware
                 'user.delivery.edit',
                 'user.delivery.update',
                 'user.delivery.destroy',
-
+                
                 'user.orders',
                 'user.orderStore',
+                
+                'user.feedback.index',
+                'user.feedback.create',
+                'user.feedback.store',
+                'user.feedback.show',
+                'user.feedback.edit',
+                'user.feedback.update',
+                'user.feedback.destroy',
 
                 'user.messages',
                 'user.messagesPisces',

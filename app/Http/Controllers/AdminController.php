@@ -203,12 +203,47 @@ class AdminController extends Controller
         ]);
     }
 
-
-
     public function updates()
     {
-        return view('admin.updates');
+        // Fetch only users with the 'User' role
+        $users = User::where('role', 'User')->get();
+        return view('admin.updates', compact('users'));
     }
+
+    public function viewOrders($userId)
+    {
+        // Fetch user by ID
+        $user = User::findOrFail($userId);
+
+        // Fetch deliveries linked to the user via email
+        $deliveries = Delivery::where('email', $user->email)->with('orders')->get();
+
+        // Process each delivery to find the menu image with the highest quantity
+        $deliveriesWithImages = $deliveries->map(function ($delivery) {
+            $orders = $delivery->orders;
+
+            if ($orders->isNotEmpty()) {
+                // Get the order with the highest quantity
+                $highestQuantityOrder = $orders->sortByDesc('quantity')->first();
+
+                if ($highestQuantityOrder) {
+                    // Get the menu item associated with the highest quantity order
+                    $menu = Menu::where('name', $highestQuantityOrder->menu_name)->first();
+
+                    // Add the image URL to the delivery for rendering in Blade
+                    $delivery->image_url = $menu ? asset('storage/' . $menu->image) : null;
+                }
+            }
+
+            return $delivery;
+        });
+
+        return view('admin.viewOrders', compact('deliveriesWithImages'));
+    }
+
+
+
+
     public function monitoring()
     {
         return view('admin.monitoring');

@@ -52,14 +52,16 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                    class="navigation">Dashboard</a> / Customers /</div>
-            <span class="faded-white ms-1">Customer Updates</span>
+                    class="navigation">Dashboard</a> / Customers / <a href="{{ route('admin.updates') }}"
+                    class="navigation">Customer Updates</a> /</div>
+            <span class="faded-white ms-1">View Orders</span>
         </div>
 
-        <div class="table-container">
+        <div class="table-container mb-3">
 
+            <!-- Filter and Search Section -->
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
-                <!-- Left Section -->
+                <!-- Left Section: Filter -->
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
                         <select id="delivery-filter" class="form-select custom-select" aria-label="Select delivery status">
@@ -76,12 +78,11 @@
                     </div>
                 </div>
 
-                <!-- Right Section -->
+                <!-- Right Section: Search -->
                 <div class="right d-flex gap-3">
-                    <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
                         <form action="#">
-                            <input type="search" placeholder="Search something..." class="form-control" id="search-input"
+                            <input type="search" placeholder="Search your orders" class="form-control" id="search-input"
                                 value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
@@ -89,36 +90,54 @@
                 </div>
             </div>
 
-            <table class="table text-center">
+            <!-- Orders Section -->
+            <div class="orders-list">
+                @if ($deliveriesWithImages->isNotEmpty())
+                    <!-- Display the name of the first delivery -->
+                    <h4 class="m-3 text-black text-center h4">
+                        {{ $deliveriesWithImages->first()->name }}'s Order/s
+                    </h4>
+                @endif
 
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col" style="width: 55%">Name</th>
-                        <th scope="col">User Since</th>
-                        <th scope="col">View Message</th>
-                        <th scope="col">View Orders</th>
-                    </tr>
-                </thead>
+                @forelse ($deliveriesWithImages as $delivery)
+                    <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
+                        <!-- Left Image Section -->
+                        <div class="order-image me-3">
+                            @if ($delivery->image_url)
+                                <img src="{{ $delivery->image_url }}" alt="Order Image" class="rounded"
+                                    style="width: 80px; height: 80px;">
+                            @else
+                                <img src="{{ asset('default-image.jpg') }}" alt="Default Image" class="rounded"
+                                    style="width: 80px; height: 80px;">
+                            @endif
+                        </div>
 
-                <tbody>
-                    @foreach ($users as $user)
-                        <tr>
-                            <td>{{ $user->first_name }} {{ $user->last_name }}</td>
-                            <td>{{ $user->created_at->format('M. d, Y') }}</td>
-                            <td>
-                                <a href="{{ route('admin.messageUser', ['id' => $user->id]) }}" class="btn btn-primary"><i class="fa-solid fa-message"></i></a>
-                            </td>
-                            <td>
-                                {{-- <a href="" class="btn btn-primary"><i class="fa-solid fa-bag-shopping"></i></a> --}}
-                                <a href="{{ route('admin.viewOrders', ['id' => $user->id]) }}" class="btn btn-primary"><i class="fa-solid fa-bag-shopping"></i></a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            
+                        <!-- Middle Details Section -->
+                        <div class="order-details flex-grow-1">
+                            <p class="m-0 text-truncate fw-bold">Order Summary: {{ $delivery->order }}</p>
+                            <!-- Format total_price using number_format -->
+                            <p class="m-0 text-truncate">₱{{ number_format($delivery->total_price, 2) }}</p>
+                            <p class="text-muted small m-0">{{ $delivery->address }}</p>
+                            <p class="text-muted small m-0">{{ $delivery->created_at->format('M. d, Y') }}</p>
+                        </div>
+
+                        <!-- Right Action Section -->
+                        <div class="order-actions text-end">
+                            <a href="#" class="btn btn-primary mb-2">View Order</a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
+                        No orders.
+                    </div>
+                @endforelse
+            </div>
+
+
+
 
         </div>
+
 
     </div>
 @endsection

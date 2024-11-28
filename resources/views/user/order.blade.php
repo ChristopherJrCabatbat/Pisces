@@ -149,6 +149,7 @@
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Total:</div>
                             <div class="fs-4">₱{{ number_format($totalPrice, 2) }}</div>
+                            <input type="hidden" name="total_price" value="{{ $totalPrice }}">
                         </div>
                     </div>
                 </div>

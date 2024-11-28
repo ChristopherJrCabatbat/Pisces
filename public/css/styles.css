@@ -588,13 +588,23 @@ th {
     font-size: 1.5rem;
 }
 
-.shop-updates-body a {
+.shop-updates-body a,
+.tab-pane a {
     text-decoration: none;
     color: black;
 }
 .shop-updates-body a .a-container:hover {
     cursor: pointer;
     background-color: #bbbbbb;
+}
+
+.tab-pane .a-container {
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.tab-pane .a-container:hover {
+    transform: scale(1.02); /* Slightly increase the size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow effect */
 }
 
 a.more {
@@ -659,7 +669,7 @@ a.more:hover {
 /* Ensure the message background expands for long content */
 .message {
     word-wrap: break-word; /* Wrap long words to the next line */
-    white-space: normal;   /* Allow multi-line text */
+    white-space: normal; /* Allow multi-line text */
     overflow-wrap: break-word; /* Compatibility for older browsers */
     display: inline-block;
     max-width: 70%; /* Prevent the message from exceeding 70% of the container width */
@@ -683,4 +693,37 @@ a.more:hover {
     .message {
         max-width: 90%; /* Adjust bubble width for smaller screens */
     }
+}
+
+.to-review:hover,
+.to-review:focus {
+    background-color: #cf9d07;
+    border-color: transparent;
+}
+
+/* Star Rating Styles */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.star-rating input:checked ~ label {
+    color: #ffc107;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #ffca28;
 }

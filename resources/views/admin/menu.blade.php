@@ -198,35 +198,10 @@
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
 
                 <!-- Left Section -->
-                {{-- <div class="left d-flex">
-                    <div class="d-flex custom-filter me-3">
-                        <!-- Category Filter Section -->
-                        <select id="categoryFilter" class="form-select custom-select" aria-label="Category select">
-                            <option value="" selected>Default</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->category }}">{{ $category->category }}</option>
-                            @endforeach
-                        </select>
-                        <button id="filterButton" class="btn btn-primary custom-filter-btn button-wid">
-                            <i class="fa-solid fa-sort me-2"></i>Filter
-                        </button>
-                    </div>
-                </div> --}}
-
-                <!-- Left Section -->
                 <div class="left d-flex">
 
                     <!-- Filter Section -->
                     <div class="filter-section d-flex align-items-center">
-                        {{-- <div class="text-black me-2 fw-bold" style="white-space: nowrap;">Filter By:</div> --}}
-                        {{-- <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter"
-                            onchange="applyFilter(this.value)">
-                            <option value="default" selected>Default</option>
-                            <option value="categoriesModal">Categories</option>
-                            <option value="priceModal">Price</option>
-                            <option value="dateModal">Date</option>
-                            <option value="analyticsModal">Analytics</option>
-                        </select> --}}
 
                         <select id="mainFilter" class="form-select custom-select" aria-label="Main Filter"
                             onchange="applyFilter(this.value)">

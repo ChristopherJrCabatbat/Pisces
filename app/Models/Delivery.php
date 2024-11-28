@@ -10,9 +10,9 @@ class Delivery extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 
-        'email', 
-        'contact_number', 
+        'name',
+        'email',
+        'contact_number',
         'order',
         'address',
         'quantity',
@@ -28,5 +28,10 @@ class Delivery extends Model
     public function rider()
     {
         return $this->belongsTo(Rider::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 }

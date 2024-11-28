@@ -23,7 +23,7 @@
 <body>
 
     @yield('modals')
-    
+
     <!-- Product Details Modal -->
     <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel"
         aria-hidden="true">
@@ -221,9 +221,40 @@
 
     @yield('scripts')
 
-    <div id="customToastBox"></div>
-
     {{-- Icon Actions Toast Message --}}
+    <div id="customToastBox"></div>
+    {{-- <script>
+        let customToastBox = document.getElementById('customToastBox');
+
+        function showToast(msg, type) {
+            let customToast = document.createElement('div');
+            customToast.classList.add('custom-toast');
+
+            // Set the icon based on the type
+            let icon = type === 'error' ?
+                '<i class="fa fa-circle-xmark"></i>' :
+                '<i class="fa fa-circle-check"></i>';
+
+            customToast.innerHTML = `${icon} ${msg}`;
+            customToastBox.appendChild(customToast);
+
+            // Add class for error or success styles
+            if (type === 'error') {
+                customToast.classList.add('error');
+            }
+
+            setTimeout(() => {
+                customToast.remove();
+            }, 3000);
+        }
+
+        // Check if a toast message exists in the session
+        @if (session('toast'))
+            const toastData = @json(session('toast'));
+            showToast(toastData.message, toastData.type);
+        @endif
+    </script> --}}
+
     <script>
         let customToastBox = document.getElementById('customToastBox');
 
@@ -255,6 +286,7 @@
             showToast(toastData.message, toastData.type);
         @endif
     </script>
+
 
     {{-- Modal Script --}}
     <script>
@@ -402,35 +434,35 @@
         }
     </script>
 
-{{-- no need reload unread  --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const messageLinks = document.querySelectorAll('.message-a');
+    {{-- no need reload unread  --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageLinks = document.querySelectorAll('.message-a');
 
-        messageLinks.forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                const userId = this.dataset.userId; // Attach userId to <a>
+            messageLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const userId = this.dataset.userId; // Attach userId to <a>
 
-                // Mark messages as read via AJAX
-                fetch(`/admin/markAsRead/${userId}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                    },
-                }).then(response => {
-                    if (response.ok) {
-                        // Update styling dynamically
-                        this.querySelector('.message-name').classList.remove('fw-bold');
-                        this.querySelector('.message-text').classList.remove('fw-bold');
-                    }
-                    window.location.href = this.href; // Redirect after marking as read
+                    // Mark messages as read via AJAX
+                    fetch(`/admin/markAsRead/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                        },
+                    }).then(response => {
+                        if (response.ok) {
+                            // Update styling dynamically
+                            this.querySelector('.message-name').classList.remove('fw-bold');
+                            this.querySelector('.message-text').classList.remove('fw-bold');
+                        }
+                        window.location.href = this.href; // Redirect after marking as read
+                    });
                 });
             });
         });
-    });
-</script>
+    </script>
 
 
 

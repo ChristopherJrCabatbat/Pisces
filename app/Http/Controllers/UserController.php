@@ -494,36 +494,6 @@ class UserController extends Controller
     }
 
 
-    // public function orders(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Fetch user-specific orders
-    //     $orders = DB::table('deliveries')
-    //         ->where('email', $user->email) // Filter by user's email
-    //         ->orderBy('created_at', 'desc')
-    //         ->get();
-
-    //     // Convert `created_at` to Carbon instance for each order
-    //     $orders = $orders->map(function ($order) {
-    //         $order->created_at = Carbon::parse($order->created_at);
-    //         return $order;
-    //     });
-
-    //     // Categorize orders by status
-    //     $statuses = [
-    //         'all' => $orders,
-    //         'pending' => $orders->where('status', 'Pending'),
-    //         'preparing' => $orders->where('status', 'Preparing'),
-    //         'out_for_delivery' => $orders->where('status', 'Out for Delivery'),
-    //         'delivered' => $orders->where('status', 'Delivered'),
-    //         'returns' => $orders->where('status', 'Returned'),
-    //     ];
-
-    //     return view('user.orders', compact('statuses'));
-    // }
-
     public function orders(Request $request)
     {
         /** @var User $user */
@@ -750,32 +720,32 @@ class UserController extends Controller
         return view('user.trackOrder', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
     }
 
-    // public function reviewOrder(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     return view('user.reviewOrder', compact('userCart', 'user', 'userFavorites'));
-    // }
-
     public function reviewOrder(Request $request)
     {
         /** @var User $user */
         $user = Auth::user();
-
-        // Fetch user's completed orders
-        $completedOrders = Delivery::where('user_id', $user->id)
-            ->where('status', 'completed') // Assuming 'completed' indicates delivered orders
-            ->orderBy('created_at', 'desc')
-            ->get();
-
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        return view('user.reviewOrder', compact('userCart', 'user', 'userFavorites', 'completedOrders'));
+        return view('user.reviewOrder', compact('userCart', 'user', 'userFavorites'));
     }
+
+    // public function reviewOrder(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch user's completed orders
+    //     $completedOrders = Delivery::where('user_id', $user->id)
+    //         ->where('status', 'completed') // Assuming 'completed' indicates delivered orders
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
+
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     return view('user.reviewOrder', compact('userCart', 'user', 'userFavorites', 'completedOrders'));
+    // }
 
 
 

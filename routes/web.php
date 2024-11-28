@@ -9,6 +9,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FeedbackController;
 
 // Route::get('/', function () {
 //     return view('start.home');
@@ -60,11 +61,14 @@ Route::group([
 
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
-    Route::get('/updates', [AdminController::class, 'updates'])->name('updates');
     Route::get('/monitoring', [AdminController::class, 'monitoring'])->name('monitoring');
 
-    Route::get('/messageUser', [AdminController::class, 'messageUser'])->name('messageUser');
-    Route::get('/messageUser/{userId}', [AdminController::class, 'messageUser'])->name('messageUser');
+    Route::get('/updates', [AdminController::class, 'updates'])->name('updates');
+    Route::get('/viewOrders/{id}', [AdminController::class, 'viewOrders'])->name('viewOrders');
+
+
+    // Route::get('/messageUser', [AdminController::class, 'messageUser'])->name('messageUser');
+    Route::get('/messageUser/{id}', [AdminController::class, 'messageUser'])->name('messageUser');
     Route::post('/messageUser/{userId}/send', [AdminController::class, 'sendMessage'])->name('sendMessage');
     Route::post('/markAsRead/{userId}', [AdminController::class, 'markMessagesAsRead'])->name('markAsRead');
 
@@ -113,6 +117,8 @@ Route::group([
 
     Route::resource('delivery', DeliveryController::class);
     Route::post('/orderStore', [DeliveryController::class, 'orderStore'])->name('orderStore');
+
+    Route::resource('feedback', FeedbackController::class);
 
     // Route for viewing menu details
     Route::get('/menu-detail/{menuId}', [UserController::class, 'menuDetail'])->name('menuDetail');
