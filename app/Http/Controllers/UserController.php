@@ -592,17 +592,17 @@ class UserController extends Controller
 
         $orders = $orders->map(function ($order) {
             $order->created_at = Carbon::parse($order->created_at);
-        
+
             // Parse the order string and quantities
             $orderItems = explode(', ', $order->order);
             $quantities = explode(', ', $order->quantity);
-        
+
             // Fetch all menu details for the order
             $menuDetails = [];
             foreach ($orderItems as $index => $item) {
                 $menuName = explode(' (', $item)[0]; // Extract menu name
                 $menu = DB::table('menus')->where('name', $menuName)->first();
-        
+
                 if ($menu) {
                     $menuDetails[] = (object)[ // Convert to an object
                         'name' => $menuName,
@@ -612,11 +612,11 @@ class UserController extends Controller
                     ];
                 }
             }
-        
+
             $order->menuDetails = $menuDetails;
             return $order;
         });
-        
+
 
         // Categorize orders by status
         $statuses = [
@@ -779,30 +779,91 @@ class UserController extends Controller
         return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
     }
 
-    public function trackOrder(Request $request)
+
+    //     public function trackOrder(Request $request, Delivery $delivery)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch delivery statuses, ensuring "Pending" is renamed to "Preparing" when necessary
+    //     $statusOrder = ['Returned', 'Delivered', 'Out for Delivery', 'Preparing', 'Pending'];
+    //     $statuses = Delivery::where('id', $delivery->id)
+    //         ->orderByRaw("FIELD(status, '" . implode("', '", $statusOrder) . "')")
+    //         ->get()
+    //         ->map(function ($status) {
+    //             // Ensure "Pending" remains but is renamed if status changes to "Preparing"
+    //             if ($status->status === 'Preparing') {
+    //                 $newStatus = clone $status;
+    //                 $newStatus->status = 'Pending';
+    //                 return [$status, $newStatus];
+    //             }
+    //             return [$status];
+    //         })
+    //         ->flatten();
+
+    //     // Fetch additional data
+    //     $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
+    //         ->groupBy('category')
+    //         ->get();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     return view('user.trackOrder', compact('statuses', 'categories', 'userCart', 'user', 'userFavorites'));
+    // }
+
+
+
+    public function trackOrder(Request $request, Delivery $delivery)
     {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Define the status order and corresponding messages/icons for all statuses
+        $statusOrder = ['Returned', 'Delivered', 'Out for Delivery', 'Preparing', 'Pending'];
+        $statusMessages = [
+            'Returned' => 'Your order has been returned to the sender.',
+            'Pending' => 'Your order is currently pending.',
+            'Preparing' => 'Your order is being prepared.',
+            'Out for Delivery' => 'Your order is out for delivery.',
+            'Delivered' => 'Your order has been successfully delivered.',
+        ];
+        $statusIcons = [
+            'Returned' => 'fa-times text-danger',
+            'Pending' => 'fa-clock text-secondary',
+            'Preparing' => 'fa-utensils text-warning',
+            'Out for Delivery' => 'fa-truck text-primary',
+            'Delivered' => 'fa-check text-success',
+        ];
+
+        // Find all statuses for this delivery
+        $statuses = Delivery::where('id', $delivery->id)->get();
+
+        // Prepare a timeline with placeholders for missing statuses
+        $timeline = [];
+        foreach ($statusOrder as $status) {
+            $record = $statuses->firstWhere('status', $status);
+
+            $timeline[] = [
+                'status' => $status,
+                'message' => $statusMessages[$status],
+                'icon' => $statusIcons[$status],
+                'timestamp' => $record ? $record->updated_at->format('M d, h:i A') : 'N/A',
+                'address' => $record ? $record->address : $delivery->address,
+                'rider' => $record ? $record->rider : null,
+            ];
+        }
+
+        // Fetch additional data for the view
         $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
             ->groupBy('category')
             ->get();
-
-        $selectedCategory = $request->input('category', 'All Menus');
-
-        /** @var User $user */
-        $user = Auth::user();
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        // Retrieve menus based on selected category, excluding items in the cart
-        if ($selectedCategory == 'All Menus') {
-            $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
-        } else {
-            $menus = Menu::where('category', $selectedCategory)
-                ->whereNotIn('id', $user->cartItems->pluck('id'))
-                ->get();
-        }
-
-        return view('user.trackOrder', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+        // Pass timeline to the view
+        return view('user.trackOrder', compact('timeline', 'categories', 'userCart', 'user', 'userFavorites'));
     }
+
 
     public function reviewOrder(Request $request)
     {

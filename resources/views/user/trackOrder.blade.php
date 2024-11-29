@@ -35,7 +35,6 @@
         {{-- Top Container --}}
         <div class="top-container d-flex w-100 p-4 mb-5 justify-content-between align-items-center">
             <div class="fw-bold h1">
-                {{-- {{ $selectedCategory }} --}}
                 Track Order
             </div>
             <div class="menu-chosen d-flex justify-content-center align-items-center gap-2 fs-5">
@@ -43,11 +42,79 @@
                         class="fa-solid fa-caret-right mx-1"></i> <a href="{{ route('user.shopUpdates') }}"
                         class="navigation">Order Updates</a> <i class="fa-solid fa-caret-right mx-1"></i></div>
                 <div class="low-opacity-white">
-                    {{-- {{ $selectedCategory }} --}}
                     Track Order
                 </div>
             </div>
         </div>
+
+        {{-- Content --}}
+        {{-- <div class="d-flex container flex-column content user-content p-0">
+
+            <!-- Track Order Section -->
+            <div
+                class="track-order d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
+                <!-- Header -->
+                <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 text-secondary">Track Order</h5>
+                </div>
+
+                <!-- Order Status Body -->
+                <div class="track-order-body px-3 py-3">
+                    <div class="timeline">
+                        @foreach ($statuses as $delivery)
+                            <div class="timeline-item d-flex align-items-start py-3">
+                                <!-- Time and Date -->
+                                <div class="time text-end pe-4">
+                                    {{ $delivery->updated_at->format('M d') }}<br>{{ $delivery->updated_at->format('h:i A') }}
+                                </div>
+                                <!-- Icon -->
+                                <div class="icon-container">
+                                    <div class="icon rounded-circle text-white d-flex align-items-center justify-content-center
+                                {{ $delivery->status === 'Delivered'
+                                    ? 'bg-success'
+                                    : ($delivery->status === 'Returned'
+                                        ? 'bg-danger'
+                                        : 'bg-secondary') }}"
+                                        style="width: 24px; height: 24px;">
+                                        <i
+                                            class="fa-solid 
+                                    {{ $delivery->status === 'Delivered'
+                                        ? 'fa-check'
+                                        : ($delivery->status === 'Returned'
+                                            ? 'fa-times'
+                                            : 'fa-truck') }}"></i>
+                                    </div>
+                                </div>
+                                <!-- Content -->
+                                <div class="content ms-3">
+                                    <div class="status fw-bold">{{ ucfirst($delivery->status) }}</div>
+                                    <div class="details text-muted small">
+                                        @if ($delivery->status === 'Delivered')
+                                            Your order has been delivered.<br>Recipient: {{ $delivery->name }}
+                                        @elseif ($delivery->status === 'Returned')
+                                            Your order has been returned to sender.<br>Reason: {{ $delivery->note }}
+                                        @else
+                                            Your order is currently {{ strtolower($delivery->status) }}.
+                                        @endif
+                                    </div>
+                                    <div class="location text-muted small">{{ $delivery->address }}</div>
+                                    @if ($delivery->rider)
+                                        <div class="rider text-muted small mt-2">
+                                            Courier: {{ $delivery->rider }}
+                                        </div>
+                                    @endif
+                                    @if ($delivery->status === 'Delivered')
+                                        <img src="{{ asset('images/logo.jpg') }}" alt="Delivery Image" class="mt-2"
+                                            style="max-height: 100px; width: auto;">
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+        </div> --}}
 
         {{-- Content --}}
         <div class="d-flex container flex-column content user-content p-0">
@@ -62,77 +129,55 @@
 
                 <!-- Order Status Body -->
                 <div class="track-order-body px-3 py-3">
-                    <!-- Top Section -->
-                    <div class="top fw-bold pb-3">
-                        Delivered Nov 13
-                    </div>
-
-                    <!-- Shipping Details -->
-                    {{-- <div class="shipping-details mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <img src="path_to_jt_express_logo.png" alt="J&T Express" class="me-2" style="height: 30px;">
-                            <div>
-                                <div>J&T Express Standard shipping</div>
-                                <div class="tracking-number text-muted small">972437104315</div>
-                            </div>
-                        </div>
-                    </div> --}}
-
-                    <!-- Timeline -->
                     <div class="timeline">
-                        <!-- Delivered Section -->
-                        <div class="timeline-item d-flex align-items-start py-3">
-                            <!-- Time and Date -->
-                            <div class="time text-end pe-4">
-                                Nov 3<br>3:15 PM
-                            </div>
-                            <!-- Icon -->
-                            <div class="icon-container">
-                                <div class="icon bg-success rounded-circle text-white d-flex align-items-center justify-content-center"
-                                    style="width: 24px; height: 24px;">
-                                    <i class="fa-solid fa-check"></i>
+                        @foreach ($timeline as $event)
+                            <div class="timeline-item d-flex align-items-start py-3">
+                                <!-- Time and Date -->
+                                <div class="time text-end pe-4">
+                                    {{ $event['timestamp'] }}
                                 </div>
-                            </div>
-                            <!-- Content -->
-                            <div class="content ms-3">
-                                <div class="status fw-bold">Delivered</div>
-                                <div class="details text-muted small">Your order has been delivered.<br>Recipient:
-                                    Customer</div>
-                                <div class="location text-muted small">PANGASINAN-SAN-CARLOS-CITY</div>
-                                <img src="{{ asset('images/logo.jpg') }}" alt="Delivery Image" class="mt-2"
-                                    style="max-height: 100px; width: auto;">
-                            </div>
-                        </div>
 
-                        <!-- Out for Delivery Section -->
-                        <div class="timeline-item py-3 d-flex align-items-start">
-                            <!-- Time and Date -->
-                            <div class="time text-end pe-4">
-                                Nov 3<br>1:03 PM
-                            </div>
-                            <!-- Icon -->
-                            <div class="icon-container">
-                                <div class="icon bg-secondary rounded-circle text-white d-flex align-items-center justify-content-center"
-                                    style="width: 24px; height: 24px;">
-                                    <i class="fa-solid fa-truck"></i>
+                                <!-- Icon -->
+                                <div class="icon-container">
+                                    <div class="icon rounded-circle text-white d-flex align-items-center justify-content-center
+                                {{ $event['status'] === 'Delivered'
+                                    ? 'bg-success'
+                                    : ($event['status'] === 'Returned'
+                                        ? 'bg-danger'
+                                        : 'bg-secondary') }}"
+                                        style="width: 24px; height: 24px;">
+                                        <i class="fa-solid {{ $event['icon'] }}"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Content -->
+                                <div class="content ms-3">
+                                    <!-- Status Header -->
+                                    <div class="status fw-bold">{{ ucfirst($event['status']) }}</div>
+
+                                    <!-- Message -->
+                                    <div class="details text-muted small">
+                                        {{ $event['message'] }}
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="location text-muted small">{{ $event['address'] }}</div>
+
+                                    <!-- Rider Information -->
+                                    @if ($event['rider'])
+                                        <div class="rider text-muted small mt-2">
+                                            Rider: {{ $event['rider'] }}
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
-                            <!-- Content -->
-                            <div class="content ms-3">
-                                <div class="status fw-bold">Out for delivery</div>
-                                <div class="details text-muted small">Your order is out for delivery.</div>
-                                <div class="location text-muted small">PANGASINAN-SAN-CARLOS-CITY</div>
-                                <div class="carrier text-muted small">Carrier: OCW Gian Carlo S. Doria<br>639927569649</div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
-
-
                 </div>
             </div>
 
-
         </div>
+
 
     </div>
 @endsection
