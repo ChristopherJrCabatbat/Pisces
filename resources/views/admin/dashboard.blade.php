@@ -49,6 +49,9 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li>
+            <li><a href="{{ route('admin.customerMessages') }}"
+                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
         </ul>
     </li>
 

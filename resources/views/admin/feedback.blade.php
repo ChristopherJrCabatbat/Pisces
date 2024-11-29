@@ -3,6 +3,80 @@
 @section('title', 'Customers')
 
 @section('styles-links')
+    <style>
+        .modal-content {
+            color: black;
+        }
+    </style>
+@endsection
+
+@section('modals')
+    {{-- View Modal --}}
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewModalLabel">Feedback Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Order Number:</strong> <span id="view-order-number"></span></p>
+                    <p><strong>Customer Name:</strong> <span id="view-customer-name"></span></p>
+                    <p><strong>Menu Items:</strong> <span id="view-menu-items"></span></p>
+                    <p><strong>Feedback:</strong> <span id="view-feedback-text"></span></p>
+                    {{-- <p><strong>Sentiment:</strong> <span id="view-sentiment"></span></p> --}}
+                    <p><strong>Rating:</strong> <span id="view-rating"></span></p>
+                    <p><strong>Response:</strong> <span id="view-response"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Respond Modal --}}
+    <div class="modal fade" id="respondModal" tabindex="-1" aria-labelledby="respondModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="respondModalLabel">Respond to <span id="customer-name"></span>'s Feedback
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('admin.respondFeedback') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="respond-menu-items" class="fw-bold form-label">Menu Items:</label>
+                            <div id="respond-menu-items" class="form-control"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="respond-feedback-text" class="fw-bold form-label">Feedback:</label>
+                            <div id="respond-feedback-text" class="form-control"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="respond-rating" class="fw-bold form-label">Rating:</label>
+                            <div id="respond-rating" class="form-control"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="response-text" class="fw-bold form-label">Response:</label>
+                            <textarea name="response" autofocus id="response-text" class="form-control" rows="3" required
+                                placeholder="Type response here..."></textarea>
+                        </div>
+                    </div>
+                    <input type="hidden" name="feedback_id" id="feedback-id">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Response</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('sidebar')
@@ -42,6 +116,10 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li>
+            <li><a href="{{ route('admin.customerMessages') }}"
+                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+
         </ul>
     </li>
 
@@ -84,8 +162,8 @@
                     <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
                         <form action="">
-                            <input type="search" placeholder="Search something..." class="form-control" id="search-input"
-                                value="{{ request('search') }}">
+                            <input type="search" placeholder="Search something..." class="form-control"
+                                id="search-input" value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
                     </div>
@@ -93,61 +171,141 @@
 
             </div>
 
-           <!-- Messenger-Style Messages Section -->
-<div class="messages-section">
-    <div class="message-container">
-        <h2 class="h2 text-center">User Messages</h2>
+            {{-- Feedback Table --}}
+            <table class="table text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Order Number</th>
+                        <th scope="col">Customer Name</th>
+                        <th scope="col">Menu</th>
+                        <th scope="col">Feedback</th>
+                        <th scope="col">Rating</th>
+                        <th scope="col">Sentiment</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($feedbacks as $feedback)
+                        <tr>
+                            <td>{{ $feedback->order_number }}</td>
+                            <td>{{ $feedback->customer_name }}</td>
+                            <td>{{ $feedback->menu_items }}</td>
+                            <td>{{ $feedback->feedback_text }}</td>
+                            <td>{{ $feedback->rating }}</td>
 
-        @foreach ($userMessages as $data)
-            @php
-                $user = $data['user'];
-                $latestMessage = $data['latestMessage'];
-                $unreadCount = $data['unreadCount'];
-            @endphp
+                            {{-- Sentiment Dropdown --}}
+                            <td>
+                                <form action="{{ route('admin.updateSentiment', $feedback->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <select name="sentiment" class="form-select sentiment-select">
+                                        <option value="Positive"
+                                            {{ $feedback->sentiment === 'Positive' ? 'selected' : '' }}>Positive</option>
+                                        <option value="Negative"
+                                            {{ $feedback->sentiment === 'Negative' ? 'selected' : '' }}>Negative</option>
+                                    </select>
+                                </form>
+                            </td>
 
-            <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a">
-                <div class="message-f">
-                    <div class="message-avatar position-relative">
-                        <i class="fa-solid fa-user"></i>
-                        <!-- Unread Badge -->
-                        @if ($unreadCount > 0)
-                            <span
-                                class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
-                        @endif
-                    </div>
+                            {{-- Actions: View and Respond --}}
+                            <td>
+                                {{-- View Button --}}
+                                <button type="button" class="btn btn-primary view-feedback"
+                                    data-feedback="{{ $feedback }}">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
 
-                    <div class="message-content">
-                        <!-- Add fw-bold if there are unread messages -->
-                        <h5 class="message-name {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
-                            {{ $user->first_name }} {{ $user->last_name }}
-                        </h5>
-                        <p class="message-text {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
-                            @if ($latestMessage)
-                                @if ($latestMessage->user_id === auth()->id())
-                                    You: {{ $latestMessage->message_text }}
-                                @else
-                                    {{ $latestMessage->message_text }}
-                                @endif
-                            @else
-                                No messages yet
-                            @endif
-                        </p>
-                        <span class="message-time">
-                            @if ($latestMessage)
-                                {{ $latestMessage->created_at->diffForHumans() }}
-                            @endif
-                        </span>
-                    </div>
-                </div>
-            </a>
-        @endforeach
-    </div>
-</div>
-
+                                {{-- Respond Button --}}
+                                <button type="button" class="btn btn-primary respond-feedback"
+                                    data-feedback="{{ $feedback }}">
+                                    <i class="fa-solid fa-reply"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7">There are no feedback records available.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
 
 
         </div>
     @endsection
 
     @section('scripts')
+
+        <script>
+            document.querySelectorAll('.view-feedback').forEach(button => {
+                button.addEventListener('click', function() {
+                    const feedback = JSON.parse(this.dataset.feedback);
+                    document.getElementById('view-customer-name').textContent = feedback.customer_name;
+                    document.getElementById('view-order-number').textContent = feedback.order_number;
+                    document.getElementById('view-menu-items').textContent = feedback.menu_items;
+                    document.getElementById('view-feedback-text').textContent = feedback.feedback_text;
+                    // document.getElementById('view-sentiment').textContent = feedback.sentiment;
+                    document.getElementById('view-rating').textContent = feedback.rating;
+                    document.getElementById('view-response').textContent = feedback.response ||
+                        'No response yet';
+                    new bootstrap.Modal(document.getElementById('viewModal')).show();
+                });
+            });
+
+            document.querySelectorAll('.respond-feedback').forEach(button => {
+                button.addEventListener('click', function() {
+                    const feedback = JSON.parse(this.dataset.feedback);
+                    document.getElementById('customer-name').textContent = feedback.customer_name;
+                    document.getElementById('respond-menu-items').textContent = feedback.menu_items;
+                    document.getElementById('respond-feedback-text').textContent = feedback.feedback_text;
+                    document.getElementById('respond-rating').textContent = feedback.rating;
+                    document.getElementById('feedback-id').value = feedback.id;
+                    new bootstrap.Modal(document.getElementById('respondModal')).show();
+                });
+            });
+        </script>
+
+        <script>
+            document.querySelectorAll('.sentiment-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const form = this.closest('form'); // Get the closest form
+                    const formData = new FormData(form); // Prepare form data
+                    const url = form.action; // Get the form's action URL
+                    const spinner = document.getElementById('loadingSpinner'); // Reference to spinner
+
+                    // Show the spinner
+                    spinner.classList.remove('d-none');
+
+                    // Perform the AJAX request
+                    fetch(url, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Show success toast
+                                showToast(data.message, 'success');
+                            } else {
+                                // Show error toast
+                                showToast(data.message || 'Failed to update sentiment.', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error updating sentiment:', error);
+                            showToast('An error occurred while updating the sentiment.', 'error');
+                        })
+                        .finally(() => {
+                            // Hide the spinner
+                            spinner.classList.add('d-none');
+                        });
+                });
+            });
+        </script>
+
+
     @endsection

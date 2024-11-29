@@ -71,6 +71,10 @@ class RoleMiddleware
                 'admin.viewOrders',
 
                 'admin.feedback',
+                'admin.updateSentiment',
+                'admin.respondFeedback',
+
+                'admin.customerMessages',
                 'admin.messageUser',
                 'admin.sendMessage',
                 'admin.markAsRead',

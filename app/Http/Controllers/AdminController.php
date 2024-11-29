@@ -12,6 +12,7 @@ use App\Models\Menu;
 use App\Models\Category;
 use App\Models\Delivery;
 use App\Models\Message;
+use App\Models\Feedback;
 
 class AdminController extends Controller
 {
@@ -60,6 +61,26 @@ class AdminController extends Controller
 
     public function feedback()
     {
+        $feedbacks = Feedback::all();
+
+        return view('admin.feedback', compact('feedbacks'));
+    }
+
+    public function respondFeedback(Request $request)
+    {
+        $feedback = Feedback::findOrFail($request->feedback_id);
+        $feedback->response = $request->response;
+        $feedback->save();
+
+        return redirect()->back()->with('success', 'Response has been submitted successfully.');
+    }
+
+
+
+
+
+    public function customerMessages()
+    {
         /** @var User $authenticatedUser */
         $authenticatedUser = Auth::user();
 
@@ -100,7 +121,7 @@ class AdminController extends Controller
                 return optional($data['latestMessage'])->created_at;
             });
 
-        return view('admin.feedback', compact('userMessages'));
+        return view('admin.customerMessages', compact('userMessages'));
     }
 
 

@@ -19,6 +19,29 @@
 
     @yield('styles-links')
 
+    <style>
+        /* Spinner overlay styles */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* background-color: rgba(255, 255, 255, 0.4); */
+            background-color: rgb(72, 64, 69, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+            /* Higher than modal */
+        }
+
+        .spinner-border {
+            color: #f81d0b;
+            font-size: 1.2rem
+        }
+    </style>
+
 </head>
 
 <body>
@@ -83,67 +106,41 @@
         @yield('main-content')
     </main>
 
-    {{-- <div id="customToastBox"></div>
-    <script>
-        let customToastBox = document.getElementById('customToastBox');
-
-        function showToast(msg, type) {
-            let customToast = document.createElement('div');
-            customToast.classList.add('custom-toast');
-
-            // Set the icon based on the type
-            let icon = type === 'error' ?
-                '<i class="fa fa-circle-xmark"></i>' :
-                '<i class="fa fa-circle-check"></i>';
-
-            customToast.innerHTML = `${icon} ${msg}`;
-            customToastBox.appendChild(customToast);
-
-            // Add class for error or success styles
-            if (type === 'error') {
-                customToast.classList.add('error');
-            }
-
-            // Remove the toast after 3 seconds
-            setTimeout(() => {
-                customToast.remove();
-            }, 3000);
-        }
-
-        // Check if a toast message exists in the session
-        @if (session('toast'))
-            const toastData = @json(session('toast'));
-            showToast(toastData.message, toastData.type);
-        @endif
-    </script> --}}
-
     <div id="customToastBox"></div>
     <script>
         let customToastBox = document.getElementById('customToastBox');
-    
+
         function showToast(msg, type) {
             let customToast = document.createElement('div');
             customToast.classList.add('custom-toast');
             let icon = type === 'error' ? '<i class="fa fa-circle-xmark"></i>' : '<i class="fa fa-circle-check"></i>';
             customToast.innerHTML = `${icon} ${msg}`;
             customToastBox.appendChild(customToast);
-    
+
             if (type === 'error') {
                 customToast.classList.add('error');
             }
-    
+
             setTimeout(() => {
                 customToast.remove();
             }, 3000);
         }
-    
+
         @if (session('toast'))
             const toastData = @json(session('toast'));
             showToast(toastData.message, toastData.type);
             {{ session()->forget('toast') }} // Clear toast session to prevent persistence
         @endif
     </script>
-    
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="spinner-overlay d-none">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Updating, please wait...</span>
+        </div>
+    </div>
+
+
 
 
     {{-- auto change style unread --}}

@@ -61,6 +61,11 @@ Route::group([
 
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
+    Route::put('/updateSentiment/{id}', [FeedbackController::class, 'updateSentiment'])->name('updateSentiment');
+    Route::post('/respondFeedback', [AdminController::class, 'respondFeedback'])->name('respondFeedback');
+
+
+    Route::get('/customerMessages', [AdminController::class, 'customerMessages'])->name('customerMessages');
     Route::get('/monitoring', [AdminController::class, 'monitoring'])->name('monitoring');
 
     Route::get('/updates', [AdminController::class, 'updates'])->name('updates');

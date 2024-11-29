@@ -31,14 +31,20 @@
         <!-- Dropdown menu -->
         <ul class="dropdown-customers">
             <li><a href="{{ route('admin.updates') }}"
-                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
+                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
             </li>
             <li><a href="{{ route('admin.feedback') }}"
-                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i class="fa-solid fa-comments me-2"></i>Feedback
+                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-comments me-2"></i>Feedback
                     Collection</a></li>
             <li><a href="{{ route('admin.monitoring') }}"
-                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }} active-customer"><i class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
-                        <span class="monitor-margin">Monitoring</span></a></li>
+                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }} active-customer"><i
+                        class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
+                    <span class="monitor-margin">Monitoring</span></a></li>
+            <li><a href="{{ route('admin.customerMessages') }}"
+                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
         </ul>
     </li>
 

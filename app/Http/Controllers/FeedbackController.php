@@ -76,54 +76,104 @@ class FeedbackController extends Controller
     // }
 
     public function store(Request $request)
-{
-    // Validate input fields
-    $validated = $request->validate([
-        'feedback_text' => 'nullable|string|max:1000',
-        'rating' => 'required|numeric|min:1|max:5',
-        'menu_items' => 'required|string',
-    ]);
-
-    /** @var \App\Models\User $user */
-    $user = Auth::user(); // Get the currently authenticated user
-
-    // Check if feedback already exists for this user and menu item
-    $existingFeedback = Feedback::where('customer_name', $user->first_name . ' ' . $user->last_name)
-        ->where('menu_items', $validated['menu_items'])
-        ->first();
-
-    if ($existingFeedback) {
-        // Update the existing feedback
-        $existingFeedback->update([
-            'feedback_text' => $validated['feedback_text'],
-            'rating' => $validated['rating'],
+    {
+        // Validate input fields
+        $validated = $request->validate([
+            'feedback_text' => 'nullable|string|max:1000',
+            'rating' => 'required|numeric|min:1|max:5',
+            'menu_items' => 'required|string',
         ]);
-    } else {
-        // Generate a random 6-digit order number for new feedback
-        $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // Create a new feedback entry
-        Feedback::create([
-            'customer_name' => $user->first_name . ' ' . $user->last_name, // Combine first and last name
-            'order_number' => $orderNumber,
-            'menu_items' => $validated['menu_items'], // Value from hidden input
-            'feedback_text' => $validated['feedback_text'],
-            'rating' => $validated['rating'],
-        ]);
+        /** @var \App\Models\User $user */
+        $user = Auth::user(); // Get the currently authenticated user
+
+        // Check if feedback already exists for this user and menu item
+        $existingFeedback = Feedback::where('customer_name', $user->first_name . ' ' . $user->last_name)
+            ->where('menu_items', $validated['menu_items'])
+            ->first();
+
+        if ($existingFeedback) {
+            // Update the existing feedback
+            $existingFeedback->update([
+                'feedback_text' => $validated['feedback_text'],
+                'rating' => $validated['rating'],
+            ]);
+        } else {
+            // Generate a random 6-digit order number for new feedback
+            $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            // Create a new feedback entry
+            Feedback::create([
+                'customer_name' => $user->first_name . ' ' . $user->last_name, // Combine first and last name
+                'order_number' => $orderNumber,
+                'menu_items' => $validated['menu_items'], // Value from hidden input
+                'feedback_text' => $validated['feedback_text'],
+                'rating' => $validated['rating'],
+            ]);
+        }
+
+        // Update the menu's rating in the menus table
+        $menu = \App\Models\Menu::where('name', $validated['menu_items'])->first();
+
+        if ($menu) {
+            // Use the latest rating submitted by the user
+            $menu->rating = round($validated['rating'], 1); // Update to 1 decimal place
+            $menu->save();
+        }
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Feedback submitted successfully!');
     }
 
-    // Update the menu's rating in the menus table
-    $menu = \App\Models\Menu::where('name', $validated['menu_items'])->first();
+    public function updateSentiment(Request $request, $id)
+    {
+        // Validate the new sentiment
+        $validatedData = $request->validate([
+            'sentiment' => 'required|string|in:Positive,Negative',
+        ]);
 
-    if ($menu) {
-        // Use the latest rating submitted by the user
-        $menu->rating = round($validated['rating'], 1); // Update to 1 decimal place
-        $menu->save();
+        // Find the feedback by ID and update the sentiment
+        $feedback = Feedback::findOrFail($id);
+        $feedback->sentiment = $validatedData['sentiment'];
+
+        if ($feedback->save()) {
+            $message = "Feedback sentiment changed to {$validatedData['sentiment']}.";
+
+            // Return a JSON response for AJAX requests
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                ]);
+            }
+
+            // Add success message to session for non-AJAX requests
+            session()->flash('toast', [
+                'message' => $message,
+                'type' => 'success',
+            ]);
+        } else {
+            $message = 'Failed to update feedback sentiment.';
+
+            // Return a JSON response for AJAX requests
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ]);
+            }
+
+            // Add error message to session for non-AJAX requests
+            session()->flash('toast', [
+                'message' => $message,
+                'type' => 'error',
+            ]);
+        }
+
+        // Redirect back for non-AJAX requests
+        return redirect()->back();
     }
 
-    // Redirect back with a success message
-    return redirect()->back()->with('success', 'Feedback submitted successfully!');
-}
 
 
 

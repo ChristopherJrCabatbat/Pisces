@@ -35,8 +35,8 @@
     <li>
         <a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
-    <li class="add-categ"><a href="/admin/rider" class="sidebar-font"><i
-        class="fa-solid fa-motorcycle me-2"></i> Riders</a></li>
+    <li class="add-categ"><a href="/admin/rider" class="sidebar-font"><i class="fa-solid fa-motorcycle me-2"></i> Riders</a>
+    </li>
 
     <li class="sidebar-item" id="customersDropdown">
         <a href="javascript:void(0)"
@@ -60,6 +60,9 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li>
+            <li><a href="{{ route('admin.customerMessages') }}"
+                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
         </ul>
     </li>
 
@@ -97,7 +100,7 @@
         </div>
 
         <div class="table-container mb-4">
-            
+
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
                 <!-- Left Section -->
                 <div class="left d-flex">
@@ -203,8 +206,10 @@
                 const form = this.closest('form'); // Get the closest form
                 const formData = new FormData(form); // Prepare form data
                 const url = form.action; // Get the form's action URL
+                const spinner = document.getElementById('loadingSpinner'); // Reference to the spinner
 
-                // Show loading feedback (optional)
+                // Show spinner and disable dropdown
+                spinner.classList.remove('d-none');
                 this.disabled = true;
 
                 // Perform the AJAX request
@@ -231,12 +236,14 @@
                         showToast('An error occurred while updating the status.', 'error');
                     })
                     .finally(() => {
-                        // Re-enable the select element
+                        // Hide spinner and re-enable dropdown
+                        spinner.classList.add('d-none');
                         this.disabled = false;
                     });
             });
         });
     </script>
+
 
 
     {{-- Filter-Search Table --}}

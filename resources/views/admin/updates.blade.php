@@ -41,6 +41,9 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li>
+            <li><a href="{{ route('admin.customerMessages') }}"
+                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
         </ul>
     </li>
 
@@ -106,17 +109,19 @@
                             <td>{{ $user->first_name }} {{ $user->last_name }}</td>
                             <td>{{ $user->created_at->format('M. d, Y') }}</td>
                             <td>
-                                <a href="{{ route('admin.messageUser', ['id' => $user->id]) }}" class="btn btn-primary"><i class="fa-solid fa-message"></i></a>
+                                <a href="{{ route('admin.messageUser', ['id' => $user->id]) }}" class="btn btn-primary"><i
+                                        class="fa-solid fa-message"></i></a>
                             </td>
                             <td>
                                 {{-- <a href="" class="btn btn-primary"><i class="fa-solid fa-bag-shopping"></i></a> --}}
-                                <a href="{{ route('admin.viewOrders', ['id' => $user->id]) }}" class="btn btn-primary"><i class="fa-solid fa-bag-shopping"></i></a>
+                                <a href="{{ route('admin.viewOrders', ['id' => $user->id]) }}" class="btn btn-primary"><i
+                                        class="fa-solid fa-bag-shopping"></i></a>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-            
+
 
         </div>
 
