@@ -15,17 +15,28 @@
 @endsection
 
 @section('modals')
+
     <!-- Feedback Modal -->
     <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="feedbackForm" class="text-black">
+                <!-- Form points to route for storing feedback -->
+                <form id="feedbackForm" class="text-black" method="POST" action="{{ route('user.feedback.store') }}">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="feedbackModalLabel">Provide Your Feedback</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <!-- Menu Details -->
+                        <div class="d-flex align-items-center mb-3">
+                            <img id="menuImage" src="" alt="Menu Image" class="rounded me-3"
+                                style="width: 60px; height: 60px; object-fit: cover;">
+                            <h5 id="menuName" class="mb-0"></h5>
+                            <!-- Hidden input to store menu name -->
+                            <input type="hidden" name="menu_items" id="menuItemInput">
+                        </div>
+
                         <!-- Feedback Text -->
                         <div class="mb-3">
                             <label for="feedbackText" class="form-label">Feedback</label>
@@ -53,6 +64,7 @@
             </div>
         </div>
     </div>
+    
 @endsection
 
 @section('topbar')
@@ -91,7 +103,8 @@
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="preparing-tab" data-bs-toggle="tab" data-bs-target="#preparing"
-                            type="button" role="tab" aria-controls="preparing" aria-selected="false">Preparing</button>
+                            type="button" role="tab" aria-controls="preparing"
+                            aria-selected="false">Preparing</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="out-for-delivery-tab" data-bs-toggle="tab"
@@ -138,26 +151,33 @@
 @endsection
 
 @section('scripts')
+
     <script>
-        $(document).ready(function() {
-            $('#feedbackForm').on('submit', function(e) {
-                e.preventDefault();
+        document.querySelectorAll('.to-review').forEach(button => {
+            button.addEventListener('click', function() {
+                const menuName = this.getAttribute('data-menu-name') || 'N/A';
+                const menuImage = this.getAttribute('data-menu-image') || '';
 
-                let formData = $(this).serialize();
+                if (!menuImage) {
+                    console.error('No image URL found for this menu!');
+                }
 
-                $.ajax({
-                    url: "{{ route('user.feedback.store') }}",
-                    method: "POST",
-                    data: formData,
-                    success: function(response) {
-                        alert("Feedback submitted successfully!");
-                        $('#feedbackModal').modal('hide');
-                    },
-                    error: function(error) {
-                        alert("An error occurred. Please try again.");
-                    }
-                });
+                // Target modal elements
+                const nameElement = document.getElementById('menuName');
+                const imageElement = document.getElementById('menuImage');
+                const hiddenInputElement = document.getElementById('menuItemInput');
+
+                // Update modal content
+                if (nameElement && imageElement && hiddenInputElement) {
+                    nameElement.textContent = menuName; // Display menu name
+                    imageElement.src = menuImage; // Display image source
+                    imageElement.alt = menuName; // Set image alt attribute
+                    hiddenInputElement.value = menuName; // Set hidden input value
+                } else {
+                    console.error('Modal elements not found!');
+                }
             });
         });
     </script>
+
 @endsection

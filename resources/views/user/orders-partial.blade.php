@@ -26,23 +26,23 @@
         <div class="@if ($order->status == 'Delivered') d-flex justify-content-between align-items-center @endif">
             <div class="d-flex align-items-center mb-2">
                 {{-- Menu Image --}}
-                <img src="{{ $menu['image'] }}" alt="Menu Image" class="rounded me-3"
+                <img src="{{ url($menu->image) }}" alt="{{ $menu->name }}" class="rounded me-3"
                     style="width: 80px; height: 80px; object-fit: cover;">
                 <div>
-                    <p class="fw-bold mb-1">{{ $menu['name'] }} (x{{ $menu['quantity'] }})</p>
-                    <p class="text-muted mb-0">₱{{ number_format($menu['price'] * $menu['quantity'], 2) }}</p>
+                    <p class="fw-bold mb-1">{{ $menu->name }} (x{{ $menu->quantity }})</p>
+                    <p class="text-muted mb-0">₱{{ number_format($menu->price * $menu->quantity, 2) }}</p>
                 </div>
             </div>
-            {{-- Optionally include a "To Review" button if needed --}}
-            {{-- Display only for Delivered status --}}
             @if ($order->status == 'Delivered')
                 <button type="button" class="btn btn-warning to-review h-25" data-bs-toggle="modal"
-                    data-bs-target="#feedbackModal">
+                    data-bs-target="#feedbackModal" data-menu-name="{{ $menu->name }}"
+                    data-menu-image="{{ url($menu->image) }}">
                     To Review
                 </button>
             @endif
         </div>
     @endforeach
+
 
 
 </div>

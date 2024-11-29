@@ -563,32 +563,60 @@ class UserController extends Controller
             ->get();
 
         // Process each order to include all menu items
+        // $orders = $orders->map(function ($order) {
+        //     $order->created_at = Carbon::parse($order->created_at);
+
+        //     // Parse the order string and quantities
+        //     $orderItems = explode(', ', $order->order);
+        //     $quantities = explode(', ', $order->quantity);
+
+        //     // Fetch all menu details for the order
+        //     $menuDetails = [];
+        //     foreach ($orderItems as $index => $item) {
+        //         $menuName = explode(' (', $item)[0]; // Extract menu name
+        //         $menu = DB::table('menus')->where('name', $menuName)->first();
+
+        //         if ($menu) {
+        //             $menuDetails[] = [
+        //                 'name' => $menuName,
+        //                 'quantity' => $quantities[$index] ?? 1,
+        //                 'image' => asset('storage/' . $menu->image),
+        //                 'price' => $menu->price
+        //             ];
+        //         }
+        //     }
+
+        //     $order->menuDetails = $menuDetails;
+        //     return $order;
+        // });
+
         $orders = $orders->map(function ($order) {
             $order->created_at = Carbon::parse($order->created_at);
-
+        
             // Parse the order string and quantities
             $orderItems = explode(', ', $order->order);
             $quantities = explode(', ', $order->quantity);
-
+        
             // Fetch all menu details for the order
             $menuDetails = [];
             foreach ($orderItems as $index => $item) {
                 $menuName = explode(' (', $item)[0]; // Extract menu name
                 $menu = DB::table('menus')->where('name', $menuName)->first();
-
+        
                 if ($menu) {
-                    $menuDetails[] = [
+                    $menuDetails[] = (object)[ // Convert to an object
                         'name' => $menuName,
                         'quantity' => $quantities[$index] ?? 1,
-                        'image' => asset('storage/' . $menu->image),
+                        'image' => 'storage/' . $menu->image, // Consistent with other files
                         'price' => $menu->price
                     ];
                 }
             }
-
+        
             $order->menuDetails = $menuDetails;
             return $order;
         });
+        
 
         // Categorize orders by status
         $statuses = [

@@ -16,8 +16,8 @@
     <li>
         <a href="/admin/delivery" class="active fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
-    <li class="add-categ"><a href="/admin/rider" class="sidebar-font"><i
-        class="fa-solid fa-motorcycle me-2"></i> Riders</a></li>
+    <li class="add-categ"><a href="/admin/rider" class="sidebar-font"><i class="fa-solid fa-motorcycle me-2"></i> Riders</a>
+    </li>
 
     <li class="sidebar-item" id="customersDropdown">
         <a href="javascript:void(0)"
@@ -51,7 +51,8 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                    class="navigation">Dashboard</a> / <a href="{{ route('admin.delivery.index') }}" class="navigation">Delivery</a>
+                    class="navigation">Dashboard</a> / <a href="{{ route('admin.delivery.index') }}"
+                    class="navigation">Delivery</a>
                 / </div>
             <span class="faded-white ms-1">Riders</span>
         </div>
@@ -81,7 +82,8 @@
                 <div class="right d-flex gap-3">
                     <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
-                        <form action="">
+                        <!-- Search Form -->
+                        <form action="#">
                             <input type="search" placeholder="Search something..." class="form-control" id="search-input"
                                 value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
@@ -106,10 +108,11 @@
                 <tbody id="menu-table-body">
                     @forelse ($riders as $rider)
                         <tr class="menu-row">
+                            <!-- Name Column -->
                             <td>{{ $rider->name }}</td>
-                            
-                            <!-- Name, Category, Description -->
-                            <td>{{ $rider->rating ?? "No Rating" }}</td>
+
+                            <!-- Rating Column -->
+                            <td>{{ $rider->rating ?? 'No Rating' }}</td>
 
                             <!-- Action Column (View, Edit, Delete) -->
                             <td>
@@ -134,17 +137,14 @@
                         </tr>
                     @empty
                         <tr id="no-menus-row">
-                            <td colspan="6">No menus found.</td>
+                            <td colspan="6">No riders found.</td>
                         </tr>
                     @endforelse
-                    <!-- Always include the "No menus" row, but hide it initially -->
+                    <!-- Always include the "No riders" row, but hide it initially -->
                     <tr id="no-menus-row" style="display: none;">
                         <td colspan="6"></td>
                     </tr>
-
                 </tbody>
-
-
             </table>
 
             {{-- Pagination --}}
@@ -156,4 +156,40 @@
 @endsection
 
 @section('scripts')
+    <!-- Filter-Search Script -->
+    <script>
+        function filterTable() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const riderRows = document.querySelectorAll('#menu-table-body .menu-row');
+            let hasVisibleRow = false;
+
+            riderRows.forEach(row => {
+                const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                const rating = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+                // Check if the row matches the search term
+                const matchesSearch = name.includes(searchTerm) || rating.includes(searchTerm);
+
+                // Show or hide the row based on the match
+                if (matchesSearch) {
+                    row.style.display = "";
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Show or hide the "No riders found" row
+            const noRidersRow = document.getElementById('no-menus-row');
+            if (hasVisibleRow) {
+                noRidersRow.style.display = "none";
+            } else {
+                noRidersRow.style.display = "";
+                noRidersRow.innerHTML =
+                    `<td colspan="6">No riders found matching your search.</td>`;
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', filterTable);
+    </script>
 @endsection

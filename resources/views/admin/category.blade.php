@@ -75,9 +75,9 @@
 
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
-                    <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
-                        <form action="">
+                        <!-- Search Form -->
+                        <form action="#">
                             <input type="search" placeholder="Search something..." class="form-control" id="search-input"
                                 value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
@@ -111,7 +111,7 @@
                                     <span>No Image</span>
                                 @endif
                             </td>
-                            <!-- Name, Category, Description -->
+                            <!-- Name Column -->
                             <td>{{ $category->category }}</td>
                             <!-- Action Column (View, Edit, Delete) -->
                             <td>
@@ -136,17 +136,14 @@
                         </tr>
                     @empty
                         <tr id="no-menus-row">
-                            <td colspan="6">No menus found.</td>
+                            <td colspan="6">No categories found.</td>
                         </tr>
                     @endforelse
-                    <!-- Always include the "No menus" row, but hide it initially -->
+                    <!-- Always include the "No categories" row, but hide it initially -->
                     <tr id="no-menus-row" style="display: none;">
                         <td colspan="6"></td>
                     </tr>
-
                 </tbody>
-
-
             </table>
 
             {{-- Pagination --}}
@@ -158,4 +155,39 @@
 @endsection
 
 @section('scripts')
+    <!-- Filter-Search Script -->
+    <script>
+        function filterTable() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const categoryRows = document.querySelectorAll('#menu-table-body .menu-row');
+            let hasVisibleRow = false;
+
+            categoryRows.forEach(row => {
+                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+                // Check if the row matches the search term
+                const matchesSearch = name.includes(searchTerm);
+
+                // Show or hide the row based on the match
+                if (matchesSearch) {
+                    row.style.display = "";
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Show or hide the "No categories found" row
+            const noCategoriesRow = document.getElementById('no-menus-row');
+            if (hasVisibleRow) {
+                noCategoriesRow.style.display = "none";
+            } else {
+                noCategoriesRow.style.display = "";
+                noCategoriesRow.innerHTML =
+                    `<td colspan="6">No categories found matching your search.</td>`;
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', filterTable);
+    </script>
 @endsection

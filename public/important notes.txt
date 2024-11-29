@@ -882,3 +882,138 @@ Messages
         </div>
     @endforeach
 </div>
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ @foreach ($order->menuDetails as $menu)
+        <div class="@if ($order->status == 'Delivered') d-flex justify-content-between align-items-center @endif">
+            <div class="d-flex align-items-center mb-2">
+                {{-- Menu Image --}}
+                <img src="{{ $menu['image'] }}" alt="Menu Image" class="rounded me-3"
+                    style="width: 80px; height: 80px; object-fit: cover;">
+                <div>
+                    <p class="fw-bold mb-1">{{ $menu['name'] }} (x{{ $menu['quantity'] }})</p>
+                    <p class="text-muted mb-0">₱{{ number_format($menu['price'] * $menu['quantity'], 2) }}</p>
+                </div>
+            </div>
+            {{-- Optionally include a "To Review" button if needed --}}
+            {{-- Display only for Delivered status --}}
+            @if ($order->status == 'Delivered')
+                {{-- <button type="button" class="btn btn-warning to-review h-25" data-bs-toggle="modal"
+                    data-bs-target="#feedbackModal">
+                    To Review
+                </button> --}}
+                <button type="button" class="btn btn-warning to-review h-25" data-bs-toggle="modal"
+                    data-bs-target="#feedbackModal" data-menu-name="{{ $menu['name'] }}"
+                    data-menu-image="{{ $menu['image'] }}">
+                    To Review
+                </button>
+            @endif
+        </div>
+    @endforeach
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+    <!-- Feedback Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackModalLabel">Review: <span id="menu-name"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="menu-image" src="" alt="Menu Image" class="img-fluid rounded">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    document.querySelectorAll('.to-review').forEach(button => {
+    button.addEventListener('click', function () {
+        const menuName = this.getAttribute('data-menu-name') || 'N/A';
+        const menuImage = this.getAttribute('data-menu-image') || '';
+
+        if (!menuImage) {
+            console.error('No image URL found for this menu!');
+        }
+
+        const nameElement = document.getElementById('menu-name');
+        const imageElement = document.getElementById('menu-image');
+
+        if (nameElement && imageElement) {
+            nameElement.textContent = menuName;
+            imageElement.src = menuImage;
+        } else {
+            console.error('Modal elements not found!');
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#feedbackModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var menuName = button.data('menu-name'); // Extract menu name
+            var menuImage = button.data('menu-image'); // Extract menu image path
+
+            // Update the modal content
+            var modal = $(this);
+            modal.find('#menuName').text(menuName);
+            modal.find('#menuItemInput').val(menuName); // Set hidden input for menu name
+
+            // Use the full URL to access the image
+            var fullImagePath = '/storage/app/public/menu_images/' + menuImage; // Adjust this path if necessary
+            modal.find('#menuImage').attr('src', fullImagePath).attr('alt', menuName);
+        });
+    });
+</script>
