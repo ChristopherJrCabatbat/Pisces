@@ -154,6 +154,7 @@
 @endsection
 
 @section('scripts')
+
     <script>
         document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
             e.preventDefault();

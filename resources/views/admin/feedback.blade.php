@@ -13,20 +13,47 @@
 @section('modals')
     {{-- View Modal --}}
     <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered" id="modasldfkj">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="viewModalLabel">Feedback Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <p><strong>Order Number:</strong> <span id="view-order-number"></span></p>
-                    <p><strong>Customer Name:</strong> <span id="view-customer-name"></span></p>
-                    <p><strong>Menu Items:</strong> <span id="view-menu-items"></span></p>
-                    <p><strong>Feedback:</strong> <span id="view-feedback-text"></span></p>
-                    {{-- <p><strong>Sentiment:</strong> <span id="view-sentiment"></span></p> --}}
-                    <p><strong>Rating:</strong> <span id="view-rating"></span></p>
-                    <p><strong>Response:</strong> <span id="view-response"></span></p>
+                    <div class="mb-2 d-flex gap-3">
+                        <div class="d-flex flex-column" style="width: 30%;">
+                            <label for="view-order-number" class="fw-bold form-label">Order Number:</label>
+                            <div id="view-order-number" class="form-control"></div>
+                        </div>
+                        <div class="d-flex flex-column" style="width: 70%">
+                            <label for="view-customer-name" class="fw-bold form-label">Customer Name:</label>
+                            <div id="view-customer-name" class="form-control"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2 d-flex gap-3">
+                        <div class="d-flex flex-column" style="width: 80%">
+                            <label for="view-menu-items" class="fw-bold form-label">Menu:</label>
+                            <div id="view-menu-items" class="form-control"></div>
+                        </div>
+                        <div class="d-flex flex-column align-items-center" style="width: 20%">
+                            <label for="view-rating" class="fw-bold form-label">Rating:</label>
+                            <div id="view-rating" class=" text-center form-control"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="mb-2">
+                        <label for="view-feedback-text" class="fw-bold form-label">Feedback:</label>
+                        <textarea readonly id="view-feedback-text" rows="4" class="form-control"></textarea>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="view-response" class="fw-bold form-label">Response:</label>
+                        <textarea name="response" readonly id="view-response" class="form-control" rows="4" required
+                            placeholder="No response yet."></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -180,7 +207,7 @@
                         <th scope="col">Menu</th>
                         <th scope="col">Feedback</th>
                         <th scope="col">Rating</th>
-                        <th scope="col">Sentiment</th>
+                        {{-- <th scope="col">Sentiment</th> --}}
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -192,7 +219,8 @@
                             <td>{{ $feedback->menu_items }}</td>
                             <td>{{ $feedback->feedback_text }}</td>
                             <td>{{ $feedback->rating }}</td>
-                            <td>
+
+                            {{-- <td>
                                 <form action="{{ route('admin.updateSentiment', $feedback->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
@@ -205,7 +233,8 @@
                                             Negative</option>
                                     </select>
                                 </form>
-                            </td>
+                            </td> --}}
+
                             <td>
                                 <button type="button" class="btn btn-primary view-feedback"
                                     data-feedback="{{ $feedback }}">

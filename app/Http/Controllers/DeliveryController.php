@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Delivery;
 use App\Models\Rider;
 use App\Models\Menu;
+use App\Models\Message;
 
 class DeliveryController extends Controller
 {
@@ -24,7 +25,7 @@ class DeliveryController extends Controller
         $deliveries = Delivery::orderBy('created_at', 'desc')->get();
         return view('admin.delivery', compact('deliveries'));
     }
-    
+
 
     public function deliveryCreateRider()
     {
@@ -46,7 +47,6 @@ class DeliveryController extends Controller
         // Redirect back with a success message
         return redirect()->route('admin.delivery.index')->with('success', 'Rider added successfully.');
     }
-
 
     public function updateStatus(Request $request, string $id)
     {
@@ -79,6 +79,9 @@ class DeliveryController extends Controller
         $delivery->status = $validatedData['status'];
 
         if ($delivery->save()) {
+            // Notify the user of the status change
+            $this->notifyUserOfStatusChange($delivery, $validatedData['status']);
+
             // Get the new valid statuses for the updated status
             $newAllowedStatuses = array_merge([$delivery->status], $allowedTransitions[$delivery->status]);
 
@@ -94,6 +97,40 @@ class DeliveryController extends Controller
             'message' => 'Failed to update delivery status.',
         ]);
     }
+
+
+    private function notifyUserOfStatusChange(Delivery $delivery, $newStatus)
+    {
+        // Check if the delivery has an associated user (for sending the message)
+        $user = User::where('email', $delivery->email)->first();
+
+        if (!$user) {
+            return;
+        }
+
+        // Define status messages
+        $statusMessages = [
+            'Pending' => 'Your order is pending.',
+            'Preparing' => 'Your order is now being prepared.',
+            'Out for Delivery' => 'Your order is now out for delivery.',
+            'Delivered' => 'Your order has been delivered.',
+            'Returned' => 'Your order has been returned.',
+        ];
+
+        // Get the message text for the new status
+        $messageText = $statusMessages[$newStatus] ?? 'Your order status has been updated.';
+
+        // Create the message
+        Message::create([
+            'user_id' => Auth::id(), // Admin is the sender
+            'receiver_id' => $user->id, // The customer is the recipient
+            'sender_role' => 'Admin',
+            'message_text' => $messageText,
+        ]);
+    }
+
+
+
 
 
 
@@ -265,13 +302,6 @@ class DeliveryController extends Controller
                 'updated_at' => now(),
             ]);
         }
-
-        // Clear the cart for the user
-        /** @var User $user */
-        $user = Auth::user();
-        DB::table('cart_items')->where('user_id', $user->id)->delete();
-        $user->cart = 0;
-        $user->save();
 
         // Add toast message to session
         session()->flash('toast', [

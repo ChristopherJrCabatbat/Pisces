@@ -179,30 +179,6 @@ class AdminController extends Controller
     }
 
 
-
-    // public function sendMessage(Request $request, $userId)
-    // {
-    //     $validated = $request->validate([
-    //         'message_text' => 'required|string',
-    //     ]);
-
-    //     // Ensure the admin is authenticated
-    //     $authUser = Auth::user();
-    //     if (!$authUser) {
-    //         return response()->json(['error' => 'Admin not authenticated'], 403);
-    //     }
-
-    //     // Create the message
-    //     Message::create([
-    //         'user_id' => $authUser->id, // Admin is the sender
-    //         'receiver_id' => $userId, // User is the recipient
-    //         'sender_role' => 'Admin',
-    //         'message_text' => $validated['message_text'],
-    //     ]);
-
-    //     return redirect()->route('admin.messageUser', $userId)->with('success', 'Message sent successfully');
-    // }
-
     public function sendMessage(Request $request, $userId)
     {
         $validated = $request->validate([
