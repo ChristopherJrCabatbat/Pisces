@@ -93,7 +93,6 @@
             </div>
 
             <table class="table text-center">
-
                 <thead class="table-light">
                     <tr>
                         <th scope="col" style="width: 55%">Name</th>
@@ -102,26 +101,32 @@
                         <th scope="col">View Orders</th>
                     </tr>
                 </thead>
-
-                <tbody>
-                    @foreach ($users as $user)
-                        <tr>
+                <tbody id="updates-table-body">
+                    @forelse ($users as $user)
+                        <tr class="updates-row">
                             <td>{{ $user->first_name }} {{ $user->last_name }}</td>
                             <td>{{ $user->created_at->format('M. d, Y') }}</td>
                             <td>
-                                <a href="{{ route('admin.messageUser', ['id' => $user->id]) }}" class="btn btn-primary"><i
-                                        class="fa-solid fa-message"></i></a>
+                                <a href="{{ route('admin.messageUser', ['id' => $user->id]) }}" class="btn btn-primary">
+                                    <i class="fa-solid fa-message"></i>
+                                </a>
                             </td>
                             <td>
-                                {{-- <a href="" class="btn btn-primary"><i class="fa-solid fa-bag-shopping"></i></a> --}}
-                                <a href="{{ route('admin.viewOrders', ['id' => $user->id]) }}" class="btn btn-primary"><i
-                                        class="fa-solid fa-bag-shopping"></i></a>
+                                <a href="{{ route('admin.viewOrders', ['id' => $user->id]) }}" class="btn btn-primary">
+                                    <i class="fa-solid fa-bag-shopping"></i>
+                                </a>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr id="no-updates-row">
+                            <td colspan="3">There are no updates available.</td>
+                        </tr>
+                    @endforelse
+                    <tr id="no-updates-row" style="display: none;">
+                        <td colspan="3">There are no updates available.</td>
+                    </tr>
                 </tbody>
             </table>
-
 
         </div>
 
@@ -129,4 +134,39 @@
 @endsection
 
 @section('scripts')
+    <script>
+        function filterUpdatesTable() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const updatesRows = document.querySelectorAll('#updates-table-body .updates-row');
+            let hasVisibleRow = false;
+
+            updatesRows.forEach(row => {
+                const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                const date = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+                const matchesSearch = name.includes(searchTerm) || date.includes(searchTerm);
+
+                // Show or hide the row based on the search
+                if (matchesSearch) {
+                    row.style.display = "";
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Show or hide the "No users found" row
+            const noUpdatesRow = document.getElementById('no-updates-row');
+            if (hasVisibleRow) {
+                if (noUpdatesRow) noUpdatesRow.style.display = "none";
+            } else {
+                if (noUpdatesRow) noUpdatesRow.style.display = "";
+                noUpdatesRow.innerHTML =
+                    `<td colspan="4">There are no customer updates available.</td>`;
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', filterUpdatesTable);
+    </script>
+
 @endsection

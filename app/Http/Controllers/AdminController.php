@@ -67,13 +67,20 @@ class AdminController extends Controller
     }
 
     public function respondFeedback(Request $request)
-    {
-        $feedback = Feedback::findOrFail($request->feedback_id);
-        $feedback->response = $request->response;
-        $feedback->save();
+{
+    $feedback = Feedback::findOrFail($request->feedback_id);
+    $feedback->response = $request->response;
+    $feedback->save();
 
-        return redirect()->back()->with('success', 'Response has been submitted successfully.');
-    }
+    // Set a toast session with the success message
+    session()->flash('toast', [
+        'message' => 'Response has been submitted successfully.',
+        'type' => 'success', // 'success' or 'error'
+    ]);
+
+    return redirect()->back();
+}
+
 
 
 

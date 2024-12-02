@@ -130,6 +130,7 @@
                         </form>
                     </div>
                 </div>
+                
             </div>
 
             {{-- Table --}}
@@ -154,20 +155,31 @@
                                     @csrf
                                     @method('PUT')
 
+                                    @php
+                                        $allowedTransitions = [
+                                            'Pending' => ['Preparing'],
+                                            'Preparing' => ['Pending', 'Out for Delivery'],
+                                            'Out for Delivery' => ['Preparing', 'Delivered'],
+                                            'Delivered' => ['Out for Delivery', 'Returned'],
+                                            'Returned' => ['Delivered'],
+                                        ];
+
+                                        $validStatuses = array_merge(
+                                            [$delivery->status],
+                                            $allowedTransitions[$delivery->status],
+                                        );
+                                    @endphp
+
                                     <select name="status" class="form-select delivery-status-select">
-                                        <option value="Pending" {{ $delivery->status === 'Pending' ? 'selected' : '' }}>
-                                            Pending</option>
-                                        <option value="Preparing"
-                                            {{ $delivery->status === 'Preparing' ? 'selected' : '' }}>Preparing</option>
-                                        <option value="Out for Delivery"
-                                            {{ $delivery->status === 'Out for Delivery' ? 'selected' : '' }}>Out for
-                                            Delivery</option>
-                                        <option value="Delivered"
-                                            {{ $delivery->status === 'Delivered' ? 'selected' : '' }}>Delivered</option>
-                                        <option value="Returned" {{ $delivery->status === 'Returned' ? 'selected' : '' }}>
-                                            Returned</option>
+                                        @foreach ($validStatuses as $status)
+                                            <option value="{{ $status }}"
+                                                {{ $delivery->status === $status ? 'selected' : '' }}>
+                                                {{ $status }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </form>
+
                             </td>
 
                             <td>
@@ -224,6 +236,21 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            // Update the dropdown options
+                            const selectElement = form.querySelector('.delivery-status-select');
+                            selectElement.innerHTML = ''; // Clear the existing options
+
+                            // Add the new allowed statuses
+                            data.allowedStatuses.forEach(status => {
+                                const option = document.createElement('option');
+                                option.value = status;
+                                option.textContent = status;
+                                if (status === formData.get('status')) {
+                                    option.selected = true;
+                                }
+                                selectElement.appendChild(option);
+                            });
+
                             // Show success toast
                             showToast(data.message, 'success');
                         } else {
@@ -243,8 +270,6 @@
             });
         });
     </script>
-
-
 
     {{-- Filter-Search Table --}}
     <script>

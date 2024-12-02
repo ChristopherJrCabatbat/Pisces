@@ -106,6 +106,7 @@
         @yield('main-content')
     </main>
 
+    {{-- Toast Message --}}
     <div id="customToastBox"></div>
     <script>
         let customToastBox = document.getElementById('customToastBox');

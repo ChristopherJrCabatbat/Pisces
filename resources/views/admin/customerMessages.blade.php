@@ -85,10 +85,9 @@
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
                     <!-- Search -->
-                    <div class="position-relative custom-search" method="GET" id="search-form">
-                        <form action="">
-                            <input type="search" placeholder="Search something..." class="form-control" id="search-input"
-                                value="{{ request('search') }}">
+                    <div class="position-relative custom-search">
+                        <form action="#" id="search-form">
+                            <input type="search" placeholder="Search by name..." class="form-control" id="search-input" />
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
                     </div>
@@ -97,7 +96,7 @@
             </div>
 
             <!-- Messenger-Style Messages Section -->
-            <div class="messages-section">
+            {{-- <div class="messages-section">
                 <div class="message-container">
                     <h2 class="h2 text-center">Customer Messages</h2>
 
@@ -145,12 +144,100 @@
                         </a>
                     @endforeach
                 </div>
-            </div>
+            </div> --}}
 
+            <!-- Messenger-Style Messages Section -->
+            <div class="messages-section">
+                <div class="message-container" id="message-container">
+                    <h2 class="h2 text-center">Customer Messages</h2>
+
+                    @forelse ($userMessages as $data)
+                        @php
+                            $user = $data['user'];
+                            $latestMessage = $data['latestMessage'];
+                            $unreadCount = $data['unreadCount'];
+                        @endphp
+
+                        <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a message-row">
+                            <div class="message-f">
+                                <div class="message-avatar position-relative">
+                                    <i class="fa-solid fa-user"></i>
+                                    <!-- Unread Badge -->
+                                    @if ($unreadCount > 0)
+                                        <span
+                                            class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
+                                    @endif
+                                </div>
+
+                                <div class="message-content">
+                                    <!-- Add fw-bold if there are unread messages -->
+                                    <h5 class="message-name {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
+                                        {{ $user->first_name }} {{ $user->last_name }}
+                                    </h5>
+                                    <p class="message-text {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
+                                        @if ($latestMessage)
+                                            @if ($latestMessage->user_id === auth()->id())
+                                                You: {{ $latestMessage->message_text }}
+                                            @else
+                                                {{ $latestMessage->message_text }}
+                                            @endif
+                                        @else
+                                            No messages yet
+                                        @endif
+                                    </p>
+                                    <span class="message-time">
+                                        @if ($latestMessage)
+                                            {{ $latestMessage->created_at->diffForHumans() }}
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    @empty
+                        <a href="#" class="message-a message-row">
+                            <div class="message-f fs-5">
+                                No messages match your search
+                            </div>
+                        </a>
+                    @endforelse
+                </div>
+
+                <!-- No Messages -->
+                    <div class="message-f fs-5 text-black" id="no-messages-row"  style="display: none;">
+                        <i class="fa-regular fa-circle-question me-2"></i> No user match your search.
+                    </div>
+
+            </div>
 
 
         </div>
     @endsection
 
     @section('scripts')
+        <script>
+            document.getElementById('search-input').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const messageRows = document.querySelectorAll('.message-row');
+                let hasVisibleRow = false;
+
+                messageRows.forEach(row => {
+                    const userName = row.querySelector('.message-name').textContent.toLowerCase();
+
+                    if (userName.includes(searchTerm)) {
+                        row.style.display = '';
+                        hasVisibleRow = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Toggle the "No messages found" row visibility
+                const noMessagesRow = document.getElementById('no-messages-row');
+                if (hasVisibleRow) {
+                    noMessagesRow.style.display = 'none';
+                } else {
+                    noMessagesRow.style.display = 'block';
+                }
+            });
+        </script>
     @endsection

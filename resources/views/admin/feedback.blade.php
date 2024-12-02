@@ -184,38 +184,33 @@
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="feedback-table-body">
                     @forelse ($feedbacks as $feedback)
-                        <tr>
+                        <tr class="feedback-row">
                             <td>{{ $feedback->order_number }}</td>
                             <td>{{ $feedback->customer_name }}</td>
                             <td>{{ $feedback->menu_items }}</td>
                             <td>{{ $feedback->feedback_text }}</td>
                             <td>{{ $feedback->rating }}</td>
-
-                            {{-- Sentiment Dropdown --}}
                             <td>
                                 <form action="{{ route('admin.updateSentiment', $feedback->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <select name="sentiment" class="form-select sentiment-select">
                                         <option value="Positive"
-                                            {{ $feedback->sentiment === 'Positive' ? 'selected' : '' }}>Positive</option>
+                                            {{ $feedback->sentiment === 'Positive' ? 'selected' : '' }}>
+                                            Positive</option>
                                         <option value="Negative"
-                                            {{ $feedback->sentiment === 'Negative' ? 'selected' : '' }}>Negative</option>
+                                            {{ $feedback->sentiment === 'Negative' ? 'selected' : '' }}>
+                                            Negative</option>
                                     </select>
                                 </form>
                             </td>
-
-                            {{-- Actions: View and Respond --}}
                             <td>
-                                {{-- View Button --}}
                                 <button type="button" class="btn btn-primary view-feedback"
                                     data-feedback="{{ $feedback }}">
                                     <i class="fa-solid fa-eye"></i>
                                 </button>
-
-                                {{-- Respond Button --}}
                                 <button type="button" class="btn btn-primary respond-feedback"
                                     data-feedback="{{ $feedback }}">
                                     <i class="fa-solid fa-reply"></i>
@@ -223,10 +218,14 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="7">There are no feedback records available.</td>
+                        <tr id="no-feedback-row">
+                            <td colspan="7" class="text-center">No feedback available.</td>
                         </tr>
                     @endforelse
+                    <!-- Always include the "No menus" row, but hide it initially -->
+                    <tr id="no-feedback-row" style="display: none;">
+                        <td colspan="6"></td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -265,6 +264,7 @@
             });
         </script>
 
+        {{-- Auto Sentiment --}}
         <script>
             document.querySelectorAll('.sentiment-select').forEach(select => {
                 select.addEventListener('change', function() {
@@ -306,6 +306,46 @@
                 });
             });
         </script>
+
+        {{-- Auto Search --}}
+        <script>
+            function filterFeedbackTable() {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                const feedbackRows = document.querySelectorAll('#feedback-table-body .feedback-row');
+                let hasVisibleRow = false;
+
+                feedbackRows.forEach(row => {
+                    const orderNumber = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                    const customerName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                    const menuItems = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                    const feedback = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+
+                    const matchesSearch = orderNumber.includes(searchTerm) || customerName.includes(searchTerm) ||
+                        menuItems.includes(searchTerm) || feedback.includes(searchTerm);
+
+                    // Show or hide the row based on the search
+                    if (matchesSearch) {
+                        row.style.display = "";
+                        hasVisibleRow = true;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                // Show or hide the "No feedback found" row
+                const noFeedbackRow = document.getElementById('no-feedback-row');
+                if (hasVisibleRow) {
+                    noFeedbackRow.style.display = "none";
+                } else {
+                    noFeedbackRow.style.display = "";
+                    noFeedbackRow.innerHTML =
+                        `<td colspan="7">There are no feedback records matching your filters.</td>`;
+                }
+            }
+
+            document.getElementById('search-input').addEventListener('input', filterFeedbackTable);
+        </script>
+
 
 
     @endsection

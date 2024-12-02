@@ -20,10 +20,11 @@ class DeliveryController extends Controller
      */
     public function index()
     {
-        // $menus = Delivery::paginate(2);
-        $deliveries = Delivery::all();
+        // Fetch deliveries ordered by latest created_at timestamp
+        $deliveries = Delivery::orderBy('created_at', 'desc')->get();
         return view('admin.delivery', compact('deliveries'));
     }
+    
 
     public function deliveryCreateRider()
     {
@@ -46,6 +47,7 @@ class DeliveryController extends Controller
         return redirect()->route('admin.delivery.index')->with('success', 'Rider added successfully.');
     }
 
+
     public function updateStatus(Request $request, string $id)
     {
         // Validate the new status
@@ -53,47 +55,46 @@ class DeliveryController extends Controller
             'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
         ]);
 
-        // Find the delivery by ID and update the status
+        // Define allowed transitions
+        $allowedTransitions = [
+            'Pending' => ['Preparing'],
+            'Preparing' => ['Pending', 'Out for Delivery'],
+            'Out for Delivery' => ['Preparing', 'Delivered'],
+            'Delivered' => ['Out for Delivery', 'Returned'],
+            'Returned' => ['Delivered'],
+        ];
+
+        // Find the delivery by ID
         $delivery = Delivery::findOrFail($id);
-        $delivery->status = $validatedData['status'];
 
-        if ($delivery->save()) {
-            $message = "Delivery status changed to {$validatedData['status']}.";
-
-            // Return a JSON response for AJAX requests
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $message,
-                ]);
-            }
-
-            // Add success message to session for non-AJAX requests
-            session()->flash('toast', [
-                'message' => $message,
-                'type' => 'success',
-            ]);
-        } else {
-            $message = 'Failed to update delivery status.';
-
-            // Return a JSON response for AJAX requests
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $message,
-                ]);
-            }
-
-            // Add error message to session for non-AJAX requests
-            session()->flash('toast', [
-                'message' => $message,
-                'type' => 'error',
+        // Check if the new status is valid for the current status
+        if (!in_array($validatedData['status'], $allowedTransitions[$delivery->status])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid status transition.',
             ]);
         }
 
-        // Redirect back for non-AJAX requests
-        return redirect()->back();
+        // Update the status
+        $delivery->status = $validatedData['status'];
+
+        if ($delivery->save()) {
+            // Get the new valid statuses for the updated status
+            $newAllowedStatuses = array_merge([$delivery->status], $allowedTransitions[$delivery->status]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Delivery status changed to {$validatedData['status']}.",
+                'allowedStatuses' => $newAllowedStatuses,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update delivery status.',
+        ]);
     }
+
 
 
     public function deliveryUpdate(Request $request)
@@ -128,81 +129,81 @@ class DeliveryController extends Controller
      */
 
 
-     public function store(Request $request)
-     {
-         $request->validate([
-             'fullName' => 'required|string|max:255',
-             'email' => 'required|email|max:255',
-             'contactNumber' => 'required|string|max:20',
-             'address' => 'required|string',
-             'shippingMethod' => 'required|string',
-             'paymentMethod' => 'required|string',
-             'note' => 'nullable|string',
-             'menu_names' => 'required|array',
-             'quantities' => 'required|array',
-         ]);
-     
-         $orderItems = [];
-         $totalQuantity = 0;
-         $orderQuantities = implode(', ', $request->quantities);
-     
-         // Construct the order string
-         foreach ($request->menu_names as $index => $menuName) {
-             $quantity = $request->quantities[$index];
-             $orderItems[] = "{$menuName} (x{$quantity})";
-             $totalQuantity += $quantity;
-         }
-     
-         $orderString = implode(', ', $orderItems);
-     
-         // Insert the order into the deliveries table
-         $deliveryId = DB::table('deliveries')->insertGetId([
-             'name' => $request->input('fullName'),
-             'email' => $request->input('email'),
-             'contact_number' => $request->input('contactNumber'),
-             'order' => $orderString,
-             'address' => $request->input('address'),
-             'quantity' => $orderQuantities,
-             'shipping_method' => $request->input('shippingMethod'),
-             'mode_of_payment' => $request->input('paymentMethod'),
-             'note' => $request->input('note'),
-             'total_price' => $request->input('total_price'),
-             'status' => 'Pending',
-             'created_at' => now(),
-             'updated_at' => now(),
-         ]);
-     
-         // Store each order item in the orders table
-         foreach ($request->menu_names as $index => $menuName) {
-             $quantity = $request->quantities[$index];
-             DB::table('orders')->insert([
-                 'delivery_id' => $deliveryId,
-                 'menu_name' => $menuName,
-                 'quantity' => $quantity,
-                 'created_at' => now(),
-                 'updated_at' => now(),
-             ]);
-         }
-     
-         /** @var User $user */
-         $user = Auth::user();
-     
-         // Remove all cart items for the logged-in user
-         DB::table('cart_items')->where('user_id', $user->id)->delete();
-     
-         // Reset the user's 'cart' field to 0
-         $user->cart = 0;
-         $user->save();
-     
-         // Add toast message to session
-         session()->flash('toast', [
-             'message' => 'Order placed successfully!',
-             'type' => 'success',
-         ]);
-     
-         return redirect()->route('user.menu');
-     }
-     
+    public function store(Request $request)
+    {
+        $request->validate([
+            'fullName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'contactNumber' => 'required|string|max:20',
+            'address' => 'required|string',
+            'shippingMethod' => 'required|string',
+            'paymentMethod' => 'required|string',
+            'note' => 'nullable|string',
+            'menu_names' => 'required|array',
+            'quantities' => 'required|array',
+        ]);
+
+        $orderItems = [];
+        $totalQuantity = 0;
+        $orderQuantities = implode(', ', $request->quantities);
+
+        // Construct the order string
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            $orderItems[] = "{$menuName} (x{$quantity})";
+            $totalQuantity += $quantity;
+        }
+
+        $orderString = implode(', ', $orderItems);
+
+        // Insert the order into the deliveries table
+        $deliveryId = DB::table('deliveries')->insertGetId([
+            'name' => $request->input('fullName'),
+            'email' => $request->input('email'),
+            'contact_number' => $request->input('contactNumber'),
+            'order' => $orderString,
+            'address' => $request->input('address'),
+            'quantity' => $orderQuantities,
+            'shipping_method' => $request->input('shippingMethod'),
+            'mode_of_payment' => $request->input('paymentMethod'),
+            'note' => $request->input('note'),
+            'total_price' => $request->input('total_price'),
+            'status' => 'Pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Store each order item in the orders table
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            DB::table('orders')->insert([
+                'delivery_id' => $deliveryId,
+                'menu_name' => $menuName,
+                'quantity' => $quantity,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Remove all cart items for the logged-in user
+        DB::table('cart_items')->where('user_id', $user->id)->delete();
+
+        // Reset the user's 'cart' field to 0
+        $user->cart = 0;
+        $user->save();
+
+        // Add toast message to session
+        session()->flash('toast', [
+            'message' => 'Order placed successfully!',
+            'type' => 'success',
+        ]);
+
+        return redirect()->route('user.menu');
+    }
+
 
 
     public function orderStore(Request $request)
