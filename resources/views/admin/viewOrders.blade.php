@@ -41,10 +41,10 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li>
-<li><a href="{{ route('admin.customerMessages') }}"
+            <li><a href="{{ route('admin.customerMessages') }}"
                     class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>        
-</ul>
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+        </ul>
     </li>
 
 @endsection
@@ -56,7 +56,7 @@
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
                     class="navigation">Dashboard</a> / Customers / <a href="{{ route('admin.updates') }}"
-                    class="navigation">Customer Updates</a> /</div>
+                    class="navigation">Updates</a> /</div>
             <span class="faded-white ms-1">View Orders</span>
         </div>
 
@@ -130,8 +130,8 @@
                         </div>
                     </div>
                 @empty
-                    <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
-                        No orders.
+                    <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 fs-5 border rounded shadow-sm">
+                        <i class="fa-regular fa-circle-question me-2"></i> No orders.
                     </div>
                 @endforelse
             </div>

@@ -75,9 +75,9 @@
                 <i class="fa-solid fa-house me-2"></i>
                 <a href="{{ route('admin.dashboard') }}" class="navigation">Dashboard</a> /
                 <a href="#" class="navigation">Customers</a> /
-                <a href="{{ route('admin.feedback') }}" class="navigation">Feedback Collection</a> /
+                <a href="{{ route('admin.customerMessages') }}" class="navigation">Messages</a> /
             </div>
-            <span class="faded-white ms-1">Message User</span>
+            <span class="faded-white ms-1">User</span>
         </div>
 
 
@@ -86,7 +86,7 @@
             <div class="d-flex flex-column flex-grow-1 bg-light text-black rounded shadow-sm">
                 <!-- Header with Back Icon -->
                 <div class="d-flex align-items-center justify-content-center position-relative py-3 border-bottom">
-                    <a href="{{ route('admin.customerMessages') }}"
+                    <a href="{{ url()->previous() }}"
                         class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3">
                         <i class="fa-solid fa-arrow-left"></i>
                     </a>

@@ -114,7 +114,7 @@
                                     <!-- Unread Badge -->
                                     @if ($unreadCount > 0)
                                         <span
-                                            class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
+                                            class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">{{ $unreadCount }}</span>
                                     @endif
                                 </div>
 
@@ -203,9 +203,9 @@
                 </div>
 
                 <!-- No Messages -->
-                    <div class="message-f fs-5 text-black" id="no-messages-row"  style="display: none;">
-                        <i class="fa-regular fa-circle-question me-2"></i> No user match your search.
-                    </div>
+                <div class="message-f fs-5 text-black" id="no-messages-row" style="display: none;">
+                    <i class="fa-regular fa-circle-question me-2"></i> No customer match your search.
+                </div>
 
             </div>
 

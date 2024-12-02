@@ -56,7 +56,7 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i>Dashboard / Customers /</div>
-            <span class="faded-white ms-1">Customer Activity Monitoring</span>
+            <span class="faded-white ms-1">Activity Monitoring</span>
         </div>
 
         <div class="table-container">

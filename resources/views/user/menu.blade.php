@@ -27,8 +27,14 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">ORDERS</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES</a>
+     <li class="nav-item position-relative">
+        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES
+            @if ($unreadCount > 0)
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
+                    {{ $unreadCount }}
+                </span>
+            @endif
+        </a>
     </li>
 @endsection
 

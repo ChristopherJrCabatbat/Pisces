@@ -59,37 +59,14 @@ class UserController extends Controller
             ->take(4)
             ->get();
 
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
 
-        return view('user.dashboard', compact('userCart', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus'));
+
+        return view('user.dashboard', compact('userCart', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount'));
     }
-
-    // public function menu(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     // Fetch categories with menu counts and sort by menu_count in descending order
-    //     $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-    //         ->groupBy('category')
-    //         ->orderByDesc('menu_count')
-    //         ->get();
-
-    //     $selectedCategory = $request->input('category', 'All Menus');
-
-    //     // Retrieve menus based on selected category, excluding items in the cart
-    //     if ($selectedCategory == 'All Menus') {
-    //         $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
-    //     } else {
-    //         $menus = Menu::where('category', $selectedCategory)
-    //             ->whereNotIn('id', $user->cartItems->pluck('id'))
-    //             ->get();
-    //     }
-
-    //     // Pass the sorted categories list to the view
-    //     return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
-    // }
 
     public function menu(Request $request)
     {
@@ -118,7 +95,12 @@ class UserController extends Controller
             $menus = Menu::where('category', $selectedCategory)->get();
         }
 
-        return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     }
 
 
@@ -229,7 +211,12 @@ class UserController extends Controller
             ->select('menus.*', 'cart_items.id as cart_item_id', 'cart_items.quantity') // Include quantity here
             ->get();
 
-        return view('user.shoppingCart', compact('user', 'menus', 'userCart', 'userFavorites'));
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        return view('user.shoppingCart', compact('user', 'menus', 'userCart', 'userFavorites', 'unreadCount'));
     }
 
 
@@ -281,36 +268,6 @@ class UserController extends Controller
         ]);
     }
 
-
-    // public function favorites(Request $request)
-    // {
-    //      // Fetch all categories, including those with zero menus
-    //      $categories = DB::table('categories')
-    //      ->leftJoin('menus', 'categories.category', '=', 'menus.category')
-    //      ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
-    //      ->groupBy('categories.category')
-    //      ->orderByDesc('menu_count')
-    //      ->get();
-
-    //     $selectedCategory = $request->input('category', 'All Menus');
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     // Retrieve favorite menus without excluding items in the cart
-    //     if ($selectedCategory == 'All Menus') {
-    //         $menus = $user->favoriteItems()->get();
-    //     } else {
-    //         $menus = $user->favoriteItems()
-    //             ->where('menus.category', $selectedCategory)
-    //             ->get();
-    //     }
-
-    //     return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
-    // }
-
     public function favorites(Request $request)
     {
         /** @var User $user */
@@ -342,7 +299,12 @@ class UserController extends Controller
                 });
         }
 
-        return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     }
 
 
@@ -445,7 +407,12 @@ class UserController extends Controller
         $userCart = $user ? $user->cart : 0;
         $userFavorites = $user ? $user->favoriteItems()->count() : 0;
 
-        return view('user.menuDetails', compact('menu', 'user', 'userCart', 'userFavorites', 'favoritesCount'));
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        return view('user.menuDetails', compact('menu', 'user', 'userCart', 'userFavorites', 'favoritesCount', 'unreadCount'));
     }
 
 
@@ -494,61 +461,6 @@ class UserController extends Controller
     }
 
 
-    // public function orders(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     // Fetch user-specific orders
-    //     $orders = DB::table('deliveries')
-    //         ->where('email', $user->email) // Filter by user's email
-    //         ->orderBy('created_at', 'desc')
-    //         ->get();
-
-    //     // Process each order to determine the appropriate image
-    //     $orders = $orders->map(function ($order) {
-    //         $order->created_at = Carbon::parse($order->created_at);
-
-    //         // Parse the order string and quantities
-    //         $orderItems = explode(', ', $order->order);
-    //         $quantities = explode(', ', $order->quantity);
-
-    //         // Determine the menu item with the highest quantity or the first item
-    //         $mostOrderedIndex = 0;
-    //         $maxQuantity = 0;
-    //         foreach ($quantities as $index => $quantity) {
-    //             if ((int)$quantity > $maxQuantity) {
-    //                 $mostOrderedIndex = $index;
-    //                 $maxQuantity = (int)$quantity;
-    //             }
-    //         }
-
-    //         // Extract menu name for the image
-    //         $menuName = explode(' (', $orderItems[$mostOrderedIndex])[0];
-    //         $menu = DB::table('menus')->where('name', $menuName)->first();
-
-    //         // Assign the image URL or default to logo
-    //         $order->image = $menu ? asset('storage/' . $menu->image) : asset('images/logo.jpg');
-
-    //         return $order;
-    //     });
-
-    //     // Categorize orders by status
-    //     $statuses = [
-    //         'all' => $orders,
-    //         'pending' => $orders->where('status', 'Pending'),
-    //         'preparing' => $orders->where('status', 'Preparing'),
-    //         'out_for_delivery' => $orders->where('status', 'Out for Delivery'),
-    //         'delivered' => $orders->where('status', 'Delivered'),
-    //         'returns' => $orders->where('status', 'Returned'),
-    //     ];
-
-    //     return view('user.orders', compact('statuses', 'userCart', 'userFavorites'));
-    // }
-
-
     public function orders(Request $request)
     {
         /** @var User $user */
@@ -561,34 +473,6 @@ class UserController extends Controller
             ->where('email', $user->email) // Filter by user's email
             ->orderBy('created_at', 'desc')
             ->get();
-
-        // Process each order to include all menu items
-        // $orders = $orders->map(function ($order) {
-        //     $order->created_at = Carbon::parse($order->created_at);
-
-        //     // Parse the order string and quantities
-        //     $orderItems = explode(', ', $order->order);
-        //     $quantities = explode(', ', $order->quantity);
-
-        //     // Fetch all menu details for the order
-        //     $menuDetails = [];
-        //     foreach ($orderItems as $index => $item) {
-        //         $menuName = explode(' (', $item)[0]; // Extract menu name
-        //         $menu = DB::table('menus')->where('name', $menuName)->first();
-
-        //         if ($menu) {
-        //             $menuDetails[] = [
-        //                 'name' => $menuName,
-        //                 'quantity' => $quantities[$index] ?? 1,
-        //                 'image' => asset('storage/' . $menu->image),
-        //                 'price' => $menu->price
-        //             ];
-        //         }
-        //     }
-
-        //     $order->menuDetails = $menuDetails;
-        //     return $order;
-        // });
 
         $orders = $orders->map(function ($order) {
             $order->created_at = Carbon::parse($order->created_at);
@@ -617,6 +501,11 @@ class UserController extends Controller
             return $order;
         });
 
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
 
         // Categorize orders by status
         $statuses = [
@@ -628,7 +517,7 @@ class UserController extends Controller
             'returns' => $orders->where('status', 'Returned'),
         ];
 
-        return view('user.orders', compact('statuses', 'userCart', 'userFavorites'));
+        return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount'));
     }
 
 

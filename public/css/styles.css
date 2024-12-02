@@ -584,6 +584,10 @@ th {
     padding: 0.25rem 0.5rem;
 }
 
+.shop-updates-body {
+    overflow-x: hidden;
+}
+
 .shop-updates-body i {
     font-size: 1.5rem;
 }
@@ -726,4 +730,8 @@ a.more:hover {
 .star-rating label:hover,
 .star-rating label:hover ~ label {
     color: #ffca28;
+}
+
+.translate-middle-y-custom {
+    transform: translate(-60%, -30%); /* Adjusts horizontal and vertical positions */
 }

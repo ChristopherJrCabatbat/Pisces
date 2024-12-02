@@ -56,7 +56,7 @@
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
                     class="navigation">Dashboard</a> / Customers /</div>
-            <span class="faded-white ms-1">Customer Updates</span>
+            <span class="faded-white ms-1">Updates</span>
         </div>
 
         <div class="table-container">

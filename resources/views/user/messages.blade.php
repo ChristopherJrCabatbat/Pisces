@@ -24,9 +24,17 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">ORDERS</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link fw-bold active" aria-current="page" href="#">MESSAGES</a>
+    <li class="nav-item position-relative">
+        <a class="nav-link fw-bold active" aria-current="page" href="#">
+            MESSAGES
+            @if ($unreadCount > 0)
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
+                    {{ $unreadCount }}
+                </span>
+            @endif
+        </a>
     </li>
+    
 @endsection
 
 @section('main-content')
@@ -128,7 +136,7 @@
                                 style="width: 50px; height: 50px; object-fit: cover;">
                             @if ($unreadCount > 0)
                                 <span
-                                    class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
+                                    class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">{{ $unreadCount }}</span>
                             @endif
                         </div>
                         <div>
@@ -136,7 +144,7 @@
                             <p class="m-0 {{ $unreadCount > 0 ? 'fw-bold' : '' }}">Pisces Coffee Hub</p>
 
                             @if ($latestMessage)
-                                <p class="m-0 {{ $unreadCount > 0 ? 'fw-bold' : 'text-muted' }} small">
+                                <p class="m-0 {{ $unreadCount > 0 ? 'fw-bold' : 'text-muted' }} small pe-3">
                                     @if ($latestMessage->user_id === $user->id)
                                         You: {{ $latestMessage->message_text }}
                                     @else
@@ -157,8 +165,6 @@
         </div>
 
     </div>
-
-
 
 </div>
 @endsection
