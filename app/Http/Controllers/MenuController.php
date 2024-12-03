@@ -95,38 +95,6 @@ class MenuController extends Controller
         return view('admin.menu', compact('menus', 'categories', 'activeFilter'));
     }
 
-
-
-    public function menuSearch(Request $request)
-    {
-        // // Get the search query from the request
-        // $search = $request->input('search');
-
-        // // Check if a search query exists
-        // if ($search) {
-        //     // Search the menus by name, category, price, or description
-        //     $menus = Menu::where('name', 'LIKE', '%' . $search . '%')
-        //         ->orWhere('category', 'LIKE', '%' . $search . '%')
-        //         ->orWhere('description', 'LIKE', '%' . $search . '%')
-        //         ->orWhere('price', 'LIKE', '%' . $search . '%')
-        //         ->paginate(2); // Adjust pagination size if needed
-        // } else {
-        //     // No search query, return all menus paginated
-        //     $menus = Menu::paginate(2); // Adjust pagination size if needed
-        // }
-
-        // // If the request is AJAX, return only the table rows
-        // if ($request->ajax()) {
-        //     return view('admin.partials.menu_table_body', compact('menus'))->render();
-        // }
-
-
-
-        // // Return the full view with the menus
-        // return view('admin.menu', compact('menus', 'search')); // Pass search query for reuse in the view
-    }
-
-
     /**
      * Show the form for creating a new resource.
      */
@@ -169,29 +137,42 @@ class MenuController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string', // Add validation for category
+            'category' => 'required|string',
             'description' => 'required|string',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle file upload
-        if ($request->hasFile('image')) {
-            // Store the uploaded image in the 'public/menu_images' directory
-            $imagePath = $request->file('image')->store('menu_images', 'public');
+        try {
+            // Handle file upload
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('menu_images', 'public');
+            }
+
+            // Create a new menu entry in the database
+            Menu::create([
+                'name' => $validated['name'],
+                'category' => $validated['category'],
+                'price' => $validated['price'],
+                'description' => $validated['description'],
+                'image' => $imagePath ?? null,
+            ]);
+
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'Menu item added successfully.',
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to add menu item. Please try again.',
+                'type' => 'error',
+            ]);
         }
 
-        // Create a new menu entry in the database
-        Menu::create([
-            'name' => $validated['name'],
-            'category' => $validated['category'], // Store the category
-            'price' => $validated['price'],
-            'description' => $validated['description'],
-            'image' => $imagePath ?? null, // Save image path
-        ]);
-
-        // Redirect back with a success message
-        return redirect()->route('admin.menu.index')->with('success', 'Menu item added successfully.');
+        return redirect()->route('admin.menu.index');
     }
+
 
     public function storeCategory(Request $request)
     {
@@ -244,42 +225,48 @@ class MenuController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Fetch the existing menu item
         $menu = Menu::findOrFail($id);
 
-        // Validate the form data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'category' => 'required|string',
             'description' => 'required|string',
-            'image' => '|image|mimes:jpeg,png,jpg,gif|max:2048', // Image is optional on update
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle file upload if a new image is provided
-        if ($request->hasFile('image')) {
-            // Delete the old image if it exists
-            if ($menu->image) {
-                Storage::delete('public/' . $menu->image);
+        try {
+            // Handle file upload if a new image is provided
+            if ($request->hasFile('image')) {
+                if ($menu->image) {
+                    Storage::delete('public/' . $menu->image);
+                }
+                $imagePath = $request->file('image')->store('menu_images', 'public');
+                $menu->image = $imagePath;
             }
 
-            // Store the new image in 'public/menu_images' directory
-            $imagePath = $request->file('image')->store('menu_images', 'public');
-            $menu->image = $imagePath; // Update the image path
+            $menu->update([
+                'name' => $validated['name'],
+                'category' => $validated['category'],
+                'price' => $validated['price'],
+                'description' => $validated['description'],
+                'image' => $menu->image ?? $menu->image,
+            ]);
+
+            session()->flash('toast', [
+                'message' => 'Menu updated successfully.',
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            session()->flash('toast', [
+                'message' => 'Failed to update menu item. Please try again.',
+                'type' => 'error',
+            ]);
         }
 
-        // Update the menu entry with new values
-        $menu->update([
-            'name' => $validated['name'],
-            'category' => $validated['category'],
-            'price' => $validated['price'],
-            'description' => $validated['description'],
-            'image' => $menu->image ?? $menu->image, // Keep the existing image if no new one is uploaded
-        ]);
-
-        // Redirect back with a success message
-        return redirect()->route('admin.menu.index')->with('success', 'Menu item updated successfully.');
+        return redirect()->route('admin.menu.index');
     }
+
 
 
     /**
@@ -288,7 +275,21 @@ class MenuController extends Controller
     public function destroy(string $id)
     {
         $menu = Menu::findOrFail($id);
-        $menu->delete();
-        return redirect()->route('admin.menu.index')->with('success', 'Menu item deleted successfully.');
+
+        try {
+            $menu->delete();
+
+            session()->flash('toast', [
+                'message' => 'Menu item deleted successfully.',
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            session()->flash('toast', [
+                'message' => 'Failed to delete menu item. Please try again.',
+                'type' => 'error',
+            ]);
+        }
+
+        return redirect()->route('admin.menu.index');
     }
 }

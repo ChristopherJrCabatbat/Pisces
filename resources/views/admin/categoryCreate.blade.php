@@ -38,61 +38,62 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i>Customer Activity
                     <span class="monitor-margin">Monitoring</span></a></li>
-<li><a href="{{ route('admin.customerMessages') }}"
+            <li><a href="{{ route('admin.customerMessages') }}"
                     class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>        
-</ul>
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+        </ul>
     </li>
 
 @endsection
 
 @section('main-content')
-<div class="main-content">
+    <div class="main-content">
 
-    <div class="current-file mb-3 d-flex">
-        <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                class="navigation">Dashboard</a> / <a href="/admin/menu" class="navigation">Menu</a> / <a href="/admin/category" class="navigation">Category</a> /</div>
-        <span class="faded-white ms-1">Add Category</span>
-    </div>
-
-    <div class="table-container p-4 text-black mb-4">
-
-        <div class="taas-table d-flex justify-content-center align-items-center">
-            <div class="h2"><i class="fa-solid fa-plus me-2"></i>Add Category</div>
+        <div class="current-file mb-3 d-flex">
+            <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
+                    class="navigation">Dashboard</a> / <a href="/admin/menu" class="navigation">Menu</a> / <a
+                    href="/admin/category" class="navigation">Category</a> /</div>
+            <span class="faded-white ms-1">Add Category</span>
         </div>
 
-        {{-- <form action="{{ route('admin.storeCategory') }}" method="POST" enctype="multipart/form-data"> --}}
-        <form action="{{ route('admin.category.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
+        <div class="table-container p-4 text-black mb-4">
 
-            <!-- Category -->
-            <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                <label for="category" class="form-label">Category Name:</label>
-                <input type="text" name="category" class="form-control" id="category" value="{{ old('category') }}"
-                    required placeholder="e.g. Coffee" autofocus>
+            <div class="taas-table d-flex justify-content-center align-items-center">
+                <div class="h2"><i class="fa-solid fa-plus me-2"></i>Add Category</div>
             </div>
 
-            <!-- Image -->
-            <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                <label for="image" class="form-label">Image:</label>
-                <input type="file" name="image" class="form-control" id="image" accept="image/*"
-                    onchange="previewImage(event)" required>
-                <img id="imagePreview" src="#" alt="Selected Image Preview"
-                    style="display:none; width:150px; margin-top:10px;">
-                @error('image')
-                    <div class="error alert alert-danger">{{ $message }}</div>
-                @enderror
-            </div>
+            {{-- <form action="{{ route('admin.storeCategory') }}" method="POST" enctype="multipart/form-data"> --}}
+            <form action="{{ route('admin.category.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <!-- Category -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="category" class="form-label">Category Name:</label>
+                    <input type="text" name="category" class="form-control" id="category" value="{{ old('category') }}"
+                        required placeholder="e.g. Coffee" autofocus>
+                </div>
+
+                <!-- Image -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="image" class="form-label">Image:</label>
+                    <input type="file" name="image" class="form-control" id="image" accept="image/*"
+                        onchange="previewImage(event)" required>
+                    <img id="imagePreview" src="#" alt="Selected Image Preview"
+                        style="display:none; width:150px; margin-top:10px;">
+                    @error('image')
+                        <div class="error alert alert-danger">{{ $message }}</div>
+                    @enderror
+                </div>
 
 
-            <div class="d-grid my-2">
-                <button class="btn btn-primary dark-blue" type="submit">Add</button>
-            </div>
-        </form>
+                <div class="d-grid my-2">
+                    <button class="btn btn-primary dark-blue" type="submit">Add</button>
+                </div>
+            </form>
+
+        </div>
 
     </div>
-
-</div>
 @endsection
 
 @section('scripts')

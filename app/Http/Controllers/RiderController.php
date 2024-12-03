@@ -37,13 +37,28 @@ class RiderController extends Controller
             'name' => 'required|string',
         ]);
 
-        // Create a new menu entry in the database
-        Rider::create([
-            'name' => $validated['name'], // Store the category
-        ]);
+        try {
+            // Create a new rider entry in the database
+            Rider::create([
+                'name' => $validated['name'],
+            ]);
 
-        return redirect()->route('admin.rider.index')->with('success', 'Rider added successfully.');
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'Rider added successfully.',
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to add rider. Please try again.',
+                'type' => 'error',
+            ]);
+        }
+
+        return redirect()->route('admin.rider.index');
     }
+
 
     /**
      * Display the specified resource.
@@ -76,14 +91,28 @@ class RiderController extends Controller
             'name' => 'required|string',
         ]);
 
-        // Update the category with new data
-        $rider->update([
-            'name' => $validated['name'], // Update category name
-        ]);
+        try {
+            // Update the rider with new data
+            $rider->update([
+                'name' => $validated['name'],
+            ]);
 
-        // Redirect back with a success message
-        return redirect()->route('admin.rider.index')->with('success', 'Menu item updated successfully.');
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'Rider updated successfully.',
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to update rider. Please try again.',
+                'type' => 'error',
+            ]);
+        }
+
+        return redirect()->route('admin.rider.index');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -91,7 +120,24 @@ class RiderController extends Controller
     public function destroy(string $id)
     {
         $rider = Rider::findOrFail($id);
-        $rider->delete();
-        return redirect()->route('admin.rider.index')->with('success', 'Menu item deleted successfully.');
+
+        try {
+            // Delete the rider
+            $rider->delete();
+
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'Rider deleted successfully.',
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to delete rider. Please try again.',
+                'type' => 'error',
+            ]);
+        }
+
+        return redirect()->route('admin.rider.index');
     }
 }

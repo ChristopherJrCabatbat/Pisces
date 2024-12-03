@@ -47,20 +47,36 @@ class CategoryController extends Controller
         ]);
 
         // Handle file upload
+        $imagePath = null;
         if ($request->hasFile('image')) {
-            // Store the uploaded image in the 'public/menu_images' directory
+            // Store the uploaded image in the 'public/category_images' directory
             $imagePath = $request->file('image')->store('category_images', 'public');
         }
 
-        // Create a new menu entry in the database
-        Category::create([
-            'category' => $validated['category'], // Store the category
-            'image' => $imagePath ?? null, // Save image path
-        ]);
+        // Create a new category entry in the database
+        try {
+            Category::create([
+                'category' => $validated['category'], // Store the category
+                'image' => $imagePath, // Save image path
+            ]);
 
-        // Redirect back with a success message
-        return redirect()->route('admin.category.index')->with('success', 'Category item added successfully.');
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'Category added successfully.',
+                'type' => 'success', // Toast type for success
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to add category item. Please try again.',
+                'type' => 'error', // Toast type for error
+            ]);
+        }
+
+        // Redirect back to the category index page
+        return redirect()->route('admin.category.index');
     }
+
 
     /**
      * Display the specified resource.
@@ -96,6 +112,8 @@ class CategoryController extends Controller
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image type and size
         ]);
 
+        $imagePath = null;
+
         // Check if a new image is uploaded
         if ($request->hasFile('image')) {
             // Delete the old image if it exists
@@ -111,20 +129,35 @@ class CategoryController extends Controller
         $oldCategoryName = $category->category;
         $newCategoryName = $validated['category'];
 
-        // Update the category with new data
-        $category->update([
-            'category' => $newCategoryName, // Update category name
-            'image' => $imagePath ?? $category->image, // Update image path only if a new image is uploaded
-        ]);
+        try {
+            // Update the category with new data
+            $category->update([
+                'category' => $newCategoryName, // Update category name
+                'image' => $imagePath ?? $category->image, // Update image path only if a new image is uploaded
+            ]);
 
-        // Update all menus to reflect the new category name
-        if ($oldCategoryName !== $newCategoryName) {
-            DB::table('menus')->where('category', $oldCategoryName)->update(['category' => $newCategoryName]);
+            // Update all menus to reflect the new category name
+            if ($oldCategoryName !== $newCategoryName) {
+                DB::table('menus')->where('category', $oldCategoryName)->update(['category' => $newCategoryName]);
+            }
+
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'Category updated successfully.',
+                'type' => 'success', // Toast type for success
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to update category. Please try again.',
+                'type' => 'error', // Toast type for error
+            ]);
         }
 
-        // Redirect back with a success message
-        return redirect()->route('admin.category.index')->with('success', 'Category updated successfully.');
+        // Redirect back to the category index page
+        return redirect()->route('admin.category.index');
     }
+
 
 
 
@@ -134,7 +167,25 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $category = Category::findOrFail($id);
-        $category->delete();
-        return redirect()->route('admin.category.index')->with('success', 'Menu item deleted successfully.');
+
+        try {
+            // Delete the category
+            $category->delete();
+
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'Category deleted successfully.',
+                'type' => 'success', // Toast type for success
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to delete category. Please try again.',
+                'type' => 'error', // Toast type for error
+            ]);
+        }
+
+        // Redirect back to the category index page
+        return redirect()->route('admin.category.index');
     }
 }

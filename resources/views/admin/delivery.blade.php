@@ -154,23 +154,21 @@
                                     class="status-form d-flex justify-content-between">
                                     @csrf
                                     @method('PUT')
-
+                            
                                     @php
                                         $allowedTransitions = [
                                             'Pending' => ['Preparing'],
-                                            'Preparing' => ['Pending', 'Out for Delivery'],
-                                            'Out for Delivery' => ['Preparing', 'Delivered'],
-                                            'Delivered' => ['Out for Delivery', 'Returned'],
-                                            'Returned' => ['Delivered'],
+                                            'Preparing' => ['Out for Delivery'],
+                                            'Out for Delivery' => ['Delivered'],
+                                            'Delivered' => ['Returned'],
+                                            'Returned' => [], // No transitions for "Returned"
                                         ];
-
-                                        $validStatuses = array_merge(
-                                            [$delivery->status],
-                                            $allowedTransitions[$delivery->status],
-                                        );
+                            
+                                        // Generate valid statuses based on current status
+                                        $validStatuses = array_merge([$delivery->status], $allowedTransitions[$delivery->status]);
                                     @endphp
-
-                                    <select name="status" class="form-select delivery-status-select">
+                            
+                                    <select name="status" class="form-select delivery-status-select" {{ $delivery->status === 'Returned' ? 'disabled' : '' }}>
                                         @foreach ($validStatuses as $status)
                                             <option value="{{ $status }}"
                                                 {{ $delivery->status === $status ? 'selected' : '' }}>
@@ -178,9 +176,14 @@
                                             </option>
                                         @endforeach
                                     </select>
+                            
+                                    @if ($delivery->status === 'Returned')
+                                        <input type="hidden" name="status" value="Returned">
+                                    @endif
                                 </form>
-
                             </td>
+                            
+                            
 
                             <td>
                                 <button type="button" class="btn btn-primary view-details-btn"

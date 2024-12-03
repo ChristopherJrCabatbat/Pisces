@@ -58,10 +58,10 @@ class DeliveryController extends Controller
         // Define allowed transitions
         $allowedTransitions = [
             'Pending' => ['Preparing'],
-            'Preparing' => ['Pending', 'Out for Delivery'],
-            'Out for Delivery' => ['Preparing', 'Delivered'],
-            'Delivered' => ['Out for Delivery', 'Returned'],
-            'Returned' => ['Delivered'],
+            'Preparing' => ['Out for Delivery'],
+            'Out for Delivery' => ['Delivered'],
+            'Delivered' => ['Returned'],
+            'Returned' => [],
         ];
 
         // Find the delivery by ID
