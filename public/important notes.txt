@@ -998,6 +998,17 @@ Messages
 
 
 
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
 
 <script>
     $(document).ready(function () {
@@ -1017,3 +1028,81 @@ Messages
         });
     });
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Order Status Body -->
+                {{-- <div class="track-order-body px-3 py-3">
+                    <div class="timeline">
+                        @foreach ($timeline as $event)
+                            <div class="timeline-item d-flex align-items-start py-3">
+                                <!-- Time and Date -->
+                                <div class="time text-end pe-4">
+                                    {{ $event['timestamp'] }}
+                                </div>
+
+                                <!-- Icon -->
+                                <div class="icon-container">
+                                    <div class="icon rounded-circle text-white d-flex align-items-center justify-content-center
+                                {{ $event['status'] === 'Delivered'
+                                    ? 'bg-success'
+                                    : ($event['status'] === 'Returned'
+                                        ? 'bg-danger'
+                                        : 'bg-secondary') }}"
+                                        style="width: 24px; height: 24px;">
+                                        <i class="fa-solid {{ $event['icon'] }}"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Content -->
+                                <div class="content ms-3">
+                                    <!-- Status Header -->
+                                    <div class="status fw-bold">{{ ucfirst($event['status']) }}</div>
+
+                                    <!-- Message -->
+                                    <div class="details text-muted small">
+                                        {{ $event['message'] }}
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="location text-muted small">{{ $event['address'] }}</div>
+
+                                    <!-- Rider Information -->
+                                    @if ($event['rider'])
+                                        <div class="rider text-muted small mt-2">
+                                            Rider: {{ $event['rider'] }}
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div> --}}

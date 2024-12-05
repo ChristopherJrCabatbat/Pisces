@@ -6,11 +6,13 @@
     <style>
         .main-content {
             margin-top: 13vh;
+            min-height: 100vh;
         }
 
         select {
             width: 30% !important;
         }
+
     </style>
 @endsection
 

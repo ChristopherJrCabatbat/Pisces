@@ -739,3 +739,13 @@ a.more:hover {
 .fa-star, .fa-star-half-stroke {
     color: #ffc107;
 }
+
+
+.timeline-item .line {
+    /* height: 15.4%; */
+    height: 106px;
+    position: absolute;
+    width: 2px;
+    transform: translateX(11px);
+    background-color: rgb(113, 113, 136, 0.4);
+}

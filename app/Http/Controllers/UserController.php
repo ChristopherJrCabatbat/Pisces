@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;  // Import DB facade
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
 use App\Models\Menu;
@@ -169,35 +170,35 @@ class UserController extends Controller
     // }
 
     public function menuView($id)
-{
-    $menu = Menu::find($id);
+    {
+        $menu = Menu::find($id);
 
-    if (!$menu) {
-        return response()->json(['error' => 'Menu not found'], 404);
+        if (!$menu) {
+            return response()->json(['error' => 'Menu not found'], 404);
+        }
+
+        // Fetch the total number of users who marked this menu as favorite
+        $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
+
+        // Fetch dynamic rating and review count
+        $rating = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->avg('rating');
+        $ratingCount = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->count();
+
+        return response()->json([
+            'name' => $menu->name,
+            'category' => $menu->category,
+            'price' => $menu->price,
+            'description' => $menu->description,
+            'image' => $menu->image,
+            'rating' => $rating ?: 0,
+            'ratingCount' => $ratingCount ?: 0,
+            'favoriteCount' => $favoriteCount, // Include total favorites count
+        ]);
     }
-
-    // Fetch the total number of users who marked this menu as favorite
-    $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
-
-    // Fetch dynamic rating and review count
-    $rating = DB::table('feedback')
-        ->where('menu_items', 'LIKE', "%{$menu->name}%")
-        ->avg('rating');
-    $ratingCount = DB::table('feedback')
-        ->where('menu_items', 'LIKE', "%{$menu->name}%")
-        ->count();
-
-    return response()->json([
-        'name' => $menu->name,
-        'category' => $menu->category,
-        'price' => $menu->price,
-        'description' => $menu->description,
-        'image' => $menu->image,
-        'rating' => $rating ?: 0,
-        'ratingCount' => $ratingCount ?: 0,
-        'favoriteCount' => $favoriteCount, // Include total favorites count
-    ]);
-}
 
 
 
@@ -342,7 +343,7 @@ class UserController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-    
+
         // Fetch categories with counts of favorite menus for the logged-in user
         $categories = DB::table('categories')
             ->leftJoin('menus', 'categories.category', '=', 'menus.category')
@@ -354,11 +355,11 @@ class UserController extends Controller
             ->groupBy('categories.category')
             ->orderByDesc('menu_count')
             ->get();
-    
+
         $selectedCategory = $request->input('category', 'All Menus');
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-    
+
         // Retrieve favorite menus filtered by the selected category
         if ($selectedCategory == 'All Menus') {
             $menus = $user->favoriteItems; // Get all favorite items
@@ -368,7 +369,7 @@ class UserController extends Controller
                     return $menu->category === $selectedCategory; // Filter by category
                 });
         }
-    
+
         // Enhance each menu item with its rating and review count
         $menus = $menus->map(function ($menu) {
             $menu->rating = DB::table('feedback')
@@ -379,17 +380,14 @@ class UserController extends Controller
                 ->count(); // Count reviews
             return $menu;
         });
-    
+
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
-    
+
         return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     }
-    
-
-
 
 
     public function updateQuantity(Request $request)
@@ -531,65 +529,6 @@ class UserController extends Controller
         return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'totalPrice'));
     }
 
-
-    // public function orders(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     // Fetch user-specific orders
-    //     $orders = DB::table('deliveries')
-    //         ->where('email', $user->email) // Filter by user's email
-    //         ->orderBy('created_at', 'desc')
-    //         ->get();
-
-    //     $orders = $orders->map(function ($order) {
-    //         $order->created_at = Carbon::parse($order->created_at);
-
-    //         // Parse the order string and quantities
-    //         $orderItems = explode(', ', $order->order);
-    //         $quantities = explode(', ', $order->quantity);
-
-    //         // Fetch all menu details for the order
-    //         $menuDetails = [];
-    //         foreach ($orderItems as $index => $item) {
-    //             $menuName = explode(' (', $item)[0]; // Extract menu name
-    //             $menu = DB::table('menus')->where('name', $menuName)->first();
-
-    //             if ($menu) {
-    //                 $menuDetails[] = (object)[ // Convert to an object
-    //                     'name' => $menuName,
-    //                     'quantity' => $quantities[$index] ?? 1,
-    //                     'image' => 'storage/' . $menu->image, // Consistent with other files
-    //                     'price' => $menu->price
-    //                 ];
-    //             }
-    //         }
-
-    //         $order->menuDetails = $menuDetails;
-    //         return $order;
-    //     });
-
-    //     // Count unread messages from the admin
-    //     $unreadCount = Message::where('receiver_id', $user->id)
-    //         ->where('is_read', false)
-    //         ->count();
-
-
-    //     // Categorize orders by status
-    //     $statuses = [
-    //         'all' => $orders,
-    //         'pending' => $orders->where('status', 'Pending'),
-    //         'preparing' => $orders->where('status', 'Preparing'),
-    //         'out-for-delivery' => $orders->where('status', 'Out for Delivery'),
-    //         'delivered' => $orders->where('status', 'Delivered'),
-    //         'returns' => $orders->where('status', 'Returned'),
-    //     ];
-
-    //     return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount'));
-    // }
 
     public function orders(Request $request)
     {
@@ -801,37 +740,57 @@ class UserController extends Controller
         return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
     }
 
-
-    //     public function trackOrder(Request $request, Delivery $delivery)
+    // public function trackOrder(Request $request, Delivery $delivery)
     // {
     //     /** @var User $user */
     //     $user = Auth::user();
 
-    //     // Fetch delivery statuses, ensuring "Pending" is renamed to "Preparing" when necessary
+    //     // Define the status order and corresponding messages/icons for all statuses
     //     $statusOrder = ['Returned', 'Delivered', 'Out for Delivery', 'Preparing', 'Pending'];
-    //     $statuses = Delivery::where('id', $delivery->id)
-    //         ->orderByRaw("FIELD(status, '" . implode("', '", $statusOrder) . "')")
-    //         ->get()
-    //         ->map(function ($status) {
-    //             // Ensure "Pending" remains but is renamed if status changes to "Preparing"
-    //             if ($status->status === 'Preparing') {
-    //                 $newStatus = clone $status;
-    //                 $newStatus->status = 'Pending';
-    //                 return [$status, $newStatus];
-    //             }
-    //             return [$status];
-    //         })
-    //         ->flatten();
+    //     $statusMessages = [
+    //         'Returned' => 'Your order has been returned to the sender.',
+    //         'Pending' => 'Your order is currently pending.',
+    //         'Preparing' => 'Your order is being prepared.',
+    //         'Out for Delivery' => 'Your order is out for delivery.',
+    //         'Delivered' => 'Your order has been successfully delivered.',
+    //     ];
+    //     $statusIcons = [
+    //         'Returned' => 'fa-times text-danger',
+    //         'Pending' => 'fa-clock text-secondary',
+    //         'Preparing' => 'fa-utensils text-warning',
+    //         'Out for Delivery' => 'fa-truck text-primary',
+    //         'Delivered' => 'fa-check text-success',
+    //     ];
 
-    //     // Fetch additional data
+    //     // Find all statuses for this delivery
+    //     $statuses = Delivery::where('id', $delivery->id)->get();
+
+    //     // Prepare a timeline with placeholders for missing statuses
+    //     $timeline = [];
+    //     foreach ($statusOrder as $status) {
+    //         $record = $statuses->firstWhere('status', $status);
+
+    //         $timeline[] = [
+    //             'status' => $status,
+    //             'message' => $statusMessages[$status],
+    //             'icon' => $statusIcons[$status],
+    //             'timestamp' => $record ? $record->updated_at->format('M d, h:i A') : 'N/A',
+    //             'address' => $record ? $record->address : $delivery->address,
+    //             'rider' => $record ? $record->rider : null,
+    //         ];
+    //     }
+
+    //     // Fetch additional data for the view
     //     $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
     //         ->groupBy('category')
     //         ->get();
     //     $userCart = $user->cart;
     //     $userFavorites = $user->favoriteItems()->count();
 
-    //     return view('user.trackOrder', compact('statuses', 'categories', 'userCart', 'user', 'userFavorites'));
+    //     // Pass timeline to the view
+    //     return view('user.trackOrder', compact('timeline', 'categories', 'userCart', 'user', 'userFavorites'));
     // }
+
 
 
 
@@ -840,40 +799,9 @@ class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // Define the status order and corresponding messages/icons for all statuses
-        $statusOrder = ['Returned', 'Delivered', 'Out for Delivery', 'Preparing', 'Pending'];
-        $statusMessages = [
-            'Returned' => 'Your order has been returned to the sender.',
-            'Pending' => 'Your order is currently pending.',
-            'Preparing' => 'Your order is being prepared.',
-            'Out for Delivery' => 'Your order is out for delivery.',
-            'Delivered' => 'Your order has been successfully delivered.',
-        ];
-        $statusIcons = [
-            'Returned' => 'fa-times text-danger',
-            'Pending' => 'fa-clock text-secondary',
-            'Preparing' => 'fa-utensils text-warning',
-            'Out for Delivery' => 'fa-truck text-primary',
-            'Delivered' => 'fa-check text-success',
-        ];
-
         // Find all statuses for this delivery
         $statuses = Delivery::where('id', $delivery->id)->get();
-
-        // Prepare a timeline with placeholders for missing statuses
-        $timeline = [];
-        foreach ($statusOrder as $status) {
-            $record = $statuses->firstWhere('status', $status);
-
-            $timeline[] = [
-                'status' => $status,
-                'message' => $statusMessages[$status],
-                'icon' => $statusIcons[$status],
-                'timestamp' => $record ? $record->updated_at->format('M d, h:i A') : 'N/A',
-                'address' => $record ? $record->address : $delivery->address,
-                'rider' => $record ? $record->rider : null,
-            ];
-        }
+        $deliveries = Delivery::findOrFail($delivery->id);
 
         // Fetch additional data for the view
         $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
@@ -883,47 +811,49 @@ class UserController extends Controller
         $userFavorites = $user->favoriteItems()->count();
 
         // Pass timeline to the view
-        return view('user.trackOrder', compact('timeline', 'categories', 'userCart', 'user', 'userFavorites'));
+        return view('user.trackOrder', compact('categories', 'userCart', 'user', 'userFavorites', 'statuses', 'deliveries'));
     }
 
-
-    public function reviewOrder(Request $request)
+    public function reviewOrder(Request $request, $deliveryId)
     {
         /** @var User $user */
         $user = Auth::user();
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
 
-        return view('user.reviewOrder', compact('userCart', 'user', 'userFavorites'));
+        // Fetch the delivery by ID and ensure it belongs to the authenticated user
+        $delivery = Delivery::where('id', $deliveryId)
+            ->where('email', $user->email) // Match with the user's email to validate
+            ->firstOrFail();
+
+        // Parse the order and quantities from the database
+        $orders = explode(',', $delivery->order); // Split items by commas
+        $quantities = explode(',', $delivery->quantity); // Split quantities by commas
+        $items = [];
+
+        // Combine orders and quantities into a structured array
+        foreach ($orders as $index => $order) {
+            $menu = Menu::where('name', $order)->first();
+
+            if ($menu) {
+                $items[] = [
+                    'name' => $menu->name,
+                    'price' => $menu->price,
+                    'image' => $menu->image,
+                    'quantity' => $quantities[$index] ?? 1,
+                ];
+            } else {
+                Log::warning('Menu not found for order: ' . $order);
+                $items[] = [
+                    'name' => $order,
+                    'price' => 0,
+                    'image' => null,
+                    'quantity' => $quantities[$index] ?? 1,
+                ];
+            }
+        }
+
+
+        return view('user.reviewOrder', compact('delivery', 'items'));
     }
-
-    // public function reviewOrder(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Fetch user's completed orders
-    //     $completedOrders = Delivery::where('user_id', $user->id)
-    //         ->where('status', 'completed') // Assuming 'completed' indicates delivered orders
-    //         ->orderBy('created_at', 'desc')
-    //         ->get();
-
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     return view('user.reviewOrder', compact('userCart', 'user', 'userFavorites', 'completedOrders'));
-    // }
-
-
-
-
-
-    // public function menuDetail($menuId)
-    // {
-    //     $menu = Menu::find($menuId);
-    //     // Return the view for the menu details page
-    //     return view('user.menuDetail', compact('menu'));
-    // }
 
 
 

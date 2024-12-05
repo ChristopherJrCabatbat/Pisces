@@ -63,33 +63,34 @@
                 <!-- Order Status Body -->
                 <div class="track-order-body px-4 py-3">
                     <!-- Top Section -->
-                    <div class="top fw-bold pb-3">
-                        Your order has been delivered on Nov 13.
+                    <div class="top pb-3">
+                        Your order has been delivered to <span class="fw-bold">{{ $delivery->name }}</span> on <span
+                            class="fw-bold">{{ $delivery->created_at->format('M d') }}</span>.
                     </div>
 
                     <!-- Shipping Details -->
-               
+
 
                     <!-- Timeline -->
                     <div class="timeline">
-                        <!-- Delivered Section -->
-                        <div class="timeline-item d-flex align-items-start py-3 top">
-                            <div class="order-width d-flex">
-                                <div class="">
-                                    <img src="{{ asset('images/logo.jpg') }}" alt="Delivery Image" class=""
-                                        style="max-height: 100px; width: auto;">
-                                </div>
-                                <div class="content ms-3">
-                                    <div class="status fs-5">Pisces Pizza</div>
-                                    <div class="location text-muted small">Pizza</div>
-                                    <div class="location fs-5 flex-between">
-                                        <div class="fw-bold">₱199</div>
-                                        <div>x1</div>
+                        <!-- Items -->
+                        @foreach ($items as $item)
+                            <div class="timeline-item d-flex align-items-start py-3 top">
+                                <div class="order-width d-flex">
+                                    {{-- <img src="{{ asset('images/logo.jpg') }}" alt="Delivery Image" class=""
+                                        style="max-height: 100px; width: auto;"> --}}
+                                    <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('images/default-placeholder.jpg') }}"
+                                        alt="{{ $item['name'] }} Image" style="max-height: 100px; width: auto;">
+                                    <div class="content ms-3">
+                                        <div class="status fw fs-5">{{ $item['name'] }}</div>
+                                        <div class="location fs-5 flex-between">
+                                            <div class="">Price: {{ $item['price'] }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                      
+                        @endforeach
+
                         <!-- Order Summary -->
                         <div class="timeline-item py-3 d-flex align-items-start top">
                             <!-- Content -->
@@ -97,7 +98,7 @@
                                 <div class="status fw-bold">Order summary</div>
                                 <div class="details text-muted flex-between">
                                     <div>Subtotal</div>
-                                    <div>₱199</div>
+                                    <div>₱{{ number_format($delivery->total_price, 2) }}</div>
                                 </div>
                                 <div class="details text-muted flex-between">
                                     <div>Shipping</div>
@@ -108,34 +109,34 @@
                                     <div>₱0</div>
                                 </div>
                                 <div class="details fw-bold flex-between">
-                                    <div>Total</div>
-                                    <div>₱199</div>
+                                    <div>Total Price</div>
+                                    <div>₱{{ number_format($delivery->total_price, 2) }}</div>
                                 </div>
                             </div>
                         </div>
 
-                          <!-- Order Details -->
-                          <div class="timeline-item py-3 d-flex align-items-start top">
+                        <!-- Order Details -->
+                        <div class="timeline-item py-3 d-flex align-items-start top">
                             <!-- Content -->
                             <div class="content order-width d-flex flex-column gap-2">
                                 <div class="status fw-bold">Order details</div>
                                 <div class="details text-muted flex-between">
                                     <div>Order date</div>
-                                    <div>Nov. 12 1:00 PM</div>
+                                    <div>{{ $delivery->created_at->format('M d, h:i A') }}</div>
+                                </div>
+                                <div class="details text-muted flex-between">
+                                    <div>Shipping Method</div>
+                                    <div>{{ $delivery->shipping_method }}</div>
                                 </div>
                                 <div class="details text-muted flex-between">
                                     <div>Payment Method</div>
-                                    <div>GCash</div>
-                                </div>
-                                <div class="details text-muted flex-between">
-                                    <div>Delivery date</div>
-                                    <div>Nov. 12 2:00 PM</div>
+                                    <div>{{ $delivery->mode_of_payment }}</div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Order Details -->
-                          <div class="timeline-item py-3 d-flex align-items-start">
+
+                        <!-- Order Actions -->
+                        <div class="timeline-item py-3 d-flex align-items-start">
                             <!-- Content -->
                             <div class="content order-width d-flex gap-2">
                                 <button type="button" class="btn btn-outline-dark w-50">Buy Again</button>
@@ -143,10 +144,13 @@
                             </div>
                         </div>
 
-                    </div>
+                    </div>"
+
+
 
 
                 </div>
+
             </div>
 
 
