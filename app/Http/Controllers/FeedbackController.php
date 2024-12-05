@@ -98,6 +98,9 @@ class FeedbackController extends Controller
                 'feedback_text' => $validated['feedback_text'],
                 'rating' => $validated['rating'],
             ]);
+
+            // Toast message for updated feedback
+            session()->flash('toast', ['message' => 'Feedback sent successfully!', 'type' => 'success']);
         } else {
             // Generate a random 6-digit order number for new feedback
             $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -110,6 +113,9 @@ class FeedbackController extends Controller
                 'feedback_text' => $validated['feedback_text'],
                 'rating' => $validated['rating'],
             ]);
+
+            // Toast message for new feedback
+            session()->flash('toast', ['message' => 'Feedback submitted successfully!', 'type' => 'success']);
         }
 
         // Update the menu's rating in the menus table
@@ -121,9 +127,10 @@ class FeedbackController extends Controller
             $menu->save();
         }
 
-        // Redirect back with a success message
-        return redirect()->back()->with('success', 'Feedback submitted successfully!');
+        // Redirect back to the previous page
+        return redirect()->back();
     }
+
 
     public function updateSentiment(Request $request, $id)
     {

@@ -172,16 +172,28 @@
                                                     ₱{{ number_format($menu->price, 2) }}
                                                 @endif
                                             </div>
+
                                             <div class="d-flex align-items-center gap-2">
                                                 <div class="stars d-flex">
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-regular fa-star"></i>
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        @if ($i <= floor($menu->rating))
+                                                            <i class="fa-solid fa-star"></i>
+                                                        @elseif ($i - $menu->rating < 1)
+                                                            <i class="fa-solid fa-star-half-stroke"></i>
+                                                        @else
+                                                            <i class="fa-regular fa-star"></i>
+                                                        @endif
+                                                    @endfor
                                                 </div>
-                                                <div>(2)</div>
-                                            </div>
+                                                <div class="star-label">
+                                                    @if ($menu->ratingCount > 0)
+                                                        ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                                    @else
+                                                        No Rating
+                                                    @endif
+                                                </div>
+                                            </div>                                            
+
                                         </div>
                                     </a>
 

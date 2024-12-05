@@ -65,12 +65,12 @@
             color: #333;
         }
 
-        .ratings {
+        /* .ratings {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
             color: #f39c12;
-        }
+        } */
 
         .pricing {
             display: flex;
@@ -183,10 +183,26 @@
             <!-- Product Details -->
             <div class="product-details">
                 <h1 id="menuName">{{ $menu->name }}</h1>
-                <div class="ratings">
-                    <span id="menuRating">⭐ 4.2</span>
-                    <span id="ratingCount">(4K Ratings)</span>
-                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="stars d-flex">
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= floor($menu->rating))
+                                <i class="fa-solid fa-star"></i>
+                            @elseif ($i - $menu->rating < 1)
+                                <i class="fa-solid fa-star-half-stroke"></i>
+                            @else
+                                <i class="fa-regular fa-star"></i>
+                            @endif
+                        @endfor
+                    </div>
+                    <div class="star-label">
+                        @if ($menu->ratingCount > 0)
+                            ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                        @else
+                            No Rating
+                        @endif
+                    </div>
+                </div>    
 
                 <!-- Pricing Section -->
                 <div class="pricing">

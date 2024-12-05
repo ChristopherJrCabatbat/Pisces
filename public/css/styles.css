@@ -442,12 +442,12 @@ th {
     margin-bottom: 10px;
 }
 
-.ratings {
+/* .ratings {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
     color: #f39c12;
-}
+} */
 
 .pricing {
     display: flex;
@@ -729,9 +729,13 @@ a.more:hover {
 
 .star-rating label:hover,
 .star-rating label:hover ~ label {
-    color: #ffca28;
+    color: #ffca28 !important;
 }
 
 .translate-middle-y-custom {
     transform: translate(-60%, -30%); /* Adjusts horizontal and vertical positions */
+}
+
+.fa-star, .fa-star-half-stroke {
+    color: #ffc107;
 }

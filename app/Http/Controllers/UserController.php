@@ -43,30 +43,50 @@ class UserController extends Controller
         // Merge both results, ensuring there are exactly 5 items
         $topCategories = $topCategoriesWithMenus->merge($remainingCategories)->take(5);
 
-        // Fetch the 4 latest menus
+        // Fetch the 4 latest menus and calculate average ratings
         $latestMenus = DB::table('menus')
             ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.created_at')
             ->orderBy('created_at', 'desc')
             ->take(4)
-            ->get();
+            ->get()
+            ->map(function ($menu) {
+                $menu->rating = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->avg('rating');
+                $menu->rating = round($menu->rating, 1); // Round rating to 1 decimal place
+                $menu->ratingCount = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->count();
+                return $menu;
+            });
 
-        // Fetch the 4 most popular menus based on order count, matching menu names
+        // Fetch the 4 most popular menus based on order count, including average ratings
         $popularMenus = DB::table('orders')
             ->join('menus', 'orders.menu_name', '=', 'menus.name')
             ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', DB::raw('COUNT(orders.id) as order_count'))
             ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price')
             ->orderByDesc('order_count')
             ->take(4)
-            ->get();
+            ->get()
+            ->map(function ($menu) {
+                $menu->rating = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->avg('rating');
+                $menu->rating = round($menu->rating, 1); // Round rating to 1 decimal place
+                $menu->ratingCount = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->count();
+                return $menu;
+            });
 
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
 
-
         return view('user.dashboard', compact('userCart', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount'));
     }
+
 
     public function menu(Request $request)
     {
@@ -85,14 +105,27 @@ class UserController extends Controller
 
         $selectedCategory = $request->input('category', 'All Menus');
 
-        // Count the number of users who added this menu to their favorites
-        // $favoritesCount = DB::table('favorite_items')->where('menu_id', $menu->id)->count();
-
-        // Retrieve menus based on selected category
+        // Retrieve menus with average ratings and rating counts
         if ($selectedCategory == 'All Menus') {
-            $menus = Menu::all();
+            $menus = Menu::all()->map(function ($menu) {
+                $menu->rating = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->avg('rating');
+                $menu->ratingCount = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->count();
+                return $menu;
+            });
         } else {
-            $menus = Menu::where('category', $selectedCategory)->get();
+            $menus = Menu::where('category', $selectedCategory)->get()->map(function ($menu) {
+                $menu->rating = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->avg('rating');
+                $menu->ratingCount = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->count();
+                return $menu;
+            });
         }
 
         // Count unread messages from the admin
@@ -105,6 +138,35 @@ class UserController extends Controller
 
 
 
+
+
+    // public function menuView($id)
+    // {
+    //     $menu = Menu::find($id);
+
+    //     if (!$menu) {
+    //         return response()->json(['error' => 'Menu not found'], 404);
+    //     }
+
+    //     // Get the total favorite count for this menu
+    //     $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
+
+    //     // Mock rating data (adjust as needed)
+    //     $rating = 4.2;
+    //     $ratingCount = 4000;
+
+    //     return response()->json([
+    //         'name' => $menu->name,
+    //         'category' => $menu->category,
+    //         'price' => $menu->price,
+    //         'description' => $menu->description,
+    //         'image' => $menu->image,
+    //         'rating' => $rating,
+    //         'ratingCount' => $ratingCount,
+    //         'favoriteCount' => $favoriteCount,
+    //     ]);
+    // }
+
     public function menuView($id)
     {
         $menu = Menu::find($id);
@@ -113,12 +175,16 @@ class UserController extends Controller
             return response()->json(['error' => 'Menu not found'], 404);
         }
 
-        // Get the total favorite count for this menu
+        // Fetch total favorite count
         $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
 
-        // Mock rating data (adjust as needed)
-        $rating = 4.2;
-        $ratingCount = 4000;
+        // Fetch dynamic rating and review count
+        $rating = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->avg('rating');
+        $ratingCount = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->count();
 
         return response()->json([
             'name' => $menu->name,
@@ -126,11 +192,12 @@ class UserController extends Controller
             'price' => $menu->price,
             'description' => $menu->description,
             'image' => $menu->image,
-            'rating' => $rating,
-            'ratingCount' => $ratingCount,
+            'rating' => $rating ?: 0,
+            'ratingCount' => $ratingCount ?: 0,
             'favoriteCount' => $favoriteCount,
         ]);
     }
+
 
 
     // Add To Cart Bawal Duplicate
@@ -394,6 +461,7 @@ class UserController extends Controller
         // Pass the menu item and user to the view
         return view('user.orderView', compact('menu', 'totalPrice', 'user'));
     }
+
     public function menuDetails($id)
     {
         // Fetch the single menu item based on the provided ID
@@ -402,18 +470,27 @@ class UserController extends Controller
         // Count the number of users who added this menu to their favorites
         $favoritesCount = DB::table('favorite_items')->where('menu_id', $menu->id)->count();
 
+        // Calculate the average rating and the rating count for the menu
+        $menu->rating = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->avg('rating');
+        $menu->ratingCount = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->count();
+
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user ? $user->cart : 0;
         $userFavorites = $user ? $user->favoriteItems()->count() : 0;
 
         // Count unread messages from the admin
-        $unreadCount = Message::where('receiver_id', $user->id)
+        $unreadCount = $user ? Message::where('receiver_id', $user->id)
             ->where('is_read', false)
-            ->count();
+            ->count() : 0;
 
         return view('user.menuDetails', compact('menu', 'user', 'userCart', 'userFavorites', 'favoritesCount', 'unreadCount'));
     }
+
 
 
 
@@ -461,6 +538,65 @@ class UserController extends Controller
     }
 
 
+    // public function orders(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Fetch user-specific orders
+    //     $orders = DB::table('deliveries')
+    //         ->where('email', $user->email) // Filter by user's email
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
+
+    //     $orders = $orders->map(function ($order) {
+    //         $order->created_at = Carbon::parse($order->created_at);
+
+    //         // Parse the order string and quantities
+    //         $orderItems = explode(', ', $order->order);
+    //         $quantities = explode(', ', $order->quantity);
+
+    //         // Fetch all menu details for the order
+    //         $menuDetails = [];
+    //         foreach ($orderItems as $index => $item) {
+    //             $menuName = explode(' (', $item)[0]; // Extract menu name
+    //             $menu = DB::table('menus')->where('name', $menuName)->first();
+
+    //             if ($menu) {
+    //                 $menuDetails[] = (object)[ // Convert to an object
+    //                     'name' => $menuName,
+    //                     'quantity' => $quantities[$index] ?? 1,
+    //                     'image' => 'storage/' . $menu->image, // Consistent with other files
+    //                     'price' => $menu->price
+    //                 ];
+    //             }
+    //         }
+
+    //         $order->menuDetails = $menuDetails;
+    //         return $order;
+    //     });
+
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
+    //         ->count();
+
+
+    //     // Categorize orders by status
+    //     $statuses = [
+    //         'all' => $orders,
+    //         'pending' => $orders->where('status', 'Pending'),
+    //         'preparing' => $orders->where('status', 'Preparing'),
+    //         'out-for-delivery' => $orders->where('status', 'Out for Delivery'),
+    //         'delivered' => $orders->where('status', 'Delivered'),
+    //         'returns' => $orders->where('status', 'Returned'),
+    //     ];
+
+    //     return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount'));
+    // }
+
     public function orders(Request $request)
     {
         /** @var User $user */
@@ -468,10 +604,13 @@ class UserController extends Controller
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        // Fetch user-specific orders
+        // Fetch user-specific orders with custom status hierarchy
         $orders = DB::table('deliveries')
             ->where('email', $user->email) // Filter by user's email
-            ->orderBy('created_at', 'desc')
+            ->orderByRaw("
+            FIELD(status, 'Out for Delivery', 'Preparing', 'Pending', 'Delivered', 'Returned'),
+            created_at DESC
+        ") // Custom ordering by status and then by creation date
             ->get();
 
         $orders = $orders->map(function ($order) {
@@ -506,7 +645,6 @@ class UserController extends Controller
             ->where('is_read', false)
             ->count();
 
-
         // Categorize orders by status
         $statuses = [
             'all' => $orders,
@@ -519,6 +657,7 @@ class UserController extends Controller
 
         return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount'));
     }
+
 
 
 

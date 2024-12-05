@@ -116,7 +116,7 @@
                                                 <i class="fa-solid fa-star"></i>
                                                 <i class="fa-regular fa-star"></i> <!-- Example rating -->
                                             </div>
-                                            <div>(2)</div> <!-- Example rating count -->
+                                            <div class="star-label">(2)</div> <!-- Example rating count -->
                                         </div>
                                     </div>
                                 </div>

@@ -184,7 +184,7 @@
                                                     <i class="fa-solid fa-star"></i>
                                                     <i class="fa-regular fa-star"></i>
                                                 </div>
-                                                <div>(2)</div>
+                                                <div class="star-label">(2)</div>
                                             </div>
                                         </div>
                                     </a>
