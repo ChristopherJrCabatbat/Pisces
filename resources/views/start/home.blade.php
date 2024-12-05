@@ -31,7 +31,112 @@
 
     {{-- <link rel="stylesheet" href="{{ asset('home-assets/css/style.css') }}"> --}}
     <link rel="stylesheet" href="./home-assets/css/style.css">
+    <style>
+        /* Modal Overlay */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            /* Darker overlay for better focus */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.3s, opacity 0.3s ease-in-out;
+        }
 
+        .custom-modal.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Modal Content */
+        .custom-modal .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Close Button */
+        .custom-modal .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+            transition: color 0.2s ease;
+        }
+
+        .custom-modal .close-modal:hover {
+            color: #d9534f;
+            /* Red for hover */
+        }
+
+        /* Title */
+        .custom-modal .modal-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Menu Grid */
+        .custom-modal #menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            /* Responsive grid */
+            gap: 20px;
+            justify-items: center;
+        }
+
+        /* Individual Menu Card */
+        .custom-modal .menu-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .custom-modal .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-modal .menu-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .custom-modal .menu-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .custom-modal .menu-card p {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
     <!--
     - google font link
   -->
@@ -210,48 +315,75 @@
             <!--
         - #TOP RESTAURANT
       -->
+            <section class="section top-restaurant explore-menu-section" aria-labelledby="top-restaurent-label">
+                <div class="container">
+                    <ul class="grid-list grid-list-menus">
+                        <li data-reveal="left">
+                            <h2 class="h2 section-title" id="top-restaurent-label">
+                                Explore Our Menu
+                            </h2>
+                            <p class="section-text">
+                                From handcrafted coffee to a variety of delicious dishes, our menu has something for
+                                everyone.
+                                Whether you're craving a light snack, a hearty meal, or the perfect brew, we’ve got you
+                                covered.
+                                Discover your next favorite bite!
+                            </p>
+                        </li>
+                        @foreach ($popularMenus as $menu)
+                            <li data-reveal="right">
+                                <div class="restaurant-card">
+                                    <div class="card-icon">
+                                        <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}"
+                                            width="100" height="100" loading="lazy" alt="{{ $menu->name }}"
+                                            class="w-100">
+                                    </div>
+                                    <h3 class="h5 card-title">{{ $menu->name }}</h3>
+                                    <div class="rating-wrapper">
+                                        <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                        <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                        <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                        <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                        <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
+                                    </div>
+                                    <div class="card-meta-wrapper">
+                                        <a href="#" class="card-meta">Popular</a>
+                                        <a href="#" class="card-meta">{{ $menu->category }}</a>
+                                    </div>
+                                    <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
+                                    <p class="card-text">{{ $menu->description }}</p>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn btn-secondary has-after" id="openMenuModal">See All</button>
+                </div>
+            </section>
 
-      <section class="section top-restaurant explore-menu-section" aria-labelledby="top-restaurent-label">
-        <div class="container">
-            <ul class="grid-list grid-list-menus">
-                <li data-reveal="left">
-                    <h2 class="h2 section-title" id="top-restaurent-label">
-                        Explore Our Menu
-                    </h2>
-                    <p class="section-text">
-                        From handcrafted coffee to a variety of delicious dishes, our menu has something for everyone.
-                        Whether you're craving a light snack, a hearty meal, or the perfect brew, we’ve got you covered.
-                        Discover your next favorite bite!
-                    </p>
-                </li>
-                @foreach ($popularMenus as $menu)
-                    <li data-reveal="right">
-                        <div class="restaurant-card">
-                            <div class="card-icon">
-                                <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}"
-                                    width="100" height="100" loading="lazy" alt="{{ $menu->name }}" class="w-100">
-                            </div>
-                            <h3 class="h5 card-title">{{ $menu->name }}</h3>
-                            <div class="rating-wrapper">
-                                <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
-                            </div>
-                            <div class="card-meta-wrapper">
-                                <a href="#" class="card-meta">Popular</a>
-                                <a href="#" class="card-meta">{{ $menu->category }}</a>
-                            </div>
-                            <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
-                            <p class="card-text">{{ $menu->description }}</p>
+            <!-- Modal -->
+            <div id="menuModal" class="custom-modal hidden">
+                <div class="modal-content">
+                    <span class="close-modal" id="closeMenuModal">&times;</span>
+                    <h3 class="modal-title">All Menus</h3>
+                    <div id="menu-grid">
+                        <div class="menu-card">
+                            <img src="/path/to/pizza.jpg" alt="Pizza">
+                            <h3>Pizza</h3>
+                            <p>₱299.00</p>
+                            <p>This is a pizza, yehey.</p>
                         </div>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    </section>
-    
+                        <div class="menu-card">
+                            <img src="/path/to/pasta.jpg" alt="Pasta">
+                            <h3>Pasta</h3>
+                            <p>₱499.00</p>
+                            <p>Pasta is made of a lot of pastas stacked together with sauce.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
 
             <!--
         - #CTA
@@ -634,39 +766,28 @@
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
     <script>
-        function showModal() {
-            document.getElementById('menuModal').style.display = 'block';
-        }
+        const modal = document.getElementById('menuModal');
+        const openModalBtn = document.getElementById('openMenuModal');
+        const closeModalBtn = document.getElementById('closeMenuModal');
 
-        function closeModal() {
-            document.getElementById('menuModal').style.display = 'none';
-        }
+        openModalBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            modal.classList.add('visible');
+        });
 
-        function showLoginAlert() {
-            alert("You must log in first to continue.");
-        }
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.remove('visible');
+            modal.classList.add('hidden');
+        });
 
-        function filterByCategory() {
-            const categorySelect = document.getElementById('categorySelect');
-            const selectedCategory = categorySelect.value;
-
-            // Update modal title to the selected category
-            document.querySelector('.modal-title').textContent = selectedCategory;
-
-            // Use AJAX to fetch filtered menus
-            fetch(`${location.pathname}?category=${selectedCategory}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.text())
-                .then(data => {
-                    // Replace the content of menuGrid with the updated menus
-                    document.getElementById('menuGrid').innerHTML = data;
-                })
-                .catch(error => console.error('Error fetching menus:', error));
-        }
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.classList.remove('visible');
+                modal.classList.add('hidden');
+            }
+        });
     </script>
+
 
 </body>
 
