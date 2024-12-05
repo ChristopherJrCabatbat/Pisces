@@ -87,7 +87,7 @@
 
                             <!-- Additional Info -->
                             <div class="extra-info mt-3">
-                                <span>❤️ 1K Favorites</span>
+                                <span>❤️ 0 Favorites</span>
                                 {{-- <span><i class="fa-solid fa-heart me-1" style="color: red;"></i> {{ $favoritesCount }} Favorites</span> --}}
                                 {{-- <span>Shopee Guarantee</span> --}}
                             </div>
@@ -221,38 +221,6 @@
     @yield('scripts')
 
     {{-- Icon Actions Toast Message --}}
-    {{-- <script>
-        let customToastBox = document.getElementById('customToastBox');
-
-        function showToast(msg, type) {
-            let customToast = document.createElement('div');
-            customToast.classList.add('custom-toast');
-
-            // Set the icon based on the type
-            let icon = type === 'error' ?
-                '<i class="fa fa-circle-xmark"></i>' :
-                '<i class="fa fa-circle-check"></i>';
-
-            customToast.innerHTML = `${icon} ${msg}`;
-            customToastBox.appendChild(customToast);
-
-            // Add class for error or success styles
-            if (type === 'error') {
-                customToast.classList.add('error');
-            }
-
-            setTimeout(() => {
-                customToast.remove();
-            }, 3000);
-        }
-
-        // Check if a toast message exists in the session
-        @if (session('toast'))
-            const toastData = @json(session('toast'));
-            showToast(toastData.message, toastData.type);
-        @endif
-    </script> --}}
-
     <div id="customToastBox"></div>
     <script>
         let customToastBox = document.getElementById('customToastBox');
@@ -288,7 +256,7 @@
 
 
     {{-- Modal Script --}}
-    {{-- <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const viewButtons = document.querySelectorAll('.view-menu-btn');
 
@@ -307,17 +275,59 @@
                         .then(data => {
                             // Populate the modal with menu details
                             document.getElementById('menuImage').src = data.image ?
-                                `/storage/${data.image}` : '/images/logo.jpg';
+                                `/storage/${data.image}` :
+                                '/images/logo.jpg';
                             document.getElementById('menuName').textContent = data.name;
                             document.getElementById('menuCategory').textContent = data.category;
                             document.getElementById('menuDescription').textContent = data
                                 .description;
                             document.getElementById('discountedPrice').textContent =
                                 `₱${parseFloat(data.price).toLocaleString()}`;
-                            document.getElementById('menuRating').textContent =
-                                `⭐ ${data.rating}`;
-                            document.getElementById('ratingCount').textContent =
-                                `(${data.ratingCount} Ratings)`;
+
+                            // Build the star and rating display
+                            const starContainer = document.getElementById('menuRating');
+                            starContainer.innerHTML = ''; // Clear previous stars if any
+                            const rating = parseFloat(data.rating ||
+                            0); // Default to 0 if no rating
+                            const fullStars = Math.floor(rating); // Full stars
+                            const halfStar = rating % 1 >= 0.5 ? 1 :
+                            0; // Half star if remainder >= 0.5
+                            const emptyStars = 5 - (fullStars +
+                            halfStar); // Remaining empty stars
+
+                            // Add full stars
+                            for (let i = 0; i < fullStars; i++) {
+                                const star = document.createElement('i');
+                                star.className = 'fa-solid fa-star';
+                                starContainer.appendChild(star);
+                            }
+
+                            // Add half star if applicable
+                            if (halfStar) {
+                                const halfStarIcon = document.createElement('i');
+                                halfStarIcon.className = 'fa-solid fa-star-half-stroke';
+                                starContainer.appendChild(halfStarIcon);
+                            }
+
+                            // Add empty stars
+                            for (let i = 0; i < emptyStars; i++) {
+                                const emptyStarIcon = document.createElement('i');
+                                emptyStarIcon.className = 'fa-regular fa-star';
+                                starContainer.appendChild(emptyStarIcon);
+                            }
+
+                            // Append the numeric rating and review count in the desired format
+                            const ratingText = document.createElement('span');
+                            const reviewText =
+                                data.ratingCount > 0 ?
+                                ` (${rating.toFixed(1)}) ${data.ratingCount} review${data.ratingCount > 1 ? 's' : ''}` :
+                                ` No reviews yet`;
+                            ratingText.textContent = reviewText;
+                            starContainer.appendChild(ratingText);
+
+                            // Update favorites info dynamically
+                            const favoriteInfo = document.querySelector('.extra-info span');
+                            favoriteInfo.textContent = `❤️ ${data.favoriteCount} Favorites`;
 
                             // Reset the quantity input for each new modal view
                             document.getElementById('modalQuantityInput').value = 1;
@@ -341,7 +351,7 @@
                                             'Content-Type': 'application/json',
                                             'X-CSRF-Token': '{{ csrf_token() }}',
                                         },
-                                    })
+                                    });
                                     window.location.reload();
                                 };
 
@@ -354,126 +364,8 @@
                             console.error('Error fetching menu details:', error);
                             alert('Failed to fetch menu details. Please try again.');
                         });
-                });
-            });
-        });
 
-        // Modal-specific increment function
-        function modalIncrementQuantity(button) {
-            let input = document.getElementById('modalQuantityInput');
-            input.value = parseInt(input.value) + 1;
 
-            // Update the hidden input field for quantity
-            document.getElementById('modalHiddenQuantity').value = input.value;
-        }
-
-        // Modal-specific decrement function
-        function modalDecrementQuantity(button) {
-            let input = document.getElementById('modalQuantityInput');
-            if (parseInt(input.value) > 1) {
-                input.value = parseInt(input.value) - 1;
-
-                // Update the hidden input field for quantity
-                document.getElementById('modalHiddenQuantity').value = input.value;
-            }
-        }
-    </script> --}}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const viewButtons = document.querySelectorAll('.view-menu-btn');
-
-            viewButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const menuId = this.getAttribute('data-id');
-
-                    // Fetch menu details via AJAX
-                    fetch(`/user/menuView/${menuId}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-    // Populate the modal with menu details
-    document.getElementById('menuImage').src = data.image
-        ? `/storage/${data.image}`
-        : '/images/logo.jpg';
-    document.getElementById('menuName').textContent = data.name;
-    document.getElementById('menuCategory').textContent = data.category;
-    document.getElementById('menuDescription').textContent = data.description;
-    document.getElementById('discountedPrice').textContent =
-        `₱${parseFloat(data.price).toLocaleString()}`;
-
-    // Build the star and rating display
-    const starContainer = document.getElementById('menuRating');
-    starContainer.innerHTML = ''; // Clear previous stars if any
-    const rating = parseFloat(data.rating || 0); // Default to 0 if no rating
-    const fullStars = Math.floor(rating); // Full stars
-    const halfStar = rating % 1 >= 0.5 ? 1 : 0; // Half star if remainder >= 0.5
-    const emptyStars = 5 - (fullStars + halfStar); // Remaining empty stars
-
-    // Add full stars
-    for (let i = 0; i < fullStars; i++) {
-        const star = document.createElement('i');
-        star.className = 'fa-solid fa-star';
-        starContainer.appendChild(star);
-    }
-
-    // Add half star if applicable
-    if (halfStar) {
-        const halfStarIcon = document.createElement('i');
-        halfStarIcon.className = 'fa-solid fa-star-half-stroke';
-        starContainer.appendChild(halfStarIcon);
-    }
-
-    // Add empty stars
-    for (let i = 0; i < emptyStars; i++) {
-        const emptyStarIcon = document.createElement('i');
-        emptyStarIcon.className = 'fa-regular fa-star';
-        starContainer.appendChild(emptyStarIcon);
-    }
-
-    // Append the numeric rating and review count in the desired format
-    const ratingText = document.createElement('span');
-    const reviewText =
-        data.ratingCount > 0
-            ? ` (${rating.toFixed(1)}) ${data.ratingCount} review${data.ratingCount > 1 ? 's' : ''}`
-            : ` No reviews yet`;
-    ratingText.textContent = reviewText;
-    starContainer.appendChild(ratingText);
-
-    // Reset the quantity input for each new modal view
-    document.getElementById('modalQuantityInput').value = 1;
-    document.getElementById('modalHiddenQuantity').value = 1;
-
-    // Set button destination for "Order Now"
-    document.querySelector('.modal-button.order-now').onclick = function () {
-        const quantity = document.getElementById('modalHiddenQuantity').value;
-        window.location.href = `/user/orderView/${menuId}?quantity=${quantity}`;
-    };
-
-    // Add To Cart
-    document.querySelector('.modal-button.add-to-cart').onclick = function () {
-        fetch(`/user/addToCart/${menuId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': '{{ csrf_token() }}',
-            },
-        });
-        window.location.reload();
-    };
-
-    // Show the modal
-    const menuDetailsModal = new bootstrap.Modal(document.getElementById('menuDetailsModal'));
-    menuDetailsModal.show();
-})
-.catch(error => {
-    console.error('Error fetching menu details:', error);
-    alert('Failed to fetch menu details. Please try again.');
-});
 
 
                 });

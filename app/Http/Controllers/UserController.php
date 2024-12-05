@@ -137,9 +137,6 @@ class UserController extends Controller
     }
 
 
-
-
-
     // public function menuView($id)
     // {
     //     $menu = Menu::find($id);
@@ -148,12 +145,16 @@ class UserController extends Controller
     //         return response()->json(['error' => 'Menu not found'], 404);
     //     }
 
-    //     // Get the total favorite count for this menu
+    //     // Fetch total favorite count
     //     $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
 
-    //     // Mock rating data (adjust as needed)
-    //     $rating = 4.2;
-    //     $ratingCount = 4000;
+    //     // Fetch dynamic rating and review count
+    //     $rating = DB::table('feedback')
+    //         ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //         ->avg('rating');
+    //     $ratingCount = DB::table('feedback')
+    //         ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //         ->count();
 
     //     return response()->json([
     //         'name' => $menu->name,
@@ -161,42 +162,44 @@ class UserController extends Controller
     //         'price' => $menu->price,
     //         'description' => $menu->description,
     //         'image' => $menu->image,
-    //         'rating' => $rating,
-    //         'ratingCount' => $ratingCount,
+    //         'rating' => $rating ?: 0,
+    //         'ratingCount' => $ratingCount ?: 0,
     //         'favoriteCount' => $favoriteCount,
     //     ]);
     // }
 
     public function menuView($id)
-    {
-        $menu = Menu::find($id);
+{
+    $menu = Menu::find($id);
 
-        if (!$menu) {
-            return response()->json(['error' => 'Menu not found'], 404);
-        }
-
-        // Fetch total favorite count
-        $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
-
-        // Fetch dynamic rating and review count
-        $rating = DB::table('feedback')
-            ->where('menu_items', 'LIKE', "%{$menu->name}%")
-            ->avg('rating');
-        $ratingCount = DB::table('feedback')
-            ->where('menu_items', 'LIKE', "%{$menu->name}%")
-            ->count();
-
-        return response()->json([
-            'name' => $menu->name,
-            'category' => $menu->category,
-            'price' => $menu->price,
-            'description' => $menu->description,
-            'image' => $menu->image,
-            'rating' => $rating ?: 0,
-            'ratingCount' => $ratingCount ?: 0,
-            'favoriteCount' => $favoriteCount,
-        ]);
+    if (!$menu) {
+        return response()->json(['error' => 'Menu not found'], 404);
     }
+
+    // Fetch the total number of users who marked this menu as favorite
+    $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
+
+    // Fetch dynamic rating and review count
+    $rating = DB::table('feedback')
+        ->where('menu_items', 'LIKE', "%{$menu->name}%")
+        ->avg('rating');
+    $ratingCount = DB::table('feedback')
+        ->where('menu_items', 'LIKE', "%{$menu->name}%")
+        ->count();
+
+    return response()->json([
+        'name' => $menu->name,
+        'category' => $menu->category,
+        'price' => $menu->price,
+        'description' => $menu->description,
+        'image' => $menu->image,
+        'rating' => $rating ?: 0,
+        'ratingCount' => $ratingCount ?: 0,
+        'favoriteCount' => $favoriteCount, // Include total favorites count
+    ]);
+}
+
+
 
 
 
@@ -339,7 +342,7 @@ class UserController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-
+    
         // Fetch categories with counts of favorite menus for the logged-in user
         $categories = DB::table('categories')
             ->leftJoin('menus', 'categories.category', '=', 'menus.category')
@@ -351,11 +354,11 @@ class UserController extends Controller
             ->groupBy('categories.category')
             ->orderByDesc('menu_count')
             ->get();
-
+    
         $selectedCategory = $request->input('category', 'All Menus');
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-
+    
         // Retrieve favorite menus filtered by the selected category
         if ($selectedCategory == 'All Menus') {
             $menus = $user->favoriteItems; // Get all favorite items
@@ -365,14 +368,26 @@ class UserController extends Controller
                     return $menu->category === $selectedCategory; // Filter by category
                 });
         }
-
+    
+        // Enhance each menu item with its rating and review count
+        $menus = $menus->map(function ($menu) {
+            $menu->rating = DB::table('feedback')
+                ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                ->avg('rating') ?: 0; // Default to 0 if no rating
+            $menu->ratingCount = DB::table('feedback')
+                ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                ->count(); // Count reviews
+            return $menu;
+        });
+    
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
-
+    
         return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     }
+    
 
 
 
@@ -492,27 +507,6 @@ class UserController extends Controller
     }
 
 
-
-
-    // public function menuDetailsOrder($id)
-    // {
-    //     // Get the current authenticated user
-    //     $user = Auth::user();
-
-    //     // Retrieve the specific menu item by ID
-    //     $menu = Menu::find($id);
-
-    //     // Check if the menu item exists
-    //     if (!$menu) {
-    //         return redirect()->route('user.menu')->with('error', 'Menu item not found');
-    //     }
-
-    //     // Fetch the quantity from the request, default to 1 if not provided
-    //     $quantity = request()->input('quantity', 1);
-
-    //     // Pass the menu item, user, and quantity to the view
-    //     return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity'));
-    // }
 
     public function menuDetailsOrder($id)
     {

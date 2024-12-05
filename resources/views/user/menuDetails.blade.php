@@ -65,13 +65,6 @@
             color: #333;
         }
 
-        /* .ratings {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            color: #f39c12;
-        } */
-
         .pricing {
             display: flex;
             align-items: center;
