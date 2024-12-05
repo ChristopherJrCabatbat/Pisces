@@ -15,9 +15,10 @@ use App\Http\Controllers\FeedbackController;
 //     return view('start.home');
 // });
 
-Route::get('/', [HomeController::class, 'home'])->name('home');
-Route::get('/fetchAllMenus', [HomeController::class, 'fetchAllMenus'])->name('fetchAllMenus');
+// Route::get('/', [HomeController::class, 'home'])->name('home');
 
+Route::get('/', [HomeController::class, 'home'])->name('home');
+Route::get('/menus/all', [HomeController::class, 'fetchAllMenus'])->name('menus.all');
 
 Route::get('/welcome', function () {
     return view('welcome');

@@ -136,6 +136,19 @@
             font-size: 14px;
             color: #555;
         }
+
+        .fa-star,
+        .fa-star-half-stroke {
+            color: #F81D0B;
+        }
+
+        .restaurant-card_grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
     </style>
     <!--
     - google font link
@@ -337,15 +350,39 @@
                                         <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/logo.jpg') }}"
                                             width="100" height="100" loading="lazy" alt="{{ $menu->name }}"
                                             class="w-100">
+
                                     </div>
                                     <h3 class="h5 card-title">{{ $menu->name }}</h3>
-                                    <div class="rating-wrapper">
+                                    {{-- <div class="rating-wrapper">
                                         <ion-icon name="star" aria-hidden="true"></ion-icon>
                                         <ion-icon name="star" aria-hidden="true"></ion-icon>
                                         <ion-icon name="star" aria-hidden="true"></ion-icon>
                                         <ion-icon name="star" aria-hidden="true"></ion-icon>
                                         <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
+                                    </div> --}}
+
+                                    <div class="rating-wrapper d-flex align-items-center gap-2">
+                                        <div class="stars d-flex">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if ($i <= floor($menu->rating))
+                                                    <i class="fa-solid fa-star"></i>
+                                                @elseif ($i - $menu->rating < 1)
+                                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                                @else
+                                                    <i class="fa-regular fa-star"></i>
+                                                @endif
+                                            @endfor
+                                        </div>
+                                        <div class="star-label">
+                                            @if ($menu->ratingCount > 0)
+                                                ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }}
+                                                review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                            @else
+                                                No Rating
+                                            @endif
+                                        </div>
                                     </div>
+
                                     <div class="card-meta-wrapper">
                                         <a href="#" class="card-meta">Popular</a>
                                         <a href="#" class="card-meta">{{ $menu->category }}</a>
@@ -360,27 +397,18 @@
                 </div>
             </section>
 
-            <!-- Modal -->
+            <!-- Modal for Menus -->
             <div id="menuModal" class="custom-modal hidden">
                 <div class="modal-content">
                     <span class="close-modal" id="closeMenuModal">&times;</span>
                     <h3 class="modal-title">All Menus</h3>
                     <div id="menu-grid">
-                        <div class="menu-card">
-                            <img src="/path/to/pizza.jpg" alt="Pizza">
-                            <h3>Pizza</h3>
-                            <p>₱299.00</p>
-                            <p>This is a pizza, yehey.</p>
-                        </div>
-                        <div class="menu-card">
-                            <img src="/path/to/pasta.jpg" alt="Pasta">
-                            <h3>Pasta</h3>
-                            <p>₱499.00</p>
-                            <p>Pasta is made of a lot of pastas stacked together with sauce.</p>
-                        </div>
+                        <!-- Content will be dynamically loaded via AJAX -->
                     </div>
                 </div>
             </div>
+
+
 
 
 
@@ -769,10 +797,17 @@
         const modal = document.getElementById('menuModal');
         const openModalBtn = document.getElementById('openMenuModal');
         const closeModalBtn = document.getElementById('closeMenuModal');
+        const menuGrid = document.getElementById('menu-grid');
 
         openModalBtn.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            modal.classList.add('visible');
+            fetch('/menus/all')
+                .then(response => response.text())
+                .then(html => {
+                    menuGrid.innerHTML = html;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('visible');
+                })
+                .catch(error => console.error('Error loading menus:', error));
         });
 
         closeModalBtn.addEventListener('click', () => {
