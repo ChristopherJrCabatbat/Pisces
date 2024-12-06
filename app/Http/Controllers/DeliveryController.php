@@ -19,10 +19,27 @@ class DeliveryController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index()
+    // {
+    //     // Fetch deliveries ordered by latest created_at timestamp
+    //     $deliveries = Delivery::orderBy('created_at', 'desc')->get();
+    //     return view('admin.delivery', compact('deliveries'));
+    // }
     public function index()
     {
-        // Fetch deliveries ordered by latest created_at timestamp
+        // Fetch deliveries ordered by the latest created_at timestamp
         $deliveries = Delivery::orderBy('created_at', 'desc')->get();
+
+        // Ensure delivery details include menu item images
+        foreach ($deliveries as $delivery) {
+            $orders = explode(', ', $delivery->order); // Split orders by comma
+            $menuImages = Menu::whereIn('name', $orders) // Find menu items matching the order names
+                ->pluck('image', 'name') // Retrieve images and associate with menu names
+                ->toArray();
+
+            $delivery->menu_images = $menuImages; // Attach images to each delivery
+        }
+
         return view('admin.delivery', compact('deliveries'));
     }
 
@@ -146,12 +163,77 @@ class DeliveryController extends Controller
     }
 
 
-
     public function deliveryDetails($id)
     {
+        // Find the delivery record by ID or fail with a 404
         $delivery = Delivery::findOrFail($id);
-        return response()->json($delivery);
+
+        // Split orders to extract menu names
+        $orders = explode(', ', $delivery->order);
+
+        // Remove the quantity part (e.g., (x5)) from each menu name
+        $plainMenuNames = array_map(function ($order) {
+            return preg_replace('/\s*\(x\d+\)$/', '', $order); // Remove (x5), (x4), etc.
+        }, $orders);
+
+        // Fetch the menu images using the cleaned menu names
+        $menuImages = Menu::whereIn('name', $plainMenuNames)
+            ->pluck('image', 'name')
+            ->map(function ($image) {
+                return $image ? asset('storage/' . $image) : asset('images/logo.jpg'); // Use fallback for missing images
+            })
+            ->toArray();
+
+
+        return response()->json([
+            'name' => $delivery->name,
+            'email' => $delivery->email,
+            'contact_number' => $delivery->contact_number,
+            'address' => $delivery->address,
+            'shipping_method' => $delivery->shipping_method,
+            'mode_of_payment' => $delivery->mode_of_payment,
+            'note' => $delivery->note,
+            'order' => $delivery->order,
+            'quantity' => $delivery->quantity,
+            'status' => $delivery->status,
+            'menu_images' => $menuImages, // Include menu images in the response
+        ]);
     }
+
+
+    // public function deliveryDetails($id)
+    // {
+    //     // Find the delivery record by ID or fail with a 404
+    //     $delivery = Delivery::findOrFail($id);
+
+    //     // Split orders to extract menu names
+    //     $orders = explode(', ', $delivery->order);
+
+    //     // Fetch the menu images using the menu names
+    //     $menuImages = Menu::whereIn('name', $orders)
+    //         ->pluck('image', 'name')
+    //         ->map(function ($image) {
+    //             return asset('storage/' . $image); // Add the full URL for images
+    //         })
+    //         ->toArray();
+
+
+    //     // Add images to the response
+    //     return response()->json([
+    //         'name' => $delivery->name,
+    //         'email' => $delivery->email,
+    //         'contact_number' => $delivery->contact_number,
+    //         'address' => $delivery->address,
+    //         'shipping_method' => $delivery->shipping_method,
+    //         'mode_of_payment' => $delivery->mode_of_payment,
+    //         'note' => $delivery->note,
+    //         'order' => $delivery->order,
+    //         'quantity' => $delivery->quantity,
+    //         'status' => $delivery->status,
+    //         'menu_images' => $menuImages, // Include menu images in the response
+    //     ]);
+    // }
+
 
     /**
      * Show the form for creating a new resource.

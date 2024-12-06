@@ -22,6 +22,56 @@
         .table th {
             vertical-align: middle;
         }
+
+        .modal-content img {
+            /* border: 1px solid #ddd; */
+            border-radius: 4px;
+        }
+
+        #imageModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 105000;
+            /* Higher than Bootstrap modals */
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #imageModal img {
+            width: auto;
+            height: 80vh;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        #imageModal img:hover {
+            cursor: pointer;
+        }
+
+        /* Ensure the close button stays outside the image */
+        #imageModal .close-modal {
+            position: absolute;
+            top: -40px;
+            right: -215px;
+            z-index: 1050010;
+            /* Ensure it's above the image */
+            border-radius: 50%;
+            border: none;
+            background-color: transparent;
+            padding: 10px;
+            opacity: 0.8;
+        }
+
+        #imageModal .close-modal:hover {
+            opacity: 1;
+            cursor: pointer;
+            color: #f81d0b;
+        }
     </style>
 @endsection
 
@@ -69,6 +119,7 @@
 @endsection
 
 @section('modals')
+
     <!-- Delivery Details Modal -->
     <div class="modal fade text-black" id="deliveryDetailsModal" tabindex="-1" aria-labelledby="deliveryDetailsModalLabel"
         aria-hidden="true">
@@ -88,6 +139,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Image Enlarge Modal -->
+    <div id="imageModal" class="modal" tabindex="-1" aria-hidden="true"
+        style="display: none; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.8);">
+        <div class="modal-dialog modal-lg position-relative">
+            <button type="button" class="close-modal"><i class="fa-solid fa-times"></i></button>
+            <img id="modalImage" src="" class="img-fluid" alt="Enlarged Image">
+        </div>
+    </div>
+
 
 @endsection
 
@@ -130,7 +191,7 @@
                         </form>
                     </div>
                 </div>
-                
+
             </div>
 
             {{-- Table --}}
@@ -154,7 +215,7 @@
                                     class="status-form d-flex justify-content-between">
                                     @csrf
                                     @method('PUT')
-                            
+
                                     @php
                                         $allowedTransitions = [
                                             'Pending' => ['Preparing'],
@@ -163,12 +224,16 @@
                                             'Delivered' => ['Returned'],
                                             'Returned' => [], // No transitions for "Returned"
                                         ];
-                            
+
                                         // Generate valid statuses based on current status
-                                        $validStatuses = array_merge([$delivery->status], $allowedTransitions[$delivery->status]);
+                                        $validStatuses = array_merge(
+                                            [$delivery->status],
+                                            $allowedTransitions[$delivery->status],
+                                        );
                                     @endphp
-                            
-                                    <select name="status" class="form-select delivery-status-select" {{ $delivery->status === 'Returned' ? 'disabled' : '' }}>
+
+                                    <select name="status" class="form-select delivery-status-select"
+                                        {{ $delivery->status === 'Returned' ? 'disabled' : '' }}>
                                         @foreach ($validStatuses as $status)
                                             <option value="{{ $status }}"
                                                 {{ $delivery->status === $status ? 'selected' : '' }}>
@@ -176,14 +241,12 @@
                                             </option>
                                         @endforeach
                                     </select>
-                            
+
                                     @if ($delivery->status === 'Returned')
                                         <input type="hidden" name="status" value="Returned">
                                     @endif
                                 </form>
                             </td>
-                            
-                            
 
                             <td>
                                 <button type="button" class="btn btn-primary view-details-btn"
@@ -332,54 +395,69 @@
                     .then((response) => response.json())
                     .then((data) => {
                         if (data) {
-                            // Parse the `order` and `quantity` strings
-                            const orders = data.order.split(', '); // Split orders by comma
-                            const quantities = data.quantity.split(', '); // Split quantities by comma
+                            const orders = data.order.split(', ');
+                            const quantities = data.quantity.split(', ');
+                            const fallbackImageUrl =
+                                '{{ asset('images/logo.jpg') }}'; // Define fallback image URL
 
-                            // Construct the rows for each order and quantity
-                            const orderRows = orders.map((order, index) => `
-                                <tr>
-                                    <td>${order.replace(/\s\(x\d+\)/, '')}</td> <!-- Remove (x1) from the order name -->
-                                    <td>${quantities[index]}</td>
-                                </tr>
-                            `).join("");
+                            const orderRows = orders.map((order, index) => {
+                                // Clean up the menu name to remove the quantity part
+                                const cleanedOrderName = order.replace(/\s*\(x\d+\)$/,
+                                    ''); // Remove (x5), (x4), etc.
 
-                            // Generate the modal content
+                                // Access the image URL from menu_images, with a fallback if not found
+                                const imageUrl = data.menu_images[cleanedOrderName] || fallbackImageUrl;
+
+                                return `
+                            <tr>
+                                <td>
+                                    <img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Menu Image">
+                                </td>
+                                <td>${order}</td>
+                            </tr>
+                        `;
+                            }).join("");
+
                             detailsDiv.innerHTML = `
-                                <table class="table table-bordered text-center align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <td><strong>Name:</strong> ${data.name}</td>
-                                            <td><strong>Email:</strong> ${data.email}</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>Contact Number:</strong> ${data.contact_number}</td>
-                                            <td><strong>Address:</strong> ${data.address}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Shipping Method:</strong> ${data.shipping_method}</td>
-                                            <td><strong>Mode of Payment:</strong> ${data.mode_of_payment}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><strong>Note:</strong> ${data.note || 'N/A'}</td>
-                                        </tr>
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Order</th>
-                                                <th>Quantity</th>
-                                            </tr>
-                                        </thead>
-                                        ${orderRows}
-                                        <thead class="table-light">
-                                            <tr>
-                                                <td colspan="2"><strong>Status:</strong> ${data.status}</td>
-                                            </tr>
-                                        </thead>
-                                    </tbody>
-                                </table>
-                            `;
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th colspan="2">Delivery Information</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Name:</strong> ${data.name}</td>
+                                    <td><strong>Email:</strong> ${data.email}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Contact Number:</strong> ${data.contact_number}</td>
+                                    <td><strong>Address:</strong> ${data.address}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Shipping Method:</strong> ${data.shipping_method}</td>
+                                    <td><strong>Mode of Payment:</strong> ${data.mode_of_payment}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><strong>Note:</strong> ${data.note || 'N/A'}</td>
+                                </tr>
+                            </tbody>
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Order</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${orderRows}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="3"><strong>Status:</strong> ${data.status}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    `;
                         } else {
                             detailsDiv.innerHTML = '<p>Failed to load delivery details.</p>';
                         }
@@ -392,5 +470,34 @@
         });
     </script>
 
+    {{-- Enlarge Image --}}
+    <script>
+        // Function to open the image modal
+        function enlargeImage(imageSrc) {
+            const modal = document.getElementById("imageModal");
+            const modalImg = document.getElementById("modalImage");
+            modal.style.display = "flex"; // Show the modal
+            modalImg.src = imageSrc; // Set the image source
+        }
+
+        // Close the modal when the user clicks the close button
+        document.querySelector(".close-modal").onclick = function() {
+            document.getElementById("imageModal").style.display = "none";
+        };
+
+        // Close the modal when clicking outside the image
+        document.getElementById("imageModal").onclick = function(event) {
+            if (event.target === this) {
+                this.style.display = "none";
+            }
+        };
+
+        // Attach click event to all images in the delivery details modal
+        document.addEventListener("click", function(e) {
+            if (e.target && e.target.tagName === "IMG" && e.target.closest("#delivery-details")) {
+                enlargeImage(e.target.src); // Enlarge the clicked image
+            }
+        });
+    </script>
 
 @endsection

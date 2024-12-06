@@ -57,11 +57,11 @@
                 <img src="./home-assets/images/hero-banner.png" width="680" height="720" alt="hero banner"
                     class="w-100">
 
-                <img src="./home-assets/images/hero-shape-1.svg" width="338" height="138" alt="shape"
+                <img src="{{ asset('home-assets/images/pisces-white.jpg') }}" width="280" height="120" alt="shape"
                     class="shape shape-1">
 
-                <img src="./home-assets/images/hero-shape-2.svg" width="237" height="80" alt="shape"
-                    class="shape shape-2">
+                <img src="{{ asset('home-assets/images/ilang-white.jpg') }}" width="217" height="80" alt="shape"
+                class="shape shape-2">
 
             </figure>
 
