@@ -34,7 +34,7 @@
             @endif
         </a>
     </li>
-    
+
 @endsection
 
 @section('main-content')
@@ -83,8 +83,10 @@
                                     </div>
                                     <div>
                                         <p class="m-0 fw-bold">Review your order</p>
-                                        <p class="m-0 text-muted small">Order #{{ $delivery->id }} -
-                                            {{ $delivery->created_at->diffForHumans() }}</p>
+                                        <p class="m-0 text-muted small">{{ $delivery->order }}</p>
+                                        <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span
+                                                class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span>
+                                        </p>
                                     </div>
                                 </div>
                             </a>
@@ -101,6 +103,7 @@
                                     </div>
                                     <div>
                                         <p class="m-0 fw-bold">Track order</p>
+                                        <p class="m-0 text-muted small">{{ $delivery->order }}</p>
                                         <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span
                                                 class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span>
                                         </p>

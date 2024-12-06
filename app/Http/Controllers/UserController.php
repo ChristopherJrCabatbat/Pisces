@@ -592,8 +592,6 @@ class UserController extends Controller
     }
 
 
-
-
     public function messages(Request $request)
     {
         /** @var User $user */
@@ -620,8 +618,46 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Attach menu images to deliveries
+        $deliveries = $deliveries->map(function ($delivery) {
+            // Split orders and quantities
+            $orderItems = explode(', ', $delivery->order);
+            $quantities = explode(', ', $delivery->quantity);
+
+            // Clean menu names to remove quantity suffix (e.g., Pizza (x5))
+            $cleanedOrderItems = array_map(function ($item) {
+                return preg_replace('/\s*\(x\d+\)$/', '', $item);
+            }, $orderItems);
+
+            // Fetch menu images using cleaned names
+            $menuData = Menu::whereIn('name', $cleanedOrderItems)
+                ->pluck('image', 'name') // Fetch images keyed by menu names
+                ->toArray();
+
+            // Determine the menu item with the highest quantity
+            $maxQuantityIndex = 0;
+            $maxQuantity = 0;
+
+            foreach ($quantities as $index => $quantity) {
+                $currentQuantity = (int) trim($quantity);
+                if ($currentQuantity > $maxQuantity) {
+                    $maxQuantity = $currentQuantity;
+                    $maxQuantityIndex = $index;
+                }
+            }
+
+            // Get the name of the menu with the highest quantity
+            $menuWithHighestQuantity = $cleanedOrderItems[$maxQuantityIndex] ?? null;
+
+            // Attach the image for the highest quantity menu
+            $delivery->menuImage = $menuData[$menuWithHighestQuantity] ?? asset('images/logo.jpg');
+
+            return $delivery;
+        });
+
         return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
     }
+
 
 
     public function messagesPisces(Request $request)
@@ -682,88 +718,77 @@ class UserController extends Controller
     }
 
 
-    // public function shopUpdates(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Fetch the latest message exchanged between the user and the admin
-    //     $latestMessage = Message::where(function ($query) use ($user) {
-    //         $query->where('user_id', $user->id)
-    //             ->orWhere('receiver_id', $user->id);
-    //     })
-    //         ->latest('created_at') // Order by most recent message
-    //         ->first(); // Get the latest message
-
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     // Count unread messages from the admin
-    //     $unreadCount = Message::where('receiver_id', $user->id)
-    //         ->where('is_read', false)
-    //         ->count();
-
-    //     // Fetch deliveries for the current user
-    //     $deliveries = Delivery::where('email', $user->email)
-    //         ->orderBy('created_at', 'desc')
-    //         ->get();
-
-    //     return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
-    // }
-
     public function shopUpdates(Request $request)
-{
-    /** @var User $user */
-    $user = Auth::user();
+    {
+        /** @var User $user */
+        $user = Auth::user();
 
-    // Fetch the latest message exchanged between the user and the admin
-    $latestMessage = Message::where(function ($query) use ($user) {
-        $query->where('user_id', $user->id)
-            ->orWhere('receiver_id', $user->id);
-    })
-        ->latest('created_at') // Order by most recent message
-        ->first(); // Get the latest message
+        // Fetch the latest message exchanged between the user and the admin
+        $latestMessage = Message::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id)
+                ->orWhere('receiver_id', $user->id);
+        })
+            ->latest('created_at') // Order by most recent message
+            ->first(); // Get the latest message
 
-    $userCart = $user->cart;
-    $userFavorites = $user->favoriteItems()->count();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
 
-    // Count unread messages from the admin
-    $unreadCount = Message::where('receiver_id', $user->id)
-        ->where('is_read', false)
-        ->count();
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
 
-    // Fetch deliveries for the current user
-    $deliveries = Delivery::where('email', $user->email)
-        ->orderBy('created_at', 'desc')
-        ->get();
+        // Fetch deliveries for the current user
+        $deliveries = Delivery::where('email', $user->email)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    // Map each delivery to include the image of the menu with the highest quantity
-    $deliveries = $deliveries->map(function ($delivery) {
-        $orderItems = explode(',', $delivery->order); // Split order string
-        $quantities = explode(',', $delivery->quantity); // Split quantity string
+        // Map each delivery to include the image of the menu with the highest quantity
+        $deliveries = $deliveries->map(function ($delivery) {
+            // Split orders and quantities
+            $orderItems = explode(', ', $delivery->order);
+            $quantities = explode(', ', $delivery->quantity);
 
-        $menuWithHighestQuantity = null;
-        $maxQuantity = 0;
+            // Clean menu names to remove quantity suffix (e.g., Pizza (x5))
+            $cleanedOrderItems = array_map(function ($item) {
+                return preg_replace('/\s*\(x\d+\)$/', '', $item);
+            }, $orderItems);
 
-        foreach ($orderItems as $index => $itemName) {
-            $menu = DB::table('menus')->where('name', trim($itemName))->first();
-            $quantity = (int)($quantities[$index] ?? 0);
+            // Fetch menu images using cleaned names
+            $menuData = Menu::whereIn('name', $cleanedOrderItems)
+                ->pluck('image', 'name') // Fetch images keyed by menu names
+                ->toArray();
 
-            // Find the menu with the highest quantity
-            if ($menu && $quantity > $maxQuantity) {
-                $menuWithHighestQuantity = $menu;
-                $maxQuantity = $quantity;
+            // Determine the menu item with the highest quantity
+            $maxQuantityIndex = 0;
+            $maxQuantity = 0;
+
+            foreach ($quantities as $index => $quantity) {
+                $currentQuantity = (int) trim($quantity);
+                if ($currentQuantity > $maxQuantity) {
+                    $maxQuantity = $currentQuantity;
+                    $maxQuantityIndex = $index;
+                }
             }
-        }
 
-        // Attach the highest quantity menu's image to the delivery
-        $delivery->menuImage = $menuWithHighestQuantity ? asset('storage/' . $menuWithHighestQuantity->image) : asset('images/logo.jpg');
+            // Get the name of the menu with the highest quantity
+            $menuWithHighestQuantity = $cleanedOrderItems[$maxQuantityIndex] ?? null;
 
-        return $delivery;
-    });
+            // Attach the image for the highest quantity menu
+            if (isset($menuData[$menuWithHighestQuantity])) {
+                $delivery->menuImage = asset('storage/' . $menuData[$menuWithHighestQuantity]);
+            } else {
+                $delivery->menuImage = asset('images/logo.jpg'); // Default fallback
+            }
 
-    return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
-}
+            return $delivery;
+        });
+
+        return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
+    }
+
+
 
 
     public function trackOrder(Request $request, Delivery $delivery)

@@ -65,7 +65,7 @@
         </div>
 
         <!-- Dashboard Cards -->
-        <div class="table-container">
+        <div class="table-container mb-4">
 
             {{-- Summary --}}
             <div class="row summary">
@@ -166,10 +166,64 @@
                 </table>
             </div>
 
+            <div class="bar-graph text-black">
+                <h3 class="h3 mt-5 text-black">Monthly Sales</h3>
+                <div>
+                    <canvas id="monthlySalesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
         </div>
 
     </div>
 @endsection
 
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const monthlySales = @json($monthlySales);
+
+        // Prepare data for Chart.js
+        const labels = Object.keys(monthlySales); // Month names
+        const data = Object.values(monthlySales); // Total sales
+
+        // Configure the Chart.js bar graph
+        const ctx = document.getElementById('monthlySalesChart').getContext('2d');
+        const monthlySalesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Sales (₱)',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Sales in ₱'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Months'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 @endsection

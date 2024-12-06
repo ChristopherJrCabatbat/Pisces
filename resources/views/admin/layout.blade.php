@@ -19,28 +19,7 @@
 
     @yield('styles-links')
 
-    <style>
-        /* Spinner overlay styles */
-        .spinner-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* background-color: rgba(255, 255, 255, 0.4); */
-            background-color: rgb(72, 64, 69, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1050;
-            /* Higher than modal */
-        }
-
-        .spinner-border {
-            color: #f81d0b;
-            font-size: 1.2rem
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
