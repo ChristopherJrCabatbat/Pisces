@@ -6,13 +6,11 @@
     <style>
         .main-content {
             margin-top: 13vh;
-            min-height: 100vh;
         }
 
         select {
             width: 30% !important;
         }
-
     </style>
 @endsection
 
@@ -132,26 +130,29 @@
             </div>
         </div>
 
-        {{-- Content --}}
-        <div class="tab-content container content user-content p-0 text-black" id="ordersTabContent">
-            @foreach (['all', 'pending', 'preparing', 'out-for-delivery', 'delivered', 'returns'] as $status)
-                <div class="tab-pane fade {{ $status === 'all' ? 'show active' : '' }}" id="{{ $status }}"
-                    role="tabpanel" aria-labelledby="{{ $status }}-tab">
-                    @forelse ($statuses[$status] as $order)
-                        @include('user.orders-partial', [
-                            'order' => $order,
-                        ])
-                    @empty
-                        <div class="order-container border rounded p-4 shadow-sm">
-                            <div class="d-flex align-items-center fs-5">
-                                <i class="fa-regular fa-circle-question me-2"></i> There are no
-                                {{ str_replace('_', ' ', $status) }} orders.
-                            </div>
-                        </div>
-                    @endforelse
+{{-- Content --}}
+<div class="tab-content container content user-content p-0 text-black" id="ordersTabContent">
+    @foreach (['all', 'pending', 'preparing', 'out-for-delivery', 'delivered', 'returns'] as $status)
+        <div class="tab-pane fade {{ $status === 'all' ? 'show active' : '' }}" id="{{ $status }}"
+            role="tabpanel" aria-labelledby="{{ $status }}-tab">
+            @forelse ($statuses[$status] as $order)
+                {{-- Wrapper for each order --}}
+                <a href="{{ $order->status === 'Delivered' ? '#' : route('user.trackOrder', ['delivery' => $order->id]) }}"
+                    class="text-decoration-none order-link" data-status="{{ $order->status }}">
+                    @include('user.orders-partial', ['order' => $order])
+                </a>
+            @empty
+                <div class="order-container border rounded p-4 shadow-sm">
+                    <div class="d-flex align-items-center fs-5">
+                        <i class="fa-regular fa-circle-question me-2"></i> There are no
+                        {{ str_replace('_', ' ', $status) }} orders.
+                    </div>
                 </div>
-            @endforeach
+            @endforelse
         </div>
+    @endforeach
+</div>
+
 
 
     </div>
@@ -187,5 +188,25 @@
             });
         });
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Select all order links
+        const orderLinks = document.querySelectorAll('.order-link');
+
+        orderLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                const status = this.dataset.status;
+
+                // Prevent navigation for Delivered status
+                if (status === 'Delivered') {
+                    event.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+
+
 
 @endsection

@@ -49,9 +49,9 @@
         </div>
 
         {{-- Content --}}
-        <div class="d-flex container flex-column content user-content p-0">
+        {{-- <div class="d-flex container flex-column content user-content p-0">
 
-         <!-- Order Updates Section -->
+            <!-- Order Updates Section -->
             <div
                 class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
@@ -59,7 +59,7 @@
                     <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i
                             class="fa-solid fa-caret-right ms-1"></i></a>
                 </div>
-                
+
                 <div class="shop-updates-body my-2">
                     @foreach ($deliveries as $delivery)
                         <!-- Review Order -->
@@ -71,8 +71,11 @@
                                 </div>
                                 <div>
                                     <p class="m-0 fw-bold">Review your order</p>
-                                    <p class="m-0 text-muted small">Order #{{ $delivery->id }} -
-                                        {{ $delivery->created_at->diffForHumans() }}</p>
+                                    <p class="m-0 text-muted small">{{ $delivery->order }}</p>
+                                    <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span
+                                            class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span></p>
+                                    <img src="{{ asset('images/logo.jpg') }}" width="60" class="mt-2 img-fluid"
+                                        alt="Order Image">
                                 </div>
                             </div>
                         </a>
@@ -86,8 +89,68 @@
                                 </div>
                                 <div>
                                     <p class="m-0 fw-bold">Track order</p>
+                                    <p class="m-0 text-muted small">{{ $delivery->order }}</p>
+                                    <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span
+                                            class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span>
+                                    </p>
+                                    <img src="{{ asset('images/logo.jpg') }}" width="60" class="mt-2 img-fluid"
+                                        alt="Order Image">
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+        </div> --}}
+
+        {{-- Content --}}
+        <div class="d-flex container flex-column content user-content p-0">
+
+            <!-- Order Updates Section -->
+            <div
+                class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
+                <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 text-secondary">Order Updates</h5>
+                    <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i
+                            class="fa-solid fa-caret-right ms-1"></i></a>
+                </div>
+
+                <div class="shop-updates-body my-2">
+                    @foreach ($deliveries as $delivery)
+                        <!-- Review Order -->
+                        <a href="{{ route('user.reviewOrder', ['delivery' => $delivery->id]) }}">
+                            <div class="d-flex a-container p-3">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fa-solid fa-bag-shopping text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="m-0 fw-bold">Review your order</p>
+                                    <p class="m-0 text-muted small">{{ $delivery->order }}</p>
                                     <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span
                                             class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span></p>
+                                    <img src="{{ $delivery->menuImage }}" width="60" class="mt-2 img-fluid"
+                                        alt="Order Image">
+                                </div>
+                            </div>
+                        </a>
+
+                        <!--    Track Order -->
+                        <a href="{{ route('user.trackOrder', ['delivery' => $delivery->id]) }}">
+                            <div class="d-flex a-container p-3">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-circle border"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fa-solid fa-box text-success"></i>
+                                </div>
+                                <div>
+                                    <p class="m-0 fw-bold">Track order</p>
+                                    <p class="m-0 text-muted small">{{ $delivery->order }}</p>
+                                    <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span
+                                            class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span>
+                                    </p>
+                                    <img src="{{ $delivery->menuImage }}" width="60" class="mt-2 img-fluid"
+                                        alt="Order Image">
                                 </div>
                             </div>
                         </a>
@@ -96,6 +159,7 @@
             </div>
 
         </div>
+
 
     </div>
 @endsection

@@ -57,7 +57,7 @@
                 class="track-order d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
                 <!-- Header -->
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 text-secondary">Order Completed</h5>
+                    <h5 class="m-0 text-secondary">Order {{ $delivery->status }}</h5>
                 </div>
 
                 <!-- Order Status Body -->
@@ -79,12 +79,13 @@
                                 <div class="order-width d-flex">
                                     {{-- <img src="{{ asset('images/logo.jpg') }}" alt="Delivery Image" class=""
                                         style="max-height: 100px; width: auto;"> --}}
-                                    <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('images/default-placeholder.jpg') }}"
+                                    <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('images/logo.jpg') }}"
                                         alt="{{ $item['name'] }} Image" style="max-height: 100px; width: auto;">
                                     <div class="content ms-3">
                                         <div class="status fw fs-5">{{ $item['name'] }}</div>
                                         <div class="location fs-5 flex-between">
-                                            <div class="">Price: {{ $item['price'] }}</div>
+                                            {{-- <div class="">Price: {{ $item['price'] }}</div> --}}
+                                            <div class="">₱{{ number_format($delivery->total_price, 2) }}</div>
                                         </div>
                                     </div>
                                 </div>

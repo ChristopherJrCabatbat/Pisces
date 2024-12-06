@@ -682,116 +682,88 @@ class UserController extends Controller
     }
 
 
-
-
     // public function shopUpdates(Request $request)
     // {
-    //     $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-    //         ->groupBy('category')
-    //         ->get();
-
-    //     $selectedCategory = $request->input('category', 'All Menus');
-
     //     /** @var User $user */
     //     $user = Auth::user();
+
+    //     // Fetch the latest message exchanged between the user and the admin
+    //     $latestMessage = Message::where(function ($query) use ($user) {
+    //         $query->where('user_id', $user->id)
+    //             ->orWhere('receiver_id', $user->id);
+    //     })
+    //         ->latest('created_at') // Order by most recent message
+    //         ->first(); // Get the latest message
+
     //     $userCart = $user->cart;
     //     $userFavorites = $user->favoriteItems()->count();
 
-    //     // Retrieve menus based on selected category, excluding items in the cart
-    //     if ($selectedCategory == 'All Menus') {
-    //         $menus = Menu::whereNotIn('id', $user->cartItems->pluck('id'))->get();
-    //     } else {
-    //         $menus = Menu::where('category', $selectedCategory)
-    //             ->whereNotIn('id', $user->cartItems->pluck('id'))
-    //             ->get();
-    //     }
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
+    //         ->count();
 
-    //     return view('user.shopUpdates', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites'));
+    //     // Fetch deliveries for the current user
+    //     $deliveries = Delivery::where('email', $user->email)
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
+
+    //     return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
     // }
-
-
 
     public function shopUpdates(Request $request)
-    {
-        /** @var User $user */
-        $user = Auth::user();
+{
+    /** @var User $user */
+    $user = Auth::user();
 
-        // Fetch the latest message exchanged between the user and the admin
-        $latestMessage = Message::where(function ($query) use ($user) {
-            $query->where('user_id', $user->id)
-                ->orWhere('receiver_id', $user->id);
-        })
-            ->latest('created_at') // Order by most recent message
-            ->first(); // Get the latest message
+    // Fetch the latest message exchanged between the user and the admin
+    $latestMessage = Message::where(function ($query) use ($user) {
+        $query->where('user_id', $user->id)
+            ->orWhere('receiver_id', $user->id);
+    })
+        ->latest('created_at') // Order by most recent message
+        ->first(); // Get the latest message
 
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
+    $userCart = $user->cart;
+    $userFavorites = $user->favoriteItems()->count();
 
-        // Count unread messages from the admin
-        $unreadCount = Message::where('receiver_id', $user->id)
-            ->where('is_read', false)
-            ->count();
+    // Count unread messages from the admin
+    $unreadCount = Message::where('receiver_id', $user->id)
+        ->where('is_read', false)
+        ->count();
 
-        // Fetch deliveries for the current user
-        $deliveries = Delivery::where('email', $user->email)
-            ->orderBy('created_at', 'desc')
-            ->get();
+    // Fetch deliveries for the current user
+    $deliveries = Delivery::where('email', $user->email)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-        return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
-    }
+    // Map each delivery to include the image of the menu with the highest quantity
+    $deliveries = $deliveries->map(function ($delivery) {
+        $orderItems = explode(',', $delivery->order); // Split order string
+        $quantities = explode(',', $delivery->quantity); // Split quantity string
 
-    // public function trackOrder(Request $request, Delivery $delivery)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
+        $menuWithHighestQuantity = null;
+        $maxQuantity = 0;
 
-    //     // Define the status order and corresponding messages/icons for all statuses
-    //     $statusOrder = ['Returned', 'Delivered', 'Out for Delivery', 'Preparing', 'Pending'];
-    //     $statusMessages = [
-    //         'Returned' => 'Your order has been returned to the sender.',
-    //         'Pending' => 'Your order is currently pending.',
-    //         'Preparing' => 'Your order is being prepared.',
-    //         'Out for Delivery' => 'Your order is out for delivery.',
-    //         'Delivered' => 'Your order has been successfully delivered.',
-    //     ];
-    //     $statusIcons = [
-    //         'Returned' => 'fa-times text-danger',
-    //         'Pending' => 'fa-clock text-secondary',
-    //         'Preparing' => 'fa-utensils text-warning',
-    //         'Out for Delivery' => 'fa-truck text-primary',
-    //         'Delivered' => 'fa-check text-success',
-    //     ];
+        foreach ($orderItems as $index => $itemName) {
+            $menu = DB::table('menus')->where('name', trim($itemName))->first();
+            $quantity = (int)($quantities[$index] ?? 0);
 
-    //     // Find all statuses for this delivery
-    //     $statuses = Delivery::where('id', $delivery->id)->get();
+            // Find the menu with the highest quantity
+            if ($menu && $quantity > $maxQuantity) {
+                $menuWithHighestQuantity = $menu;
+                $maxQuantity = $quantity;
+            }
+        }
 
-    //     // Prepare a timeline with placeholders for missing statuses
-    //     $timeline = [];
-    //     foreach ($statusOrder as $status) {
-    //         $record = $statuses->firstWhere('status', $status);
+        // Attach the highest quantity menu's image to the delivery
+        $delivery->menuImage = $menuWithHighestQuantity ? asset('storage/' . $menuWithHighestQuantity->image) : asset('images/logo.jpg');
 
-    //         $timeline[] = [
-    //             'status' => $status,
-    //             'message' => $statusMessages[$status],
-    //             'icon' => $statusIcons[$status],
-    //             'timestamp' => $record ? $record->updated_at->format('M d, h:i A') : 'N/A',
-    //             'address' => $record ? $record->address : $delivery->address,
-    //             'rider' => $record ? $record->rider : null,
-    //         ];
-    //     }
+        return $delivery;
+    });
 
-    //     // Fetch additional data for the view
-    //     $categories = Menu::select('category', DB::raw('count(*) as menu_count'))
-    //         ->groupBy('category')
-    //         ->get();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     // Pass timeline to the view
-    //     return view('user.trackOrder', compact('timeline', 'categories', 'userCart', 'user', 'userFavorites'));
-    // }
-
-
+    return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
+}
 
 
     public function trackOrder(Request $request, Delivery $delivery)
