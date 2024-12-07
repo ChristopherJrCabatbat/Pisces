@@ -27,7 +27,7 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">ORDERS</a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES
             @if ($unreadCount > 0)
                 <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
@@ -88,27 +88,32 @@
                 </div>
             </div>
 
-
             {{-- Menus --}}
             <div class="menus d-flex flex-column gap-4 mb-5 w-100">
 
-                {{-- Select --}}
-                <div class="top-menus">
-                    <select class="form-select" aria-label="Default select example">
-                        <option selected value="Default">Default</option>
-                        <option value="Expensive">Expensive</option>
-                        <option value="Cheap">Cheap</option>
+                {{-- Select - Search --}}
+                <div class="top-menus d-flex justify-content-between">
+                    <select id="sort-select" class="form-select" aria-label="Sort by price">
+                        <option selected disabled value="Default">Sort by price</option>
+                        <option value="Expensive">Highest first</option>
+                        <option value="Cheap">Lowest first</option>
                     </select>
+                    <div class="position-relative custom-search" id="search-form">
+                        <form action="">
+                            <input type="text" id="search-input" class="form-control" placeholder="Search menus..." />
+                            <i class="fas fa-search custom-search-icon"></i>
+                        </form>
+                    </div>
                 </div>
 
                 {{-- Menu --}}
                 <div class="menu-list">
-                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div id="menu-container" class="row row-cols-1 row-cols-md-3 g-4">
                         @forelse($menus as $menu)
-                            <div class="col">
+                            <div class="col menu-item" data-price="{{ $menu->price }}"
+                                data-name="{{ strtolower($menu->name) }}">
                                 <div class="card card-hover h-100 position-relative">
-
-                                    {{-- Menu Image --}}
+                                    {{-- Menu Content --}}
                                     <div class="img-container">
                                         @if ($menu->image)
                                             <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
@@ -157,22 +162,12 @@
                                             </form>
 
                                         </div>
-
                                     </div>
-
-                                    {{-- Menu Body --}}
                                     <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
                                         class="menu-body">
-                                        <div class="card-body card-body-mt">
+                                        <div class="card-body">
                                             <h5 class="card-title">{{ $menu->name }}</h5>
-                                            <div class="price fw-bold mb-2">
-                                                @if (floor($menu->price) == $menu->price)
-                                                    ₱{{ number_format($menu->price, 0) }}
-                                                @else
-                                                    ₱{{ number_format($menu->price, 2) }}
-                                                @endif
-                                            </div>
-
+                                            <p class="price fw-bold mb-0">₱{{ number_format($menu->price, 2) }}</p>
                                             <div class="d-flex align-items-center gap-2">
                                                 <div class="stars d-flex">
                                                     @for ($i = 1; $i <= 5; $i++)
@@ -187,20 +182,20 @@
                                                 </div>
                                                 <div class="star-label">
                                                     @if ($menu->ratingCount > 0)
-                                                        ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                                        ({{ number_format($menu->rating, 1) }})
+                                                        {{ $menu->ratingCount }}
+                                                        review{{ $menu->ratingCount > 1 ? 's' : '' }}
                                                     @else
                                                         No Rating
                                                     @endif
                                                 </div>
-                                            </div>                                            
-
+                                            </div>
                                         </div>
                                     </a>
-
                                 </div>
                             </div>
                         @empty
-                            <div class="col">
+                            <div class="col no-menus">
                                 <p>No menus available.</p>
                             </div>
                         @endforelse
@@ -216,4 +211,49 @@
 @endsection
 
 @section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sortSelect = document.getElementById('sort-select');
+            const searchInput = document.getElementById('search-input');
+            const menuContainer = document.getElementById('menu-container');
+            const menuItems = [...document.querySelectorAll('.menu-item')]; // Convert NodeList to Array
+    
+            // Function to render menus
+            function renderMenus(filteredMenus) {
+                menuContainer.innerHTML = ''; // Clear existing menus
+                if (filteredMenus.length === 0) {
+                    menuContainer.innerHTML = `<div class="col no-menus"><p>No menus available.</p></div>`;
+                } else {
+                    filteredMenus.forEach(menu => menuContainer.appendChild(menu));
+                }
+            }
+    
+            // Combined function for sorting and searching
+            function updateMenus() {
+                const sortValue = sortSelect.value;
+                const query = searchInput.value.toLowerCase();
+    
+                // Filter menus by search query
+                let filteredMenus = menuItems.filter(menu => {
+                    const menuName = menu.getAttribute('data-name');
+                    return menuName.includes(query);
+                });
+    
+                // Sort filtered menus
+                filteredMenus = filteredMenus.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-price'));
+                    const priceB = parseFloat(b.getAttribute('data-price'));
+                    return sortValue === 'Expensive' ? priceB - priceA : priceA - priceB;
+                });
+    
+                // Render updated menus
+                renderMenus(filteredMenus);
+            }
+    
+            // Event listeners
+            sortSelect.addEventListener('change', updateMenus);
+            searchInput.addEventListener('input', updateMenus);
+        });
+    </script>
+    
 @endsection

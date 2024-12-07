@@ -237,8 +237,6 @@
                     <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
                         <form action="">
-                            {{-- <input type="search" placeholder="Search something..." class="form-control"
-                                id="search-input" value="{{ request('search') }}"> --}}
                             <input type="text" id="search-input" class="form-control"
                                 placeholder="Search menus..." />
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
@@ -314,7 +312,7 @@
                     @endforelse
                     <!-- Always include the "No menus" row, but hide it initially -->
                     <tr id="no-menus-row" style="display: none;">
-                        <td colspan="6"></td>
+                        <td colspan="6">No menu found.</td>
                     </tr>
 
                 </tbody>

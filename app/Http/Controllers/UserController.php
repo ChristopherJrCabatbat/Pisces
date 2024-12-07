@@ -89,85 +89,111 @@ class UserController extends Controller
     }
 
 
-    public function menu(Request $request)
-    {
-        /** @var User $user */
-        $user = Auth::user();
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
-
-        // Fetch all categories, including those with zero menus
-        $categories = DB::table('categories')
-            ->leftJoin('menus', 'categories.category', '=', 'menus.category')
-            ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
-            ->groupBy('categories.category')
-            ->orderByDesc('menu_count')
-            ->get();
-
-        $selectedCategory = $request->input('category', 'All Menus');
-
-        // Retrieve menus with average ratings and rating counts
-        if ($selectedCategory == 'All Menus') {
-            $menus = Menu::all()->map(function ($menu) {
-                $menu->rating = DB::table('feedback')
-                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                    ->avg('rating');
-                $menu->ratingCount = DB::table('feedback')
-                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                    ->count();
-                return $menu;
-            });
-        } else {
-            $menus = Menu::where('category', $selectedCategory)->get()->map(function ($menu) {
-                $menu->rating = DB::table('feedback')
-                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                    ->avg('rating');
-                $menu->ratingCount = DB::table('feedback')
-                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                    ->count();
-                return $menu;
-            });
-        }
-
-        // Count unread messages from the admin
-        $unreadCount = Message::where('receiver_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
-    }
-
-
-    // public function menuView($id)
+    // public function menu(Request $request)
     // {
-    //     $menu = Menu::find($id);
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
 
-    //     if (!$menu) {
-    //         return response()->json(['error' => 'Menu not found'], 404);
+    //     // Fetch all categories, including those with zero menus
+    //     $categories = DB::table('categories')
+    //         ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+    //         ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
+    //         ->groupBy('categories.category')
+    //         ->orderByDesc('menu_count')
+    //         ->get();
+
+    //     $selectedCategory = $request->input('category', 'All Menus');
+
+    //     // Retrieve menus with average ratings and rating counts
+    //     if ($selectedCategory == 'All Menus') {
+    //         $menus = Menu::all()->map(function ($menu) {
+    //             $menu->rating = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->avg('rating');
+    //             $menu->ratingCount = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->count();
+    //             return $menu;
+    //         });
+    //     } else {
+    //         $menus = Menu::where('category', $selectedCategory)->get()->map(function ($menu) {
+    //             $menu->rating = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->avg('rating');
+    //             $menu->ratingCount = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->count();
+    //             return $menu;
+    //         });
     //     }
 
-    //     // Fetch total favorite count
-    //     $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
-
-    //     // Fetch dynamic rating and review count
-    //     $rating = DB::table('feedback')
-    //         ->where('menu_items', 'LIKE', "%{$menu->name}%")
-    //         ->avg('rating');
-    //     $ratingCount = DB::table('feedback')
-    //         ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
     //         ->count();
 
-    //     return response()->json([
-    //         'name' => $menu->name,
-    //         'category' => $menu->category,
-    //         'price' => $menu->price,
-    //         'description' => $menu->description,
-    //         'image' => $menu->image,
-    //         'rating' => $rating ?: 0,
-    //         'ratingCount' => $ratingCount ?: 0,
-    //         'favoriteCount' => $favoriteCount,
-    //     ]);
+    //     return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     // }
+
+   // Modified menu method in your Controller
+public function menu(Request $request)
+{
+    /** @var User $user */
+    $user = Auth::user();
+    $userCart = $user->cart;
+    $userFavorites = $user->favoriteItems()->count();
+
+    // Fetch all categories, including those with zero menus
+    $categories = DB::table('categories')
+        ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+        ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
+        ->groupBy('categories.category')
+        ->orderByDesc('menu_count')
+        ->get();
+
+    $selectedCategory = $request->input('category', 'All Menus');
+    $search = $request->input('search', ''); // Search keyword
+    $sort = $request->input('sort', 'Cheapest'); // Sort criteria
+
+    // Base query for menus
+    $menusQuery = Menu::query();
+
+    // Filter menus by category
+    if ($selectedCategory !== 'All Menus') {
+        $menusQuery->where('category', $selectedCategory);
+    }
+
+    // Filter menus by search keyword
+    if (!empty($search)) {
+        $menusQuery->where('name', 'LIKE', '%' . $search . '%');
+    }
+
+    // Apply sorting by price
+    $menusQuery->orderBy('price', $sort === 'Expensive' ? 'desc' : 'asc');
+
+    // Retrieve menus with average ratings and rating counts
+    $menus = $menusQuery->get()->map(function ($menu) {
+        $menu->rating = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->avg('rating');
+        $menu->ratingCount = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->count();
+        return $menu;
+    });
+
+    // Count unread messages from the admin
+    $unreadCount = Message::where('receiver_id', $user->id)
+        ->where('is_read', false)
+        ->count();
+
+    // Return the view with required data
+    return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
+}
+
+
 
     public function menuView($id)
     {

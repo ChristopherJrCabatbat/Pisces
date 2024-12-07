@@ -25,6 +25,7 @@ class DeliveryController extends Controller
     //     $deliveries = Delivery::orderBy('created_at', 'desc')->get();
     //     return view('admin.delivery', compact('deliveries'));
     // }
+    
     public function index()
     {
         // Fetch deliveries ordered by the latest created_at timestamp

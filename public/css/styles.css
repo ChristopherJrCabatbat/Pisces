@@ -749,3 +749,21 @@ a.more:hover {
     transform: translateX(11px);
     background-color: rgb(113, 113, 136, 0.4);
 }
+
+
+/* Custom search input with icon */
+.custom-search {
+    position: relative;
+}
+
+.custom-search input#search-input {
+    padding-right: 40px; /* Add space for the search icon inside the input */
+}
+
+.custom-search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d; /* Optional: Adjust icon color if needed */
+}
