@@ -137,61 +137,61 @@ class UserController extends Controller
     //     return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     // }
 
-   // Modified menu method in your Controller
-public function menu(Request $request)
-{
-    /** @var User $user */
-    $user = Auth::user();
-    $userCart = $user->cart;
-    $userFavorites = $user->favoriteItems()->count();
+    // Modified menu method in your Controller
+    public function menu(Request $request)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
 
-    // Fetch all categories, including those with zero menus
-    $categories = DB::table('categories')
-        ->leftJoin('menus', 'categories.category', '=', 'menus.category')
-        ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
-        ->groupBy('categories.category')
-        ->orderByDesc('menu_count')
-        ->get();
+        // Fetch all categories, including those with zero menus
+        $categories = DB::table('categories')
+            ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+            ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
+            ->groupBy('categories.category')
+            ->orderByDesc('menu_count')
+            ->get();
 
-    $selectedCategory = $request->input('category', 'All Menus');
-    $search = $request->input('search', ''); // Search keyword
-    $sort = $request->input('sort', 'Cheapest'); // Sort criteria
+        $selectedCategory = $request->input('category', 'All Menus');
+        $search = $request->input('search', ''); // Search keyword
+        $sort = $request->input('sort', 'Cheapest'); // Sort criteria
 
-    // Base query for menus
-    $menusQuery = Menu::query();
+        // Base query for menus
+        $menusQuery = Menu::query();
 
-    // Filter menus by category
-    if ($selectedCategory !== 'All Menus') {
-        $menusQuery->where('category', $selectedCategory);
-    }
+        // Filter menus by category
+        if ($selectedCategory !== 'All Menus') {
+            $menusQuery->where('category', $selectedCategory);
+        }
 
-    // Filter menus by search keyword
-    if (!empty($search)) {
-        $menusQuery->where('name', 'LIKE', '%' . $search . '%');
-    }
+        // Filter menus by search keyword
+        if (!empty($search)) {
+            $menusQuery->where('name', 'LIKE', '%' . $search . '%');
+        }
 
-    // Apply sorting by price
-    $menusQuery->orderBy('price', $sort === 'Expensive' ? 'desc' : 'asc');
+        // Apply sorting by price
+        $menusQuery->orderBy('price', $sort === 'Expensive' ? 'desc' : 'asc');
 
-    // Retrieve menus with average ratings and rating counts
-    $menus = $menusQuery->get()->map(function ($menu) {
-        $menu->rating = DB::table('feedback')
-            ->where('menu_items', 'LIKE', "%{$menu->name}%")
-            ->avg('rating');
-        $menu->ratingCount = DB::table('feedback')
-            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+        // Retrieve menus with average ratings and rating counts
+        $menus = $menusQuery->get()->map(function ($menu) {
+            $menu->rating = DB::table('feedback')
+                ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                ->avg('rating');
+            $menu->ratingCount = DB::table('feedback')
+                ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                ->count();
+            return $menu;
+        });
+
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
             ->count();
-        return $menu;
-    });
 
-    // Count unread messages from the admin
-    $unreadCount = Message::where('receiver_id', $user->id)
-        ->where('is_read', false)
-        ->count();
-
-    // Return the view with required data
-    return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
-}
+        // Return the view with required data
+        return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
+    }
 
 
 
@@ -836,7 +836,7 @@ public function menu(Request $request)
         // Pass timeline to the view
         return view('user.trackOrder', compact('categories', 'userCart', 'user', 'userFavorites', 'statuses', 'deliveries'));
     }
-
+    
     public function reviewOrder(Request $request, $deliveryId)
     {
         /** @var User $user */
@@ -847,36 +847,45 @@ public function menu(Request $request)
             ->where('email', $user->email) // Match with the user's email to validate
             ->firstOrFail();
 
-        // Parse the order and quantities from the database
+        // Parse the orders and quantities from the database
         $orders = explode(',', $delivery->order); // Split items by commas
-        $quantities = explode(',', $delivery->quantity); // Split quantities by commas
         $items = [];
 
-        // Combine orders and quantities into a structured array
-        foreach ($orders as $index => $order) {
-            $menu = Menu::where('name', $order)->first();
+        foreach ($orders as $order) {
+            // Extract the menu item name (removing the quantity part " (x1)")
+            preg_match('/^(.*?)\s*\(x(\d+)\)$/', trim($order), $matches);
+            $itemName = $matches[1] ?? trim($order); // Extracted name or fallback to the original
+            $quantity = $matches[2] ?? 1; // Default quantity is 1 if not found
+
+            // Find the menu item by name
+            $menu = Menu::where('name', $itemName)->first();
 
             if ($menu) {
                 $items[] = [
                     'name' => $menu->name,
-                    'price' => $menu->price,
+                    'price' => $menu->price * $quantity, // Calculate total price
                     'image' => $menu->image,
-                    'quantity' => $quantities[$index] ?? 1,
+                    'quantity' => $quantity,
                 ];
             } else {
-                Log::warning('Menu not found for order: ' . $order);
+                // Log a warning for unmatched menu items
+                Log::warning('Menu item not found for order: ' . $order);
+
+                // Fallback for missing menu items
                 $items[] = [
-                    'name' => $order,
-                    'price' => 0,
+                    'name' => $itemName,
+                    'price' => 0, // Total price is 0 for missing items
                     'image' => null,
-                    'quantity' => $quantities[$index] ?? 1,
+                    'quantity' => $quantity,
                 ];
             }
         }
 
-
+        // Return the view with the parsed items
         return view('user.reviewOrder', compact('delivery', 'items'));
     }
+
+
 
 
 

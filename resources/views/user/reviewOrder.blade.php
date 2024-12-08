@@ -63,10 +63,16 @@
                 <!-- Order Status Body -->
                 <div class="track-order-body px-4 py-3">
                     <!-- Top Section -->
-                    <div class="top pb-3">
-                        Your order has been delivered to <span class="fw-bold">{{ $delivery->name }}</span> on <span
-                            class="fw-bold">{{ $delivery->created_at->format('M d') }}</span>.
+                    <div class="bottom pb-3 mb-3">
+                        @if ($delivery->status === 'Delivered' || $delivery->status === 'Returned')
+                            Your order has been delivered to <span class="fw-bold">{{ $delivery->name }}</span> on 
+                            <span class="fw-bold">{{ $delivery->created_at->format('M d') }}</span>.
+                        @else
+                            Your order is currently <span class="fw-bold">{{ $delivery->status }}</span> on 
+                            <span class="fw-bold">{{ $delivery->created_at->format('M d') }}</span>.
+                        @endif
                     </div>
+                    
 
                     <!-- Shipping Details -->
 
@@ -75,25 +81,22 @@
                     <div class="timeline">
                         <!-- Items -->
                         @foreach ($items as $item)
-                            <div class="timeline-item d-flex align-items-start py-3 top">
+                            <div class="timeline-item d-flex align-items-start py-2">
                                 <div class="order-width d-flex">
-                                    {{-- <img src="{{ asset('images/logo.jpg') }}" alt="Delivery Image" class=""
-                                        style="max-height: 100px; width: auto;"> --}}
-                                    <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('images/logo.jpg') }}"
-                                        alt="{{ $item['name'] }} Image" style="max-height: 100px; width: auto;">
+                                    <div>
+                                        <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('images/logo.jpg') }}"
+                                            alt="{{ $item['name'] }} Image" style="max-height: 100px; width: auto;">
+                                    </div>
                                     <div class="content ms-3">
-                                        <div class="status fw fs-5">{{ $item['name'] }}</div>
-                                        <div class="location fs-5 flex-between">
-                                            {{-- <div class="">Price: {{ $item['price'] }}</div> --}}
-                                            <div class="">₱{{ number_format($delivery->total_price, 2) }}</div>
-                                        </div>
+                                        <h4>{{ $item['name'] }} (x{{ $item['quantity'] }})</h4>
+                                        <p>Price: ₱{{ number_format($item['price'], 2) }}</p>
                                     </div>
                                 </div>
                             </div>
                         @endforeach
 
                         <!-- Order Summary -->
-                        <div class="timeline-item py-3 d-flex align-items-start top">
+                        <div class="timeline-item py-3 d-flex align-items-start bottom top mt-3">
                             <!-- Content -->
                             <div class="content order-width d-flex flex-column gap-2">
                                 <div class="status fw-bold">Order summary</div>
@@ -117,7 +120,7 @@
                         </div>
 
                         <!-- Order Details -->
-                        <div class="timeline-item py-3 d-flex align-items-start top">
+                        <div class="timeline-item py-3 d-flex align-items-start bottom">
                             <!-- Content -->
                             <div class="content order-width d-flex flex-column gap-2">
                                 <div class="status fw-bold">Order details</div>
@@ -145,7 +148,7 @@
                             </div>
                         </div>
 
-                    </div>"
+                    </div>
 
 
 

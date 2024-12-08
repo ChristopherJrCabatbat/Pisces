@@ -60,7 +60,7 @@
                         <div class="mb-3">
                             <label for="address" class="form-label">Full Address</label>
                             <input type="text" class="form-control" id="address" name="address" autofocus
-                                placeholder="#123 Barangay ABC SCCP" required>
+                                placeholder="#123 Barangay ABC SCCP" required title="Make sure to insert your full address for the rider to find your location immediately.">
                         </div>
 
                         <!-- Shipping Method -->

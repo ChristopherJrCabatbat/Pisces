@@ -638,8 +638,11 @@ a.more:hover {
     transition: box-shadow 0.3s;
 }
 
-.top {
+.bottom {
     border-bottom: 1px solid rgb(0, 0, 0, 0.2);
+}
+.top {
+    border-top: 1px solid rgb(0, 0, 0, 0.2);
 }
 
 .timeline-item .time {
