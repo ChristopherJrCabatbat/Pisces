@@ -118,6 +118,7 @@ class RoleMiddleware
                 'user.delivery.destroy',
                 
                 'user.orders',
+                'user.orderRepeat',
                 'user.orderStore',
                 
                 'user.feedback.index',

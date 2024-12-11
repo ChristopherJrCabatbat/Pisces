@@ -19,7 +19,7 @@
 
     <div class="container">
         <div class="d-flex">
-            
+
             {{-- Combined Form --}}
             <form action="{{ route('user.delivery.store') }}" method="POST" class="d-flex w-100">
                 @csrf
@@ -60,7 +60,8 @@
                         <div class="mb-3">
                             <label for="address" class="form-label">Full Address</label>
                             <input type="text" class="form-control" id="address" name="address" autofocus
-                                placeholder="#123 Barangay ABC SCCP" required title="Make sure to insert your full address for the rider to find your location immediately.">
+                                placeholder="#123 Barangay ABC SCCP" required
+                                title="Make sure to insert your full address for the rider to find your location immediately.">
                         </div>
 
                         <!-- Shipping Method -->
@@ -112,34 +113,29 @@
                         @php
                             $totalPrice = 0;
                         @endphp
+
                         <div class="d-flex flex-column gap-3">
                             @foreach ($menus as $menu)
                                 @php
-                                    $quantity = $menu->pivot->quantity ?? 1;
-                                    $itemTotal = $menu->price * $quantity;
+                                    $itemTotal = $menu['price'] * $menu['quantity'];
                                     $totalPrice += $itemTotal;
                                 @endphp
 
                                 <div class="d-flex gap-3 justify-content-between align-items-center">
                                     <div class="picture border border-1">
-                                        <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid"
+                                        <img src="{{ asset('storage/' . $menu['image']) }}" class="img-fluid"
                                             width="70" alt="Picture">
                                     </div>
                                     <div class="menu-name d-flex flex-column align-items-center">
-                                        <div class="name">{{ $menu->name }} ({{ $quantity }})</div>
-                                        {{-- <div class="size">
-                                            @if ($quantity > 0)
-                                                ({{ $quantity }})
-                                            @endif
-                                        </div> --}}
+                                        <div class="name">{{ $menu['name'] }} ({{ $menu['quantity'] }})</div>
                                     </div>
                                     <div class="price fw-bold">
                                         ₱{{ number_format($itemTotal, 2) }}
                                     </div>
 
                                     <!-- Hidden Inputs for Order Data -->
-                                    <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
-                                    <input type="hidden" name="quantities[]" value="{{ $quantity }}">
+                                    <input type="hidden" name="menu_names[]" value="{{ $menu['name'] }}">
+                                    <input type="hidden" name="quantities[]" value="{{ $menu['quantity'] }}">
                                 </div>
                             @endforeach
                         </div>
@@ -153,6 +149,8 @@
                         </div>
                     </div>
                 </div>
+
+
             </form>
 
         </div>

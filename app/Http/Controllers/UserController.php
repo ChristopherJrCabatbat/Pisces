@@ -223,39 +223,6 @@ class UserController extends Controller
 
 
     // Add To Cart Pwede Duplicate
-    // public function addToCart(Request $request, $menuId)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Attach the menu item to the user's cart without checking for duplicates
-    //     $user->cartItems()->attach($menuId);
-
-    //     // Increment the cart count
-    //     $user->increment('cart');
-
-    //     return redirect()->route('user.menu')->with('success', 'Item added to cart!');
-    // }
-
-
-    // public function addToCartModal(Request $request, $menuId)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Check if the menu item is already in the user's cart
-    //     if (!$user->cartItems()->where('menu_id', $menuId)->exists()) {
-    //         // Attach the menu item to the user's cart
-    //         $user->cartItems()->attach($menuId);
-    //     }
-
-    //     // Increment the cart count
-    //     $user->increment('cart');
-
-    //     // Return a JSON response instead of redirecting
-    //     return response()->json(['success' => true, 'message' => 'Item added to cart!']);
-    // }
-
 
     public function shoppingCart()
     {
@@ -284,26 +251,6 @@ class UserController extends Controller
 
         return view('user.shoppingCart', compact('user', 'pendingOrdersCount', 'menus', 'userCart', 'userFavorites', 'unreadCount'));
     }
-
-
-    // public function addToFavorites(Request $request, $menuId)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Check if the item is already in the user's favorites
-    //     if ($user->favoriteItems()->where('menu_id', $menuId)->exists()) {
-    //         // Remove from favorites if already present
-    //         $user->favoriteItems()->detach($menuId);
-    //         $user->decrement('favorites');
-    //     } else {
-    //         // Add to favorites if not present
-    //         $user->favoriteItems()->attach($menuId);
-    //         $user->increment('favorites');
-    //     }
-
-    //     return redirect()->back()->with('success', 'Item added to favorites!');
-    // }
 
     public function addToFavorites(Request $request, $menuId)
     {
@@ -453,6 +400,7 @@ class UserController extends Controller
 
         return view('user.order', compact('user', 'menus'));
     }
+    
     public function orderView($id)
     {
         // Get the current authenticated user
@@ -969,8 +917,6 @@ class UserController extends Controller
         // Return the view with the parsed items
         return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items'));
     }
-
-
 
 
 

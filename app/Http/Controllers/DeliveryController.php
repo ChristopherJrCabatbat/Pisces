@@ -110,7 +110,7 @@ class DeliveryController extends Controller
         $validatedData = $request->validate([
             'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
         ]);
-    
+
         $allowedTransitions = [
             'Pending' => ['Preparing'],
             'Preparing' => ['Out for Delivery'],
@@ -118,23 +118,23 @@ class DeliveryController extends Controller
             'Delivered' => ['Returned'],
             'Returned' => [],
         ];
-    
+
         $delivery = Delivery::findOrFail($id);
-    
+
         if (!in_array($validatedData['status'], $allowedTransitions[$delivery->status])) {
             return response()->json(['success' => false, 'message' => 'Invalid status transition.']);
         }
-    
+
         $delivery->status = $validatedData['status'];
         $delivery->save();
-    
+
         $validStatuses = array_merge(
             [$delivery->status],
             $allowedTransitions[$delivery->status]
         );
-    
+
         $showModal = $validatedData['status'] === 'Out for Delivery';
-    
+
         return response()->json([
             'success' => true,
             'message' => "Delivery status updated to {$validatedData['status']}.",
@@ -144,8 +144,8 @@ class DeliveryController extends Controller
             'currentStatus' => $delivery->status,
         ]);
     }
-    
-    
+
+
 
     public function assignRider(Request $request)
     {
@@ -153,14 +153,14 @@ class DeliveryController extends Controller
             'delivery_id' => 'required|exists:deliveries,id',
             'rider' => 'required|string',
         ]);
-    
+
         $delivery = Delivery::findOrFail($validatedData['delivery_id']);
         $delivery->rider = $validatedData['rider'];
         $delivery->save();
-    
+
         return response()->json(['success' => true, 'message' => 'Rider assigned successfully.']);
     }
-    
+
 
 
 
@@ -248,6 +248,71 @@ class DeliveryController extends Controller
             'menu_images' => $menuImages, // Include menu images in the response
         ]);
     }
+
+    // public function orderRepeat($deliveryId)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch delivery details
+    //     $delivery = Delivery::findOrFail($deliveryId);
+
+    //     // Fetch related orders
+    //     $orders = $delivery->orders; // Fetch using the 'orders' relationship
+
+    //     // Ensure there are orders associated with the delivery
+    //     if ($orders->isEmpty()) {
+    //         abort(404, 'No orders found for this delivery.');
+    //     }
+
+    //     // Prepare data to pass to the order page
+    //     $menus = [];
+    //     foreach ($orders as $order) {
+    //         $menus[] = [
+    //             'name' => $order->menu_name,
+    //             'quantity' => $order->quantity,
+    //             'price' => 0,
+    //             'image' => '',
+    //         ];
+    //     }
+
+    //     // Redirect to order.blade.php with data
+    //     return view('user.order', compact('menus', 'user', 'delivery'));
+    // }
+
+    public function orderRepeat($deliveryId)
+    {
+            /** @var User $user */
+            $user = Auth::user();
+
+        // Fetch delivery details
+        $delivery = Delivery::findOrFail($deliveryId);
+
+        // Fetch related orders
+        $orders = $delivery->orders;
+
+        // Ensure there are orders associated with the delivery
+        if ($orders->isEmpty()) {
+            abort(404, 'No orders found for this delivery.');
+        }
+
+        // Prepare data to pass to the order page
+        $menus = [];
+        foreach ($orders as $order) {
+            $menu = $order->menu; // Use the 'menu' relationship
+
+            $menus[] = [
+                'name' => $order->menu_name,
+                'quantity' => $order->quantity,
+                'price' => $menu ? $menu->price : 0, // Fallback to 0 if no menu is found
+                'image' => $menu ? $menu->image : '', // Fallback to empty string if no menu is found
+            ];
+        }
+
+        // Redirect to order.blade.php with data
+        return view('user.order', compact('menus', 'user', 'delivery'));
+    }
+
 
 
     /**

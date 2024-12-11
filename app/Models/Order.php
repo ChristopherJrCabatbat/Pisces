@@ -18,4 +18,9 @@ class Order extends Model
     {
         return $this->belongsTo(Delivery::class);
     }
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class, 'menu_name', 'name');
+    }
 }
