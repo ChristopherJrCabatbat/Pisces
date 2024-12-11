@@ -295,6 +295,12 @@ select:hover {
     overflow: hidden;
 }
 
+.button-wid-u {
+    width: 55%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 /* Image Modal Styles */
 .image-modal {
     display: none; /* Hidden by default */

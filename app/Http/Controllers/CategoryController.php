@@ -43,7 +43,7 @@ class CategoryController extends Controller
         // Validate the form data
         $validated = $request->validate([
             'category' => 'required|string', // Add validation for category
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file type and size
+            'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image file type and size
         ]);
 
         // Handle file upload
@@ -109,7 +109,7 @@ class CategoryController extends Controller
         // Validate the form data
         $validated = $request->validate([
             'category' => 'required|string', // Validate category name
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image type and size
+            'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image type and size
         ]);
 
         $imagePath = null;

@@ -17,8 +17,9 @@ return new class extends Migration
             $table->string('category');
             $table->decimal('price', 8, 2);
             $table->text('description');
-            $table->string('image', 255);
+            $table->text('image');
             $table->decimal('rating', 2, 1)->nullable();
+            $table->string('availability')->default('Available');
             $table->timestamps();
         });
     }

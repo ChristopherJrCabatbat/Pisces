@@ -64,16 +64,14 @@
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
                 <!-- Left Section -->
                 <div class="left d-flex">
-                    <div class="d-flex custom-filter me-3">
-                        <select id="delivery-filter" class="form-select custom-select" aria-label="Select delivery status">
+                    <div class="d-flex me-3 gap-2">
+                        <select id="delivery-filter" class="form-select" aria-label="Select delivery status">
                             <option value="" selected>Default</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Preparing">Preparing</option>
-                            <option value="Out for Delivery">Out for Delivery</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Returned">Returned</option>
+                            <option value="Pending">Alphabetical</option>
+                            <option value="Preparing">New customers first</option>
+                            <option value="Out for Delivery">Old customers first</option>
                         </select>
-                        <button type="button" id="filter-button" class="btn btn-primary custom-filter-btn button-wid">
+                        <button type="button" id="filter-button" class="btn btn-primary custom-filter-btn button-wid-u">
                             <i class="fa-solid fa-sort me-2"></i>Filter
                         </button>
                     </div>
