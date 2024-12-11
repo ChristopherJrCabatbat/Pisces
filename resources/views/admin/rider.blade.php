@@ -69,6 +69,7 @@
                         <!-- Category Filter Section -->
                         <select id="categoryFilter" class="form-select custom-select" aria-label="Category select">
                             <option value="" selected>Default</option>
+                            <option value="">Alphabetically</option>
                             <option value="By rating">By rating</option>
                             {{-- @foreach ($categories as $category)
                             <option value="{{ $category->category }}">{{ $category->category }}</option>

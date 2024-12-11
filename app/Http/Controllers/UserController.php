@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;  // Import DB facade
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 use App\Models\User;
 use App\Models\Menu;
@@ -80,62 +80,19 @@ class UserController extends Controller
                 return $menu;
             });
 
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
 
-        return view('user.dashboard', compact('userCart', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount'));
+        return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount'));
     }
-
-
-    // public function menu(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     // Fetch all categories, including those with zero menus
-    //     $categories = DB::table('categories')
-    //         ->leftJoin('menus', 'categories.category', '=', 'menus.category')
-    //         ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
-    //         ->groupBy('categories.category')
-    //         ->orderByDesc('menu_count')
-    //         ->get();
-
-    //     $selectedCategory = $request->input('category', 'All Menus');
-
-    //     // Retrieve menus with average ratings and rating counts
-    //     if ($selectedCategory == 'All Menus') {
-    //         $menus = Menu::all()->map(function ($menu) {
-    //             $menu->rating = DB::table('feedback')
-    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
-    //                 ->avg('rating');
-    //             $menu->ratingCount = DB::table('feedback')
-    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
-    //                 ->count();
-    //             return $menu;
-    //         });
-    //     } else {
-    //         $menus = Menu::where('category', $selectedCategory)->get()->map(function ($menu) {
-    //             $menu->rating = DB::table('feedback')
-    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
-    //                 ->avg('rating');
-    //             $menu->ratingCount = DB::table('feedback')
-    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
-    //                 ->count();
-    //             return $menu;
-    //         });
-    //     }
-
-    //     // Count unread messages from the admin
-    //     $unreadCount = Message::where('receiver_id', $user->id)
-    //         ->where('is_read', false)
-    //         ->count();
-
-    //     return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
-    // }
 
     // Modified menu method in your Controller
     public function menu(Request $request)
@@ -189,8 +146,14 @@ class UserController extends Controller
             ->where('is_read', false)
             ->count();
 
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
         // Return the view with required data
-        return view('user.menu', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
+        return view('user.menu', compact('menus', 'pendingOrdersCount', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     }
 
 
@@ -308,12 +271,18 @@ class UserController extends Controller
             ->select('menus.*', 'cart_items.id as cart_item_id', 'cart_items.quantity') // Include quantity here
             ->get();
 
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
 
-        return view('user.shoppingCart', compact('user', 'menus', 'userCart', 'userFavorites', 'unreadCount'));
+        return view('user.shoppingCart', compact('user', 'pendingOrdersCount', 'menus', 'userCart', 'userFavorites', 'unreadCount'));
     }
 
 
@@ -407,12 +376,18 @@ class UserController extends Controller
             return $menu;
         });
 
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
 
-        return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
+        return view('user.favorites', compact('menus', 'pendingOrdersCount', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     }
 
 
@@ -527,7 +502,13 @@ class UserController extends Controller
             ->where('is_read', false)
             ->count() : 0;
 
-        return view('user.menuDetails', compact('menu', 'user', 'userCart', 'userFavorites', 'favoritesCount', 'unreadCount'));
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
+        return view('user.menuDetails', compact('menu', 'pendingOrdersCount', 'user', 'userCart', 'userFavorites', 'favoritesCount', 'unreadCount'));
     }
 
 
@@ -556,6 +537,68 @@ class UserController extends Controller
     }
 
 
+    // public function orders(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Fetch user-specific orders with custom status hierarchy
+    //     $orders = DB::table('deliveries')
+    //         ->where('email', $user->email) // Filter by user's email
+    //         ->orderByRaw("
+    //         FIELD(status, 'Out for Delivery', 'Preparing', 'Pending', 'Delivered', 'Returned'),
+    //         created_at DESC
+    //     ") // Custom ordering by status and then by creation date
+    //         ->get();
+
+    //     $orders = $orders->map(function ($order) {
+    //         $order->created_at = Carbon::parse($order->created_at);
+
+    //         // Parse the order string and quantities
+    //         $orderItems = explode(', ', $order->order);
+    //         $quantities = explode(', ', $order->quantity);
+
+    //         // Fetch all menu details for the order
+    //         $menuDetails = [];
+    //         foreach ($orderItems as $index => $item) {
+    //             $menuName = explode(' (', $item)[0]; // Extract menu name
+    //             $menu = DB::table('menus')->where('name', $menuName)->first();
+
+    //             if ($menu) {
+    //                 $menuDetails[] = (object)[ // Convert to an object
+    //                     'name' => $menuName,
+    //                     'quantity' => $quantities[$index] ?? 1,
+    //                     'image' => 'storage/' . $menu->image, // Consistent with other files
+    //                     'price' => $menu->price
+    //                 ];
+    //             }
+    //         }
+
+    //         $order->menuDetails = $menuDetails;
+    //         return $order;
+    //     });
+
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
+    //         ->count();
+
+    //     // Categorize orders by status
+    //     $statuses = [
+    //         'all' => $orders,
+    //         'pending' => $orders->where('status', 'Pending'),
+    //         'preparing' => $orders->where('status', 'Preparing'),
+    //         'out-for-delivery' => $orders->where('status', 'Out for Delivery'),
+    //         'delivered' => $orders->where('status', 'Delivered'),
+    //         'returns' => $orders->where('status', 'Returned'),
+    //     ];
+
+    //     return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount'));
+    // }
+
+
     public function orders(Request $request)
     {
         /** @var User $user */
@@ -563,19 +606,19 @@ class UserController extends Controller
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        // Fetch user-specific orders with custom status hierarchy
+        // Fetch user-specific orders
         $orders = DB::table('deliveries')
             ->where('email', $user->email) // Filter by user's email
             ->orderByRaw("
             FIELD(status, 'Out for Delivery', 'Preparing', 'Pending', 'Delivered', 'Returned'),
             created_at DESC
-        ") // Custom ordering by status and then by creation date
+        ") // Custom ordering
             ->get();
 
         $orders = $orders->map(function ($order) {
             $order->created_at = Carbon::parse($order->created_at);
 
-            // Parse the order string and quantities
+            // Parse order items and quantities
             $orderItems = explode(', ', $order->order);
             $quantities = explode(', ', $order->quantity);
 
@@ -589,8 +632,8 @@ class UserController extends Controller
                     $menuDetails[] = (object)[ // Convert to an object
                         'name' => $menuName,
                         'quantity' => $quantities[$index] ?? 1,
-                        'image' => 'storage/' . $menu->image, // Consistent with other files
-                        'price' => $menu->price
+                        'image' => 'storage/' . $menu->image,
+                        'price' => $menu->price,
                     ];
                 }
             }
@@ -604,6 +647,12 @@ class UserController extends Controller
             ->where('is_read', false)
             ->count();
 
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
         // Categorize orders by status
         $statuses = [
             'all' => $orders,
@@ -614,8 +663,9 @@ class UserController extends Controller
             'returns' => $orders->where('status', 'Returned'),
         ];
 
-        return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount'));
+        return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount', 'pendingOrdersCount'));
     }
+
 
 
     public function messages(Request $request)
@@ -681,7 +731,13 @@ class UserController extends Controller
             return $delivery;
         });
 
-        return view('user.messages', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
+        return view('user.messages', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
     }
 
 
@@ -811,7 +867,13 @@ class UserController extends Controller
             return $delivery;
         });
 
-        return view('user.shopUpdates', compact('userCart', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
+        return view('user.shopUpdates', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
     }
 
 
@@ -833,10 +895,21 @@ class UserController extends Controller
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
         // Pass timeline to the view
-        return view('user.trackOrder', compact('categories', 'userCart', 'user', 'userFavorites', 'statuses', 'deliveries'));
+        return view('user.trackOrder', compact('categories', 'unreadCount', 'pendingOrdersCount', 'userCart', 'user', 'userFavorites', 'statuses', 'deliveries'));
     }
-    
+
     public function reviewOrder(Request $request, $deliveryId)
     {
         /** @var User $user */
@@ -881,8 +954,20 @@ class UserController extends Controller
             }
         }
 
+        // Count unread messages from the admin
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
+
         // Return the view with the parsed items
-        return view('user.reviewOrder', compact('delivery', 'items'));
+        return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items'));
     }
 
 

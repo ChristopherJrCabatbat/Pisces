@@ -62,6 +62,7 @@ class RoleMiddleware
 
                 'admin.deliveryDetails',
                 'admin.updateStatus',
+                'admin.assignRider',
                 'admin.deliveryCreateRider',
                 'admin.storeRider',
 
@@ -69,6 +70,7 @@ class RoleMiddleware
                 'admin.monitoring',
                 'admin.updates',
                 'admin.viewOrders',
+                'admin.getOrderDetails',
 
                 'admin.feedback',
                 'admin.updateSentiment',

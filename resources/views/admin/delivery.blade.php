@@ -140,6 +140,37 @@
         </div>
     </div>
 
+    <!-- Rider Selection Modal -->
+    <div class="modal fade" id="riderSelectionModal" tabindex="-1" aria-labelledby="riderSelectionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="riderSelectionModalLabel">Select Rider</h5>
+
+                    <!-- Close Button in Modal -->
+                    <button type="button" class="btn-close" id="modalCloseButton" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignRiderForm" method="POST">
+                        @csrf
+                        <input type="hidden" name="delivery_id" id="deliveryIdInput">
+                        <div class="mb-3">
+                            <label for="riderSelect" class="form-label text-black">Available Riders:</label>
+                            <select class="form-select" id="riderSelect" name="rider" required>
+                                <option value="" disabled selected>Select a rider</option>
+                                @foreach ($riders as $rider)
+                                    <option value="{{ $rider->name }}">{{ $rider->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Assign Rider</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Image Enlarge Modal -->
     <div id="imageModal" class="modal" tabindex="-1" aria-hidden="true"
         style="display: none; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.8);">
@@ -166,7 +197,8 @@
                 <!-- Left Section -->
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
-                        <select id="delivery-filter" class="form-select custom-select" aria-label="Select delivery status">
+                        <select id="delivery-filter" class="form-select custom-select"
+                            aria-label="Select delivery status">
                             <option value="" selected>All Statuses</option>
                             <option value="Pending">Pending</option>
                             <option value="Preparing">Preparing</option>
@@ -185,8 +217,8 @@
                     <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
                         <form action="#">
-                            <input type="search" placeholder="Search something..." class="form-control" id="search-input"
-                                value="{{ request('search') }}">
+                            <input type="search" placeholder="Search something..." class="form-control"
+                                id="search-input" value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
                     </div>
@@ -222,10 +254,8 @@
                                             'Preparing' => ['Out for Delivery'],
                                             'Out for Delivery' => ['Delivered'],
                                             'Delivered' => ['Returned'],
-                                            'Returned' => [], // No transitions for "Returned"
+                                            'Returned' => [],
                                         ];
-
-                                        // Generate valid statuses based on current status
                                         $validStatuses = array_merge(
                                             [$delivery->status],
                                             $allowedTransitions[$delivery->status],
@@ -277,14 +307,14 @@
 
 @section('scripts')
 
-    {{-- Auto Update Status Script --}}
+    {{-- Auto Update Status / Rider Modal Script --}}
     <script>
         document.querySelectorAll('.delivery-status-select').forEach(select => {
             select.addEventListener('change', function() {
                 const form = this.closest('form'); // Get the closest form
                 const formData = new FormData(form); // Prepare form data
                 const url = form.action; // Get the form's action URL
-                const spinner = document.getElementById('loadingSpinner'); // Reference to the spinner
+                const spinner = document.getElementById('loadingSpinner'); // Reference the spinner element
 
                 // Show spinner and disable dropdown
                 spinner.classList.remove('d-none');
@@ -296,32 +326,33 @@
                         body: formData,
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        }
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update the dropdown options
-                            const selectElement = form.querySelector('.delivery-status-select');
-                            selectElement.innerHTML = ''; // Clear the existing options
-
-                            // Add the new allowed statuses
-                            data.allowedStatuses.forEach(status => {
-                                const option = document.createElement('option');
-                                option.value = status;
-                                option.textContent = status;
-                                if (status === formData.get('status')) {
-                                    option.selected = true;
-                                }
-                                selectElement.appendChild(option);
-                            });
-
-                            // Show success toast
                             showToast(data.message, 'success');
+
+                            // Dynamically update the dropdown options if necessary
+                            if (data.validStatuses) {
+                                const updatedOptions = data.validStatuses
+                                    .map(status =>
+                                        `<option value="${status}" ${data.currentStatus === status ? 'selected' : ''}>${status}</option>`
+                                    )
+                                    .join('');
+                                this.innerHTML = updatedOptions;
+                            }
+
+                            // Show modal if needed
+                            if (data.showModal) {
+                                document.getElementById('deliveryIdInput').value = data.deliveryId;
+                                const modal = new bootstrap.Modal(document.getElementById(
+                                    'riderSelectionModal'));
+                                modal.show();
+                            }
                         } else {
-                            // Show error toast
-                            showToast(data.message || 'Failed to update status.', 'error');
+                            showToast(data.message, 'error');
                         }
                     })
                     .catch(error => {
@@ -335,7 +366,69 @@
                     });
             });
         });
+
+        // Handle rider assignment form submission
+        document.getElementById('assignRiderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const url = "{{ route('admin.assignRider') }}";
+            const spinner = document.getElementById('loadingSpinner'); // Reference spinner
+            const riderSelect = document.getElementById('riderSelect');
+
+            // Ensure a rider is selected before proceeding
+            if (!riderSelect.value) {
+                showToast('Please select a rider before assigning.', 'error');
+                return;
+            }
+
+            // Show spinner
+            spinner.classList.remove('d-none');
+
+            fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        const modal = bootstrap.Modal.getInstance(document.getElementById(
+                            'riderSelectionModal'));
+                        modal.hide();
+
+                        // Reload the page after assigning a rider
+                        window.location.reload();
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error assigning rider:', error);
+                    showToast('An error occurred while assigning the rider.', 'error');
+                })
+                .finally(() => {
+                    // Hide spinner
+                    spinner.classList.add('d-none');
+                });
+        });
+
+        // Prevent modal from closing if no rider is selected
+        document.getElementById('modalCloseButton').addEventListener('click', function() {
+            const riderSelect = document.getElementById('riderSelect');
+            if (!riderSelect.value) {
+                showToast('Please select a rider before closing the modal.', 'error');
+                return;
+            }
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById('riderSelectionModal'));
+            modal.hide();
+        });
     </script>
+
 
     {{-- Filter-Search Table --}}
     <script>

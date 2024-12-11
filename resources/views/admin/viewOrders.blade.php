@@ -49,6 +49,27 @@
 
 @endsection
 
+@section('modals')
+    <!-- Order Details Modal -->
+    <div class="modal fade text-black" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="viewOrderModalLabel">Order Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="orderDetailsContent" class="table-responsive">
+                        <p class="text-center text-muted">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
 
 @section('main-content')
     <div class="main-content">
@@ -68,12 +89,8 @@
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
                         <select id="delivery-filter" class="form-select custom-select" aria-label="Select delivery status">
-                            <option value="" selected>All Statuses</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Preparing">Preparing</option>
-                            <option value="Out for Delivery">Out for Delivery</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Returned">Returned</option>
+                            <option value="" selected>Default</option>
+                            <option value="Sample">Sample</option>
                         </select>
                         <button type="button" id="filter-button" class="btn btn-primary custom-filter-btn button-wid">
                             <i class="fa-solid fa-sort me-2"></i>Filter
@@ -94,9 +111,9 @@
             </div>
 
             <!-- Orders Section -->
+            <!-- Orders Section -->
             <div class="orders-list">
                 @if ($deliveriesWithImages->isNotEmpty())
-                    <!-- Display the name of the first delivery -->
                     <h4 class="m-3 text-black text-center h4">
                         {{ $deliveriesWithImages->first()->name }}'s Order/s
                     </h4>
@@ -106,19 +123,13 @@
                     <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
                         <!-- Left Image Section -->
                         <div class="order-image me-3">
-                            @if ($delivery->image_url)
-                                <img src="{{ $delivery->image_url }}" alt="Order Image" class="rounded"
-                                    style="width: 80px; height: 80px;">
-                            @else
-                                <img src="{{ asset('default-image.jpg') }}" alt="Default Image" class="rounded"
-                                    style="width: 80px; height: 80px;">
-                            @endif
+                            <img src="{{ $delivery->image_url ?? asset('default-image.jpg') }}" alt="Order Image"
+                                class="rounded" style="width: 80px; height: 80px;">
                         </div>
 
                         <!-- Middle Details Section -->
                         <div class="order-details flex-grow-1">
                             <p class="m-0 text-truncate fw-bold">Order Summary: {{ $delivery->order }}</p>
-                            <!-- Format total_price using number_format -->
                             <p class="m-0 text-truncate">₱{{ number_format($delivery->total_price, 2) }}</p>
                             <p class="text-muted small m-0">{{ $delivery->address }}</p>
                             <p class="text-muted small m-0">{{ $delivery->created_at->format('M. d, Y') }}</p>
@@ -126,11 +137,14 @@
 
                         <!-- Right Action Section -->
                         <div class="order-actions text-end">
-                            <a href="#" class="btn btn-primary mb-2">View Order</a>
+                            <button type="button" class="btn btn-primary mb-2 view-order-btn"
+                                data-id="{{ $delivery->id }}" data-bs-toggle="modal" data-bs-target="#viewOrderModal">View
+                                Order</button>
                         </div>
                     </div>
                 @empty
-                    <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 fs-5 border rounded shadow-sm">
+                    <div
+                        class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 fs-5 border rounded shadow-sm">
                         <i class="fa-regular fa-circle-question me-2"></i> No orders.
                     </div>
                 @endforelse
@@ -146,4 +160,74 @@
 @endsection
 
 @section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.view-order-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const deliveryId = this.getAttribute('data-id');
+                const contentDiv = document.getElementById('orderDetailsContent');
+
+                contentDiv.innerHTML = '<p class="text-center text-muted">Loading...</p>';
+
+                fetch(`/admin/getOrderDetails/${deliveryId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const orders = data.delivery.order.split(', ');
+                            const quantities = data.delivery.quantity.split(', ');
+                            const fallbackImageUrl = "{{ asset('images/logo.jpg') }}";
+
+                            const orderRows = orders.map((order, index) => {
+                                const imageUrl = data.menu_images[order.trim()] || fallbackImageUrl;
+                                return `
+                                    <tr>
+                                        <td><img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Order Image"></td>
+                                        <td>${order}</td>
+                                    </tr>
+                                `;
+                            }).join("");
+
+                            contentDiv.innerHTML = `
+                                <table class="table table-bordered text-center align-middle">
+                                    <thead class="table-light">
+                                        <tr><th colspan="2">Order Details</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Name:</strong> ${data.delivery.name}</td>
+                                            <td><strong>Email:</strong> ${data.delivery.email}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Contact:</strong> ${data.delivery.contact_number}</td>
+                                            <td><strong>Address:</strong> ${data.delivery.address}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Total Price:</strong> ₱${Number(data.delivery.total_price).toFixed(2)}</td>
+                                            <td><strong>Status:</strong> ${data.delivery.status}</td>
+                                        </tr>
+                                    </tbody>
+                                    <thead class="table-light">
+                                        <tr><th>Image</th><th>Order</th></tr>
+                                    </thead>
+                                    <tbody>${orderRows}</tbody>
+                                </table>
+                            `;
+                        } else {
+                            contentDiv.innerHTML = '<p class="text-center text-danger">Failed to load order details.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching order details:', error);
+                        contentDiv.innerHTML = '<p class="text-center text-danger">An error occurred while fetching order details.</p>';
+                    });
+            });
+        });
+    });
+</script>
+
 @endsection

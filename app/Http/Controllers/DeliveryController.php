@@ -19,31 +19,19 @@ class DeliveryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index()
-    // {
-    //     // Fetch deliveries ordered by latest created_at timestamp
-    //     $deliveries = Delivery::orderBy('created_at', 'desc')->get();
-    //     return view('admin.delivery', compact('deliveries'));
-    // }
-    
     public function index()
     {
-        // Fetch deliveries ordered by the latest created_at timestamp
         $deliveries = Delivery::orderBy('created_at', 'desc')->get();
+        $riders = Rider::all(); // Assuming you have a Rider model
 
-        // Ensure delivery details include menu item images
         foreach ($deliveries as $delivery) {
-            $orders = explode(', ', $delivery->order); // Split orders by comma
-            $menuImages = Menu::whereIn('name', $orders) // Find menu items matching the order names
-                ->pluck('image', 'name') // Retrieve images and associate with menu names
-                ->toArray();
-
-            $delivery->menu_images = $menuImages; // Attach images to each delivery
+            $orders = explode(', ', $delivery->order);
+            $menuImages = Menu::whereIn('name', $orders)->pluck('image', 'name')->toArray();
+            $delivery->menu_images = $menuImages;
         }
 
-        return view('admin.delivery', compact('deliveries'));
+        return view('admin.delivery', compact('deliveries', 'riders'));
     }
-
 
     public function deliveryCreateRider()
     {
@@ -66,14 +54,63 @@ class DeliveryController extends Controller
         return redirect()->route('admin.delivery.index')->with('success', 'Rider added successfully.');
     }
 
+    // public function updateStatus(Request $request, string $id)
+    // {
+    //     // Validate the new status
+    //     $validatedData = $request->validate([
+    //         'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
+    //     ]);
+
+    //     // Define allowed transitions
+    //     $allowedTransitions = [
+    //         'Pending' => ['Preparing'],
+    //         'Preparing' => ['Out for Delivery'],
+    //         'Out for Delivery' => ['Delivered'],
+    //         'Delivered' => ['Returned'],
+    //         'Returned' => [],
+    //     ];
+
+    //     // Find the delivery by ID
+    //     $delivery = Delivery::findOrFail($id);
+
+    //     // Check if the new status is valid for the current status
+    //     if (!in_array($validatedData['status'], $allowedTransitions[$delivery->status])) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Invalid status transition.',
+    //         ]);
+    //     }
+
+    //     // Update the status
+    //     $delivery->status = $validatedData['status'];
+
+    //     if ($delivery->save()) {
+    //         // Notify the user of the status change
+    //         $this->notifyUserOfStatusChange($delivery, $validatedData['status']);
+
+    //         // Get the new valid statuses for the updated status
+    //         $newAllowedStatuses = array_merge([$delivery->status], $allowedTransitions[$delivery->status]);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => "Delivery status changed to {$validatedData['status']}.",
+    //             'allowedStatuses' => $newAllowedStatuses,
+    //         ]);
+    //     }
+
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => 'Failed to update delivery status.',
+    //     ]);
+    // }
+
+
     public function updateStatus(Request $request, string $id)
     {
-        // Validate the new status
         $validatedData = $request->validate([
             'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
         ]);
-
-        // Define allowed transitions
+    
         $allowedTransitions = [
             'Pending' => ['Preparing'],
             'Preparing' => ['Out for Delivery'],
@@ -81,40 +118,51 @@ class DeliveryController extends Controller
             'Delivered' => ['Returned'],
             'Returned' => [],
         ];
-
-        // Find the delivery by ID
+    
         $delivery = Delivery::findOrFail($id);
-
-        // Check if the new status is valid for the current status
+    
         if (!in_array($validatedData['status'], $allowedTransitions[$delivery->status])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid status transition.',
-            ]);
+            return response()->json(['success' => false, 'message' => 'Invalid status transition.']);
         }
-
-        // Update the status
+    
         $delivery->status = $validatedData['status'];
-
-        if ($delivery->save()) {
-            // Notify the user of the status change
-            $this->notifyUserOfStatusChange($delivery, $validatedData['status']);
-
-            // Get the new valid statuses for the updated status
-            $newAllowedStatuses = array_merge([$delivery->status], $allowedTransitions[$delivery->status]);
-
-            return response()->json([
-                'success' => true,
-                'message' => "Delivery status changed to {$validatedData['status']}.",
-                'allowedStatuses' => $newAllowedStatuses,
-            ]);
-        }
-
+        $delivery->save();
+    
+        $validStatuses = array_merge(
+            [$delivery->status],
+            $allowedTransitions[$delivery->status]
+        );
+    
+        $showModal = $validatedData['status'] === 'Out for Delivery';
+    
         return response()->json([
-            'success' => false,
-            'message' => 'Failed to update delivery status.',
+            'success' => true,
+            'message' => "Delivery status updated to {$validatedData['status']}.",
+            'showModal' => $showModal,
+            'deliveryId' => $delivery->id,
+            'validStatuses' => $validStatuses,
+            'currentStatus' => $delivery->status,
         ]);
     }
+    
+    
+
+    public function assignRider(Request $request)
+    {
+        $validatedData = $request->validate([
+            'delivery_id' => 'required|exists:deliveries,id',
+            'rider' => 'required|string',
+        ]);
+    
+        $delivery = Delivery::findOrFail($validatedData['delivery_id']);
+        $delivery->rider = $validatedData['rider'];
+        $delivery->save();
+    
+        return response()->json(['success' => true, 'message' => 'Rider assigned successfully.']);
+    }
+    
+
+
 
 
     private function notifyUserOfStatusChange(Delivery $delivery, $newStatus)
@@ -200,40 +248,6 @@ class DeliveryController extends Controller
             'menu_images' => $menuImages, // Include menu images in the response
         ]);
     }
-
-
-    // public function deliveryDetails($id)
-    // {
-    //     // Find the delivery record by ID or fail with a 404
-    //     $delivery = Delivery::findOrFail($id);
-
-    //     // Split orders to extract menu names
-    //     $orders = explode(', ', $delivery->order);
-
-    //     // Fetch the menu images using the menu names
-    //     $menuImages = Menu::whereIn('name', $orders)
-    //         ->pluck('image', 'name')
-    //         ->map(function ($image) {
-    //             return asset('storage/' . $image); // Add the full URL for images
-    //         })
-    //         ->toArray();
-
-
-    //     // Add images to the response
-    //     return response()->json([
-    //         'name' => $delivery->name,
-    //         'email' => $delivery->email,
-    //         'contact_number' => $delivery->contact_number,
-    //         'address' => $delivery->address,
-    //         'shipping_method' => $delivery->shipping_method,
-    //         'mode_of_payment' => $delivery->mode_of_payment,
-    //         'note' => $delivery->note,
-    //         'order' => $delivery->order,
-    //         'quantity' => $delivery->quantity,
-    //         'status' => $delivery->status,
-    //         'menu_images' => $menuImages, // Include menu images in the response
-    //     ]);
-    // }
 
 
     /**

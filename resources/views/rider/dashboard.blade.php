@@ -12,8 +12,15 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">ORDERS</a>
+     <li class="nav-item position-relative">
+        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
+            ORDERS
+            @if ($pendingOrdersCount > 0)
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
+                    {{ $pendingOrdersCount }}
+                </span>
+            @endif
+        </a>
     </li>
      <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES

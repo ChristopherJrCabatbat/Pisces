@@ -131,6 +131,7 @@ class MenuController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
         // Validate the form data
@@ -171,6 +172,51 @@ class MenuController extends Controller
         }
         return redirect()->route('admin.menu.index');
     }
+
+    // public function store(Request $request)
+    // {
+    //     // Validate the form data
+    //     $validated = $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'price' => 'required|numeric|min:0',
+    //         'category' => 'required|string',
+    //         'description' => 'required|string',
+    //         'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+    //     ]);
+
+    //     try {
+    //         // Handle file upload
+    //         $imagePath = null;
+    //         if ($request->hasFile('image')) {
+    //             $imagePath = $request->file('image')->store('menu_images', 'public');
+    //         }
+
+    //         // Create a new menu entry in the database
+    //         Menu::create([
+    //             'name' => $validated['name'],
+    //             'category' => $validated['category'],
+    //             'price' => $validated['price'],
+    //             'description' => $validated['description'],
+    //             'image' => $imagePath,
+    //             'availability' => 'Available', // Automatically set to 'Available'
+    //         ]);
+
+    //         // Set success toast message
+    //         session()->flash('toast', [
+    //             'message' => 'Menu item added successfully.',
+    //             'type' => 'success',
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         // Set error toast message
+    //         session()->flash('toast', [
+    //             'message' => 'Failed to add menu item. Please try again.',
+    //             'type' => 'error',
+    //         ]);
+    //     }
+
+    //     return redirect()->route('admin.menu.index');
+    // }
+
 
 
     public function storeCategory(Request $request)
@@ -222,6 +268,7 @@ class MenuController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     // public function update(Request $request, string $id)
     // {
     //     $menu = Menu::findOrFail($id);
@@ -269,16 +316,15 @@ class MenuController extends Controller
     public function update(Request $request, string $id)
     {
         $menu = Menu::findOrFail($id);
-    
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'category' => 'required|string',
             'description' => 'required|string',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'availability' => 'required|string',
         ]);
-    
+
         try {
             // Handle file upload if a new image is provided
             if ($request->hasFile('image')) {
@@ -288,18 +334,17 @@ class MenuController extends Controller
                 $imagePath = $request->file('image')->store('menu_images', 'public');
                 $menu->image = $imagePath;
             }
-    
-            // Update menu item, including the availability field
+
+            // Update the menu fields
             $menu->update([
                 'name' => $validated['name'],
                 'category' => $validated['category'],
                 'price' => $validated['price'],
                 'description' => $validated['description'],
-                // 'availability' => $request->input('availability'),
-                'availability' => $validated['availability'],
                 'image' => $menu->image ?? $menu->image,
+                'availability' => 'aslfjalsdfkjalsfkjasldfkjasdlfkj',
             ]);
-    
+
             session()->flash('toast', [
                 'message' => 'Menu updated successfully.',
                 'type' => 'success',
@@ -310,13 +355,9 @@ class MenuController extends Controller
                 'type' => 'error',
             ]);
         }
-    
+
         return redirect()->route('admin.menu.index');
     }
-    
-    
-    
-
 
 
 

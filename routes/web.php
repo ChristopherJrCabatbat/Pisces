@@ -58,6 +58,7 @@ Route::group([
 
     Route::resource('delivery', DeliveryController::class);
     Route::put('/updateStatus/{id}', [DeliveryController::class, 'updateStatus'])->name('updateStatus');
+    Route::post('/assignRider', [DeliveryController::class, 'assignRider'])->name('assignRider');
     Route::get('/deliveryDetails/{id}', [DeliveryController::class, 'deliveryDetails'])->name('deliveryDetails');
     Route::get('/deliveryCreateRider', [DeliveryController::class, 'deliveryCreateRider'])->name('deliveryCreateRider');
     Route::post('/storeRider', [DeliveryController::class, 'storeRider'])->name('storeRider');
@@ -73,6 +74,7 @@ Route::group([
 
     Route::get('/updates', [AdminController::class, 'updates'])->name('updates');
     Route::get('/viewOrders/{id}', [AdminController::class, 'viewOrders'])->name('viewOrders');
+    Route::get('/getOrderDetails/{id}', [AdminController::class, 'getOrderDetails'])->name('getOrderDetails');
 
 
     // Route::get('/messageUser', [AdminController::class, 'messageUser'])->name('messageUser');

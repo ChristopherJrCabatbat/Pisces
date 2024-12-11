@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
 use App\Models\Menu;
@@ -44,48 +45,48 @@ class AdminController extends Controller
     // }
 
     public function dashboard()
-{
-    $userCount = User::where('role', 'User')->count();
-    $deliveryCount = Delivery::count();
-    $menuCount = Menu::count();
-    $categoryCount = Category::count();
+    {
+        $userCount = User::where('role', 'User')->count();
+        $deliveryCount = Delivery::count();
+        $menuCount = Menu::count();
+        $categoryCount = Category::count();
 
-    // Fetch the top 5 most popular menus based on the total order count
-    $topPicks = DB::table('orders')
-        ->join('menus', 'orders.menu_name', '=', 'menus.name')
-        ->select(
-            'menus.id',
-            'menus.name',
-            'menus.image',
-            'menus.category',
-            'menus.price',
-            'menus.description',
-            DB::raw('SUM(orders.quantity) as total_order_count')
+        // Fetch the top 5 most popular menus based on the total order count
+        $topPicks = DB::table('orders')
+            ->join('menus', 'orders.menu_name', '=', 'menus.name')
+            ->select(
+                'menus.id',
+                'menus.name',
+                'menus.image',
+                'menus.category',
+                'menus.price',
+                'menus.description',
+                DB::raw('SUM(orders.quantity) as total_order_count')
+            )
+            ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.category', 'menus.price', 'menus.description')
+            ->orderByDesc('total_order_count')
+            ->take(5)
+            ->get();
+
+        // Calculate total sales for each month (only 'Delivered' orders)
+        $monthlySales = Delivery::select(
+            DB::raw("SUM(total_price) as total_sales"),
+            DB::raw("MONTHNAME(created_at) as month_name")
         )
-        ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.category', 'menus.price', 'menus.description')
-        ->orderByDesc('total_order_count')
-        ->take(5)
-        ->get();
+            ->where('status', 'Delivered')
+            ->groupBy(DB::raw("MONTH(created_at)"), DB::raw("MONTHNAME(created_at)"))
+            ->orderBy(DB::raw("MONTH(created_at)"))
+            ->pluck('total_sales', 'month_name');
 
-    // Calculate total sales for each month (only 'Delivered' orders)
-    $monthlySales = Delivery::select(
-        DB::raw("SUM(total_price) as total_sales"),
-        DB::raw("MONTHNAME(created_at) as month_name")
-    )
-        ->where('status', 'Delivered')
-        ->groupBy(DB::raw("MONTH(created_at)"), DB::raw("MONTHNAME(created_at)"))
-        ->orderBy(DB::raw("MONTH(created_at)"))
-        ->pluck('total_sales', 'month_name');
-
-    return view('admin.dashboard', compact(
-        'userCount',
-        'deliveryCount',
-        'menuCount',
-        'categoryCount',
-        'topPicks',
-        'monthlySales'
-    ));
-}
+        return view('admin.dashboard', compact(
+            'userCount',
+            'deliveryCount',
+            'menuCount',
+            'categoryCount',
+            'topPicks',
+            'monthlySales'
+        ));
+    }
 
 
     public function menu()
@@ -111,19 +112,19 @@ class AdminController extends Controller
     }
 
     public function respondFeedback(Request $request)
-{
-    $feedback = Feedback::findOrFail($request->feedback_id);
-    $feedback->response = $request->response;
-    $feedback->save();
+    {
+        $feedback = Feedback::findOrFail($request->feedback_id);
+        $feedback->response = $request->response;
+        $feedback->save();
 
-    // Set a toast session with the success message
-    session()->flash('toast', [
-        'message' => 'Response has been submitted successfully.',
-        'type' => 'success', // 'success' or 'error'
-    ]);
+        // Set a toast session with the success message
+        session()->flash('toast', [
+            'message' => 'Response has been submitted successfully.',
+            'type' => 'success', // 'success' or 'error'
+        ]);
 
-    return redirect()->back();
-}
+        return redirect()->back();
+    }
 
 
 
@@ -289,7 +290,77 @@ class AdminController extends Controller
         return view('admin.viewOrders', compact('deliveriesWithImages'));
     }
 
+    // public function getOrderDetails($id)
+    // {
+    //     $delivery = Delivery::find($id);
+    
+    //     if (!$delivery) {
+    //         return response()->json(['success' => false, 'message' => 'Delivery not found']);
+    //     }
+    
+    //     $orders = explode(', ', $delivery->order);
+    //     $quantities = explode(', ', $delivery->quantity);
+    //     $menuImages = Menu::whereIn('name', $orders)
+    //         ->pluck('image', 'name')
+    //         ->map(fn($image) => $image ? asset('storage/' . $image) : asset('images/logo.jpg'))
+    //         ->toArray();
+    
+    //     return response()->json([
+    //         'success' => true,
+    //         'delivery' => $delivery,
+    //         'menu_images' => $menuImages,
+    //         'quantities' => $quantities
+    //     ]);
+    // }
 
+    public function getOrderDetails($id)
+    {
+        $delivery = Delivery::find($id);
+    
+        if (!$delivery) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Delivery not found'
+            ]);
+        }
+    
+        // Get orders and quantities from delivery
+        $orders = explode(', ', $delivery->order);
+        $quantities = explode(', ', $delivery->quantity);
+    
+        // Normalize menu names
+        $plainMenuNames = array_map(function ($order) {
+            return trim(strtolower(preg_replace('/\s*\(x\d+\)$/', '', $order)));
+        }, $orders);
+    
+        // Retrieve menu images
+        $menuImages = Menu::whereIn('name', $plainMenuNames)
+            ->pluck('image', 'name')
+            ->mapWithKeys(fn($image, $name) => [
+                strtolower(trim($name)) => $image ? asset('storage/' . $image) : asset('images/logo.jpg')
+            ])
+            ->toArray();
+    
+        // Log for debugging
+        Log::info('Normalized Menu Names: ', $plainMenuNames);
+        Log::info('Retrieved Menu Images: ', $menuImages);
+    
+        // Match normalized names to images
+        $imageUrls = [];
+        foreach ($plainMenuNames as $name) {
+            $imageUrls[] = $menuImages[$name] ?? asset('images/logo.jpg');
+        }
+    
+        return response()->json([
+            'success' => true,
+            'delivery' => $delivery,
+            'menu_images' => $imageUrls,
+            'quantities' => $quantities
+        ]);
+    }
+    
+    
+    
 
 
     public function monitoring()

@@ -9,7 +9,7 @@
 @section('sidebar')
     <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a>
     </li>
-    <li><a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
+    <li><a href="/admin/menu" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
     <li class="add-categ"><a href="/admin/category" class="sidebar-font"><i class="fa-solid fa-list me-2"></i> Category</a></li>
 
     <li>
@@ -121,22 +121,7 @@
                     <textarea name="description" id="description" cols="30" rows="5" class="form-control" required>{{ old('description', $menus->description) }}</textarea>
                 </div>
 
-                <!-- Hidden Field for Default Value -->
-                {{-- <input type="hidden" name="availability" value="Available"> --}}
-
-                <!-- Checkbox for Marking as Unavailable -->
-                <div class="form-check">
-                    {{-- <input type="checkbox" id="availability" name="availability" value="Unavailable"
-                        {{ old('availability', $menus->availability) === 'Unavailable' ? 'checked' : '' }}> --}}
-                    <label class="form-check-label" for="availability">Mark as Unavailable</label>
-                    <input type="text" name="availability" class="form-control" id="availability"
-                        value="{{ old('availability', $menus->availability) }}">
-                </div>
-
-
-
-
-
+        
                 <div class="d-grid my-2">
                     <button class="btn btn-primary dark-blue" type="submit">Update Menu</button>
                 </div>

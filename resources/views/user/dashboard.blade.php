@@ -52,10 +52,17 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">ORDERS</a>
+   <li class="nav-item position-relative">
+        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
+            ORDERS
+            @if ($pendingOrdersCount > 0)
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
+                    {{ $pendingOrdersCount }}
+                </span>
+            @endif
+        </a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES
             @if ($unreadCount > 0)
                 <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
@@ -137,7 +144,7 @@
                                     <div class="off text-success">-10% Off</div>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
-                                    
+
                                     <div class="stars d-flex">
                                         <i class="fa-solid fa-star"></i>
                                         <i class="fa-solid fa-star"></i>
@@ -167,7 +174,7 @@
                                             @endif
                                         </div>
                                     </div> --}}
-                                    
+
                                 </div>
                                 <p class="card-text mt-2">
                                     <small class="text-body-secondary">Bold and intense, our dark coffee offers deep, rich
@@ -270,7 +277,8 @@
                                             </div>
                                             <div class="star-label">
                                                 @if ($menu->ratingCount > 0)
-                                                    ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                                    ({{ number_format($menu->rating, 1) }})
+                                                    {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
                                                 @else
                                                     No Rating
                                                 @endif
@@ -383,13 +391,14 @@
                                             </div>
                                             <div class="star-label">
                                                 @if ($menu->ratingCount > 0)
-                                                    ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                                    ({{ number_format($menu->rating, 1) }})
+                                                    {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
                                                 @else
                                                     No Rating
                                                 @endif
                                             </div>
                                         </div>
-                                        
+
 
                                     </div>
                                 </a>
