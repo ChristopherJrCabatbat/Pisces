@@ -12,6 +12,7 @@ use Carbon\Carbon;
 
 use App\Models\User;
 use App\Models\Feedback;
+use App\Models\Message;
 
 class FeedbackController extends Controller
 {
@@ -35,6 +36,7 @@ class FeedbackController extends Controller
      * Store a newly created resource in storage.
      */
 
+
     // public function store(Request $request)
     // {
     //     // Validate input fields
@@ -47,32 +49,48 @@ class FeedbackController extends Controller
     //     /** @var \App\Models\User $user */
     //     $user = Auth::user(); // Get the currently authenticated user
 
-    //     // Generate a random 6-digit order number
-    //     $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+    //     // Check if feedback already exists for this user and menu item
+    //     $existingFeedback = Feedback::where('customer_name', $user->first_name . ' ' . $user->last_name)
+    //         ->where('menu_items', $validated['menu_items'])
+    //         ->first();
 
-    //     // Create the feedback entry
-    //     Feedback::create([
-    //         'customer_name' => $user->first_name . ' ' . $user->last_name, // Combine first and last name
-    //         'order_number' => $orderNumber,
-    //         'menu_items' => $validated['menu_items'], // Value from hidden input
-    //         'feedback_text' => $validated['feedback_text'],
-    //         'rating' => $validated['rating'],
-    //     ]);
+    //     if ($existingFeedback) {
+    //         // Update the existing feedback
+    //         $existingFeedback->update([
+    //             'feedback_text' => $validated['feedback_text'],
+    //             'rating' => $validated['rating'],
+    //         ]);
+
+    //         // Toast message for updated feedback
+    //         session()->flash('toast', ['message' => 'Feedback sent successfully!', 'type' => 'success']);
+    //     } else {
+    //         // Generate a random 6-digit order number for new feedback
+    //         $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+    //         // Create a new feedback entry
+    //         Feedback::create([
+    //             'customer_name' => $user->first_name . ' ' . $user->last_name, // Combine first and last name
+    //             'order_number' => $orderNumber,
+    //             'menu_items' => $validated['menu_items'], // Value from hidden input
+    //             'feedback_text' => $validated['feedback_text'],
+    //             'rating' => $validated['rating'],
+    //         ]);
+
+    //         // Toast message for new feedback
+    //         session()->flash('toast', ['message' => 'Feedback submitted successfully!', 'type' => 'success']);
+    //     }
 
     //     // Update the menu's rating in the menus table
     //     $menu = \App\Models\Menu::where('name', $validated['menu_items'])->first();
 
     //     if ($menu) {
-    //         // Calculate the new average rating
-    //         $averageRating = Feedback::where('menu_items', $menu->name)
-    //             ->avg('rating');
-
-    //         $menu->rating = round($averageRating, 1); // Round to 1 decimal place
-    //         $menu->save(); // Save the updated rating
+    //         // Use the latest rating submitted by the user
+    //         $menu->rating = round($validated['rating'], 1); // Update to 1 decimal place
+    //         $menu->save();
     //     }
 
-    //     // Redirect back with success message
-    //     return redirect()->back()->with('success', 'Feedback submitted successfully!');
+    //     // Redirect back to the previous page
+    //     return redirect()->back();
     // }
 
     public function store(Request $request)
@@ -84,52 +102,59 @@ class FeedbackController extends Controller
             'menu_items' => 'required|string',
         ]);
 
-        /** @var \App\Models\User $user */
         $user = Auth::user(); // Get the currently authenticated user
 
-        // Check if feedback already exists for this user and menu item
+        // Check for existing feedback
         $existingFeedback = Feedback::where('customer_name', $user->first_name . ' ' . $user->last_name)
             ->where('menu_items', $validated['menu_items'])
             ->first();
 
         if ($existingFeedback) {
-            // Update the existing feedback
             $existingFeedback->update([
                 'feedback_text' => $validated['feedback_text'],
                 'rating' => $validated['rating'],
             ]);
-
-            // Toast message for updated feedback
-            session()->flash('toast', ['message' => 'Feedback sent successfully!', 'type' => 'success']);
+            session()->flash('toast', ['message' => 'Feedback updated successfully!', 'type' => 'success']);
         } else {
-            // Generate a random 6-digit order number for new feedback
             $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-
-            // Create a new feedback entry
             Feedback::create([
-                'customer_name' => $user->first_name . ' ' . $user->last_name, // Combine first and last name
+                'customer_name' => $user->first_name . ' ' . $user->last_name,
                 'order_number' => $orderNumber,
-                'menu_items' => $validated['menu_items'], // Value from hidden input
+                'menu_items' => $validated['menu_items'],
                 'feedback_text' => $validated['feedback_text'],
                 'rating' => $validated['rating'],
             ]);
-
-            // Toast message for new feedback
             session()->flash('toast', ['message' => 'Feedback submitted successfully!', 'type' => 'success']);
         }
 
-        // Update the menu's rating in the menus table
+        // Update menu's rating
         $menu = \App\Models\Menu::where('name', $validated['menu_items'])->first();
-
         if ($menu) {
-            // Use the latest rating submitted by the user
-            $menu->rating = round($validated['rating'], 1); // Update to 1 decimal place
+            $menu->rating = round($validated['rating'], 1);
             $menu->save();
         }
 
-        // Redirect back to the previous page
+        // Format the message
+        $messageText = sprintf(
+            "I would like to share my feedback on '%s'. \"%s\" I rate it %d star%s.",
+            $validated['menu_items'],
+            ucfirst($validated['feedback_text']),
+            $validated['rating'],
+            $validated['rating'] > 1 ? 's' : ''
+        );
+
+        // Send the formatted message to the admin (userId: 1 as an example)
+        Message::create([
+            'user_id' => $user->id,
+            'receiver_id' => 1, // Admin or target user ID
+            'sender_role' => 'User',
+            'message_text' => $messageText,
+        ]);
+
+        // Redirect back
         return redirect()->back();
     }
+
 
 
     public function updateSentiment(Request $request, $id)

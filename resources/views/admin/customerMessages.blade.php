@@ -61,7 +61,7 @@
             <span class="faded-white ms-1">Messages</span>
         </div>
 
-        <div class="table-container">
+        <div class="table-container mb-4">
 
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
                 <!-- Left Section -->

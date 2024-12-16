@@ -718,26 +718,28 @@ class UserController extends Controller
         return view('user.messagesPisces', compact('messages', 'pendingOrdersCount', 'userCart', 'user', 'userFavorites'));
     }
 
-    public function sendMessage(Request $request, $userId)
-    {
-        $validated = $request->validate([
-            'message_text' => 'required|string',
-        ]);
+    // public function sendMessage(Request $request, $userId)
+    // {
+    //     $validated = $request->validate([
+    //         'message_text' => 'required|string',
+    //     ]);
 
-        // Create the message
-        $message = Message::create([
-            'user_id' => Auth::id(), // Sender is the authenticated user
-            'receiver_id' => $userId, // Receiver is the admin or target user
-            'sender_role' => 'User',
-            'message_text' => $validated['message_text'],
-        ]);
+    //     // Create the message
+    //     $message = Message::create([
+    //         'user_id' => Auth::id(), // Sender is the authenticated user
+    //         'receiver_id' => $userId, // Receiver is the admin or target user
+    //         'sender_role' => 'User',
+    //         'message_text' => $validated['message_text'],
+    //     ]);
 
-        // Return only the new message
-        return response()->json([
-            'success' => true,
-            'message' => $message,
-        ]);
-    }
+    //     // Return only the new message
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => $message,
+    //     ]);
+    // }
+
+    
 
 
 
