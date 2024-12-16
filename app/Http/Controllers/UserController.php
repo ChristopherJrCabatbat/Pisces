@@ -387,17 +387,30 @@ class UserController extends Controller
     }
 
 
+    // public function order()
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch the user's cart items with pivot data (quantity) and menu details
+    //     $menus = $user->cartItems()->withPivot('quantity')->get();
+
+    //     // Pass data to the order view
+    //     return view('user.order', compact('user', 'menus'));
+    // }
+
     public function order()
-    {
-        /** @var User $user */
-        $user = Auth::user();
+{
+    /** @var User $user */
+    $user = Auth::user();
 
-        // Fetch the user's cart items with pivot data (quantity) and menu details
-        $menus = $user->cartItems()->withPivot('quantity')->get();
+    // Fetch cart items with pivot data
+    $menus = $user->cartItems()->withPivot('quantity')->get();
 
-        // Pass data to the order view
-        return view('user.order', compact('user', 'menus'));
-    }
+    // Pass data to the order view
+    return view('user.order', compact('user', 'menus'));
+}
+
 
     public function orderView($id)
     {
