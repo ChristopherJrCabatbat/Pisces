@@ -31,7 +31,12 @@
 
     {{-- <link rel="stylesheet" href="{{ asset('home-assets/css/style.css') }}"> --}}
     <link rel="stylesheet" href="./home-assets/css/style.css">
+
     <style>
+        .text-center {
+            text-align: center !important;
+        }
+
         /* Modal Overlay */
         .custom-modal {
             position: fixed;
@@ -40,7 +45,6 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
-            /* Darker overlay for better focus */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -58,22 +62,23 @@
         /* Modal Content */
         .custom-modal .modal-content {
             background: #fff;
-            padding: 30px;
+            padding: 20px;
             border-radius: 12px;
-            max-width: 800px;
             width: 90%;
-            text-align: center;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
             overflow: hidden;
         }
 
         /* Close Button */
         .custom-modal .close-modal {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px;
+            top: 51px;
+            right: 320px;
+            font-size: 34px;
             cursor: pointer;
             color: #333;
             transition: color 0.2s ease;
@@ -81,38 +86,66 @@
 
         .custom-modal .close-modal:hover {
             color: #d9534f;
-            /* Red for hover */
         }
 
         /* Title */
         .custom-modal .modal-title {
             font-size: 28px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #333;
             font-weight: bold;
+            text-align: center;
         }
 
-        /* Menu Grid */
+        /* Grid Container */
         .custom-modal #menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            /* Responsive grid */
-            gap: 20px;
-            justify-items: center;
+            /* grid-template-columns: repeat(auto-fill, minmax(200px, 3fr)); */
+            /* grid-template-columns: 1fr 1fr; */
+            gap: 30px;
+            /* Space between grid items */
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 10px;
         }
 
-        /* Individual Menu Card */
+        .custom-modal #menu-grid .grid-list {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        @media (max-width: 820px) {
+            .custom-modal #menu-grid .grid-list {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .custom-modal #menu-grid .grid-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Menu Card */
         .custom-modal .menu-card {
             background: #f9f9f9;
             border-radius: 10px;
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
             width: 100%;
             max-width: 200px;
-            text-align: center;
+            /* Ensure proper width for each card */
             padding: 15px;
         }
+
+        /* .restaurant-card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        } */
 
         .custom-modal .menu-card:hover {
             transform: translateY(-5px);
@@ -141,15 +174,9 @@
         .fa-star-half-stroke {
             color: #F81D0B;
         }
-
-        .restaurant-card_grid {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
     </style>
+
+
     <!--
     - google font link
   -->
@@ -353,13 +380,6 @@
 
                                     </div>
                                     <h3 class="h5 card-title">{{ $menu->name }}</h3>
-                                    {{-- <div class="rating-wrapper">
-                                        <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                        <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                        <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                        <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                        <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
-                                    </div> --}}
 
                                     <div class="rating-wrapper d-flex align-items-center gap-2">
                                         <div class="stars d-flex">
@@ -402,11 +422,24 @@
                 <div class="modal-content">
                     <span class="close-modal" id="closeMenuModal">&times;</span>
                     <h3 class="modal-title">All Menus</h3>
-                    <div id="menu-grid">
-                        <!-- Content will be dynamically loaded via AJAX -->
+                    <div id="menu-grid" class="">
+                        <!-- Menu cards dynamically loaded here -->
+                        <div class="menu-card">
+                            <img src="path-to-image.jpg" alt="Menu Item">
+                            <h3>Iced Taro</h3>
+                            <p>No Rating<br>₱89.00<br>Drinks</p>
+                        </div>
+                        <div class="menu-card">
+                            <img src="path-to-image.jpg" alt="Menu Item">
+                            <h3>Pork Shanghai</h3>
+                            <p>4.0 (1)<br>₱599.00<br>Bilao</p>
+                        </div>
+                        <!-- Add more menu cards -->
                     </div>
                 </div>
             </div>
+
+
 
 
 
@@ -793,12 +826,14 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
+    {{-- Modal --}}
     <script>
         const modal = document.getElementById('menuModal');
         const openModalBtn = document.getElementById('openMenuModal');
         const closeModalBtn = document.getElementById('closeMenuModal');
         const menuGrid = document.getElementById('menu-grid');
 
+        // Open Modal and Load Content
         openModalBtn.addEventListener('click', () => {
             fetch('/menus/all')
                 .then(response => response.text())
@@ -810,11 +845,13 @@
                 .catch(error => console.error('Error loading menus:', error));
         });
 
+        // Close Modal
         closeModalBtn.addEventListener('click', () => {
             modal.classList.remove('visible');
             modal.classList.add('hidden');
         });
 
+        // Close Modal on Click Outside
         window.addEventListener('click', (event) => {
             if (event.target === modal) {
                 modal.classList.remove('visible');
@@ -822,6 +859,7 @@
             }
         });
     </script>
+
 
 
 </body>

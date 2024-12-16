@@ -31,6 +31,7 @@
                 <div>
                     <p class="fw-bold mb-1">{{ $menu->name }} (x{{ $menu->quantity }})</p>
                     <p class="text-muted mb-0">₱{{ number_format($menu->price * $menu->quantity, 2) }}</p>
+                    {{-- <p class="text-muted mb-0">₱{{ number_format($menu->price * $menu->pivot->quantity, 2) }}</p> --}}
                 </div>
             </div>
             @if ($order->status == 'Delivered')

@@ -196,7 +196,7 @@
                     @empty
                         <a href="#" class="message-a message-row">
                             <div class="message-f fs-5">
-                                No messages match your search
+                                <i class="fa-regular fa-circle-question me-2"></i> No messages match your search
                             </div>
                         </a>
                     @endforelse

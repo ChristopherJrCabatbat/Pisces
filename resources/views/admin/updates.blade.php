@@ -117,11 +117,11 @@
                         </tr>
                     @empty
                         <tr id="no-updates-row">
-                            <td colspan="3">There are no updates available.</td>
+                            <td colspan="5">There are no updates available.</td>
                         </tr>
                     @endforelse
                     <tr id="no-updates-row" style="display: none;">
-                        <td colspan="3">There are no updates available.</td>
+                        <td colspan="5">There are no updates available.</td>
                     </tr>
                 </tbody>
             </table>
@@ -160,7 +160,7 @@
             } else {
                 if (noUpdatesRow) noUpdatesRow.style.display = "";
                 noUpdatesRow.innerHTML =
-                    `<td colspan="4">There are no customer updates available.</td>`;
+                    `<td colspan="5">There are no customer updates available.</td>`;
             }
         }
 

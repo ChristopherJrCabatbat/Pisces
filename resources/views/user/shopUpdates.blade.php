@@ -21,7 +21,7 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
             ORDERS
             @if ($pendingOrdersCount > 0)
@@ -62,12 +62,12 @@
                 class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="m-0 text-secondary">Order Updates</h5>
-                    <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i
-                            class="fa-solid fa-caret-right ms-1"></i></a>
+                    {{-- <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i
+                            class="fa-solid fa-caret-right ms-1"></i></a> --}}
                 </div>
 
                 <div class="shop-updates-body my-2">
-                    @foreach ($deliveries as $delivery)
+                    @forelse ($deliveries as $delivery)
                         <!-- Review Order -->
                         <a href="{{ route('user.reviewOrder', ['delivery' => $delivery->id]) }}">
                             <div class="d-flex a-container p-3">
@@ -79,7 +79,8 @@
                                     <p class="m-0 fw-bold">Review your order</p>
                                     <p class="m-0 text-muted small">{{ $delivery->order }}</p>
                                     <p class="m-0 text-muted small">Status: {{ ucfirst($delivery->status) }} <span
-                                            class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span></p>
+                                            class="text-muted small">{{ $delivery->updated_at->diffForHumans() }}</span>
+                                    </p>
                                     <img src="{{ $delivery->menuImage }}" width="60" class="mt-2 img-fluid"
                                         alt="Order Image">
                                 </div>
@@ -104,7 +105,11 @@
                                 </div>
                             </div>
                         </a>
-                    @endforeach
+                    @empty
+                        <div class="d-flex align-items-center fs-5 p-3">
+                            <i class="fa-regular fa-circle-question me-2"></i> There are no orders.
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>

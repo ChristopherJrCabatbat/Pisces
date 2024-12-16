@@ -21,7 +21,7 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
             ORDERS
             @if ($pendingOrdersCount > 0)
@@ -72,14 +72,14 @@
                     <!-- Top Section -->
                     <div class="bottom pb-3 mb-3">
                         @if ($delivery->status === 'Delivered' || $delivery->status === 'Returned')
-                            Your order has been delivered to <span class="fw-bold">{{ $delivery->name }}</span> on 
+                            Your order has been delivered to <span class="fw-bold">{{ $delivery->name }}</span> on
                             <span class="fw-bold">{{ $delivery->created_at->format('M d') }}</span>.
                         @else
-                            Your order is currently <span class="fw-bold">{{ $delivery->status }}</span> on 
+                            Your order is currently <span class="fw-bold">{{ $delivery->status }}</span> on
                             <span class="fw-bold">{{ $delivery->created_at->format('M d') }}</span>.
                         @endif
                     </div>
-                    
+
 
                     <!-- Shipping Details -->
 
@@ -151,10 +151,10 @@
                             <!-- Content -->
                             <div class="content order-width d-flex gap-2">
                                 {{-- <button type="button" class="btn btn-outline-dark w-50" onclick="location.href='{{ route('user.shoppingCart', ['deliveryId' => $delivery->id]) }}'">Buy Again</button> --}}
-                                <button type="button" class="btn btn-outline-dark w-50" 
-    onclick="location.href='{{ route('user.orderRepeat', ['deliveryId' => $delivery->id]) }}'">
-    Buy Again
-</button>
+                                <button type="button" class="btn btn-outline-dark w-50"
+                                    onclick="location.href='{{ route('user.orderRepeat', ['deliveryId' => $delivery->id]) }}'">
+                                    Buy Again
+                                </button>
                                 <button type="button" class="btn btn-outline-dark w-50">View Review</button>
                             </div>
                         </div>
