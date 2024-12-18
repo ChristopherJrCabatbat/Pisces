@@ -76,8 +76,8 @@
         /* Close Button */
         .custom-modal .close-modal {
             position: absolute;
-            top: 51px;
-            right: 320px;
+            top: 7vh;
+            right: 22vw;
             font-size: 34px;
             cursor: pointer;
             color: #333;

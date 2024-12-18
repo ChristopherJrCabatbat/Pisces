@@ -736,7 +736,24 @@ a.more:hover {
 }
 
 .translate-middle-y-custom {
-    transform: translate(-60%, -30%); /* Adjusts horizontal and vertical positions */
+    transform: translate(-60%, -30%);
+}
+
+@media (max-width: 993px) {
+    .translate-middle-y-custom {
+        /* transform: translate(0%, 0%); */
+        transform: translate(-141%, 48%);
+    }
+
+    .dropdown-binago {
+        height: 200px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .navbar-nav .dropdown-menu {
+        margin-top: 90px;
+    }
 }
 
 .fa-star, .fa-star-half-stroke {

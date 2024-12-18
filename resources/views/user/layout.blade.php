@@ -10,10 +10,12 @@
     {{-- <title>@yield('title')</title> --}}
     <title>Pisces Coffee Hub</title>
 
+    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> --}}
+
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-icon.png') }}">
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-
     <script src="https://kit.fontawesome.com/f416851b63.js" crossorigin="anonymous"></script>
 
     @yield('styles-links')
@@ -109,11 +111,11 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarScroll">
-                    <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                    <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
                         @yield('topbar')
                     </ul>
 
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center" style="max-height: 57px">
 
                         <!-- Heart Icon -->
                         <div class="icon-wrapper">
@@ -134,7 +136,7 @@
 
                         <!-- User Dropdown -->
                         <ul class="navbar-nav ms-4 my-2 my-lg-0 navbar-nav-scroll">
-                            <li class="nav-item dropdown">
+                            <li class="nav-item dropdown dropdown-binago">
                                 <a class="nav-link dropdown-toggle" href="#" role="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     {{ Auth::user()->first_name }}
@@ -288,12 +290,12 @@
                             const starContainer = document.getElementById('menuRating');
                             starContainer.innerHTML = ''; // Clear previous stars if any
                             const rating = parseFloat(data.rating ||
-                            0); // Default to 0 if no rating
+                                0); // Default to 0 if no rating
                             const fullStars = Math.floor(rating); // Full stars
                             const halfStar = rating % 1 >= 0.5 ? 1 :
-                            0; // Half star if remainder >= 0.5
+                                0; // Half star if remainder >= 0.5
                             const emptyStars = 5 - (fullStars +
-                            halfStar); // Remaining empty stars
+                                halfStar); // Remaining empty stars
 
                             // Add full stars
                             for (let i = 0; i < fullStars; i++) {
@@ -439,7 +441,9 @@
         });
     </script>
 
-
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script> --}}
 
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>
