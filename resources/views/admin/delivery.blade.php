@@ -250,6 +250,7 @@
 
                                     @php
                                         $allowedTransitions = [
+                                            'Pending GCash Transaction' => ['Pending'],
                                             'Pending' => ['Preparing'],
                                             'Preparing' => ['Out for Delivery'],
                                             'Out for Delivery' => ['Delivered'],

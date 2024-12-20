@@ -111,6 +111,10 @@
                             type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pending-gcash-transaction-tab" data-bs-toggle="tab" data-bs-target="#pending-gcash-transaction"
+                            type="button" role="tab" aria-controls="pending-gcash-transaction" aria-selected="false">Pending GCash</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
                             type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
                     </li>
@@ -139,7 +143,7 @@
 
         {{-- Content --}}
         <div class="tab-content container content user-content p-0 text-black" id="ordersTabContent">
-            @foreach (['all', 'pending', 'preparing', 'out-for-delivery', 'delivered', 'returns'] as $status)
+            @foreach (['all', 'pending-gcash-transaction', 'pending', 'preparing', 'out-for-delivery', 'delivered', 'returns'] as $status)
                 <div class="tab-pane fade {{ $status === 'all' ? 'show active' : '' }}" id="{{ $status }}"
                     role="tabpanel" aria-labelledby="{{ $status }}-tab">
                     @forelse ($statuses[$status] as $order)

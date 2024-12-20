@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id(); // Primary key
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Sender
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade'); // Sender (nullable for system messages)
             $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade'); // Receiver
-            $table->string('sender_role'); // Role of the sender (User or Admin)
+            $table->string('sender_role'); // Role of the sender (User, Admin, or System)
             $table->text('message_text'); // Actual message content
             $table->boolean('is_read')->default(false); // Tracks if the message has been read
             $table->timestamps(); // Includes created_at and updated_at
         });
-        
     }
 
     /**

@@ -496,68 +496,6 @@ class UserController extends Controller
     }
 
 
-    // public function orders(Request $request)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-    //     $userCart = $user->cart;
-    //     $userFavorites = $user->favoriteItems()->count();
-
-    //     // Fetch user-specific orders with custom status hierarchy
-    //     $orders = DB::table('deliveries')
-    //         ->where('email', $user->email) // Filter by user's email
-    //         ->orderByRaw("
-    //         FIELD(status, 'Out for Delivery', 'Preparing', 'Pending', 'Delivered', 'Returned'),
-    //         created_at DESC
-    //     ") // Custom ordering by status and then by creation date
-    //         ->get();
-
-    //     $orders = $orders->map(function ($order) {
-    //         $order->created_at = Carbon::parse($order->created_at);
-
-    //         // Parse the order string and quantities
-    //         $orderItems = explode(', ', $order->order);
-    //         $quantities = explode(', ', $order->quantity);
-
-    //         // Fetch all menu details for the order
-    //         $menuDetails = [];
-    //         foreach ($orderItems as $index => $item) {
-    //             $menuName = explode(' (', $item)[0]; // Extract menu name
-    //             $menu = DB::table('menus')->where('name', $menuName)->first();
-
-    //             if ($menu) {
-    //                 $menuDetails[] = (object)[ // Convert to an object
-    //                     'name' => $menuName,
-    //                     'quantity' => $quantities[$index] ?? 1,
-    //                     'image' => 'storage/' . $menu->image, // Consistent with other files
-    //                     'price' => $menu->price
-    //                 ];
-    //             }
-    //         }
-
-    //         $order->menuDetails = $menuDetails;
-    //         return $order;
-    //     });
-
-    //     // Count unread messages from the admin
-    //     $unreadCount = Message::where('receiver_id', $user->id)
-    //         ->where('is_read', false)
-    //         ->count();
-
-    //     // Categorize orders by status
-    //     $statuses = [
-    //         'all' => $orders,
-    //         'pending' => $orders->where('status', 'Pending'),
-    //         'preparing' => $orders->where('status', 'Preparing'),
-    //         'out-for-delivery' => $orders->where('status', 'Out for Delivery'),
-    //         'delivered' => $orders->where('status', 'Delivered'),
-    //         'returns' => $orders->where('status', 'Returned'),
-    //     ];
-
-    //     return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount'));
-    // }
-
-
     public function orders(Request $request)
     {
         /** @var User $user */
@@ -615,6 +553,7 @@ class UserController extends Controller
         // Categorize orders by status
         $statuses = [
             'all' => $orders,
+            'pending-gcash-transaction' => $orders->where('status', 'Pending GCash Transaction'),
             'pending' => $orders->where('status', 'Pending'),
             'preparing' => $orders->where('status', 'Preparing'),
             'out-for-delivery' => $orders->where('status', 'Out for Delivery'),
@@ -731,28 +670,26 @@ class UserController extends Controller
         return view('user.messagesPisces', compact('messages', 'pendingOrdersCount', 'userCart', 'user', 'userFavorites'));
     }
 
-    // public function sendMessage(Request $request, $userId)
-    // {
-    //     $validated = $request->validate([
-    //         'message_text' => 'required|string',
-    //     ]);
+    public function sendMessage(Request $request, $userId)
+    {
+        $validated = $request->validate([
+            'message_text' => 'required|string',
+        ]);
 
-    //     // Create the message
-    //     $message = Message::create([
-    //         'user_id' => Auth::id(), // Sender is the authenticated user
-    //         'receiver_id' => $userId, // Receiver is the admin or target user
-    //         'sender_role' => 'User',
-    //         'message_text' => $validated['message_text'],
-    //     ]);
+        // Create the message
+        $message = Message::create([
+            'user_id' => Auth::id(), // Sender is the authenticated user
+            'receiver_id' => $userId, // Receiver is the admin or target user
+            'sender_role' => 'User',
+            'message_text' => $validated['message_text'],
+        ]);
 
-    //     // Return only the new message
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => $message,
-    //     ]);
-    // }
-
-    
+        // Return only the new message
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+        ]);
+    }
 
 
 

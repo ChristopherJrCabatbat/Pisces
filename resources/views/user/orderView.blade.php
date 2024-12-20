@@ -19,6 +19,7 @@
 
     <div class="container">
         <div class="d-flex">
+            
             {{-- Combined Form --}}
             <form action="{{ route('user.orderStore') }}" method="POST" class="d-flex w-100">
                 @csrf

@@ -54,56 +54,6 @@ class DeliveryController extends Controller
         return redirect()->route('admin.delivery.index')->with('success', 'Rider added successfully.');
     }
 
-    // public function updateStatus(Request $request, string $id)
-    // {
-    //     // Validate the new status
-    //     $validatedData = $request->validate([
-    //         'status' => 'required|string|in:Pending,Preparing,Out for Delivery,Delivered,Returned',
-    //     ]);
-
-    //     // Define allowed transitions
-    //     $allowedTransitions = [
-    //         'Pending' => ['Preparing'],
-    //         'Preparing' => ['Out for Delivery'],
-    //         'Out for Delivery' => ['Delivered'],
-    //         'Delivered' => ['Returned'],
-    //         'Returned' => [],
-    //     ];
-
-    //     // Find the delivery by ID
-    //     $delivery = Delivery::findOrFail($id);
-
-    //     // Check if the new status is valid for the current status
-    //     if (!in_array($validatedData['status'], $allowedTransitions[$delivery->status])) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Invalid status transition.',
-    //         ]);
-    //     }
-
-    //     // Update the status
-    //     $delivery->status = $validatedData['status'];
-
-    //     if ($delivery->save()) {
-    //         // Notify the user of the status change
-    //         $this->notifyUserOfStatusChange($delivery, $validatedData['status']);
-
-    //         // Get the new valid statuses for the updated status
-    //         $newAllowedStatuses = array_merge([$delivery->status], $allowedTransitions[$delivery->status]);
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => "Delivery status changed to {$validatedData['status']}.",
-    //             'allowedStatuses' => $newAllowedStatuses,
-    //         ]);
-    //     }
-
-    //     return response()->json([
-    //         'success' => false,
-    //         'message' => 'Failed to update delivery status.',
-    //     ]);
-    // }
-
 
     public function updateStatus(Request $request, string $id)
     {
@@ -112,6 +62,7 @@ class DeliveryController extends Controller
         ]);
 
         $allowedTransitions = [
+            'Pending GCash Transaction' => ['Pending'],
             'Pending' => ['Preparing'],
             'Preparing' => ['Out for Delivery'],
             'Out for Delivery' => ['Delivered'],
@@ -282,8 +233,8 @@ class DeliveryController extends Controller
 
     public function orderRepeat($deliveryId)
     {
-            /** @var User $user */
-            $user = Auth::user();
+        /** @var User $user */
+        $user = Auth::user();
 
         // Fetch delivery details
         $delivery = Delivery::findOrFail($deliveryId);
@@ -405,6 +356,105 @@ class DeliveryController extends Controller
 
 
 
+    // public function orderStore(Request $request)
+    // {
+    //     $request->validate([
+    //         'fullName' => 'required|string|max:255',
+    //         'email' => 'required|email|max:255',
+    //         'contactNumber' => 'required|string|max:20',
+    //         'address' => 'required|string',
+    //         'shippingMethod' => 'required|string',
+    //         'paymentMethod' => 'required|string',
+    //         'note' => 'nullable|string',
+    //         'menu_names' => 'required|array',
+    //         'quantities' => 'required|array',
+    //     ]);
+
+    //     $orderItems = [];
+    //     $totalQuantity = 0;
+    //     $totalPrice = 0; // Initialize total price
+    //     $orderQuantities = implode(', ', $request->quantities);
+
+    //     // Construct the order string and calculate total price
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         $menu = Menu::where('name', $menuName)->firstOrFail();
+    //         $itemTotal = $menu->price * $quantity; // Calculate total for each item
+    //         $orderItems[] = "{$menuName} (x{$quantity})";
+    //         $totalQuantity += $quantity;
+    //         $totalPrice += $itemTotal; // Add to total price
+    //     }
+
+    //     $orderString = implode(', ', $orderItems);
+
+    //     // Insert the order into the deliveries table
+    //     $deliveryId = DB::table('deliveries')->insertGetId([
+    //         'name' => $request->input('fullName'),
+    //         'email' => $request->input('email'),
+    //         'contact_number' => $request->input('contactNumber'),
+    //         'order' => $orderString,
+    //         'address' => $request->input('address'),
+    //         'quantity' => $orderQuantities,
+    //         'shipping_method' => $request->input('shippingMethod'),
+    //         'mode_of_payment' => $request->input('paymentMethod'),
+    //         'note' => $request->input('note'),
+    //         'status' => 'Pending',
+    //         'total_price' => $totalPrice, // Save total price
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+
+    //     // Store each order item in the orders table
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         DB::table('orders')->insert([
+    //             'delivery_id' => $deliveryId,
+    //             'menu_name' => $menuName,
+    //             'quantity' => $quantity,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ]);
+    //     }
+
+    //     // Add toast message to session
+    //     session()->flash('toast', [
+    //         'message' => 'Order placed successfully!',
+    //         'type' => 'success',
+    //     ]);
+
+    //     return redirect()->route('user.menu');
+    // }
+
+
+
+    public function sendMessage(Request $request, $userId)
+    {
+        $validated = $request->validate([
+            'message_text' => 'required|string',
+        ]);
+
+        $authUser = Auth::user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Admin not authenticated'], 403);
+        }
+
+        // Create the message
+        $message = Message::create([
+            'user_id' => $authUser->id, // Admin is the sender
+            'receiver_id' => $userId, // User is the recipient
+            'sender_role' => 'Admin',
+            'message_text' => $validated['message_text'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => [
+                'message_text' => $message->message_text,
+                'created_at' => $message->created_at->diffForHumans(),
+            ],
+        ]);
+    }
+
     public function orderStore(Request $request)
     {
         $request->validate([
@@ -436,6 +486,9 @@ class DeliveryController extends Controller
 
         $orderString = implode(', ', $orderItems);
 
+        // Determine order status based on payment method
+        $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
         // Insert the order into the deliveries table
         $deliveryId = DB::table('deliveries')->insertGetId([
             'name' => $request->input('fullName'),
@@ -447,7 +500,7 @@ class DeliveryController extends Controller
             'shipping_method' => $request->input('shippingMethod'),
             'mode_of_payment' => $request->input('paymentMethod'),
             'note' => $request->input('note'),
-            'status' => 'Pending',
+            'status' => $status,
             'total_price' => $totalPrice, // Save total price
             'created_at' => now(),
             'updated_at' => now(),
@@ -463,6 +516,21 @@ class DeliveryController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+        }
+
+        // Handle GCash-specific logic
+        if ($request->input('paymentMethod') === 'GCash') {
+            // Admin sends a message to the user
+            $this->sendMessage(
+                new Request([
+                    'message_text' => 'Please complete your GCash transaction. Here are the details: 
+                GCash Number: 09123456789. Kindly send the payment and notify us once done.',
+                ]),
+                Auth::id() // Assume the current authenticated user is the recipient
+            );
+
+            // Redirect to the GCash-specific page
+            return redirect()->route('user.messagesPisces');
         }
 
         // Add toast message to session

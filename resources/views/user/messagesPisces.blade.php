@@ -89,7 +89,8 @@
                             <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
                                 ORDERS
                                 @if ($pendingOrdersCount > 0)
-                                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
+                                    <span
+                                        class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
                                         {{ $pendingOrdersCount }}
                                     </span>
                                 @endif
@@ -160,10 +161,9 @@
                     <!-- Header with Back Icon -->
                     <div
                         class="d-flex align-items-center justify-content-center position-relative py-3 px-3 border-bottom">
-                        <a href="{{ route('user.messages') }}"
-                            class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3">
+                        <button class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3" onclick="history.back();">
                             <i class="fa-solid fa-arrow-left"></i>
-                        </a>
+                        </button>
                         <div class="d-flex align-items-center">
                             <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-2"
                                 alt="Shop icon" style="width: 50px; height: 50px; object-fit: cover;">
@@ -177,29 +177,36 @@
                             @if ($message->user_id === $user->id)
                                 {{-- User --}}
                                 <div class="d-flex align-items-start justify-content-end mb-4">
-                                    <span
-                                        class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                        <span
+                                            class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    @endif
                                     <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
-                                        style="max-width: 70%;">
+                                        style="max-width: 70%; {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
                                         <p class="m-0">{{ $message->message_text }}</p>
                                     </div>
-                                    <div class="message-avatar bg-primary text-white">
-                                        <i class="fa-solid fa-user"></i>
-                                    </div>
+                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                        <div class="message-avatar bg-primary text-white">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                    @endif
                                 </div>
                             @else
                                 {{-- Pisces --}}
                                 <div class="d-flex align-items-start mb-4">
                                     <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3"
                                         alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
-                                    <div class="message bg-white border px-3 py-2 rounded shadow-sm"
-                                        style="max-width: 70%;">
+                                    <div class="message bg-white border px-3 py-2 rounded shadow-sm 
+                            @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false) gcash-message @endif"
+                                        style="max-width: 70%; {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
                                         <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
                                             {{ $message->message_text }}
                                         </p>
                                     </div>
-                                    <span
-                                        class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                        <span
+                                            class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    @endif
                                 </div>
                             @endif
                         @endforeach
@@ -281,6 +288,24 @@
         window.addEventListener('load', () => {
             const chatBody = document.getElementById('chatBody');
             chatBody.scrollTop = chatBody.scrollHeight;
+        });
+    </script>
+
+    <!-- Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Identify all messages in the DOM
+            const messages = document.querySelectorAll('.message');
+
+            messages.forEach(message => {
+                // Check if message text contains GCash-related keywords
+                if (message.textContent.includes(
+                        'Please complete your GCash transaction. Here are the details:')) {
+                    message.classList.add('gcash-message'); // Apply specific styling
+                    message.style.margin = "0 auto"; // Center the message
+                    message.style.maxWidth = "80%"; // Adjust width for centered messages
+                }
+            });
         });
     </script>
 

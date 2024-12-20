@@ -1,6 +1,7 @@
 body {
     overflow-x: hidden;
     background-color: #484045;
+    /* background-color: #E3F2FD; */
     color: white;
 }
 
@@ -786,4 +787,20 @@ a.more:hover {
     top: 50%;
     transform: translateY(-50%);
     color: #6c757d; /* Optional: Adjust icon color if needed */
+}
+
+/* Special styling for GCash-related messages */
+.gcash-message {
+    background-color: #856404 !important;
+    color: #fffae6;
+    text-align: center; /* Center the text content */
+}
+/* End special styling for GCash-related messages */
+
+.head-message {
+    text-decoration: none;
+}
+
+.head-message:hover {
+    text-decoration: underline;
 }

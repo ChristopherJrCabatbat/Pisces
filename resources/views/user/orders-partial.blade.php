@@ -8,7 +8,7 @@
             {{-- Dynamic Badge Color Based on Order Status --}}
             @if ($order->status == 'Returned')
                 <span class="badge bg-danger">{{ $order->status }}</span>
-            @elseif ($order->status == 'Pending')
+            @elseif ($order->status == 'Pending' || $order->status == 'Pending GCash Transaction')
                 <span class="badge bg-secondary">{{ $order->status }}</span>
             @elseif ($order->status == 'Preparing')
                 <span class="badge bg-warning text-dark">{{ $order->status }}</span>

@@ -21,7 +21,7 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
             ORDERS
             @if ($pendingOrdersCount > 0)
@@ -261,7 +261,9 @@
                 </div>
 
                 {{-- Pending --}}
-                <div class="track-order-body px-3 py-3">
+                <div class="track-order-body px-3 py-3"  @if ($deliveries->status == 'Pending GCash Transaction') style="display: none;" 
+                    @else 
+                style="display: block;" @endif>
                     <div class="timeline">
                         <div class="timeline-item d-flex align-items-start py-3">
                             <!-- Time and Date -->
@@ -286,6 +288,52 @@
                                 <!-- Message -->
                                 <div class="details text-muted small">
                                     Your order {{ $deliveries->order }} is currently being pending.
+                                </div>
+
+                                <!-- Address -->
+                                <div class="location text-muted small">{{ $deliveries->address }}</div>
+
+                                <!-- Rider Information -->
+                                @if ($deliveries->rider)
+                                    <div class="rider text-muted small mt-2">
+                                        Rider: {{ $deliveries->rider }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Pending GCash Transaction --}}
+                <div class="track-order-body px-3 py-3"
+                    @if ($deliveries->status == 'Pending GCash Transaction') style="display: block;" 
+                    @else 
+                style="display: none;" @endif>
+                    <div class="timeline">
+                        <div class="timeline-item d-flex align-items-start py-3">
+                            <!-- Time and Date -->
+                            <div class="time text-start pe-4">
+                                <div>{{ $deliveries->updated_at->format('M d') }}</div>
+                                {{-- <div>{{ $deliveries->updated_at->format('h:i A') }}</div> --}}
+                            </div>
+
+                            <!-- Icon -->
+                            <div class="icon-container">
+                                <div class="icon rounded-circle text-white d-flex align-items-center justify-content-center bg-secondary"
+                                    style="width: 24px; height: 24px;">
+                                    <i class="fa fa-clock" style="font-size: 0.8rem"></i>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="content ms-3">
+                                <!-- Status Header -->
+                                <div class="status fw-bold">Pending GCash Transaction</div>
+
+                                <!-- Message -->
+                                <div class="details text-muted small">
+                                    Your order {{ $deliveries->order }} is currently waiting for the GCash transaction to
+                                    finish. Please head to <a href="{{ route('user.messagesPisces') }}" class="head-message">messages section</a>.
                                 </div>
 
                                 <!-- Address -->

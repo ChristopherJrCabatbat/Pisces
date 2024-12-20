@@ -413,7 +413,8 @@ select:hover {
 
 
 td.td-select {
-    max-width: 110px;
+    /* max-width: 110px; */
+    max-width: 128px;
     padding: 0 30px;
 }
 

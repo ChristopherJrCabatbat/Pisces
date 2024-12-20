@@ -1344,3 +1344,134 @@ Messages
                         </div>
                     </div>
                 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+                <!-- Chat Body -->
+                    <div id="chatBody" class="shop-messages overflow-auto px-3 py-3">
+                        @foreach ($messages as $message)
+                            @if ($message->type === 'system')
+                                {{-- System Message --}}
+                                <div class="d-flex justify-content-center mb-4">
+                                    <div class="message bg-secondary text-white px-4 py-3 rounded shadow-sm text-center"
+                                        style="max-width: 80%; font-weight: bold; font-size: 0.9rem;">
+                                        <p class="m-0">{{ $message->message_text }}</p>
+                                    </div>
+                                </div>
+                            @elseif ($message->user_id === $user->id)
+                                {{-- User Message --}}
+                                <div class="d-flex align-items-start justify-content-end mb-4">
+                                    <span
+                                        class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
+                                        style="max-width: 70%;">
+                                        <p class="m-0">{{ $message->message_text }}</p>
+                                    </div>
+                                    <div class="message-avatar bg-primary text-white">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                </div>
+                            @else
+                                {{-- Pisces (Admin) Message --}}
+                                <div class="d-flex align-items-start mb-4">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3"
+                                        alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div class="message bg-white border px-3 py-2 rounded shadow-sm"
+                                        style="max-width: 70%;">
+                                        <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
+                                            {{ $message->message_text }}
+                                        </p>
+                                    </div>
+                                    <span
+                                        class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+
+                    <!-- Input Section -->
+                    <div class="d-flex border-top p-3 align-items-center">
+                        <form id="sendMessageForm" class="d-flex w-100">
+                            @csrf
+                            <input type="text" id="messageInput" name="message_text"
+                                class="form-control me-2 rounded-pill" placeholder="Type your message here..."
+                                required autofocus />
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+
+
+
+                    
+                    
+                    <!-- Chat Body -->
+                    <div id="chatBody" class="shop-messages overflow-auto px-3 py-3">
+                        @foreach ($messages as $message)
+                            @if ($message->user_id === $user->id)
+                                {{-- User --}}
+                                <div class="d-flex align-items-start justify-content-end mb-4">
+                                    <span
+                                        class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
+                                    <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
+                                        style="max-width: 70%;">
+                                        <p class="m-0">{{ $message->message_text }}</p>
+                                    </div>
+                                    <div class="message-avatar bg-primary text-white">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                </div>
+                            @else
+                                {{-- Pisces --}}
+                                <div class="d-flex align-items-start mb-4">
+                                    <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3"
+                                        alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div class="message bg-white border px-3 py-2 rounded shadow-sm"
+                                        style="max-width: 70%;">
+                                        <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
+                                            {{ $message->message_text }}
+                                        </p>
+                                    </div>
+                                    <span
+                                        class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+
+                    <!-- Input Section -->
+                    <div class="d-flex border-top p-3 align-items-center">
+                        <form id="sendMessageForm" class="d-flex w-100">
+                            @csrf
+                            <input type="text" id="messageInput" name="message_text"
+                                class="form-control me-2 rounded-pill" placeholder="Type your message here..."
+                                required autofocus />
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
