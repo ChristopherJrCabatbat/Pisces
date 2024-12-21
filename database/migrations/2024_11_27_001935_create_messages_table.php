@@ -16,8 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade'); // Sender (nullable for system messages)
             $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade'); // Receiver
             $table->string('sender_role'); // Role of the sender (User, Admin, or System)
-            $table->text('message_text'); // Actual message content
+            $table->text('message_text')->nullable();; // Actual message content
             $table->boolean('is_read')->default(false); // Tracks if the message has been read
+            $table->string('image_url')->nullable(); // Path to the uploaded image
             $table->timestamps(); // Includes created_at and updated_at
         });
     }

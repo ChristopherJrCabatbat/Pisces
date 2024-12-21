@@ -14,6 +14,7 @@ class Message extends Model
         'receiver_id',
         'sender_role',
         'message_text',
+        'image_url', // Ensure this is present
         'is_read',
     ];
 
