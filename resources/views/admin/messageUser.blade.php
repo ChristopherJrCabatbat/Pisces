@@ -155,7 +155,7 @@
                 </div>
 
                 <!-- Input Section -->
-                <div class="d-flex border-top p-3 align-items-center">
+                {{-- <div class="d-flex border-top p-3 align-items-center">
                     <form id="sendMessageForm" class="d-flex w-100">
                         @csrf
                         <input type="text" id="messageInput" name="message_text" class="form-control me-2 rounded-pill"
@@ -164,11 +164,50 @@
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </form>
+                </div> --}}
+
+                {{-- <div class="d-flex border-top p-3 align-items-center">
+                    <form id="sendMessageForm" class="d-flex w-100" enctype="multipart/form-data">
+                        @csrf
+                        <input type="text" id="messageInput" name="message_text" class="form-control me-2 rounded-pill"
+                            placeholder="Type your message here..." autofocus />
+
+                        <!-- Image Upload Button -->
+                        <label for="imageUpload" class="btn btn-secondary rounded-pill px-3 me-2">
+                            <i class="fa-solid fa-image"></i>
+                            <input type="file" id="imageUpload" name="image" class="d-none" accept="image/*">
+                        </label>
+
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div> --}}
+
+                <!-- Input Section -->
+                <div class="d-flex border-top p-3 align-items-center">
+                    <form id="sendMessageForm" class="d-flex w-100" enctype="multipart/form-data">
+                        @csrf
+                        <input type="text" id="messageInput" name="message_text" class="form-control me-2 rounded-pill"
+                            placeholder="Type your message here..." autofocus />
+
+                        <!-- Image Upload Button -->
+                        <label for="imageUpload" class="btn btn-secondary rounded-pill px-3 me-2">
+                            <i class="fa-solid fa-image"></i>
+                            <input type="file" id="imageUpload" name="image" class="d-none" accept="image/*">
+                        </label>
+
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
                 </div>
 
 
             </div>
+
         </div>
+    </div>
 
 
     </div>
@@ -176,7 +215,7 @@
 
 @section('scripts')
 
-    <script>
+    {{-- <script>
         document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -232,7 +271,7 @@
             const chatBody = document.getElementById('chatBody');
             chatBody.scrollTop = chatBody.scrollHeight;
         });
-    </script>
+    </script> --}}
 
 
     {{-- Submit message no reload and scroll bottom --}}
@@ -262,7 +301,125 @@
             formData.append('_token', '{{ csrf_token() }}'); // CSRF token
 
             try {
-                const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
+                const response = await fetch('{{ route('admin.sendMessage', ['userId' => $userId]) }}', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    // Append the new message to the chat body
+                    const newMessage = `
+                    <div class="d-flex align-items-start justify-content-end mb-4">
+                        <span class="text-muted align-self-center small me-3">Just now</span>
+                        <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm" style="max-width: 70%;">
+                            ${result.message.message_text ? `<p class="m-0">${result.message.message_text}</p>` : ''}
+                            ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
+                        </div>
+                        <div class="message-avatar bg-primary text-white">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                    </div>
+                `;
+                    chatBody.insertAdjacentHTML('beforeend', newMessage);
+
+                    // Clear the inputs
+                    messageInput.value = '';
+                    imageInput.value = '';
+
+                    // Scroll to the bottom of the chat body
+                    setTimeout(() => {
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }, 100);
+                } else {
+                    alert('Failed to send the message. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+
+        // Automatically send the image when selected
+        imageInput.addEventListener('change', async function() {
+            if (imageInput.files.length === 0) return;
+
+            const formData = new FormData();
+            const imageFile = imageInput.files[0];
+
+            formData.append('image', imageFile);
+            formData.append('_token', '{{ csrf_token() }}'); // CSRF token
+
+            try {
+                const response = await fetch('{{ route('admin.sendMessage', ['userId' => $userId]) }}', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    // Append the new image message to the chat body
+                    const newMessage = `
+                    <div class="d-flex align-items-start justify-content-end mb-4">
+                        <span class="text-muted align-self-center small me-3">Just now</span>
+                        ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
+                        <div class="message-avatar bg-primary text-white">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                    </div>
+                `;
+                    chatBody.insertAdjacentHTML('beforeend', newMessage);
+
+                    // Clear the file input
+                    imageInput.value = '';
+
+                    // Scroll to the bottom of the chat body
+                    setTimeout(() => {
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }, 100);
+                } else {
+                    alert('Failed to send the image. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+
+        // Scroll chat body to the bottom on page load
+        window.addEventListener('load', () => {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        });
+    </script> --}}
+
+    {{-- Submit message no reload and scroll bottom --}}
+    <script>
+        const sendMessageForm = document.getElementById('sendMessageForm');
+        const messageInput = document.getElementById('messageInput');
+        const imageInput = document.getElementById('imageUpload');
+        const chatBody = document.getElementById('chatBody');
+
+        // Handle form submission for text and image
+        sendMessageForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            const messageText = messageInput.value.trim();
+            const imageFile = imageInput.files[0];
+
+            // Validate input
+            if (!messageText && !imageFile) {
+                alert('Please enter a message or upload an image.');
+                return;
+            }
+
+            if (messageText) formData.append('message_text', messageText);
+            if (imageFile) formData.append('image', imageFile);
+
+            formData.append('_token', '{{ csrf_token() }}'); // CSRF token
+
+            try {
+                const response = await fetch('{{ route('admin.sendMessage', $user->id) }}', {
                     method: 'POST',
                     body: formData,
                 });
@@ -273,8 +430,10 @@
                     const newMessage = `
                         <div class="d-flex align-items-start justify-content-end mb-4">
                             <span class="text-muted align-self-center small me-3">Just now</span>
+                            <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm" style="max-width: 70%;">
                                 ${result.message.message_text ? `<p class="m-0">${result.message.message_text}</p>` : ''}
                                 ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
+                            </div>
                             <div class="message-avatar bg-primary text-white">
                                 <i class="fa-solid fa-user"></i>
                             </div>
@@ -310,7 +469,7 @@
             formData.append('_token', '{{ csrf_token() }}'); // CSRF token
 
             try {
-                const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
+                const response = await fetch('{{ route('admin.sendMessage', ['userId' => 1]) }}', {
                     method: 'POST',
                     body: formData,
                 });
@@ -319,14 +478,18 @@
                 if (response.ok && result.success) {
                     // Append the new image message to the chat body
                     const newMessage = `
-                        <div class="d-flex align-items-start justify-content-end mb-4">
-                            <span class="text-muted align-self-center small me-3">Just now</span>
-                                ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
-                            <div class="message-avatar bg-primary text-white">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                        </div>
-                    `;
+                <div class="d-flex align-items-start justify-content-end mb-4">
+                    <span class="text-muted align-self-center small me-3">Just now</span>
+                    ${
+                        result.message.image_url
+                            ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">`
+                            : ''
+                    }
+                    <div class="message-avatar bg-primary text-white">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+            `;
                     chatBody.insertAdjacentHTML('beforeend', newMessage);
 
                     // Clear the file input
@@ -345,14 +508,15 @@
             }
         });
 
+
         // Scroll chat body to the bottom on page load
         window.addEventListener('load', () => {
             chatBody.scrollTop = chatBody.scrollHeight;
         });
-    </script> --}}
+    </script>
 
     <!-- GCash Script -->
-    {{-- <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Identify all messages in the DOM
             const messages = document.querySelectorAll('.message');
@@ -367,6 +531,7 @@
                 }
             });
         });
-    </script> --}}
+    </script>
+
 
 @endsection
