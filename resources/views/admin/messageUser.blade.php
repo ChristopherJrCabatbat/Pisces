@@ -107,24 +107,45 @@
                                 <div class="message-avatar">
                                     <i class="fa-solid fa-user"></i>
                                 </div>
+
                                 <!-- Bold message if unread -->
                                 <div class="message bg-white border px-3 py-2 rounded shadow-sm {{ $message->is_read ? '' : 'fw-bold' }}"
-                                    style="max-width: 70%;">
-                                    <p class="m-0">{{ $message->message_text }}</p>
+                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }}; 
+                                {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                    @if ($message->message_text)
+                                        <p class="m-0">{{ $message->message_text }}</p>
+                                    @endif
                                 </div>
-                                <span class="text-muted align-self-center small ms-3">
-                                    {{ $message->created_at->diffForHumans() }}
-                                </span>
+                                @if ($message->image_url)
+                                    <img src="{{ $message->image_url }}" alt="Sent Image" class="mt-2 rounded shadow-sm"
+                                        height="310px" width="auto">
+                                @endif
+                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                    <span class="text-muted align-self-center small ms-3">
+                                        {{ $message->created_at->diffForHumans() }}
+                                    </span>
+                                @endif
                             </div>
                         @else
                             <!-- Message from Admin -->
                             <div class="d-flex align-items-start justify-content-end mb-4">
-                                <span class="text-muted align-self-center small me-3">
-                                    {{ $message->created_at->diffForHumans() }}
-                                </span>
+                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                    <span class="text-muted align-self-center small me-3">
+                                        {{ $message->created_at->diffForHumans() }}
+                                    </span>
+                                @endif
+                                @if ($message->image_url)
+                                    <img src="{{ $message->image_url }}" alt="Received Image"
+                                        class="mt-2 rounded shadow-sm" height="310px" width="auto">
+                                @endif
                                 <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
-                                    style="max-width: 70%;">
-                                    <p class="m-0">{{ $message->message_text }}</p>
+                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }}; 
+                                    {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                    @if ($message->message_text)
+                                        <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
+                                            {{ $message->message_text }}
+                                        </p>
+                                    @endif
                                 </div>
                                 <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
                                     alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
@@ -212,5 +233,140 @@
             chatBody.scrollTop = chatBody.scrollHeight;
         });
     </script>
+
+
+    {{-- Submit message no reload and scroll bottom --}}
+    {{-- <script>
+        const sendMessageForm = document.getElementById('sendMessageForm');
+        const messageInput = document.getElementById('messageInput');
+        const imageInput = document.getElementById('imageUpload');
+        const chatBody = document.getElementById('chatBody');
+
+        // Handle form submission for text and image
+        sendMessageForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            const messageText = messageInput.value.trim();
+            const imageFile = imageInput.files[0];
+
+            // Validate input
+            if (!messageText && !imageFile) {
+                alert('Please enter a message or upload an image.');
+                return;
+            }
+
+            if (messageText) formData.append('message_text', messageText);
+            if (imageFile) formData.append('image', imageFile);
+
+            formData.append('_token', '{{ csrf_token() }}'); // CSRF token
+
+            try {
+                const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    // Append the new message to the chat body
+                    const newMessage = `
+                        <div class="d-flex align-items-start justify-content-end mb-4">
+                            <span class="text-muted align-self-center small me-3">Just now</span>
+                                ${result.message.message_text ? `<p class="m-0">${result.message.message_text}</p>` : ''}
+                                ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
+                            <div class="message-avatar bg-primary text-white">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
+                    `;
+                    chatBody.insertAdjacentHTML('beforeend', newMessage);
+
+                    // Clear the inputs
+                    messageInput.value = '';
+                    imageInput.value = '';
+
+                    // Scroll to the bottom of the chat body
+                    setTimeout(() => {
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }, 100);
+                } else {
+                    alert('Failed to send the message. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+
+        // Automatically send the image when selected
+        imageInput.addEventListener('change', async function() {
+            if (imageInput.files.length === 0) return;
+
+            const formData = new FormData();
+            const imageFile = imageInput.files[0];
+
+            formData.append('image', imageFile);
+            formData.append('_token', '{{ csrf_token() }}'); // CSRF token
+
+            try {
+                const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    // Append the new image message to the chat body
+                    const newMessage = `
+                        <div class="d-flex align-items-start justify-content-end mb-4">
+                            <span class="text-muted align-self-center small me-3">Just now</span>
+                                ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
+                            <div class="message-avatar bg-primary text-white">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
+                    `;
+                    chatBody.insertAdjacentHTML('beforeend', newMessage);
+
+                    // Clear the file input
+                    imageInput.value = '';
+
+                    // Scroll to the bottom of the chat body
+                    setTimeout(() => {
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }, 100);
+                } else {
+                    alert('Failed to send the image. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+
+        // Scroll chat body to the bottom on page load
+        window.addEventListener('load', () => {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        });
+    </script> --}}
+
+    <!-- GCash Script -->
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Identify all messages in the DOM
+            const messages = document.querySelectorAll('.message');
+
+            messages.forEach(message => {
+                // Check if message text contains GCash-related keywords
+                if (message.textContent.includes(
+                        'Please complete your GCash transaction. Here are the details:')) {
+                    message.classList.add('gcash-message'); // Apply specific styling
+                    message.style.margin = "0 auto"; // Center the message
+                    message.style.maxWidth = "80%"; // Adjust width for centered messages
+                }
+            });
+        });
+    </script> --}}
 
 @endsection

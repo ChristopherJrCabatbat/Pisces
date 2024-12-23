@@ -161,10 +161,10 @@
                     <!-- Header with Back Icon -->
                     <div
                         class="d-flex align-items-center justify-content-center position-relative py-3 px-3 border-bottom">
-                        <button class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3"
-                            onclick="history.back();">
+                        <a class="btn btn-light rounded-circle back-button position-absolute start-0 ms-3"
+                            type="button" href="{{ route('user.messages') }}">
                             <i class="fa-solid fa-arrow-left"></i>
-                        </button>
+                        </a>
                         <div class="d-flex align-items-center">
                             <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-2"
                                 alt="Shop icon" style="width: 50px; height: 50px; object-fit: cover;">
@@ -183,15 +183,16 @@
                                             class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
                                     @endif
                                     <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
-                                        style="max-width: 70%; {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                        style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }}; 
+                                    {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
                                         @if ($message->message_text)
                                             <p class="m-0">{{ $message->message_text }}</p>
                                         @endif
-                                        @if ($message->image_url)
-                                            <img src="{{ $message->image_url }}" alt="Sent Image"
-                                                class="img-fluid mt-2 rounded shadow-sm">
-                                        @endif
                                     </div>
+                                    @if ($message->image_url)
+                                        <img src="{{ $message->image_url }}" alt="Sent Image"
+                                            class="mt-2 rounded shadow-sm" height="310px" width="auto">
+                                    @endif
                                     @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
                                         <div class="message-avatar bg-primary text-white">
                                             <i class="fa-solid fa-user"></i>
@@ -203,17 +204,17 @@
                                 <div class="d-flex align-items-start mb-4">
                                     <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border me-3"
                                         alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
-                                    <div class="message bg-white border px-3 py-2 rounded shadow-sm 
-                        @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false) gcash-message @endif"
-                                        style="max-width: 70%; {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                    @if ($message->image_url)
+                                        <img src="{{ $message->image_url }}" alt="Received Image"
+                                            class="mt-2 rounded shadow-sm" height="310px" width="auto">
+                                    @endif
+                                    <div class="message bg-white text-dark px-3 py-2 rounded shadow-sm"
+                                        style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }}; 
+                                        {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
                                         @if ($message->message_text)
                                             <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
                                                 {{ $message->message_text }}
                                             </p>
-                                        @endif
-                                        @if ($message->image_url)
-                                            <img src="{{ $message->image_url }}" alt="Received Image"
-                                                class="img-fluid mt-2 rounded shadow-sm">
                                         @endif
                                     </div>
                                     @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
@@ -224,21 +225,6 @@
                             @endif
                         @endforeach
                     </div>
-
-
-
-                    <!-- Input Section -->
-                    {{-- <div class="d-flex border-top p-3 align-items-center">
-                        <form id="sendMessageForm" class="d-flex w-100">
-                            @csrf
-                            <input type="text" id="messageInput" name="message_text"
-                                class="form-control me-2 rounded-pill" placeholder="Type your message here..."
-                                required autofocus />
-                            <button type="submit" class="btn btn-primary rounded-pill px-4">
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </form>
-                    </div> --}}
 
                     <!-- Input Section -->
                     <div class="d-flex border-top p-3 align-items-center">
@@ -269,65 +255,6 @@
     </main>
 
     {{-- Submit message no reload and scroll bottom --}}
-    {{-- <script>
-        document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const messageInput = document.getElementById('messageInput');
-            const chatBody = document.getElementById('chatBody');
-            const messageText = messageInput.value.trim(); // Trim to avoid sending empty spaces
-
-            if (!messageText) return; // Prevent sending empty messages
-
-            // Send the message via fetch
-            const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message_text: messageText,
-                }),
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                if (result.success) {
-                    // Update the chat UI with the new message
-                    const newMessage = `
-                        <div class="d-flex align-items-start justify-content-end mb-4">
-                            <span class="text-muted align-self-center small me-3">Just now</span>
-                            <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm" style="max-width: 70%;">
-                                <p class="m-0">${result.message.message_text}</p>
-                            </div>
-                            <div class="message-avatar bg-primary text-white">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                        </div>
-                    `;
-                    chatBody.insertAdjacentHTML('beforeend', newMessage);
-
-                    // Clear the input field
-                    messageInput.value = '';
-
-                    // Scroll to bottom after DOM update
-                    setTimeout(() => {
-                        chatBody.scrollTop = chatBody.scrollHeight;
-                    }, 100); // Slight delay to ensure DOM updates
-                }
-            } else {
-                alert('Failed to send the message. Please try again.');
-            }
-        });
-
-        // Ensure scrolling to the bottom on page load
-        window.addEventListener('load', () => {
-            const chatBody = document.getElementById('chatBody');
-            chatBody.scrollTop = chatBody.scrollHeight;
-        });
-    </script> --}}
-
     <script>
         const sendMessageForm = document.getElementById('sendMessageForm');
         const messageInput = document.getElementById('messageInput');
@@ -367,7 +294,7 @@
                             <span class="text-muted align-self-center small me-3">Just now</span>
                             <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm" style="max-width: 70%;">
                                 ${result.message.message_text ? `<p class="m-0">${result.message.message_text}</p>` : ''}
-                                ${result.message.image_url ? `<img src="${result.message.image_url}" class="img-fluid rounded mt-2" alt="Sent Image">` : ''}
+                                ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
                             </div>
                             <div class="message-avatar bg-primary text-white">
                                 <i class="fa-solid fa-user"></i>
@@ -415,9 +342,9 @@
                     const newMessage = `
                         <div class="d-flex align-items-start justify-content-end mb-4">
                             <span class="text-muted align-self-center small me-3">Just now</span>
-                            <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm" style="max-width: 70%;">
-                                ${result.message.image_url ? `<img src="${result.message.image_url}" class="img-fluid rounded mt-2" alt="Sent Image">` : ''}
-                            </div>
+                            
+                                ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
+                            
                             <div class="message-avatar bg-primary text-white">
                                 <i class="fa-solid fa-user"></i>
                             </div>

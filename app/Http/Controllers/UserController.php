@@ -670,27 +670,6 @@ class UserController extends Controller
         return view('user.messagesPisces', compact('messages', 'pendingOrdersCount', 'userCart', 'user', 'userFavorites'));
     }
 
-    // public function sendMessage(Request $request, $userId)
-    // {
-    //     $validated = $request->validate([
-    //         'message_text' => 'required|string',
-    //     ]);
-
-    //     // Create the message
-    //     $message = Message::create([
-    //         'user_id' => Auth::id(), // Sender is the authenticated user
-    //         'receiver_id' => $userId, // Receiver is the admin or target user
-    //         'sender_role' => 'User',
-    //         'message_text' => $validated['message_text'],
-    //     ]);
-
-    //     // Return only the new message
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => $message,
-    //     ]);
-    // }
-
 
     // public function sendMessage(Request $request, $userId)
     // {
@@ -698,22 +677,41 @@ class UserController extends Controller
     //         Log::info('Message request received:', $request->all());
 
     //         $request->validate([
-    //             'message_text' => 'required_without:image',
-    //             'image' => 'required_without:message_text|image|max:2048',
+    //             'message_text' => 'nullable|required_without:image',
+    //             'image' => 'nullable|required_without:message_text|image|max:2048',
     //         ]);
 
-    //         $messageText = $request->input('message_text');
+    //         $messageText = $request->input('message_text') ?? 'Image sent';
     //         $imageFile = $request->file('image');
-    //         $imagePath = $imageFile ? $imageFile->store('messages', 'public') : null;
+
+    //         $imageUrl = null; // Default to null
+    //         if ($imageFile) {
+    //             $imagePath = $imageFile->store('messages', 'public');
+    //             Log::info('Stored image path:', ['path' => $imagePath]);
+    //             $imageUrl = asset('storage/' . $imagePath);
+    //         }
+
+    //         // Add debug logging before saving
+    //         Log::info('Creating message:', [
+    //             'user_id' => Auth::id(),
+    //             'receiver_id' => $userId,
+    //             'sender_role' => 'User',
+    //             'message_text' => $messageText,
+    //             'image_url' => $imageUrl,
+    //             'is_read' => false,
+    //         ]);
 
     //         $message = Message::create([
     //             'user_id' => Auth::id(),
     //             'receiver_id' => $userId,
     //             'sender_role' => 'User',
-    //             'message_text' => $messageText ?? 'Image sent', // Default message text
-    //             'image_url' => $imagePath,
+    //             'message_text' => $messageText,
+    //             'image_url' => $imageUrl,
     //             'is_read' => false,
     //         ]);
+
+    //         // Log the saved message
+    //         Log::info('Saved message:', $message->toArray());
 
     //         return response()->json(['success' => true, 'message' => $message], 201);
     //     } catch (\Exception $e) {
@@ -722,67 +720,39 @@ class UserController extends Controller
     //     }
     // }
 
-
     public function sendMessage(Request $request, $userId)
     {
         try {
-            Log::info('Message request received:', $request->all());
-    
+            // Validate input for either message_text or image
             $request->validate([
                 'message_text' => 'nullable|required_without:image',
                 'image' => 'nullable|required_without:message_text|image|max:2048',
             ]);
-    
-            $messageText = $request->input('message_text') ?? 'Image sent';
+
             $imageFile = $request->file('image');
-    
-            $imageUrl = null; // Default to null
+            $imageUrl = null;
+
+            // Handle image upload if present
             if ($imageFile) {
                 $imagePath = $imageFile->store('messages', 'public');
-                Log::info('Stored image path:', ['path' => $imagePath]);
                 $imageUrl = asset('storage/' . $imagePath);
             }
-    
-            // Add debug logging before saving
-            Log::info('Creating message:', [
-                'user_id' => Auth::id(),
-                'receiver_id' => $userId,
-                'sender_role' => 'User',
-                'message_text' => $messageText,
-                'image_url' => $imageUrl,
-                'is_read' => false,
-            ]);
-    
+
+            // Create the message
             $message = Message::create([
                 'user_id' => Auth::id(),
                 'receiver_id' => $userId,
                 'sender_role' => 'User',
-                'message_text' => $messageText,
+                'message_text' => $request->input('message_text'), // Can be null
                 'image_url' => $imageUrl,
                 'is_read' => false,
             ]);
-    
-            // Log the saved message
-            Log::info('Saved message:', $message->toArray());
-    
+
             return response()->json(['success' => true, 'message' => $message], 201);
         } catch (\Exception $e) {
-            Log::error('Error sending message:', ['error' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => 'Failed to send the message.'], 500);
         }
     }
-    
-
-
-
-
-
-
-
-
-
-
-
 
 
     public function markMessagesAsRead($userId)
