@@ -99,20 +99,21 @@
 
 
                 {{-- Nasa important notes yung original chat body --}}
-                <!-- Chat Body -->
-                <div id="chatBody" class="shop-messages overflow-auto px-3 py-3">
+                 <!-- Chat Body -->
+                 <div id="chatBody" class="shop-messages overflow-auto px-3 py-3">
                     @foreach ($messages as $message)
-                        @if ($message->user_id === Auth::id())
-                            <!-- Message from Authenticated User -->
+                        @if ($message->user_id === $user->id)
+                            <!-- Message from User -->
                             <div class="d-flex align-items-start mb-4">
                                 <!-- User Icon -->
                                 <div class="message-avatar">
                                     <i class="fa-solid fa-user"></i>
                                 </div>
 
-                                <!-- User Message Text -->
+                                <!-- Message Text -->
                                 <div class="message bg-white border px-3 py-2 rounded shadow-sm {{ $message->is_read ? '' : 'fw-bold' }}"
-                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }};">
+                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }};
+                        {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
                                     @if ($message->message_text)
                                         <p class="m-0">{{ $message->message_text }}</p>
                                     @endif
@@ -125,45 +126,46 @@
                                 @endif
 
                                 <!-- Message Timestamp -->
-                                <span class="text-muted align-self-center small ms-3">
-                                    {{ $message->created_at->diffForHumans() }}
-                                </span>
+                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                    <span class="text-muted align-self-center small ms-3">
+                                        {{ $message->created_at->diffForHumans() }}
+                                    </span>
+                                @endif
                             </div>
                         @else
-                            <!-- Message from the Other User -->
+                            <!-- Message from Admin -->
                             <div class="d-flex align-items-start justify-content-end mb-4">
-                                <!-- Other User Message Timestamp -->
-                                <span class="text-muted align-self-center small me-3">
-                                    {{ $message->created_at->diffForHumans() }}
-                                </span>
+                                <!-- Message Timestamp -->
+                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                    <span class="text-muted align-self-center small me-3">
+                                        {{ $message->created_at->diffForHumans() }}
+                                    </span>
+                                @endif
 
-                                <!-- Other User Sent Image -->
+                                <!-- Admin Sent Image -->
                                 @if ($message->image_url)
                                     <img src="{{ $message->image_url }}" alt="Received Image"
                                         class="mt-2 rounded shadow-sm" height="310px" width="auto">
                                 @endif
 
-                                <!-- Other User Message Text -->
+                                <!-- Admin Message Text -->
                                 <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
-                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }};">
+                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }};
+                    {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
                                     @if ($message->message_text)
-                                        <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
+                                        <p class="m-0">
                                             {{ $message->message_text }}
                                         </p>
                                     @endif
                                 </div>
 
-                                <!-- Other User Icon -->
+                                <!-- Admin Icon -->
                                 <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
                                     alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
                             </div>
                         @endif
                     @endforeach
                 </div>
-
-
-
-
 
                 <!-- Input Section -->
                 <div class="d-flex border-top p-3 align-items-center">
@@ -415,9 +417,8 @@
                                 ${result.message.message_text ? `<p class="m-0">${result.message.message_text}</p>` : ''}
                                 ${result.message.image_url ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">` : ''}
                             </div>
-                            <div class="message-avatar bg-primary text-white">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
+                             <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
+                                    alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
                         </div>
                     `;
                     chatBody.insertAdjacentHTML('beforeend', newMessage);
@@ -466,9 +467,8 @@
                             ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">`
                             : ''
                     }
-                    <div class="message-avatar bg-primary text-white">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
+                      <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
+                                    alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
                 </div>
             `;
                     chatBody.insertAdjacentHTML('beforeend', newMessage);

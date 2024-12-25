@@ -80,6 +80,21 @@ class UserController extends Controller
                 return $menu;
             });
 
+        // Fetch the 4 highest-rated menus
+        $highestRatedMenus = DB::table('menus')
+            ->select('id', 'name', 'image', 'price', 'rating')
+            ->whereNotNull('rating') // Ensure menus have a rating
+            ->orderByDesc('rating') // Sort by rating in descending order
+            ->take(4)
+            ->get()
+            ->map(function ($menu) {
+                $menu->ratingCount = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->count();
+                return $menu;
+            });
+
+
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
@@ -91,7 +106,7 @@ class UserController extends Controller
             ->where('is_read', false)
             ->count();
 
-        return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount'));
+        return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount', 'highestRatedMenus'));
     }
 
     // Modified menu method in your Controller

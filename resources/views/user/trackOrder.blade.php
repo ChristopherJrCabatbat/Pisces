@@ -85,7 +85,9 @@
                                     style="width: 24px; height: 24px;">
                                     <i class="fa-solid fa-times"></i>
                                 </div>
-                                <div class="line"></div>
+                                <div
+                                    class="{{ $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
+                                </div>
                             </div>
 
                             <!-- Content -->
@@ -132,7 +134,9 @@
                                     style="width: 24px; height: 24px;">
                                     <i class="fa-solid fa-check"></i>
                                 </div>
-                                <div class="line"></div>
+                                <div
+                                    class="{{ $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
+                                </div>
                             </div>
 
                             <!-- Content -->
@@ -182,7 +186,9 @@
                                     style="width: 24px; height: 24px;">
                                     <i class="fa fa-truck" style="font-size: 0.8rem"></i>
                                 </div>
-                                <div class="line"></div>
+                                <div
+                                    class="{{ $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
+                                </div>
                             </div>
 
                             <!-- Content -->
@@ -233,7 +239,9 @@
                                     style="width: 24px; height: 24px;">
                                     <i class="fa fa-utensils"></i>
                                 </div>
-                                <div class="line"></div>
+                                <div
+                                    class="{{ $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
+                                </div>
                             </div>
 
                             <!-- Content -->
@@ -261,7 +269,8 @@
                 </div>
 
                 {{-- Pending --}}
-                <div class="track-order-body px-3 py-3"  @if ($deliveries->status == 'Pending GCash Transaction') style="display: none;" 
+                <div class="track-order-body px-3 py-3"
+                    @if ($deliveries->status == 'Pending GCash Transaction') style="display: none;" 
                     @else 
                 style="display: block;" @endif>
                     <div class="timeline">
@@ -333,7 +342,8 @@
                                 <!-- Message -->
                                 <div class="details text-muted small">
                                     Your order {{ $deliveries->order }} is currently waiting for the GCash transaction to
-                                    finish. Please head to <a href="{{ route('user.messagesPisces') }}" class="head-message">messages section</a>.
+                                    finish. Please head to <a href="{{ route('user.messagesPisces') }}"
+                                        class="head-message">messages section</a>.
                                 </div>
 
                                 <!-- Address -->

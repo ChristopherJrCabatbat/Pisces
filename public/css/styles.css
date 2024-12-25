@@ -763,8 +763,16 @@ a.more:hover {
 
 
 .timeline-item .line {
-    /* height: 15.4%; */
+    /* height: 19.4%; */
     height: 106px;
+    position: absolute;
+    width: 2px;
+    transform: translateX(11px);
+    background-color: rgb(113, 113, 136, 0.4);
+}
+.timeline-item .line-d-r {
+    height: 19.4%;
+    /* height: 106px; */
     position: absolute;
     width: 2px;
     transform: translateX(11px);

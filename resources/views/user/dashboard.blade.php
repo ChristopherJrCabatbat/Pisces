@@ -112,8 +112,6 @@
 
         </div>
 
-
-
         {{-- Best Deals For You --}}
         <div class="w-100 mb-5">
             <div class="h2 border-baba pb-3 mb-4">
@@ -153,27 +151,6 @@
                                         <i class="fa-regular fa-star"></i>
                                     </div>
                                     <div class="star-label">(2)</div>
-
-                                    {{-- <div class="d-flex align-items-center gap-2">
-                                        <div class="stars d-flex">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                @if ($i <= floor($menu->rating))
-                                                    <i class="fa-solid fa-star"></i>
-                                                @elseif ($i - $menu->rating < 1)
-                                                    <i class="fa-solid fa-star-half-stroke"></i>
-                                                @else
-                                                    <i class="fa-regular fa-star"></i>
-                                                @endif
-                                            @endfor
-                                        </div>
-                                        <div class="star-label">
-                                            @if ($menu->ratingCount > 0)
-                                                ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
-                                            @else
-                                                No Rating
-                                            @endif
-                                        </div>
-                                    </div> --}}
 
                                 </div>
                                 <p class="card-text mt-2">
@@ -413,6 +390,117 @@
                 </div>
             </div>
         </div>
+
+        {{-- Highest Rated Menus --}}
+<div class="w-100 mb-5">
+    <div class="h2 border-baba pb-3 mb-4">
+        Highest Rated Menus
+    </div>
+    <div>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            @forelse ($highestRatedMenus as $menu)
+                <div class="col">
+                    <div class="card h-100">
+
+                        <div class="img-container">
+                            <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
+                                alt="{{ $menu->name }}">
+
+                            <div class="icon-overlay text-white">
+                                {{-- Add to Cart --}}
+                                <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="icon-buttons"><i
+                                            class="fa-solid fa-cart-plus text-white"
+                                            title="Add to Cart"></i></button>
+                                </form>
+
+                                {{-- Share Menu --}}
+                                <form action="" method="GET">
+                                    @csrf
+                                    <button type="button" class="icon-buttons">
+                                        <!-- Share Button -->
+                                        <i class="fa-solid fa-share" title="Share Menu"
+                                            onclick="copyMenuLink({{ $menu->id }})"></i>
+                                    </button>
+                                </form>
+
+                                {{-- View Menu --}}
+                                <form action="" method="GET">
+                                    @csrf
+                                    <button type="button" class="icon-buttons"><i
+                                            class="fa-solid fa-search view-menu-btn" title="View Menu"
+                                            data-id="{{ $menu->id }}"></i></button>
+                                </form>
+
+                                {{-- Add to Favorites --}}
+                                <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="icon-buttons">
+                                        <i class="fa-solid fa-heart"
+                                            style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
+                                            title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                        </i>
+                                    </button>
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                        {{-- Menu Body --}}
+                        <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
+                            class="menu-body">
+                            <div class="card-body card-body-mt">
+                                <h5 class="card-title">{{ $menu->name }}</h5>
+                                <div class="price fw-bold mb-2">
+                                    @if (floor($menu->price) == $menu->price)
+                                        ₱{{ number_format($menu->price, 0) }}
+                                    @else
+                                        ₱{{ number_format($menu->price, 2) }}
+                                    @endif
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="stars d-flex">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= floor($menu->rating))
+                                                <i class="fa-solid fa-star"></i>
+                                            @elseif ($i - $menu->rating < 1)
+                                                <i class="fa-solid fa-star-half-stroke"></i>
+                                            @else
+                                                <i class="fa-regular fa-star"></i>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <div class="star-label">
+                                        @if ($menu->ratingCount > 0)
+                                            ({{ number_format($menu->rating, 1) }})
+                                            {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                        @else
+                                            No Rating
+                                        @endif
+                                    </div>
+                                </div>
+
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+            @empty
+                <div class="col">
+                    <p>No highest-rated menu available.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+</div>
+
 
     </div>
 

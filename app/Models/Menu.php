@@ -16,6 +16,7 @@ class Menu extends Model
         'description',
         'image',
         'rating',
+        'availability',
     ];
 
     public function cartUsers()
