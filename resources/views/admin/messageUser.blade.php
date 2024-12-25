@@ -97,56 +97,63 @@
                     </div>
                 </div>
 
+
+                {{-- Nasa important notes yung original chat body --}}
                 <!-- Chat Body -->
                 <div id="chatBody" class="shop-messages overflow-auto px-3 py-3">
                     @foreach ($messages as $message)
-                        @if ($message->user_id === $user->id)
-                            <!-- Message from User -->
+                        @if ($message->user_id === Auth::id())
+                            <!-- Message from Authenticated User -->
                             <div class="d-flex align-items-start mb-4">
                                 <!-- User Icon -->
                                 <div class="message-avatar">
                                     <i class="fa-solid fa-user"></i>
                                 </div>
 
-                                <!-- Bold message if unread -->
+                                <!-- User Message Text -->
                                 <div class="message bg-white border px-3 py-2 rounded shadow-sm {{ $message->is_read ? '' : 'fw-bold' }}"
-                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }}; 
-                                {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }};">
                                     @if ($message->message_text)
                                         <p class="m-0">{{ $message->message_text }}</p>
                                     @endif
                                 </div>
+
+                                <!-- User Sent Image -->
                                 @if ($message->image_url)
                                     <img src="{{ $message->image_url }}" alt="Sent Image" class="mt-2 rounded shadow-sm"
                                         height="310px" width="auto">
                                 @endif
-                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
-                                    <span class="text-muted align-self-center small ms-3">
-                                        {{ $message->created_at->diffForHumans() }}
-                                    </span>
-                                @endif
+
+                                <!-- Message Timestamp -->
+                                <span class="text-muted align-self-center small ms-3">
+                                    {{ $message->created_at->diffForHumans() }}
+                                </span>
                             </div>
                         @else
-                            <!-- Message from Admin -->
+                            <!-- Message from the Other User -->
                             <div class="d-flex align-items-start justify-content-end mb-4">
-                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
-                                    <span class="text-muted align-self-center small me-3">
-                                        {{ $message->created_at->diffForHumans() }}
-                                    </span>
-                                @endif
+                                <!-- Other User Message Timestamp -->
+                                <span class="text-muted align-self-center small me-3">
+                                    {{ $message->created_at->diffForHumans() }}
+                                </span>
+
+                                <!-- Other User Sent Image -->
                                 @if ($message->image_url)
                                     <img src="{{ $message->image_url }}" alt="Received Image"
                                         class="mt-2 rounded shadow-sm" height="310px" width="auto">
                                 @endif
+
+                                <!-- Other User Message Text -->
                                 <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
-                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }}; 
-                                    {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                    style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }};">
                                     @if ($message->message_text)
                                         <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
                                             {{ $message->message_text }}
                                         </p>
                                     @endif
                                 </div>
+
+                                <!-- Other User Icon -->
                                 <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
                                     alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
                             </div>
@@ -154,35 +161,9 @@
                     @endforeach
                 </div>
 
-                <!-- Input Section -->
-                {{-- <div class="d-flex border-top p-3 align-items-center">
-                    <form id="sendMessageForm" class="d-flex w-100">
-                        @csrf
-                        <input type="text" id="messageInput" name="message_text" class="form-control me-2 rounded-pill"
-                            placeholder="Type your message here..." required autofocus />
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
-                    </form>
-                </div> --}}
 
-                {{-- <div class="d-flex border-top p-3 align-items-center">
-                    <form id="sendMessageForm" class="d-flex w-100" enctype="multipart/form-data">
-                        @csrf
-                        <input type="text" id="messageInput" name="message_text" class="form-control me-2 rounded-pill"
-                            placeholder="Type your message here..." autofocus />
 
-                        <!-- Image Upload Button -->
-                        <label for="imageUpload" class="btn btn-secondary rounded-pill px-3 me-2">
-                            <i class="fa-solid fa-image"></i>
-                            <input type="file" id="imageUpload" name="image" class="d-none" accept="image/*">
-                        </label>
 
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
-                    </form>
-                </div> --}}
 
                 <!-- Input Section -->
                 <div class="d-flex border-top p-3 align-items-center">

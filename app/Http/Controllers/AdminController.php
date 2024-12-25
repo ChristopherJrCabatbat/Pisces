@@ -188,7 +188,7 @@ class AdminController extends Controller
 
     //     $user = User::findOrFail($userId);
 
-    //     // Fetch messages between the authenticated user (Admin) and the specified user
+    //     // Fetch messages between the authenticated user and the specified user
     //     $messages = Message::where(function ($query) use ($userId, $authenticatedUser) {
     //         $query->where(function ($q) use ($userId, $authenticatedUser) {
     //             $q->where('user_id', $authenticatedUser->id)
@@ -201,7 +201,7 @@ class AdminController extends Controller
     //         ->orderBy('created_at', 'asc')
     //         ->get();
 
-    //     // Mark all unread messages sent by the specified user to the admin as read
+    //     // Mark all unread messages sent by the specified user as read
     //     Message::where('user_id', $userId)
     //         ->where('receiver_id', $authenticatedUser->id)
     //         ->where('is_read', false)
@@ -209,40 +209,6 @@ class AdminController extends Controller
 
     //     return view('admin.messageUser', compact('user', 'messages'));
     // }
-
-
-    public function messageUser($userId)
-    {
-        /** @var User $authenticatedUser */
-        $authenticatedUser = Auth::user();
-
-        if (!$authenticatedUser) {
-            abort(403, 'Unauthorized access.');
-        }
-
-        $user = User::findOrFail($userId);
-
-        // Fetch messages between the authenticated user and the specified user
-        $messages = Message::where(function ($query) use ($userId, $authenticatedUser) {
-            $query->where(function ($q) use ($userId, $authenticatedUser) {
-                $q->where('user_id', $authenticatedUser->id)
-                    ->where('receiver_id', $userId);
-            })->orWhere(function ($q) use ($userId, $authenticatedUser) {
-                $q->where('user_id', $userId)
-                    ->where('receiver_id', $authenticatedUser->id);
-            });
-        })
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-        // Mark all unread messages sent by the specified user as read
-        Message::where('user_id', $userId)
-            ->where('receiver_id', $authenticatedUser->id)
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
-
-        return view('admin.messageUser', compact('user', 'messages'));
-    }
 
 
     public function markMessagesAsRead($userId)
@@ -283,53 +249,81 @@ class AdminController extends Controller
     //     ]);
     // }
 
-
-
+    public function messageUser($userId)
+    {
+        $authenticatedUser = Auth::user();
+    
+        if (!$authenticatedUser) {
+            abort(403, 'Unauthorized access.');
+        }
+    
+        $user = User::findOrFail($userId);
+    
+        // Fetch messages between the authenticated user and the specified user
+        $messages = Message::where(function ($query) use ($userId, $authenticatedUser) {
+            $query->where('user_id', $authenticatedUser->id)
+                  ->where('receiver_id', $userId);
+        })->orWhere(function ($query) use ($userId, $authenticatedUser) {
+            $query->where('user_id', $userId)
+                  ->where('receiver_id', $authenticatedUser->id);
+        })
+        ->orderBy('created_at', 'asc')
+        ->get();
+    
+        // Mark all unread messages sent by the specified user as read
+        Message::where('user_id', $userId)
+            ->where('receiver_id', $authenticatedUser->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+    
+        return view('admin.messageUser', compact('user', 'messages'));
+    }
+    
     public function sendMessage(Request $request, $userId)
     {
         try {
             // Debug incoming request data
             logger('Request Data:', $request->all());
-    
+
             // Validate input
             $request->validate([
                 'message_text' => 'nullable|required_without:image',
                 'image' => 'nullable|required_without:message_text|image|max:2048',
             ]);
-    
+
             $imageFile = $request->file('image');
             $imageUrl = null;
-    
+
             // Handle image upload
             if ($imageFile) {
                 $imagePath = $imageFile->store('messages', 'public');
                 $imageUrl = asset('storage/' . $imagePath);
-    
+
                 logger('Image URL:', [$imageUrl]); // Debug image path
             }
-    
+
             // Save message to database
             $message = Message::create([
                 'user_id' => Auth::id(),
                 'receiver_id' => $userId,
-                'sender_role' => 'User',
+                'sender_role' => 'Admin',
                 'message_text' => $request->input('message_text'),
                 'image_url' => $imageUrl,
                 'is_read' => false,
             ]);
-    
+
             if (!$message) {
                 throw new \Exception('Failed to save the message.');
             }
-    
+
             return response()->json(['success' => true, 'message' => $message], 201);
         } catch (\Exception $e) {
             logger('Error in sendMessage:', [$e->getMessage()]);
-    
+
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-    
+
 
     // public function sendMessage(Request $request, $userId)
     // {
@@ -339,16 +333,16 @@ class AdminController extends Controller
     //             'message_text' => 'nullable|required_without:image',
     //             'image' => 'nullable|required_without:message_text|image|max:2048',
     //         ]);
-    
+
     //         $imageFile = $request->file('image');
     //         $imageUrl = null;
-    
+
     //         // Handle image upload if present
     //         if ($imageFile) {
     //             $imagePath = $imageFile->store('messages', 'public'); // Store in the 'public/messages' directory
     //             $imageUrl = asset('storage/' . $imagePath);
     //         }
-    
+
     //         // Create the message
     //         $message = Message::create([
     //             'user_id' => Auth::id(),
@@ -358,14 +352,14 @@ class AdminController extends Controller
     //             'image_url' => $imageUrl,
     //             'is_read' => false,
     //         ]);
-    
+
     //         return response()->json(['success' => true, 'message' => $message], 201);
     //     } catch (\Exception $e) {
     //         Log::error('Error sending message:', ['error' => $e->getMessage()]);
     //         return response()->json(['success' => false, 'message' => 'Failed to send the message.'], 500);
     //     }
     // }
-    
+
 
     public function updates()
     {
