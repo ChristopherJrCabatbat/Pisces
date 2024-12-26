@@ -329,7 +329,7 @@
                         <th scope="col">Category</th>
                         <th scope="col">Price</th>
                         <th scope="col">Description</th>
-                        <th scope="col">Availability</th>
+                        {{-- <th scope="col">Availability</th> --}}
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -355,12 +355,12 @@
                                 @endif
                             </td>
                             <td style="width: 25vw !important;">{{ $menu->description }}</td>
-                            <td>
+                            {{-- <td>
                                 <span
                                     class="badge {{ $menu->availability === 'Available' ? 'bg-success' : 'bg-danger' }}">
                                     {{ $menu->availability }}
                                 </span>
-                            </td>
+                            </td> --}}
                             <td>
                                 <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info"
                                     title="View">

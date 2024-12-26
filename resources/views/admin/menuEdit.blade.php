@@ -72,15 +72,51 @@
                         value="{{ old('name', $menus->name) }}" required autofocus>
                 </div>
 
+                <div class="mb-3 w-100 d-flex justify-content-center align-items-start gap-2">
+                    <!-- Price -->
+                    <div class="w-75">
+                        <label for="price" class="form-label">Price:</label>
+                        <input type="text" name="price" class="form-control" id="price"
+                            value="{{ old('price', $menus->price) }}" required>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="w-75">
+                        <label for="category" class="form-label">Category:</label>
+                        <select class="form-select" required name="category" id="category">
+                            <option value="" disabled>Select Category</option>
+
+                            <!-- Loop through categories and create option elements -->
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->category }}"
+                                    {{ old('category', $menus->category) === $category->category ? 'selected' : '' }}>
+                                    {{ $category->category }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Availability -->
+                    <div class="w-75 ms-2">
+                        <label for="availability" class="form-label">Availability:</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="availability" name="availability"
+                                value="Available"
+                                {{ old('availability', $menus->availability) === 'Available' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="availability">{{ $menus->availability }}</label>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Price -->
-                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                {{-- <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="price" class="form-label">Price:</label>
                     <input type="text" name="price" class="form-control" id="price"
                         value="{{ old('price', $menus->price) }}" required>
-                </div>
+                </div> --}}
 
                 <!-- Category -->
-                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                {{-- <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="category" class="form-label">Category:</label>
                     <select class="form-select" required name="category" id="category">
                         <option value="" disabled>Select Category</option>
@@ -93,7 +129,7 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
+                </div> --}}
 
 
                 <!-- Current Image -->
@@ -122,15 +158,9 @@
                 </div>
 
                 <!-- Availability Toggle -->
-                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="availability" class="form-label">Availability:</label>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="availability" name="availability"
-                            value="Available"
-                            {{ old('availability', $menus->availability) === 'Available' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="availability">{{ $menus->availability }}</label>
-                    </div>
-                </div>
+                {{-- <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+
+                </div> --}}
 
 
 
