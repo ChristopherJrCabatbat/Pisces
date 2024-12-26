@@ -64,113 +64,53 @@
         <div class="table-container mb-4">
 
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
-                <!-- Left Section -->
+                <!-- Filter Section -->
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
-                        <!-- Category Filter Section -->
-                        <select id="categoryFilter" class="form-select custom-select" aria-label="Category select">
-                            <option value="" selected>Default</option>
-                            {{-- @foreach ($categories as $category)
-                        <option value="{{ $category->category }}">{{ $category->category }}</option>
-                    @endforeach --}}
-                        </select>
-                        <button id="filterButton" class="btn btn-primary custom-filter-btn button-wid">
-                            <i class="fa-solid fa-sort me-2"></i>Filter
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <!-- Right Section -->
-                <div class="right d-flex gap-3">
-                    <!-- Search -->
-                    <div class="position-relative custom-search">
-                        <form action="#" id="search-form">
-                            <input type="search" placeholder="Search by name..." class="form-control" id="search-input" />
-                            <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
+                        <form action="{{ route('admin.customerMessages') }}" method="GET" id="filter-form" class="d-flex">
+                            <select name="filter" id="categoryFilter" class="form-select custom-select">
+                                <option value="recent" {{ request('filter') == 'recent' ? 'selected' : '' }}>Recent</option>
+                                <option value="oldest" {{ request('filter') == 'oldest' ? 'selected' : '' }}>Old</option>
+                                <option value="alphabetical" {{ request('filter') == 'alphabetical' ? 'selected' : '' }}>Alphabetical</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
+                                <i class="fa-solid fa-sort me-2"></i>Filter
+                            </button>
                         </form>
                     </div>
                 </div>
-
-            </div>
-
-            <!-- Messenger-Style Messages Section -->
-            {{-- <div class="messages-section">
-                <div class="message-container">
-                    <h2 class="h2 text-center">Customer Messages</h2>
-
-                    @foreach ($userMessages as $data)
-                        @php
-                            $user = $data['user'];
-                            $latestMessage = $data['latestMessage'];
-                            $unreadCount = $data['unreadCount'];
-                        @endphp
-
-                        <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a">
-                            <div class="message-f">
-                                <div class="message-avatar position-relative">
-                                    <i class="fa-solid fa-user"></i>
-                                    <!-- Unread Badge -->
-                                    @if ($unreadCount > 0)
-                                        <span
-                                            class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">{{ $unreadCount }}</span>
-                                    @endif
-                                </div>
-
-                                <div class="message-content">
-                                    <!-- Add fw-bold if there are unread messages -->
-                                    <h5 class="message-name {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
-                                        {{ $user->first_name }} {{ $user->last_name }}
-                                    </h5>
-                                    <p class="message-text {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
-                                        @if ($latestMessage)
-                                            @if ($latestMessage->user_id === auth()->id())
-                                                You: {{ $latestMessage->message_text }}
-                                            @else
-                                                {{ $latestMessage->message_text }}
-                                            @endif
-                                        @else
-                                            No messages yet
-                                        @endif
-                                    </p>
-                                    <span class="message-time">
-                                        @if ($latestMessage)
-                                            {{ $latestMessage->created_at->diffForHumans() }}
-                                        @endif
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    @endforeach
+            
+                <!-- Search Section -->
+                <div class="right d-flex gap-3">
+                    <div class="position-relative custom-search">
+                        <form action="{{ route('admin.customerMessages') }}" method="GET" id="search-form">
+                            <input type="text" name="search" placeholder="Search by name..." class="form-control" id="search-input" value="{{ request('search') }}">
+                            <i class="fas fa-search custom-search-icon"></i>
+                        </form>
+                    </div>
                 </div>
-            </div> --}}
-
-            <!-- Messenger-Style Messages Section -->
+            </div>
+            
+            <!-- Customer Messages Section -->
             <div class="messages-section">
                 <div class="message-container" id="message-container">
                     <h2 class="h2 text-center">Customer Messages</h2>
-
                     @forelse ($userMessages as $data)
                         @php
                             $user = $data['user'];
                             $latestMessage = $data['latestMessage'];
                             $unreadCount = $data['unreadCount'];
                         @endphp
-
+            
                         <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a message-row">
                             <div class="message-f">
                                 <div class="message-avatar position-relative">
                                     <i class="fa-solid fa-user"></i>
-                                    <!-- Unread Badge -->
                                     @if ($unreadCount > 0)
-                                        <span
-                                            class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
+                                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
                                     @endif
                                 </div>
-
                                 <div class="message-content">
-                                    <!-- Add fw-bold if there are unread messages -->
                                     <h5 class="message-name {{ $unreadCount > 0 ? 'fw-bold' : '' }}">
                                         {{ $user->first_name }} {{ $user->last_name }}
                                     </h5>
@@ -194,20 +134,17 @@
                             </div>
                         </a>
                     @empty
-                        <a href="#" class="message-a message-row">
-                            <div class="message-f fs-5">
-                                <i class="fa-regular fa-circle-question me-2"></i> No messages match your search
-                            </div>
-                        </a>
+                        <div class="message-f fs-5">
+                            <i class="fa-regular fa-circle-question me-2"></i> No messages found.
+                        </div>
                     @endforelse
                 </div>
-
-                <!-- No Messages -->
-                <div class="message-f fs-5 text-black" id="no-messages-row" style="display: none;">
-                    <i class="fa-regular fa-circle-question me-2"></i> No customer match your search.
-                </div>
-
             </div>
+              <!-- No Messages -->
+              <div class="message-f fs-5 text-black" id="no-messages-row" style="display: none;">
+                <i class="fa-regular fa-circle-question me-2"></i> No customer match your search.
+            </div>
+            
 
 
         </div>
@@ -238,6 +175,43 @@
                 } else {
                     noMessagesRow.style.display = 'block';
                 }
+            });
+        </script>
+
+        <script>
+            document.getElementById('filterButton').addEventListener('click', function() {
+                const filter = document.getElementById('categoryFilter').value;
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+                // Send AJAX request to apply filter and search
+                fetch(`/admin/customerMessages?filter=${filter}&search=${searchTerm}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('message-container').innerHTML = html;
+                    })
+                    .catch(error => console.error('Error fetching messages:', error));
+            });
+
+            // Search event handler
+            document.getElementById('search-input').addEventListener('input', function() {
+                const filter = document.getElementById('categoryFilter').value;
+                const searchTerm = this.value.toLowerCase();
+
+                // Send AJAX request to apply filter and search
+                fetch(`/admin/customerMessages?filter=${filter}&search=${searchTerm}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('message-container').innerHTML = html;
+                    })
+                    .catch(error => console.error('Error fetching messages:', error));
             });
         </script>
     @endsection

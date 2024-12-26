@@ -79,7 +79,7 @@
                                 </option>
                                 <option value="alphabetically"
                                     {{ request('filter') == 'alphabetically' ? 'selected' : '' }}>
-                                    Alphabetically
+                                    Alphabetical
                                 </option>
                                 <option value="byRating" {{ request('filter') == 'byRating' ? 'selected' : '' }}>By Rating
                                 </option>

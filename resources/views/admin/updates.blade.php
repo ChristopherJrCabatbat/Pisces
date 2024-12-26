@@ -3,6 +3,11 @@
 @section('title', 'Customer Updates')
 
 @section('styles-links')
+    <style>
+        .table-container {
+            padding: 1rem 2rem 0rem 2rem;
+        }
+    </style>
 @endsection
 
 @section('sidebar')
@@ -66,10 +71,11 @@
                 <div class="left d-flex">
                     <div class="d-flex me-3 gap-2">
                         <select id="delivery-filter" class="form-select" aria-label="Select delivery status">
-                            <option value="" selected>Default</option>
-                            <option value="Pending">Alphabetical</option>
-                            <option value="Preparing">New customers first</option>
-                            <option value="Out for Delivery">Old customers first</option>
+                            <option value="default" {{ $filter === 'default' ? 'selected' : '' }}>Default</option>
+                            <option value="alphabetical" {{ $filter === 'alphabetical' ? 'selected' : '' }}>Alphabetical
+                            </option>
+                            <option value="new" {{ $filter === 'new' ? 'selected' : '' }}>New customers first</option>
+                            <option value="old" {{ $filter === 'old' ? 'selected' : '' }}>Old customers first</option>
                         </select>
                         <button type="button" id="filter-button" class="btn btn-primary custom-filter-btn button-wid-u">
                             <i class="fa-solid fa-sort me-2"></i>Filter
@@ -126,6 +132,11 @@
                 </tbody>
             </table>
 
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center">
+                {{ $users->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </div>
+
         </div>
 
     </div>
@@ -165,6 +176,22 @@
         }
 
         document.getElementById('search-input').addEventListener('input', filterUpdatesTable);
+    </script>
+
+    <script>
+        document.getElementById('filter-button').addEventListener('click', function() {
+            const filter = document.getElementById('delivery-filter').value;
+            const search = document.getElementById('search-input') ? document.getElementById('search-input').value :
+                '';
+
+            const params = new URLSearchParams({
+                filter: filter,
+                search: search
+            });
+
+            // Reload page with query parameters
+            window.location.href = '?' + params.toString();
+        });
     </script>
 
 @endsection

@@ -89,8 +89,8 @@
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
                         <select id="delivery-filter" class="form-select custom-select" aria-label="Select delivery status">
-                            <option value="" selected>Default</option>
-                            <option value="Sample">Sample</option>
+                            <option value="newest" selected>Newest</option>
+                            <option value="oldest">Oldest</option>
                         </select>
                         <button type="button" id="filter-button" class="btn btn-primary custom-filter-btn button-wid">
                             <i class="fa-solid fa-sort me-2"></i>Filter
@@ -100,17 +100,13 @@
 
                 <!-- Right Section: Search -->
                 <div class="right d-flex gap-3">
-                    <div class="position-relative custom-search" method="GET" id="search-form">
-                        <form action="#">
-                            <input type="search" placeholder="Search your orders" class="form-control" id="search-input"
-                                value="{{ request('search') }}">
-                            <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
-                        </form>
+                    <div class="position-relative custom-search">
+                        <input type="search" placeholder="Search your orders" class="form-control" id="search-input">
+                        <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                     </div>
                 </div>
             </div>
 
-            <!-- Orders Section -->
             <!-- Orders Section -->
             <div class="orders-list">
                 @if ($deliveriesWithImages->isNotEmpty())
@@ -119,38 +115,40 @@
                     </h4>
                 @endif
 
-                @forelse ($deliveriesWithImages as $delivery)
-                    <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
-                        <!-- Left Image Section -->
-                        <div class="order-image me-3">
-                            <img src="{{ $delivery->image_url ?? asset('default-image.jpg') }}" alt="Order Image"
-                                class="rounded" style="width: 80px; height: 80px;">
-                        </div>
+                <div id="orders-container">
+                    @forelse ($deliveriesWithImages as $delivery)
+                        <div
+                            class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
+                            <!-- Left Image Section -->
+                            <div class="order-image me-3">
+                                <img src="{{ $delivery->image_url ?? asset('default-image.jpg') }}" alt="Order Image"
+                                    class="rounded" style="width: 80px; height: 80px;">
+                            </div>
 
-                        <!-- Middle Details Section -->
-                        <div class="order-details flex-grow-1">
-                            <p class="m-0 text-truncate fw-bold">Order Summary: {{ $delivery->order }}</p>
-                            <p class="m-0 text-truncate">₱{{ number_format($delivery->total_price, 2) }}</p>
-                            <p class="text-muted small m-0">{{ $delivery->address }}</p>
-                            <p class="text-muted small m-0">{{ $delivery->created_at->format('M. d, Y') }}</p>
-                        </div>
+                            <!-- Middle Details Section -->
+                            <div class="order-details flex-grow-1">
+                                <p class="m-0 text-truncate fw-bold">{{ $delivery->order }}</p>
+                                <p class="m-0 text-truncate">₱{{ number_format($delivery->total_price, 2) }}</p>
+                                <p class="text-muted small m-0">{{ $delivery->address }}</p>
+                                <p class="text-muted small m-0">{{ $delivery->created_at->format('M. d, Y') }}</p>
+                            </div>
 
-                        <!-- Right Action Section -->
-                        <div class="order-actions text-end">
-                            <button type="button" class="btn btn-primary mb-2 view-order-btn"
-                                data-id="{{ $delivery->id }}" data-bs-toggle="modal" data-bs-target="#viewOrderModal">View
-                                Order</button>
+                            <!-- Right Action Section -->
+                            <div class="order-actions text-end">
+                                <button type="button" class="btn btn-primary mb-2 view-order-btn"
+                                    data-id="{{ $delivery->id }}" data-bs-toggle="modal"
+                                    data-bs-target="#viewOrderModal">View
+                                    Order</button>
+                            </div>
                         </div>
-                    </div>
-                @empty
-                    <div
-                        class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 fs-5 border rounded shadow-sm">
-                        <i class="fa-regular fa-circle-question me-2"></i> No orders.
-                    </div>
-                @endforelse
+                    @empty
+                        <div
+                            class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 fs-5 border rounded shadow-sm">
+                            <i class="fa-regular fa-circle-question me-2"></i> No orders.
+                        </div>
+                    @endforelse
+                </div>
             </div>
-
-
 
 
         </div>
@@ -160,39 +158,41 @@
 @endsection
 
 @section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.view-order-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const deliveryId = this.getAttribute('data-id');
-                const contentDiv = document.getElementById('orderDetailsContent');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.view-order-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const deliveryId = this.getAttribute('data-id');
+                    const contentDiv = document.getElementById('orderDetailsContent');
 
-                contentDiv.innerHTML = '<p class="text-center text-muted">Loading...</p>';
+                    contentDiv.innerHTML = '<p class="text-center text-muted">Loading...</p>';
 
-                fetch(`/admin/getOrderDetails/${deliveryId}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const orders = data.delivery.order.split(', ');
-                            const quantities = data.delivery.quantity.split(', ');
-                            const fallbackImageUrl = "{{ asset('images/logo.jpg') }}";
+                    fetch(`/admin/getOrderDetails/${deliveryId}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').content
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const orders = data.delivery.order.split(', ');
+                                const quantities = data.delivery.quantity.split(', ');
+                                const fallbackImageUrl = "{{ asset('images/logo.jpg') }}";
 
-                            const orderRows = orders.map((order, index) => {
-                                const imageUrl = data.menu_images[order.trim()] || fallbackImageUrl;
-                                return `
+                                const orderRows = orders.map((order, index) => {
+                                    const imageUrl = data.menu_images[order.trim()] ||
+                                        fallbackImageUrl;
+                                    return `
                                     <tr>
                                         <td><img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Order Image"></td>
                                         <td>${order}</td>
                                     </tr>
                                 `;
-                            }).join("");
+                                }).join("");
 
-                            contentDiv.innerHTML = `
+                                contentDiv.innerHTML = `
                                 <table class="table table-bordered text-center align-middle">
                                     <thead class="table-light">
                                         <tr><th colspan="2">Order Details</th></tr>
@@ -217,17 +217,103 @@
                                     <tbody>${orderRows}</tbody>
                                 </table>
                             `;
-                        } else {
-                            contentDiv.innerHTML = '<p class="text-center text-danger">Failed to load order details.</p>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching order details:', error);
-                        contentDiv.innerHTML = '<p class="text-center text-danger">An error occurred while fetching order details.</p>';
-                    });
+                            } else {
+                                contentDiv.innerHTML =
+                                    '<p class="text-center text-danger">Failed to load order details.</p>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching order details:', error);
+                            contentDiv.innerHTML =
+                                '<p class="text-center text-danger">An error occurred while fetching order details.</p>';
+                        });
+                });
             });
         });
-    });
-</script>
+    </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterButton = document.getElementById('filter-button');
+            const deliveryFilter = document.getElementById('delivery-filter');
+            const searchInput = document.getElementById('search-input');
+            const ordersContainer = document.getElementById('orders-container');
+            let deliveries = @json($deliveriesWithImages); // Pass PHP data to JavaScript
+
+            // Render deliveries to the container
+            const renderDeliveries = (filteredDeliveries) => {
+                if (filteredDeliveries.length === 0) {
+                    ordersContainer.innerHTML = `
+                <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 fs-5 border rounded shadow-sm">
+                    <i class="fa-regular fa-circle-question me-2"></i> No orders found.
+                </div>
+            `;
+                } else {
+                    ordersContainer.innerHTML = filteredDeliveries
+                        .map(
+                            (delivery) => `
+                        <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
+                            <div class="order-image me-3">
+                                <img src="${delivery.image_url || '{{ asset('default-image.jpg') }}'}" 
+                                     alt="Order Image" class="rounded" style="width: 80px; height: 80px;">
+                            </div>
+                            <div class="order-details flex-grow-1">
+                                <p class="m-0 text-truncate fw-bold">${delivery.order}</p>
+                                <p class="m-0 text-truncate">₱${parseFloat(delivery.total_price).toFixed(2)}</p>
+                                <p class="text-muted small m-0">${delivery.address}</p>
+                                <p class="text-muted small m-0">${new Date(delivery.created_at).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                })}</p>
+                            </div>
+                            <div class="order-actions text-end">
+                                <button type="button" class="btn btn-primary mb-2 view-order-btn" 
+                                    data-id="${delivery.id}" data-bs-toggle="modal" data-bs-target="#viewOrderModal">
+                                    View Order
+                                </button>
+                            </div>
+                        </div>
+                    `
+                        )
+                        .join('');
+                }
+            };
+
+            // Filter and search deliveries
+            const filterAndSearchDeliveries = () => {
+                const filterValue = deliveryFilter.value;
+                const searchTerm = searchInput.value.toLowerCase();
+
+                let filteredDeliveries = [...deliveries];
+
+                // Apply sorting
+                if (filterValue === 'newest') {
+                    filteredDeliveries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                } else if (filterValue === 'oldest') {
+                    filteredDeliveries.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                }
+
+                // Apply search
+                if (searchTerm) {
+                    filteredDeliveries = filteredDeliveries.filter(
+                        (delivery) =>
+                        delivery.order.toLowerCase().includes(searchTerm) ||
+                        delivery.address.toLowerCase().includes(searchTerm) ||
+                        delivery.created_at.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                // Render the filtered and searched deliveries
+                renderDeliveries(filteredDeliveries);
+            };
+
+            // Event listeners for filter and search
+            filterButton.addEventListener('click', filterAndSearchDeliveries);
+            searchInput.addEventListener('input', filterAndSearchDeliveries);
+
+            // Initial render
+            renderDeliveries(deliveries);
+        });
+    </script>
 @endsection

@@ -7,6 +7,9 @@
         .modal-content {
             color: black;
         }
+        .table-container {
+            padding: 1rem 2rem 0rem 2rem;
+        }
     </style>
 @endsection
 
@@ -171,17 +174,15 @@
                     <div class="d-flex custom-filter me-3">
                         <!-- Category Filter Section -->
                         <select id="categoryFilter" class="form-select custom-select" aria-label="Category select">
-                            <option value="" selected>Default</option>
-                            {{-- @foreach ($categories as $category)
-                        <option value="{{ $category->category }}">{{ $category->category }}</option>
-                    @endforeach --}}
+                            <option value="default" {{ $filter === 'default' ? 'selected' : '' }}>Default</option>
+                            <option value="name" {{ $filter === 'name' ? 'selected' : '' }}>Customer</option>
+                            <option value="menu" {{ $filter === 'menu' ? 'selected' : '' }}>Menu</option>
+                            <option value="rating" {{ $filter === 'rating' ? 'selected' : '' }}>Rating</option>
                         </select>
                         <button id="filterButton" class="btn btn-primary custom-filter-btn button-wid">
                             <i class="fa-solid fa-sort me-2"></i>Filter
                         </button>
-
                     </div>
-
                 </div>
 
                 <!-- Right Section -->
@@ -199,42 +200,24 @@
             </div>
 
             {{-- Feedback Table --}}
+            {{-- Feedback Table --}}
             <table class="table text-center">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col">Order Number</th>
                         <th scope="col">Customer Name</th>
                         <th scope="col">Menu</th>
                         <th scope="col">Feedback</th>
                         <th scope="col">Rating</th>
-                        {{-- <th scope="col">Sentiment</th> --}}
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody id="feedback-table-body">
                     @forelse ($feedbacks as $feedback)
                         <tr class="feedback-row">
-                            <td>{{ $feedback->order_number }}</td>
                             <td>{{ $feedback->customer_name }}</td>
                             <td>{{ $feedback->menu_items }}</td>
-                            <td>{{ $feedback->feedback_text ? : 'No feedback' }}</td>
+                            <td>{{ $feedback->feedback_text ?: 'No feedback' }}</td>
                             <td>{{ $feedback->rating }}</td>
-
-                            {{-- <td>
-                                <form action="{{ route('admin.updateSentiment', $feedback->id) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <select name="sentiment" class="form-select sentiment-select">
-                                        <option value="Positive"
-                                            {{ $feedback->sentiment === 'Positive' ? 'selected' : '' }}>
-                                            Positive</option>
-                                        <option value="Negative"
-                                            {{ $feedback->sentiment === 'Negative' ? 'selected' : '' }}>
-                                            Negative</option>
-                                    </select>
-                                </form>
-                            </td> --}}
-
                             <td>
                                 <button type="button" class="btn btn-primary view-feedback"
                                     data-feedback="{{ $feedback }}">
@@ -247,16 +230,20 @@
                             </td>
                         </tr>
                     @empty
-                        <tr id="no-feedback-row">
-                            <td colspan="7" class="text-center">No feedback available.</td>
+                        <tr id="">
+                            <td colspan="5" class="text-center">No feedback available.</td>
                         </tr>
-                    @endforelse
-                    <!-- Always include the "No menus" row, but hide it initially -->
-                    <tr id="no-feedback-row" style="display: none;">
-                        <td colspan="6"></td>
-                    </tr>
+                        @endforelse
+                        <tr id="no-feedback-row" style="display: none;">
+                            <td colspan="5" class="text-center">No feedback available.</td>
+                        </tr>
                 </tbody>
             </table>
+
+             <!-- Pagination -->
+             <div class="d-flex justify-content-center">
+                {{ $feedbacks->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </div>
 
 
         </div>
@@ -375,6 +362,18 @@
             document.getElementById('search-input').addEventListener('input', filterFeedbackTable);
         </script>
 
+        <script>
+            document.getElementById('filterButton').addEventListener('click', function() {
+                const filterValue = document.getElementById('categoryFilter').value;
+                const searchValue = document.getElementById('search-input').value;
 
+                // Redirect to the same page with query parameters for filtering and searching
+                const queryParams = new URLSearchParams({
+                    filter: filterValue,
+                    search: searchValue
+                });
+                window.location.href = `{{ route('admin.feedback') }}?${queryParams.toString()}`;
+            });
+        </script>
 
     @endsection

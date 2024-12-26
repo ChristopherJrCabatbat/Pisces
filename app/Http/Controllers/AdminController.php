@@ -17,33 +17,6 @@ use App\Models\Feedback;
 
 class AdminController extends Controller
 {
-    // public function dashboard()
-    // {
-    //     $userCount = User::where('role', 'User')->count();
-    //     $deliveryCount = Delivery::count();
-    //     $menuCount = Menu::count();
-    //     $categoryCount = Category::count();
-
-    //     // Fetch the top 5 most popular menus based on the total order count
-    //     $topPicks = DB::table('orders')
-    //         ->join('menus', 'orders.menu_name', '=', 'menus.name')
-    //         ->select(
-    //             'menus.id',
-    //             'menus.name',
-    //             'menus.image',
-    //             'menus.category',
-    //             'menus.price',
-    //             'menus.description',
-    //             DB::raw('SUM(orders.quantity) as total_order_count')
-    //         )
-    //         ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.category', 'menus.price', 'menus.description')
-    //         ->orderByDesc('total_order_count')
-    //         ->take(5)
-    //         ->get();
-
-    //     return view('admin.dashboard', compact('userCount', 'deliveryCount', 'menuCount', 'categoryCount', 'topPicks'));
-    // }
-
     public function dashboard()
     {
         $userCount = User::where('role', 'User')->count();
@@ -104,12 +77,33 @@ class AdminController extends Controller
         return view('admin.customers');
     }
 
-    public function feedback()
+    public function feedback(Request $request)
     {
-        $feedbacks = Feedback::all();
+        // Fetch search and filter parameters
+        $search = $request->input('search', '');
+        $filter = $request->input('filter', 'default'); // Default to "default"
 
-        return view('admin.feedback', compact('feedbacks'));
+        // Query feedbacks with search and filter
+        $feedbacks = Feedback::when($search, function ($query, $search) {
+            $query->where('customer_name', 'like', '%' . $search . '%')
+                ->orWhere('menu_items', 'like', '%' . $search . '%')
+                ->orWhere('feedback_text', 'like', '%' . $search . '%');
+        })
+            ->when($filter === 'name', function ($query) {
+                $query->orderBy('customer_name', 'asc'); // Alphabetically by customer name
+            })
+            ->when($filter === 'menu', function ($query) {
+                $query->orderBy('menu_items', 'asc'); // Alphabetically by menu
+            })
+            ->when($filter === 'rating', function ($query) {
+                $query->orderBy('rating', 'desc'); // By rating descending
+            })
+            ->paginate(4) // Adjust pagination as needed
+            ->appends(['search' => $search, 'filter' => $filter]); // Preserve query parameters in pagination links
+
+        return view('admin.feedback', compact('feedbacks', 'filter', 'search'));
     }
+
 
     public function respondFeedback(Request $request)
     {
@@ -127,11 +121,7 @@ class AdminController extends Controller
     }
 
 
-
-
-
-
-    public function customerMessages()
+    public function customerMessages(Request $request)
     {
         /** @var User $authenticatedUser */
         $authenticatedUser = Auth::user();
@@ -140,8 +130,19 @@ class AdminController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        // Fetch all users with the role "User"
-        $users = User::where('role', 'User')->get();
+        // Fetch search and filter parameters
+        $search = $request->input('search', '');
+        $filter = $request->input('filter', 'recent'); // Default to "recent"
+
+        // Fetch users with the role "User" and apply search and filter
+        $users = User::where('role', 'User')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('first_name', 'like', '%' . $search . '%')
+                        ->orWhere('last_name', 'like', '%' . $search . '%');
+                });
+            })
+            ->get();
 
         // Fetch the latest message and unread message count for each user
         $userMessages = $users->map(function ($user) use ($authenticatedUser) {
@@ -168,13 +169,27 @@ class AdminController extends Controller
                 'latestMessage' => $latestMessage,
                 'unreadCount' => $unreadCount,
             ];
-        })
-            ->sortByDesc(function ($data) {
+        });
+
+        // Apply filtering based on the selected filter
+        if ($filter === 'recent') {
+            $userMessages = $userMessages->sortByDesc(function ($data) {
                 return optional($data['latestMessage'])->created_at;
             });
+        } elseif ($filter === 'oldest') {
+            $userMessages = $userMessages->sortBy(function ($data) {
+                return optional($data['latestMessage'])->created_at;
+            });
+        } elseif ($filter === 'alphabetical') {
+            $userMessages = $userMessages->sortBy(function ($data) {
+                return strtolower($data['user']->first_name . ' ' . $data['user']->last_name);
+            });
+        }
 
-        return view('admin.customerMessages', compact('userMessages'));
+        return view('admin.customerMessages', compact('userMessages', 'filter', 'search'));
     }
+
+
 
 
     // public function messageUser($userId)
@@ -252,33 +267,33 @@ class AdminController extends Controller
     public function messageUser($userId)
     {
         $authenticatedUser = Auth::user();
-    
+
         if (!$authenticatedUser) {
             abort(403, 'Unauthorized access.');
         }
-    
+
         $user = User::findOrFail($userId);
-    
+
         // Fetch messages between the authenticated user and the specified user
         $messages = Message::where(function ($query) use ($userId, $authenticatedUser) {
             $query->where('user_id', $authenticatedUser->id)
-                  ->where('receiver_id', $userId);
+                ->where('receiver_id', $userId);
         })->orWhere(function ($query) use ($userId, $authenticatedUser) {
             $query->where('user_id', $userId)
-                  ->where('receiver_id', $authenticatedUser->id);
+                ->where('receiver_id', $authenticatedUser->id);
         })
-        ->orderBy('created_at', 'asc')
-        ->get();
-    
+            ->orderBy('created_at', 'asc')
+            ->get();
+
         // Mark all unread messages sent by the specified user as read
         Message::where('user_id', $userId)
             ->where('receiver_id', $authenticatedUser->id)
             ->where('is_read', false)
             ->update(['is_read' => true]);
-    
+
         return view('admin.messageUser', compact('user', 'messages'));
     }
-    
+
     public function sendMessage(Request $request, $userId)
     {
         try {
@@ -361,34 +376,107 @@ class AdminController extends Controller
     // }
 
 
-    public function updates()
+    // public function updates(Request $request)
+    // {
+    //     // Fetch only users with the 'User' role
+    //     $query = User::where('role', 'User');
+
+    //     // Apply filters based on the selected option
+    //     if ($request->has('filter')) {
+    //         switch ($request->filter) {
+    //             case 'alphabetical':
+    //                 $query->orderBy('first_name')->orderBy('last_name');
+    //                 break;
+    //             case 'new_customers':
+    //                 $query->orderBy('created_at', 'desc');
+    //                 break;
+    //             case 'old_customers':
+    //                 $query->orderBy('created_at', 'asc');
+    //                 break;
+    //         }
+    //     }
+
+    //     $users = $query->get();
+    //     return view('admin.updates', compact('users'));
+    // }
+
+    public function updates(Request $request)
     {
-        // Fetch only users with the 'User' role
-        $users = User::where('role', 'User')->get();
-        return view('admin.updates', compact('users'));
+        // Fetch search and filter parameters
+        $search = $request->input('search', '');
+        $filter = $request->input('filter', 'default'); // Default filter
+
+        // Query users with search and filter
+        $users = User::where('role', 'User')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('first_name', 'like', '%' . $search . '%')
+                        ->orWhere('last_name', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($filter === 'alphabetical', function ($query) {
+                $query->orderBy('first_name')->orderBy('last_name'); // Alphabetical order
+            })
+            ->when($filter === 'new', function ($query) {
+                $query->orderBy('created_at', 'desc'); // New customers first
+            })
+            ->when($filter === 'old', function ($query) {
+                $query->orderBy('created_at', 'asc'); // Old customers first
+            })
+            ->paginate(3) // Paginate results
+            ->appends(['search' => $search, 'filter' => $filter]); // Preserve query parameters in pagination
+
+        return view('admin.updates', compact('users', 'search', 'filter'));
     }
+
+
+    // public function viewOrders($userId)
+    // {
+    //     // Fetch user by ID
+    //     $user = User::findOrFail($userId);
+
+    //     // Fetch deliveries linked to the user via email
+    //     $deliveries = Delivery::where('email', $user->email)->with('orders')->get();
+
+    //     // Process each delivery to find the menu image with the highest quantity
+    //     $deliveriesWithImages = $deliveries->map(function ($delivery) {
+    //         $orders = $delivery->orders;
+
+    //         if ($orders->isNotEmpty()) {
+    //             // Get the order with the highest quantity
+    //             $highestQuantityOrder = $orders->sortByDesc('quantity')->first();
+
+    //             if ($highestQuantityOrder) {
+    //                 // Get the menu item associated with the highest quantity order
+    //                 $menu = Menu::where('name', $highestQuantityOrder->menu_name)->first();
+
+    //                 // Add the image URL to the delivery for rendering in Blade
+    //                 $delivery->image_url = $menu ? asset('storage/' . $menu->image) : null;
+    //             }
+    //         }
+
+    //         return $delivery;
+    //     });
+
+    //     return view('admin.viewOrders', compact('deliveriesWithImages'));
+    // }
 
     public function viewOrders($userId)
     {
-        // Fetch user by ID
         $user = User::findOrFail($userId);
 
-        // Fetch deliveries linked to the user via email
-        $deliveries = Delivery::where('email', $user->email)->with('orders')->get();
+        $deliveries = Delivery::where('email', $user->email)
+            ->with('orders')
+            ->orderBy('created_at', 'desc') // Default sorting
+            ->get();
 
-        // Process each delivery to find the menu image with the highest quantity
         $deliveriesWithImages = $deliveries->map(function ($delivery) {
             $orders = $delivery->orders;
 
             if ($orders->isNotEmpty()) {
-                // Get the order with the highest quantity
                 $highestQuantityOrder = $orders->sortByDesc('quantity')->first();
-
                 if ($highestQuantityOrder) {
-                    // Get the menu item associated with the highest quantity order
                     $menu = Menu::where('name', $highestQuantityOrder->menu_name)->first();
-
-                    // Add the image URL to the delivery for rendering in Blade
                     $delivery->image_url = $menu ? asset('storage/' . $menu->image) : null;
                 }
             }
@@ -398,6 +486,7 @@ class AdminController extends Controller
 
         return view('admin.viewOrders', compact('deliveriesWithImages'));
     }
+
 
     // public function getOrderDetails($id)
     // {
