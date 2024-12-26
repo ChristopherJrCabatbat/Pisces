@@ -12,22 +12,6 @@ class RiderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index(Request $request)
-    // {
-    //     // Fetch the filter from the request
-    //     $filter = $request->input('filter', 'default'); // Default filter is "default"
-
-    //     // Query to fetch riders
-    //     $riders = Rider::when($filter === 'alphabetically', function ($query) {
-    //         $query->orderBy('name', 'asc'); // Alphabetically descending
-    //     })
-    //         ->when($filter === 'byRating', function ($query) {
-    //             $query->orderBy('rating', 'desc'); // By rating descending
-    //         })
-    //         ->paginate(4); // Paginate with 5 items per page
-
-    //     return view('admin.rider', compact('riders', 'filter'));
-    // }
 
     public function index(Request $request)
     {
@@ -50,8 +34,6 @@ class RiderController extends Controller
     
         return view('admin.rider', compact('riders', 'filter', 'search'));
     }
-    
-
 
 
     /**

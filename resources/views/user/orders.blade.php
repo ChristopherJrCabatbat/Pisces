@@ -49,7 +49,7 @@
                             <label for="rating" class="form-label">Rating</label>
                             <div id="starRating" class="star-rating">
                                 @for ($i = 5; $i >= 1; $i--)
-                                    <input type="radio" id="star{{ $i }}" name="rating"
+                                    <input type="radio" required id="star{{ $i }}" name="rating"
                                         value="{{ $i }}">
                                     <label for="star{{ $i }}" class="star">★</label>
                                 @endfor

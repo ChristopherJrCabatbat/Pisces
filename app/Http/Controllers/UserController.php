@@ -98,7 +98,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         // Count unread messages from the admin
@@ -164,7 +164,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         // Return the view with required data
@@ -256,7 +256,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         // Count unread messages from the admin
@@ -341,7 +341,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         // Count unread messages from the admin
@@ -479,7 +479,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         return view('user.menuDetails', compact('menu', 'pendingOrdersCount', 'user', 'userCart', 'userFavorites', 'favoritesCount', 'unreadCount'));
@@ -562,7 +562,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         // Categorize orders by status
@@ -647,7 +647,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         return view('user.messages', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
@@ -679,7 +679,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         return view('user.messagesPisces', compact('messages', 'pendingOrdersCount', 'userCart', 'user', 'userFavorites'));
@@ -800,7 +800,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         return view('user.shopUpdates', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'latestMessage', 'unreadCount', 'deliveries'));
@@ -833,7 +833,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         // Pass timeline to the view
@@ -960,7 +960,7 @@ class UserController extends Controller
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
-            ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
 
         // Return the view with parsed data
