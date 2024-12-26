@@ -121,7 +121,19 @@
                     <textarea name="description" id="description" cols="30" rows="5" class="form-control" required>{{ old('description', $menus->description) }}</textarea>
                 </div>
 
-        
+                <!-- Availability Toggle -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="availability" class="form-label">Availability:</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="availability" name="availability"
+                            value="Available"
+                            {{ old('availability', $menus->availability) === 'Available' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="availability">{{ $menus->availability }}</label>
+                    </div>
+                </div>
+
+
+
                 <div class="d-grid my-2">
                     <button class="btn btn-primary dark-blue" type="submit">Update Menu</button>
                 </div>
@@ -133,4 +145,12 @@
 @endsection
 
 @section('scripts')
+    <script>
+        const availabilityToggle = document.getElementById('availability');
+        const availabilityLabel = availabilityToggle.nextElementSibling;
+
+        availabilityToggle.addEventListener('change', () => {
+            availabilityLabel.textContent = availabilityToggle.checked ? 'Available' : 'Unavailable';
+        });
+    </script>
 @endsection

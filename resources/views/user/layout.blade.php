@@ -142,7 +142,7 @@
                                     {{ Auth::user()->first_name }}
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">
+                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">
                                             <i class="fa-solid fa-user me-2"></i>Profile</a></li>
                                     <li>
                                         <hr class="dropdown-divider">

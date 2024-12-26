@@ -685,56 +685,6 @@ class UserController extends Controller
         return view('user.messagesPisces', compact('messages', 'pendingOrdersCount', 'userCart', 'user', 'userFavorites'));
     }
 
-
-    // public function sendMessage(Request $request, $userId)
-    // {
-    //     try {
-    //         Log::info('Message request received:', $request->all());
-
-    //         $request->validate([
-    //             'message_text' => 'nullable|required_without:image',
-    //             'image' => 'nullable|required_without:message_text|image|max:2048',
-    //         ]);
-
-    //         $messageText = $request->input('message_text') ?? 'Image sent';
-    //         $imageFile = $request->file('image');
-
-    //         $imageUrl = null; // Default to null
-    //         if ($imageFile) {
-    //             $imagePath = $imageFile->store('messages', 'public');
-    //             Log::info('Stored image path:', ['path' => $imagePath]);
-    //             $imageUrl = asset('storage/' . $imagePath);
-    //         }
-
-    //         // Add debug logging before saving
-    //         Log::info('Creating message:', [
-    //             'user_id' => Auth::id(),
-    //             'receiver_id' => $userId,
-    //             'sender_role' => 'User',
-    //             'message_text' => $messageText,
-    //             'image_url' => $imageUrl,
-    //             'is_read' => false,
-    //         ]);
-
-    //         $message = Message::create([
-    //             'user_id' => Auth::id(),
-    //             'receiver_id' => $userId,
-    //             'sender_role' => 'User',
-    //             'message_text' => $messageText,
-    //             'image_url' => $imageUrl,
-    //             'is_read' => false,
-    //         ]);
-
-    //         // Log the saved message
-    //         Log::info('Saved message:', $message->toArray());
-
-    //         return response()->json(['success' => true, 'message' => $message], 201);
-    //     } catch (\Exception $e) {
-    //         Log::error('Error sending message:', ['error' => $e->getMessage()]);
-    //         return response()->json(['success' => false, 'message' => 'Failed to send the message.'], 500);
-    //     }
-    // }
-
     public function sendMessage(Request $request, $userId)
     {
         try {

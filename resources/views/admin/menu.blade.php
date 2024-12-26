@@ -46,9 +46,9 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li> --}}
-                    <li><a href="{{ route('admin.customerMessages') }}"
-                        class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                            class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+            <li><a href="{{ route('admin.customerMessages') }}"
+                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
         </ul>
     </li>
 
@@ -249,7 +249,7 @@
             </div>
 
             {{-- Table --}}
-            <table class="table text-center">
+            {{-- <table class="table text-center">
                 <thead class="table-light">
                     <tr>
                         <th scope="col">Image</th>
@@ -318,7 +318,81 @@
                 </tbody>
 
 
+            </table> --}}
+
+            {{-- Table --}}
+            <table class="table text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Image</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Availability</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="menu-table-body">
+                    @forelse ($menus as $menu)
+                        <tr class="menu-row {{ $menu->availability === 'Unavailable' ? 'table-danger' : '' }}">
+                            <!-- Image Column -->
+                            <td>
+                                @if ($menu->image)
+                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                        class="img-fluid" width="50">
+                                @else
+                                    <span>No Image</span>
+                                @endif
+                            </td>
+                            <td>{{ $menu->name }}</td>
+                            <td>{{ $menu->category }}</td>
+                            <td>
+                                @if (floor($menu->price) == $menu->price)
+                                    ₱{{ number_format($menu->price, 0) }}
+                                @else
+                                    ₱{{ number_format($menu->price, 2) }}
+                                @endif
+                            </td>
+                            <td style="width: 25vw !important;">{{ $menu->description }}</td>
+                            <td>
+                                <span
+                                    class="badge {{ $menu->availability === 'Available' ? 'bg-success' : 'bg-danger' }}">
+                                    {{ $menu->availability }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info"
+                                    title="View">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                                <a href="{{ route('admin.menu.edit', $menu->id) }}" class="btn btn-sm btn-warning"
+                                    title="Edit">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <form action="{{ route('admin.menu.destroy', $menu->id) }}" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete this menu?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr id="">
+                            <td colspan="7">No menu available</td>
+                        </tr>
+                    @endforelse
+                    <tr id="no-menus-row" style="display: none">
+                        <td colspan="7">No menu available</td>
+                    </tr>
+                </tbody>
             </table>
+
+
 
             {{-- Pagination --}}
             {{-- @include('admin.components.pagination', ['menus' => $menus]) --}}
@@ -330,16 +404,14 @@
 
 @section('scripts')
 
-    {{-- Search / Filter Script --}}
+    {{-- Open Filter Modal --}}
     <script>
         function openFilterModal(modalId) {
             if (modalId) {
                 new bootstrap.Modal(document.getElementById(modalId)).show();
             }
         }
-    </script>
 
-    <script>
         function applyFilter(value) {
             switch (value) {
                 case "default":
@@ -394,20 +466,23 @@
         });
     </script>
 
+    {{-- Search / Filter Script --}}
     <script>
-        function filterTable(searchTerm, categoryFilter, priceFilter, dateFilter, analyticsFilter) {
+        function filterTable(searchTerm, categoryFilter = '', priceFilter = '', dateFilter = '', analyticsFilter = '') {
             const menuRows = document.querySelectorAll('#menu-table-body .menu-row');
             let hasVisibleRow = false;
 
             menuRows.forEach(row => {
                 const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-                const name = row.cells[1].textContent.toLowerCase();
-                const price = row.cells[3].textContent.toLowerCase();
-                const description = row.cells[4].textContent.toLowerCase();
+                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const price = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                const description = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
 
                 const matchesCategory = !categoryFilter || category === categoryFilter.toLowerCase();
-                const matchesSearch = !searchTerm || name.includes(searchTerm) || description.includes(
-                    searchTerm) || price.includes(searchTerm);
+                const matchesSearch = !searchTerm ||
+                    name.includes(searchTerm) ||
+                    description.includes(searchTerm) ||
+                    price.includes(searchTerm);
 
                 if (matchesCategory && matchesSearch) {
                     row.style.display = '';
@@ -417,8 +492,11 @@
                 }
             });
 
+            // Show or hide the "No menu available" row
             const noMenusRow = document.getElementById('no-menus-row');
-            noMenusRow.style.display = hasVisibleRow ? 'none' : '';
+            if (noMenusRow) {
+                noMenusRow.style.display = hasVisibleRow ? 'none' : '';
+            }
         }
 
         document.getElementById('mainFilter').addEventListener('change', function() {
@@ -455,8 +533,13 @@
             });
         });
 
+        // document.getElementById('search-input').addEventListener('input', function() {
+        //     filterTable(this.value.toLowerCase());
+        // });
+
         document.getElementById('search-input').addEventListener('input', function() {
-            filterTable(this.value.toLowerCase());
+            const searchTerm = this.value.toLowerCase();
+            filterTable(searchTerm);
         });
     </script>
 
