@@ -3,7 +3,11 @@
 @section('title', 'Add Category')
 
 @section('styles-links')
-
+    <style>
+        .table-container {
+            padding: 1rem 2rem 0rem 2rem;
+        }
+    </style>
 @endsection
 
 @section('sidebar')
@@ -41,10 +45,10 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
                     <span class="monitor-margin">Monitoring</span></a></li> --}}
-<li><a href="{{ route('admin.customerMessages') }}"
+            <li><a href="{{ route('admin.customerMessages') }}"
                     class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>        
-</ul>
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+        </ul>
     </li>
 
 @endsection
@@ -64,23 +68,27 @@
 
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
                 <!-- Left Section -->
+
+                {{-- Filter Section --}}
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
-                        <!-- Category Filter Section -->
-                        <select id="categoryFilter" class="form-select custom-select" aria-label="Category select">
-                            <option value="" selected>Default</option>
-                            <option value="">Alphabetically</option>
-                            <option value="By rating">By rating</option>
-                            {{-- @foreach ($categories as $category)
-                            <option value="{{ $category->category }}">{{ $category->category }}</option>
-                        @endforeach --}}
-                        </select>
-                        <button id="filterButton" class="btn btn-primary custom-filter-btn button-wid">
-                            <i class="fa-solid fa-sort me-2"></i>Filter
-                        </button>
-
+                        <form action="{{ route('admin.rider.index') }}" method="GET" id="filter-form" class="d-flex">
+                            <select name="filter" id="categoryFilter" class="form-select custom-select"
+                                aria-label="Filter Riders">
+                                <option value="default" {{ request('filter') == 'default' ? 'selected' : '' }}>Default
+                                </option>
+                                <option value="alphabetically"
+                                    {{ request('filter') == 'alphabetically' ? 'selected' : '' }}>
+                                    Alphabetically
+                                </option>
+                                <option value="byRating" {{ request('filter') == 'byRating' ? 'selected' : '' }}>By Rating
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
+                                <i class="fa-solid fa-sort me-2"></i>Filter
+                            </button>
+                        </form>
                     </div>
-
                 </div>
 
                 <!-- Right Section -->
@@ -101,7 +109,7 @@
 
             </div>
 
-            {{-- Table --}}
+            {{-- Riders Table --}}
             <table class="table text-center">
                 <thead class="table-light">
                     <tr>
@@ -113,14 +121,9 @@
                 <tbody id="menu-table-body">
                     @forelse ($riders as $rider)
                         <tr class="menu-row">
-                            <!-- Name Column -->
                             <td>{{ $rider->name }}</td>
-
-                            <!-- Rating Column -->
                             <td>{{ $rider->rating ?? 'No Rating' }}</td>
-
-                            <!-- Action Column (View, Edit, Delete) -->
-                            <td>
+                            <td style="width: 18vw;">
                                 <a href="{{ route('admin.rider.show', $rider->id) }}" class="btn btn-sm btn-info"
                                     title="View">
                                     <i class="fa fa-eye"></i>
@@ -141,19 +144,21 @@
                             </td>
                         </tr>
                     @empty
-                        <tr id="no-menus-row">
-                            <td colspan="6">No riders found.</td>
+                        <tr>
+                            <td colspan="3">No riders found.</td>
                         </tr>
-                    @endforelse
-                    <!-- Always include the "No riders" row, but hide it initially -->
-                    <tr id="no-menus-row" style="display: none;">
-                        <td colspan="6"></td>
-                    </tr>
+                        @endforelse
+                        <tr class="" id="no-menus-row" style="display: none;">
+                            <td colspan="3">No riders found.</td>
+                        </tr>
                 </tbody>
             </table>
 
-            {{-- Pagination --}}
-            {{-- @include('admin.components.pagination', ['menus' => $menus]) --}}
+
+            {{-- Pagination Links --}}
+            <div class="d-flex justify-content-center">
+                {{ $riders->links('pagination::bootstrap-4') }}
+            </div>
 
         </div>
 
@@ -161,19 +166,21 @@
 @endsection
 
 @section('scripts')
-    <!-- Filter-Search Script -->
-    <script>
+
+     <!-- Filter-Search Script -->
+     <script>
         function filterTable() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const riderRows = document.querySelectorAll('#menu-table-body .menu-row');
+            const categoryRows = document.querySelectorAll('#menu-table-body .menu-row');
             let hasVisibleRow = false;
 
-            riderRows.forEach(row => {
+            categoryRows.forEach(row => {
                 const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
                 const rating = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
 
                 // Check if the row matches the search term
-                const matchesSearch = name.includes(searchTerm) || rating.includes(searchTerm);
+                const matchesSearch = name.includes(searchTerm) ||
+                rating.includes(searchTerm);
 
                 // Show or hide the row based on the match
                 if (matchesSearch) {
@@ -184,17 +191,18 @@
                 }
             });
 
-            // Show or hide the "No riders found" row
-            const noRidersRow = document.getElementById('no-menus-row');
+            // Show or hide the "No categories found" row
+            const noCategoriesRow = document.getElementById('no-menus-row');
             if (hasVisibleRow) {
-                noRidersRow.style.display = "none";
+                noCategoriesRow.style.display = "none";
             } else {
-                noRidersRow.style.display = "";
-                noRidersRow.innerHTML =
-                    `<td colspan="6">No riders found matching your search.</td>`;
+                noCategoriesRow.style.display = "";
+                noCategoriesRow.innerHTML =
+                    `<td colspan="6">No rider found matching your search.</td>`;
             }
         }
 
         document.getElementById('search-input').addEventListener('input', filterTable);
     </script>
+
 @endsection

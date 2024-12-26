@@ -82,7 +82,16 @@ class MenuController extends Controller
             $activeFilter = 'Analytics: ' . ucfirst(str_replace('-', ' ', $request->analyticsFilter));
         }
 
-        $menus = $query->get();
+        // New: Filter by Unavailable
+        if ($request->has('mainFilter') && $request->mainFilter === 'unavailable') {
+            $query->where('availability', 'Unavailable');
+            $toastMessage = 'Successfully filtered by Availability: Unavailable';
+            $activeFilter = 'Unavailable Menus';
+        }
+
+        // Pagination: Show 5 menus per page
+        $menus = $query->paginate(4);
+
         $categories = DB::table('categories')->select('category')->distinct()->get();
 
         if (!is_null($toastMessage)) {
@@ -94,6 +103,8 @@ class MenuController extends Controller
 
         return view('admin.menu', compact('menus', 'categories', 'activeFilter'));
     }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -316,52 +327,52 @@ class MenuController extends Controller
     // }
 
     public function update(Request $request, string $id)
-{
-    $menu = Menu::findOrFail($id);
+    {
+        $menu = Menu::findOrFail($id);
 
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'price' => 'required|numeric|min:0',
-        'category' => 'required|string',
-        'description' => 'required|string',
-        'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string',
+            'description' => 'required|string',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-    try {
-        // Handle file upload if a new image is provided
-        if ($request->hasFile('image')) {
-            if ($menu->image) {
-                Storage::delete('public/' . $menu->image);
+        try {
+            // Handle file upload if a new image is provided
+            if ($request->hasFile('image')) {
+                if ($menu->image) {
+                    Storage::delete('public/' . $menu->image);
+                }
+                $imagePath = $request->file('image')->store('menu_images', 'public');
+                $menu->image = $imagePath;
             }
-            $imagePath = $request->file('image')->store('menu_images', 'public');
-            $menu->image = $imagePath;
+
+            // Update the menu fields
+            $menu->update([
+                'name' => $validated['name'],
+                'category' => $validated['category'],
+                'price' => $validated['price'],
+                'description' => $validated['description'],
+                'image' => $menu->image ?? $menu->image,
+                'availability' => $request->has('availability') && $request->availability === 'Available'
+                    ? 'Available'
+                    : 'Unavailable',
+            ]);
+
+            session()->flash('toast', [
+                'message' => 'Menu updated successfully.',
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            session()->flash('toast', [
+                'message' => 'Failed to update menu item. Please try again.',
+                'type' => 'error',
+            ]);
         }
 
-        // Update the menu fields
-        $menu->update([
-            'name' => $validated['name'],
-            'category' => $validated['category'],
-            'price' => $validated['price'],
-            'description' => $validated['description'],
-            'image' => $menu->image ?? $menu->image,
-            'availability' => $request->has('availability') && $request->availability === 'Available' 
-                ? 'Available' 
-                : 'Unavailable',
-        ]);
-
-        session()->flash('toast', [
-            'message' => 'Menu updated successfully.',
-            'type' => 'success',
-        ]);
-    } catch (\Exception $e) {
-        session()->flash('toast', [
-            'message' => 'Failed to update menu item. Please try again.',
-            'type' => 'error',
-        ]);
+        return redirect()->route('admin.menu.index');
     }
-
-    return redirect()->route('admin.menu.index');
-}
 
 
 

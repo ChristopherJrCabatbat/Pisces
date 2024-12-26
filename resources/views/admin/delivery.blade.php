@@ -72,6 +72,11 @@
             cursor: pointer;
             color: #f81d0b;
         }
+
+        .table-container {
+            padding: 1rem 2rem 0rem 2rem;
+        }
+        
     </style>
 @endsection
 
@@ -200,6 +205,7 @@
                         <select id="delivery-filter" class="form-select custom-select"
                             aria-label="Select delivery status">
                             <option value="" selected>All Statuses</option>
+                            <option value="Pending GCash Transaction">Pending GCash Transaction</option>
                             <option value="Pending">Pending</option>
                             <option value="Preparing">Preparing</option>
                             <option value="Out for Delivery">Out for Delivery</option>
@@ -300,8 +306,12 @@
                 </tbody>
             </table>
 
-        </div>
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center">
+                {{ $deliveries->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </div>
 
+        </div>
 
     </div>
 @endsection
@@ -429,7 +439,6 @@
             modal.hide();
         });
     </script>
-
 
     {{-- Filter-Search Table --}}
     <script>

@@ -3,7 +3,11 @@
 @section('title', 'Add Category')
 
 @section('styles-links')
-
+    <style>
+        .table-container {
+            padding: 1rem 2rem 0rem 2rem;
+        }
+    </style>
 @endsection
 
 @section('sidebar')
@@ -37,10 +41,10 @@
                     class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-users-gear me-2"></i>Customer Activity
                     <span class="monitor-margin">Monitoring</span></a></li>
-<li><a href="{{ route('admin.customerMessages') }}"
+            <li><a href="{{ route('admin.customerMessages') }}"
                     class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>        
-</ul>
+                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+        </ul>
     </li>
 
 @endsection
@@ -50,7 +54,8 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                    class="navigation">Dashboard</a> / <a href="{{ route('admin.menu.index') }}" class="navigation">Menu</a>
+                    class="navigation">Dashboard</a> / <a href="{{ route('admin.menu.index') }}"
+                    class="navigation">Menu</a>
                 / </div>
             <span class="faded-white ms-1">Category</span>
         </div>
@@ -62,35 +67,38 @@
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
                         <!-- Category Filter Section -->
-                        <select id="categoryFilter" class="form-select custom-select" aria-label="Category select">
-                            <option value="" selected>Default</option>
-                            {{-- @foreach ($categories as $category)
-                            <option value="{{ $category->category }}">{{ $category->category }}</option>
-                        @endforeach --}}
-                        </select>
-                        <button id="filterButton" class="btn btn-primary custom-filter-btn button-wid">
-                            <i class="fa-solid fa-sort me-2"></i>Filter
-                        </button>
-
+                        <form action="{{ route('admin.category.index') }}" method="GET" id="filter-form" class="d-flex">
+                            <select name="filter" id="categoryFilter" class="form-select custom-select"
+                                aria-label="Category Filter">
+                                <option value="" {{ request('filter') == '' ? 'selected' : '' }}>Default</option>
+                                <option value="asc" {{ request('filter') == 'asc' ? 'selected' : '' }}>Ascending
+                                </option>
+                                <option value="desc" {{ request('filter') == 'desc' ? 'selected' : '' }}>Descending
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
+                                <i class="fa-solid fa-sort me-2"></i>Apply
+                            </button>
+                        </form>
                     </div>
-
                 </div>
 
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
-                    <div class="position-relative custom-search" method="GET" id="search-form">
+                    <div class="position-relative custom-search" id="search-form">
                         <!-- Search Form -->
-                        <form action="#">
-                            <input type="search" placeholder="Search something..." class="form-control" id="search-input"
-                                value="{{ request('search') }}">
-                            <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
+                        <form action="{{ route('admin.category.index') }}" method="GET">
+                            <input type="search" name="search" placeholder="Search something..." class="form-control"
+                                id="search-input" value="{{ $search ?? '' }}">
+                            <i class="fas fa-search custom-search-icon"></i>
                         </form>
                     </div>
-
-                    <div><a href="{{ route('admin.category.create') }}" class="btn btn-primary"><i
-                                class="fa-solid fa-plus me-2"></i>Add</a></div>
+                    <div>
+                        <a href="{{ route('admin.category.create') }}" class="btn btn-primary">
+                            <i class="fa-solid fa-plus me-2"></i>Add
+                        </a>
+                    </div>
                 </div>
-
             </div>
 
             {{-- Table --}}
@@ -105,7 +113,6 @@
                 <tbody id="menu-table-body">
                     @forelse ($categories as $category)
                         <tr class="menu-row">
-                            <!-- Image Column -->
                             <td>
                                 @if ($category->image)
                                     <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
@@ -114,10 +121,8 @@
                                     <span>No Image</span>
                                 @endif
                             </td>
-                            <!-- Name Column -->
                             <td>{{ $category->category }}</td>
-                            <!-- Action Column (View, Edit, Delete) -->
-                            <td>
+                            <td style="width: 16vw;">
                                 <a href="{{ route('admin.category.show', $category->id) }}" class="btn btn-sm btn-info"
                                     title="View">
                                     <i class="fa fa-eye"></i>
@@ -138,19 +143,20 @@
                             </td>
                         </tr>
                     @empty
-                        <tr id="no-menus-row">
+                        <tr id="">
                             <td colspan="6">No categories found.</td>
                         </tr>
                     @endforelse
-                    <!-- Always include the "No categories" row, but hide it initially -->
-                    <tr id="no-menus-row" style="display: none;">
-                        <td colspan="6"></td>
+                    <tr id="no-menus-row" style="display: none">
+                        <td colspan="6">No categories found.</td>
                     </tr>
                 </tbody>
             </table>
 
-            {{-- Pagination --}}
-            {{-- @include('admin.components.pagination', ['menus' => $menus]) --}}
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center">
+                {{ $categories->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </div>
 
         </div>
 

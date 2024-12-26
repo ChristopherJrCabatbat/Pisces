@@ -97,11 +97,6 @@
                     </div>
                 </div>
 
-                {{-- <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="category" class="form-label">Category:</label>
-                    <div class="form-control">{{ $menus->category }}</div>
-                </div> --}}
-
                 <!-- Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="image" class="form-label">Image:</label>

@@ -9,7 +9,7 @@
 
     <title>Pisces Coffee Hub</title>
 
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-home.png') }}">
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 

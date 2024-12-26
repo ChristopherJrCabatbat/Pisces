@@ -12,12 +12,47 @@ class RiderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $riders = Rider::all();
+    // public function index(Request $request)
+    // {
+    //     // Fetch the filter from the request
+    //     $filter = $request->input('filter', 'default'); // Default filter is "default"
 
-        return view('admin.rider', compact('riders'));
+    //     // Query to fetch riders
+    //     $riders = Rider::when($filter === 'alphabetically', function ($query) {
+    //         $query->orderBy('name', 'asc'); // Alphabetically descending
+    //     })
+    //         ->when($filter === 'byRating', function ($query) {
+    //             $query->orderBy('rating', 'desc'); // By rating descending
+    //         })
+    //         ->paginate(4); // Paginate with 5 items per page
+
+    //     return view('admin.rider', compact('riders', 'filter'));
+    // }
+
+    public function index(Request $request)
+    {
+        // Fetch search and filter parameters
+        $search = $request->input('search', '');
+        $filter = $request->input('filter', 'default'); // Default to "default"
+    
+        // Query riders with search and filter
+        $riders = Rider::when($search, function ($query, $search) {
+                $query->where('name', 'like', '%' . $search . '%');
+            })
+            ->when($filter === 'alphabetically', function ($query) {
+                $query->orderBy('name', 'asc'); // Alphabetically descending
+            })
+            ->when($filter === 'byRating', function ($query) {
+                $query->orderBy('rating', 'desc'); // By rating descending
+            })
+            ->paginate(4) // Show 5 items per page
+            ->appends(['search' => $search, 'filter' => $filter]); // Preserve query parameters in pagination links
+    
+        return view('admin.rider', compact('riders', 'filter', 'search'));
     }
+    
+
+
 
     /**
      * Show the form for creating a new resource.

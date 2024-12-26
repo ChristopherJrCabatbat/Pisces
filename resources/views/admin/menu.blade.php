@@ -10,6 +10,7 @@
 
         .table-container {
             min-width: 681px;
+            padding: 1rem 2rem 0rem 2rem;
         }
     </style>
 @endsection
@@ -210,17 +211,14 @@
                             onchange="applyFilter(this.value)">
                             <option value="filterBy" selected disabled>Filter by</option>
                             <option value="default">Default</option>
-                            <option value="categoriesModal">
-                                Categories</option>
-                            <option value="priceModal">Price
-                            </option>
+                            <option value="categoriesModal">Categories</option>
+                            <option value="priceModal">Price</option>
                             <option value="dateModal">Date</option>
-                            <option value="analyticsModal">
-                                Analytics</option>
+                            <option value="analyticsModal">Analytics</option>
+                            <option value="unavailable">Unavailable</option> <!-- New Filter -->
                         </select>
 
                     </div>
-
 
                 </div>
 
@@ -231,7 +229,6 @@
                     </div>
                 @endif
 
-
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
                     <!-- Search -->
@@ -239,7 +236,7 @@
                         <form action="">
                             <input type="text" id="search-input" class="form-control"
                                 placeholder="Search menus..." />
-                            <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
+                            <i class="fas fa-search custom-search-icon"></i>
                         </form>
                     </div>
 
@@ -247,78 +244,6 @@
                 </div>
 
             </div>
-
-            {{-- Table --}}
-            {{-- <table class="table text-center">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Image</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="menu-table-body">
-                    @forelse ($menus as $menu)
-                        <tr class="menu-row">
-                            <!-- Image Column -->
-                            <td>
-                                @if ($menu->image)
-                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
-                                        class="img-fluid" width="50">
-                                @else
-                                    <span>No Image</span>
-                                @endif
-                            </td>
-                            <!-- Name, Category, Description -->
-                            <td>{{ $menu->name }}</td>
-                            <td>{{ $menu->category }}</td>
-                            <!-- Price (Remove trailing .00 if present) -->
-                            <td>
-                                @if (floor($menu->price) == $menu->price)
-                                    ₱{{ number_format($menu->price, 0) }}
-                                @else
-                                    ₱{{ number_format($menu->price, 2) }}
-                                @endif
-                            </td>
-                            <td style="width: 25vw !important;">{{ $menu->description }}</td>
-                            <!-- Action Column (View, Edit, Delete) -->
-                            <td>
-                                <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info"
-                                    title="View">
-                                    <i class="fa fa-eye"></i>
-                                </a>
-                                <a href="{{ route('admin.menu.edit', $menu->id) }}" class="btn btn-sm btn-warning"
-                                    title="Edit">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <form action="{{ route('admin.menu.destroy', $menu->id) }}" method="POST"
-                                    style="display:inline;"
-                                    onsubmit="return confirm('Are you sure you want to delete this menu?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr id="no-menus-row">
-                            <td colspan="6">No menus found.</td>
-                        </tr>
-                    @endforelse
-                    <!-- Always include the "No menus" row, but hide it initially -->
-                    <tr id="no-menus-row" style="display: none;">
-                        <td colspan="6">No menu found.</td>
-                    </tr>
-
-                </tbody>
-
-
-            </table> --}}
 
             {{-- Table --}}
             <table class="table text-center">
@@ -392,10 +317,10 @@
                 </tbody>
             </table>
 
-
-
-            {{-- Pagination --}}
-            {{-- @include('admin.components.pagination', ['menus' => $menus]) --}}
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center">
+                {{ $menus->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </div>
 
         </div>
 
@@ -428,6 +353,9 @@
                     break;
                 case "analyticsModal":
                     $('#analyticsModal').modal('show');
+                    break;
+                case "unavailable": // New Filter
+                    window.location.href = "/admin/menu?mainFilter=unavailable";
                     break;
                 default:
                     break;
@@ -532,10 +460,6 @@
 
             });
         });
-
-        // document.getElementById('search-input').addEventListener('input', function() {
-        //     filterTable(this.value.toLowerCase());
-        // });
 
         document.getElementById('search-input').addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();

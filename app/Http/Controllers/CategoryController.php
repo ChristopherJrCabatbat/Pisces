@@ -15,12 +15,23 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::all();
-
-        return view('admin.category', compact('categories'));
-    }
+        // Fetch search, filter, and sort parameters
+        $search = $request->input('search');
+        $filter = $request->input('filter', ''); // Default is empty for no specific order
+    
+        // Query categories with filtering, searching, and sorting
+        $categories = Category::when($search, function ($query, $search) {
+            $query->where('category', 'like', '%' . $search . '%');
+        })
+        ->when($filter, function ($query, $filter) {
+            $query->orderBy('category', $filter); // Apply sorting only if filter is set
+        })
+        ->paginate(4); // Paginate with 4 items per page
+    
+        return view('admin.category', compact('categories', 'search', 'filter'));
+    }    
 
     /**
      * Show the form for creating a new resource.

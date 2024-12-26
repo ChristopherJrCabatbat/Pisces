@@ -108,30 +108,6 @@
                     </div>
                 </div>
 
-                <!-- Price -->
-                {{-- <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="price" class="form-label">Price:</label>
-                    <input type="text" name="price" class="form-control" id="price"
-                        value="{{ old('price', $menus->price) }}" required>
-                </div> --}}
-
-                <!-- Category -->
-                {{-- <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="category" class="form-label">Category:</label>
-                    <select class="form-select" required name="category" id="category">
-                        <option value="" disabled>Select Category</option>
-
-                        <!-- Loop through categories and create option elements -->
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->category }}"
-                                {{ old('category', $menus->category) === $category->category ? 'selected' : '' }}>
-                                {{ $category->category }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div> --}}
-
-
                 <!-- Current Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="current_image" class="form-label">Current Image:</label>
@@ -156,13 +132,6 @@
                     <label for="description" class="form-label">Description:</label>
                     <textarea name="description" id="description" cols="30" rows="5" class="form-control" required>{{ old('description', $menus->description) }}</textarea>
                 </div>
-
-                <!-- Availability Toggle -->
-                {{-- <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-
-                </div> --}}
-
-
 
                 <div class="d-grid my-2">
                     <button class="btn btn-primary dark-blue" type="submit">Update Menu</button>
