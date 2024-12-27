@@ -101,7 +101,7 @@
     </div>
 
     <header>
-        <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">
+        <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #fff;">
             <div class="container">
                 <a class="navbar-brand" href="{{ route('user.dashboard') }}">
                     <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo">

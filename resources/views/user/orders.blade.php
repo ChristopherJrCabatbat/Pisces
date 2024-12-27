@@ -107,34 +107,34 @@
             <div class="sub-tabs-container">
                 <ul class="nav nav-tabs justify-content-center" id="ordersTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all"
+                        <button class="nav-link text-black active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all"
                             type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pending-gcash-transaction-tab" data-bs-toggle="tab" data-bs-target="#pending-gcash-transaction"
+                        <button class="nav-link text-black" id="pending-gcash-transaction-tab" data-bs-toggle="tab" data-bs-target="#pending-gcash-transaction"
                             type="button" role="tab" aria-controls="pending-gcash-transaction" aria-selected="false">Pending GCash</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
+                        <button class="nav-link text-black" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
                             type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="preparing-tab" data-bs-toggle="tab" data-bs-target="#preparing"
+                        <button class="nav-link text-black" id="preparing-tab" data-bs-toggle="tab" data-bs-target="#preparing"
                             type="button" role="tab" aria-controls="preparing"
                             aria-selected="false">Preparing</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="out-for-delivery-tab" data-bs-toggle="tab"
+                        <button class="nav-link text-black" id="out-for-delivery-tab" data-bs-toggle="tab"
                             data-bs-target="#out-for-delivery" type="button" role="tab"
                             aria-controls="out-for-delivery" aria-selected="false">Out for Delivery</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered"
+                        <button class="nav-link text-black" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered"
                             type="button" role="tab" aria-controls="delivered"
                             aria-selected="false">Delivered</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="returns-tab" data-bs-toggle="tab" data-bs-target="#returns"
+                        <button class="nav-link text-black" id="returns-tab" data-bs-toggle="tab" data-bs-target="#returns"
                             type="button" role="tab" aria-controls="returns" aria-selected="false">Returns</button>
                     </li>
                 </ul>
@@ -153,7 +153,7 @@
                             @include('user.orders-partial', ['order' => $order])
                         </a>
                     @empty
-                        <div class="order-container border rounded p-4 shadow-sm">
+                        <div class="order-container border rounded p-4">
                             <div class="d-flex align-items-center fs-5">
                                 <i class="fa-regular fa-circle-question me-2"></i> There are no
                                 {{ str_replace('_', ' ', $status) }} orders.

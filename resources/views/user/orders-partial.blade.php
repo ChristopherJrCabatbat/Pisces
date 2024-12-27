@@ -1,4 +1,4 @@
-<div class="a-container order-container border rounded mb-4 p-4 shadow-sm">
+<div class="a-container order-container border rounded mb-4 p-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <p class="text-muted mb-1">Order Date</p>

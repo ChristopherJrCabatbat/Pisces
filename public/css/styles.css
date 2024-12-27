@@ -1,8 +1,9 @@
 body {
     overflow-x: hidden;
-    background-color: #484045;
-    /* background-color: #E3F2FD; */
-    color: white;
+    /* background-color: #484045; */
+    background-color: #f5f5f5;
+    color: black;
+    /* color: white; */
 }
 
 .dropdown-menu .dropdown-item:active {
@@ -21,7 +22,8 @@ body {
 }
 
 .border-baba {
-    border-bottom: 1px solid rgb(255, 255, 255, 0.6);
+    /* border-bottom: 1px solid rgb(255, 255, 255, 0.6); */
+    border-bottom: solid 1px #787878;
 }
 
 .card {
@@ -48,7 +50,8 @@ body {
 .card {
     position: relative;
     overflow: hidden;
-    border: 2px solid #3a3a3a; /* Slightly lighter than before */
+    /* border: 2px solid #3a3a3a; */
+    border: 2px solid transparent; /* Slightly lighter than before */
     border-radius: 12px;
     background-color: #fdfdfd; /* Light background for better contrast */
     transition: transform 0.3s ease, box-shadow 0.3s ease,
@@ -61,6 +64,15 @@ body {
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2),
         inset 0 0 15px rgba(248, 29, 11, 0.3);
     border-color: #f81d0b;
+}
+
+.card-shadow {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.15); /* Stronger and deeper shadow */
+    border: 1px solid rgba(0, 0, 0, 0.2); /* Adds a subtle outline */
+}
+
+.card-shadow:hover {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 6px 12px rgba(0, 0, 0, 0.18); /* Much more intense shadow on hover */
 }
 
 .card-hover {
@@ -163,14 +175,15 @@ body {
 
 /* Menu Styles */
 .top-container {
-    background-color: rgb(122, 109, 117);
+    /* background-color: rgb(122, 109, 117); */
+    background-color: rgb(193 193 193);
     width: 100vw !important;
     padding-left: 9vw !important;
     padding-right: 9vw !important;
 }
 
 .low-opacity-white {
-    color: rgb(255, 255, 255, 0.7);
+    color: rgba(0, 0, 0, 0.6);
 }
 
 .categories {
@@ -183,7 +196,7 @@ body {
 
 .white-underline {
     text-decoration: none;
-    color: white;
+    color: black;
 }
 
 .white-underline:hover {
@@ -193,8 +206,9 @@ body {
 /* Footer Styles */
 
 .footer {
-    background-color: #e3f2fd;
+    background-color: #f5f5f5;
     color: hsl(0, 0%, 47%) !important;
+    border-top: solid 1px #787878;
 }
 
 .footer-title {
@@ -248,7 +262,7 @@ body {
 /* Navigation sa Taas ng Table */
 .navigation {
     text-decoration: none;
-    color: white;
+    color: black;
 }
 .navigation:hover {
     text-decoration: underline;
@@ -585,6 +599,16 @@ th {
     padding: 0.25rem 0.5rem;
 }
 
+.shop-updates, .shop-messagess {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.15); /* Stronger and deeper shadow */
+    border: 1px solid rgba(0, 0, 0, 0.2); /* Adds a subtle outline */
+    transition: box-shadow 0.3s ease-in-out; /* Smooth shadow animation on hover */
+}
+
+.shop-updates:hover, .shop-messagess:hover {
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.2); /* Much more intense shadow on hover */
+}
+
 .shop-updates-body {
     overflow-x: hidden;
 }
@@ -603,13 +627,15 @@ th {
     background-color: #bbbbbb;
 }
 
-.tab-pane .a-container {
+.tab-pane .a-container, .order-container {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.15); /* Stronger and deeper shadow */
+    border: 1px solid rgba(0, 0, 0, 0.2); /* Adds a subtle outline */
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
 }
 
-.tab-pane .a-container:hover {
+.tab-pane .a-container:hover, .order-container:hover {
     transform: scale(1.02); /* Slightly increase the size */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow effect */
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.2); /* Much more intense shadow on hover */
 }
 
 a.more {
@@ -632,11 +658,6 @@ a.more:hover {
 
 .order-container {
     background-color: #fff;
-}
-
-.order-container:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s;
 }
 
 .bottom {

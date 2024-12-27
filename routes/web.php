@@ -11,6 +11,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FeedbackController;
 
+use Illuminate\Support\Facades\Auth;
+
 // Route::get('/', function () {
 //     return view('start.home');
 // });
@@ -24,9 +26,22 @@ Route::get('/welcome', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/dashboard', function () { 
+    $user = Auth::user();
+
+    if ($user->role === 'Admin') {
+        return redirect('/admin/dashboard');
+    } elseif ($user->role === 'User') {
+        return redirect('/user/dashboard');
+    }
+
+    abort(403, 'Unauthorized access'); // Handle unexpected roles or unauthorized access
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -53,7 +68,7 @@ Route::group([
     Route::post('/storeCategory', [MenuController::class, 'storeCategory'])->name('storeCategory');
 
     Route::resource('category', CategoryController::class);
-    
+
     Route::resource('rider', RiderController::class);
 
     Route::resource('delivery', DeliveryController::class);
@@ -81,8 +96,6 @@ Route::group([
     Route::get('/messageUser/{id}', [AdminController::class, 'messageUser'])->name('messageUser');
     Route::post('/messageUser/{userId}/send', [AdminController::class, 'sendMessage'])->name('sendMessage');
     Route::post('/markAsRead/{userId}', [AdminController::class, 'markMessagesAsRead'])->name('markAsRead');
-
-
 });
 
 // User Routes
@@ -144,5 +157,4 @@ Route::group([
 ], function () {
 
     Route::get('/dashboard', [RiderController::class, 'dashboard'])->name('dashboard');
-
 });

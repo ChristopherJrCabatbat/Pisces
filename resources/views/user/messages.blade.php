@@ -67,7 +67,7 @@
 
             <!-- Order Updates Section -->
             <div
-                class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
+                class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded mb-4">
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="m-0 text-secondary">Order Updates</h5>
                     <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i
@@ -133,7 +133,7 @@
         </div>
 
         <!-- Messages Section -->
-        <div class="d-flex shop-messages flex-column flex-grow-1 bg-light text-black rounded shadow-sm">
+        <div class="d-flex shop-messages shop-messagess flex-column flex-grow-1 bg-light text-black rounded">
             <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
                 <h5 class="m-0 text-secondary">Messages</h5>
             </div>

@@ -59,7 +59,7 @@
         <div class="d-flex container flex-column content user-content p-0">
             <!-- Order Updates Section -->
             <div
-                class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
+                class="shop-updates d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shop-messagess mb-4">
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="m-0 text-secondary">Order Updates</h5>
                     {{-- <a href="{{ route('user.shopUpdates') }}" class="text-muted small more">More<i

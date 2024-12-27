@@ -119,7 +119,7 @@
                         @forelse($menus as $menu)
                             <div class="col menu-item" data-price="{{ $menu->price }}"
                                 data-name="{{ strtolower($menu->name) }}">
-                                <div class="card card-hover h-100 position-relative">
+                                <div class="card card-shadow card-hover h-100 position-relative">
                                     {{-- Menu Content --}}
                                     <div class="img-container">
                                         @if ($menu->image)
@@ -202,8 +202,10 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="col no-menus">
-                                <p>No menus available.</p>
+                            <div class="order-container border rounded p-4">
+                                <div class="d-flex align-items-center fs-5">
+                                    <i class="fa-regular fa-circle-question me-2"></i> No menus available.
+                                </div>
                             </div>
                         @endforelse
                     </div>
@@ -229,7 +231,11 @@
             function renderMenus(filteredMenus) {
                 menuContainer.innerHTML = ''; // Clear existing menus
                 if (filteredMenus.length === 0) {
-                    menuContainer.innerHTML = `<div class="col no-menus"><p>No menus available.</p></div>`;
+                    menuContainer.innerHTML = `<div class="order-container ms-2 border rounded p-3">
+                                <div class="d-flex align-items-center fs-5">
+                                    <i class="fa-regular fa-circle-question me-2"></i> No menus available.
+                                </div>
+                            </div>`;
                 } else {
                     filteredMenus.forEach(menu => menuContainer.appendChild(menu));
                 }

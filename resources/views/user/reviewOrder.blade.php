@@ -61,7 +61,7 @@
 
             <!-- Review Order Section -->
             <div
-                class="track-order d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded shadow-sm mb-4">
+                class="track-order shop-messagess d-flex flex-column border-bottom flex-grow-1 bg-light text-black rounded mb-4">
                 <!-- Header -->
                 <div class="header-more p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="m-0 text-secondary">Order {{ $delivery->status }}</h5>

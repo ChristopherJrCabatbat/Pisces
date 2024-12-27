@@ -154,7 +154,7 @@
     <main>
         <div class="container main-content d-flex flex-column align-items-center mb-5">
             {{-- Content --}}
-            <div class="d-flex flex-column content user-content p-0 w-100">
+            <div class="d-flex flex-column content user-content p-0 w-100 shop-messagess">
 
                 <!-- Messages Section -->
                 <div class="d-flex flex-column flex-grow-1 bg-light text-black rounded shadow-sm">
