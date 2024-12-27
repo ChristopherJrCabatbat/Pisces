@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
 use App\Models\Menu;
@@ -60,6 +61,43 @@ class AdminController extends Controller
             'monthlySales'
         ));
     }
+
+    public function userUpdate(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'contact_number' => 'required|string|max:20',
+            'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
+            'password' => 'nullable|string|min:8|confirmed', // Only validate if provided
+        ]);
+    
+        /** @var User $user */
+        $user = Auth::user();
+    
+        $user->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'contact_number' => $request->contact_number,
+            'email' => $request->email,
+        ]);
+    
+        // Update password if provided
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
+    
+        // Set a toast session with the success message
+        session()->flash('toast', [
+            'message' => 'Profile updated successfully.',
+            'type' => 'success', // 'success' or 'error'
+        ]);
+    
+        return redirect()->back()->with('success', 'Profile updated successfully!');
+    }   
+
 
 
     public function menu()

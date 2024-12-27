@@ -24,6 +24,8 @@ class RoleMiddleware
             'Admin' => [
                 'admin.dashboard',
 
+                'admin.userUpdate',
+
                 'admin.menu.index',
                 'admin.menu.create',
                 'admin.menu.store',
@@ -88,6 +90,8 @@ class RoleMiddleware
 
             'User'  => [
                 'user.dashboard',
+
+                'admin.userUpdate',
 
                 'user.menu',
                 

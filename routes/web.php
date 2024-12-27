@@ -60,6 +60,8 @@ Route::group([
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+    Route::put('/userUpdate', [AdminController::class, 'userUpdate'])->name('userUpdate');
+
     // Route::get('/menu', [AdminController::class, 'menu'])->name('menu');
     Route::resource('menu', MenuController::class);
     Route::get('/menuSearch', [MenuController::class, 'menuSearch'])->name('menuSearch');
@@ -106,6 +108,8 @@ Route::group([
 ], function () {
 
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+
+    Route::put('/userUpdate', [UserController::class, 'userUpdate'])->name('userUpdate');
 
     Route::get('/menu', [UserController::class, 'menu'])->name('menu');
 

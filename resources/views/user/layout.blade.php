@@ -100,14 +100,99 @@
         </div>
     </div>
 
+    <!-- Edit User Modal -->
+    <div class="custom-modal-overlay" id="editProfileModal">
+        <div class="custom-modal">
+            <div class="custom-modal-header text-black">
+                <h5 class="custom-modal-title">Edit Profile</h5>
+                <button type="button" class="btn-close" onclick="closeModal('editProfileModal')"
+                    aria-label="Close"></button>
+            </div>
+            <div class="custom-modal-body">
+                <form id="editProfileForm" method="POST" action="{{ route('admin.userUpdate') }}">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-3 d-flex gap-2">
+                        <!-- First Name -->
+                        <div class="w-100">
+                            <label for="firstName" class="form-label text-black">First Name</label>
+                            <input type="text" class="form-control" id="firstName" name="first_name"
+                                value="{{ old('first_name', Auth::user()->first_name) }}" required>
+                            @error('first_name')
+                                <div><small class="text-danger">{{ $message }}</small></div>
+                            @enderror
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="w-100">
+                            <label for="lastName" class="form-label text-black">Last Name</label>
+                            <input type="text" class="form-control" id="lastName" name="last_name"
+                                value="{{ old('last_name', Auth::user()->last_name) }}" required>
+                            @error('last_name')
+                                <div><small class="text-danger">{{ $message }}</small></div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="mb-3 d-flex gap-2">
+                        <!-- Email -->
+                        <div class="w-100">
+                            <label for="email" class="form-label text-black">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                value="{{ old('email', Auth::user()->email) }}" required>
+                            @error('email')
+                                <div><small class="text-danger">{{ $message }}</small></div>
+                            @enderror
+                        </div>
+
+                        <!-- Contact Number -->
+                        <div class="w-75">
+                            <label for="contactNumber" class="form-label text-black">Contact Number</label>
+                            <input type="text" class="form-control" id="contactNumber" name="contact_number"
+                                value="{{ old('contact_number', Auth::user()->contact_number) }}" required>
+                            @error('contact_number')
+                                <div><small class="text-danger">{{ $message }}</small></div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Change Password -->
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label text-black">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="password">
+                        <small class="text-secondary">*Leave this blank if you don't want to change your
+                            password.</small>
+                        @error('password')
+                            <div><small class="text-danger">{{ $message }}</small></div>
+                        @enderror
+                    </div>
+
+                    <!-- Confirm New Password -->
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label text-black">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword"
+                            name="password_confirmation">
+                        @error('password_confirmation')
+                            <div><small class="text-danger">{{ $message }}</small></div>
+                        @enderror
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <header>
         <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #fff;">
             <div class="container">
                 <a class="navbar-brand" href="{{ route('user.dashboard') }}">
                     <img src="{{ asset('images/logo-name.png') }}" width="148" height="" alt="Pisces logo">
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
-                    aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false"
+                    aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarScroll">
@@ -142,8 +227,12 @@
                                     {{ Auth::user()->first_name }}
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                            <i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#"
+                                            onclick="openModal(event, 'editProfileModal')">
+                                            <i class="fa-solid fa-user me-2"></i>Profile
+                                        </a>
+                                    </li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
@@ -219,6 +308,38 @@
         </div>
     </footer>
 
+    {{-- Profile Modal Script --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const editProfileForm = document.getElementById('editProfileForm');
+            const modalOverlay = document.getElementById('editProfileModal');
+
+            // Reopen the modal if there are server-side validation errors
+            if ({{ $errors->any() ? 'true' : 'false' }}) {
+                modalOverlay.classList.add('active');
+                modalOverlay.querySelector('.custom-modal').classList.add('active');
+            }
+
+            // Add client-side password validation
+            editProfileForm.addEventListener('submit', (event) => {
+                const password = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                // Clear previous error messages
+                document.querySelectorAll('.validation-error').forEach(el => el.remove());
+
+                if (password !== confirmPassword) {
+                    event.preventDefault(); // Prevent form submission
+
+                    // Display error message
+                    const errorMsg = document.createElement('small');
+                    errorMsg.className = 'text-danger validation-error';
+                    errorMsg.textContent = 'Passwords do not match.';
+                    document.getElementById('confirmPassword').after(errorMsg);
+                }
+            });
+        });
+    </script>
 
     @yield('scripts')
 

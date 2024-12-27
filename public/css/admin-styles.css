@@ -1,3 +1,9 @@
+body {
+    overflow-x: hidden;
+    background-color: #484045;
+    color: white;
+}
+
 /* Ensure the dropdown menu is absolute and floating */
 .nav-item.dropdown .dropdown-menu {
     position: fixed;
@@ -263,6 +269,14 @@ li.add-categ:hover {
     color: rgb(255, 255, 255, 0.7);
 }
 
+.navigation {
+    text-decoration: none;
+    color: white;
+}
+.navigation:hover {
+    text-decoration: underline;
+}
+
 table {
     margin-bottom: 0px;
 }
@@ -411,15 +425,11 @@ select:hover {
 
 /* End Menu Icon Toast Message */
 
-
 td.td-select {
     /* max-width: 110px; */
     max-width: 128px;
     padding: 0 30px;
 }
-
-
-
 
 /* Messages Feedback  */
 .messages-section {
@@ -456,7 +466,6 @@ td.td-select {
     transition: background-color 0.3s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-
 
 .message-f:hover {
     background-color: #e8f4fd;
@@ -520,10 +529,8 @@ td.td-select {
     min-width: 50vw;
 }
 
-
-
- /* Spinner overlay styles */
- .spinner-overlay {
+/* Spinner overlay styles */
+.spinner-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -540,6 +547,6 @@ td.td-select {
 
 .spinner-border {
     color: #f81d0b;
-    font-size: 1.2rem
+    font-size: 1.2rem;
 }
- /* Spinner overlay styles */
+/* Spinner overlay styles */

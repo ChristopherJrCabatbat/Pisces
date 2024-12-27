@@ -151,3 +151,23 @@ document.querySelectorAll("#menu-table-body img").forEach((img) => {
     img.style.cursor = "pointer";
     img.addEventListener("click", () => enlargeImage(img.src));
 });
+
+
+// Open modal without scrolling to the top
+function openModal(event, modalId) {
+    event.preventDefault(); // Prevent default link behavior
+    const overlay = document.getElementById(modalId);
+    const modal = overlay.querySelector('.custom-modal');
+
+    overlay.classList.add('active');
+    modal.classList.add('active');
+}
+
+// Close modal
+function closeModal(modalId) {
+    const overlay = document.getElementById(modalId);
+    const modal = overlay.querySelector('.custom-modal');
+
+    overlay.classList.remove('active');
+    modal.classList.remove('active');
+}
