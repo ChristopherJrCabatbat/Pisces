@@ -42,6 +42,28 @@ class AdminController extends Controller
             ->take(5)
             ->get();
 
+        // Fetch menus with ratings and the number of reviewers
+        $highestRatedMenus = Menu::select('menus.id', 'menus.name', 'menus.image', 'menus.category', 'menus.price')
+            ->get()
+            ->map(function ($menu) {
+                // Calculate average rating and count of ratings dynamically
+                $menu->rating = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->avg('rating');
+                $menu->review_count = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->count();
+                return $menu;
+            })
+            ->filter(function ($menu) {
+                // Filter out menus without ratings
+                return $menu->review_count > 0;
+            })
+            ->sortByDesc('rating') // Sort by highest rating
+            ->take(5); // Limit to top 5
+
+
+
         // Calculate total sales for each month (only 'Delivered' orders)
         $monthlySales = Delivery::select(
             DB::raw("SUM(total_price) as total_sales"),
@@ -58,6 +80,7 @@ class AdminController extends Controller
             'menuCount',
             'categoryCount',
             'topPicks',
+            'highestRatedMenus',
             'monthlySales'
         ));
     }
@@ -71,32 +94,32 @@ class AdminController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
             'password' => 'nullable|string|min:8|confirmed', // Only validate if provided
         ]);
-    
+
         /** @var User $user */
         $user = Auth::user();
-    
+
         $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'contact_number' => $request->contact_number,
             'email' => $request->email,
         ]);
-    
+
         // Update password if provided
         if ($request->filled('password')) {
             $user->update([
                 'password' => Hash::make($request->password),
             ]);
         }
-    
+
         // Set a toast session with the success message
         session()->flash('toast', [
             'message' => 'Profile updated successfully.',
             'type' => 'success', // 'success' or 'error'
         ]);
-    
+
         return redirect()->back()->with('success', 'Profile updated successfully!');
-    }   
+    }
 
 
 

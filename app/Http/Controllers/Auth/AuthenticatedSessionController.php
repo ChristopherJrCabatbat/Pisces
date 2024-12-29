@@ -26,35 +26,52 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
+
+    // public function store(LoginRequest $request): RedirectResponse
+    // {
+    //     $request->authenticate();
+
+    //     $request->session()->regenerate();
+
+    //     if ($request->user()->role === 'Admin') {
+    //         return redirect('admin/dashboard');
+    //     } elseif ($request->user()->role === 'Rider') {
+    //         return redirect('rider/dashboard');
+    //     } else {
+    //         return redirect('user/dashboard');
+    //     }
+    // }
+
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        if ($request->user()->role === 'Admin') {
+        $user = $request->user();
+
+        // Update the last login timestamp
+        // $user->update(['last_login_at' => now()]);
+
+        // Check for inactivity and add a discount if applicable
+        if ($user->checkInactivityDiscount()) {
+            session()->flash('discount', 'Welcome back! Here’s a 5% discount on your next order.');
+        }
+
+        if ($user->role === 'Admin') {
             return redirect('admin/dashboard');
-        } elseif ($request->user()->role === 'Rider') {
+        } elseif ($user->role === 'Rider') {
             return redirect('rider/dashboard');
         } else {
             return redirect('user/dashboard');
         }
     }
 
+
+
     /**
      * Destroy an authenticated session.
      */
-    
-    // public function destroy(Request $request): RedirectResponse
-    // {
-    //     Auth::guard('web')->logout();
-
-    //     $request->session()->invalidate();
-
-    //     $request->session()->regenerateToken();
-
-    //     return redirect('/');
-    // }
 
     public function destroy(Request $request): RedirectResponse
     {

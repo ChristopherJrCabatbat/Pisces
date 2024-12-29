@@ -24,6 +24,12 @@
 
 <body>
 
+    @if (session('discount'))
+    <script>
+        alert("{{ session('discount') }}");
+    </script>
+@endif
+
     @yield('modals')
 
     <!-- Product Details Modal -->

@@ -24,7 +24,7 @@
     <li class="nav-item">
         <a class="nav-link fw-bold active" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
             ORDERS
             @if ($pendingOrdersCount > 0)
@@ -104,6 +104,7 @@
                         <option selected disabled value="Default">Sort by price</option>
                         <option value="Expensive">Highest first</option>
                         <option value="Cheap">Lowest first</option>
+                        <option value="Rating">Sort by Rating</option>
                     </select>
                     <div class="position-relative custom-search" id="search-form">
                         <form action="">
@@ -118,7 +119,7 @@
                     <div id="menu-container" class="row row-cols-1 row-cols-md-3 g-4">
                         @forelse($menus as $menu)
                             <div class="col menu-item" data-price="{{ $menu->price }}"
-                                data-name="{{ strtolower($menu->name) }}">
+                                data-rating="{{ $menu->rating ?? 0 }}" data-name="{{ strtolower($menu->name) }}">
                                 <div class="card card-shadow card-hover h-100 position-relative">
                                     {{-- Menu Content --}}
                                     <div class="img-container">
@@ -220,7 +221,7 @@
 @endsection
 
 @section('scripts')
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sortSelect = document.getElementById('sort-select');
             const searchInput = document.getElementById('search-input');
@@ -267,6 +268,60 @@
             sortSelect.addEventListener('change', updateMenus);
             searchInput.addEventListener('input', updateMenus);
         });
+    </script> --}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sortSelect = document.getElementById('sort-select');
+            const searchInput = document.getElementById('search-input');
+            const menuContainer = document.getElementById('menu-container');
+            const menuItems = [...document.querySelectorAll('.menu-item')]; // Convert NodeList to Array
+
+            // Function to render menus
+            function renderMenus(filteredMenus) {
+                menuContainer.innerHTML = ''; // Clear existing menus
+                if (filteredMenus.length === 0) {
+                    menuContainer.innerHTML = `<div class="order-container ms-2 border rounded p-3">
+                        <div class="d-flex align-items-center fs-5">
+                            <i class="fa-regular fa-circle-question me-2"></i> No menus available.
+                        </div>
+                    </div>`;
+                } else {
+                    filteredMenus.forEach(menu => menuContainer.appendChild(menu));
+                }
+            }
+
+            // Combined function for sorting and searching
+            function updateMenus() {
+                const sortValue = sortSelect.value;
+                const query = searchInput.value.toLowerCase();
+
+                // Filter menus by search query
+                let filteredMenus = menuItems.filter(menu => {
+                    const menuName = menu.getAttribute('data-name');
+                    return menuName.includes(query);
+                });
+
+                // Sort filtered menus
+                filteredMenus = filteredMenus.sort((a, b) => {
+                    if (sortValue === 'Rating') {
+                        const ratingA = parseFloat(a.getAttribute('data-rating')) || 0;
+                        const ratingB = parseFloat(b.getAttribute('data-rating')) || 0;
+                        return ratingB - ratingA; // Descending order
+                    } else {
+                        const priceA = parseFloat(a.getAttribute('data-price'));
+                        const priceB = parseFloat(b.getAttribute('data-price'));
+                        return sortValue === 'Expensive' ? priceB - priceA : priceA - priceB;
+                    }
+                });
+
+                // Render updated menus
+                renderMenus(filteredMenus);
+            }
+
+            // Event listeners
+            sortSelect.addEventListener('change', updateMenus);
+            searchInput.addEventListener('input', updateMenus);
+        });
     </script>
-    
 @endsection

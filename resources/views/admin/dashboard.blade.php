@@ -116,7 +116,9 @@
 
 
             {{-- Analytics --}}
-            <div class="analytics text-black">
+
+            {{-- Top Picks --}}
+            <div class="analytics text-black mt-2">
                 <h3 class="h3 mb-3">Top Picks</h3>
                 {{-- Table --}}
                 <table class="table text-center">
@@ -165,9 +167,61 @@
                     </tbody>
                 </table>
             </div>
+          
+            {{-- Highest Rated Menus --}}
+            <div class="analytics text-black mt-4">
+                <h3 class="h3 mb-3">Highest Rated Menus</h3>
+                {{-- Table --}}
+                <table class="table text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Image</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menu-table-body">
+                        @forelse ($highestRatedMenus  as $menu)
+                            <tr class="menu-row">
+                                <!-- Image Column -->
+                                <td>
+                                    @if ($menu->image)
+                                        <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                            class="img-fluid" width="50">
+                                    @else
+                                        <span>No Image</span>
+                                    @endif
+                                </td>
+                                <!-- Name, Category, Description -->
+                                <td>{{ $menu->name }}</td>
+                                <td>{{ $menu->category }}</td>
+                                <!-- Price (Remove trailing .00 if present) -->
+                                <td>
+                                    @if (floor($menu->price) == $menu->price)
+                                        ₱{{ number_format($menu->price, 0) }}
+                                    @else
+                                        ₱{{ number_format($menu->price, 2) }}
+                                    @endif
+                                </td>
+                                <!-- Total Orders Column -->
+                                <td>
+                                    {{ number_format($menu->rating, 1) }} <i class="fa-solid fa-star"></i> ({{ $menu->review_count }})
+                                </td>
+                            </tr>
+                        @empty
+                            <tr id="no-menus-row">
+                                <td colspan="6">No popular menus found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-            <div class="bar-graph text-black">
-                <h3 class="h3 mt-5 text-black">Monthly Sales</h3>
+            {{-- Monthly Sales --}}
+            <div class="bar-graph text-black mt-4">
+                <h3 class="h3 text-black">Monthly Sales</h3>
                 <div>
                     <canvas id="monthlySalesChart" width="400" height="200"></canvas>
                 </div>

@@ -19,33 +19,136 @@ use App\Models\Delivery;
 
 class UserController extends Controller
 {
+    // public function dashboard()
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Fetch categories with menu counts and prioritize those with at least one menu
+    //     $topCategoriesWithMenus = DB::table('menus')
+    //         ->join('categories', 'menus.category', '=', 'categories.category')
+    //         ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
+    //         ->groupBy('categories.category', 'categories.image')
+    //         ->orderBy('menu_count', 'desc')
+    //         ->get();
+
+    //     // Fetch remaining categories that have no menus, limited to complete the top 5 list
+    //     $remainingCategories = DB::table('categories')
+    //         ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+    //         ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
+    //         ->groupBy('categories.category', 'categories.image')
+    //         ->havingRaw('menu_count = 0')
+    //         ->take(5 - $topCategoriesWithMenus->count())
+    //         ->get();
+
+    //     // Merge both results, ensuring there are exactly 5 items
+    //     $topCategories = $topCategoriesWithMenus->merge($remainingCategories)->take(5);
+
+    //     // Fetch the 4 latest menus and calculate average ratings
+    //     $latestMenus = DB::table('menus')
+    //         ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.created_at')
+    //         ->orderBy('created_at', 'desc')
+    //         ->take(4)
+    //         ->get()
+    //         ->map(function ($menu) {
+    //             $menu->rating = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->avg('rating');
+    //             $menu->rating = round($menu->rating, 1); // Round rating to 1 decimal place
+    //             $menu->ratingCount = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->count();
+    //             return $menu;
+    //         });
+
+    //     // Fetch the 4 most popular menus based on order count, including average ratings
+    //     $popularMenus = DB::table('orders')
+    //         ->join('menus', 'orders.menu_name', '=', 'menus.name')
+    //         ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', DB::raw('COUNT(orders.id) as order_count'))
+    //         ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price')
+    //         ->orderByDesc('order_count')
+    //         ->take(4)
+    //         ->get()
+    //         ->map(function ($menu) {
+    //             $menu->rating = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->avg('rating');
+    //             $menu->rating = round($menu->rating, 1); // Round rating to 1 decimal place
+    //             $menu->ratingCount = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->count();
+    //             return $menu;
+    //         });
+
+    //     // Fetch the 4 highest-rated menus
+    //     $highestRatedMenus = DB::table('menus')
+    //         ->select('id', 'name', 'image', 'price', 'rating')
+    //         ->whereNotNull('rating') // Ensure menus have a rating
+    //         ->orderByDesc('rating') // Sort by rating in descending order
+    //         ->take(4)
+    //         ->get()
+    //         ->map(function ($menu) {
+    //             $menu->ratingCount = DB::table('feedback')
+    //                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //                 ->count();
+    //             return $menu;
+    //         });
+
+
+    //     // Count pending or active orders
+    //     $pendingOrdersCount = DB::table('deliveries')
+    //         ->where('email', $user->email)
+    //         ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
+    //         ->count();
+
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
+    //         ->count();
+
+    //     return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount', 'highestRatedMenus'));
+    // }
+
     public function dashboard()
     {
+        // dd(now());
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-
-        // Fetch categories with menu counts and prioritize those with at least one menu
-        $topCategoriesWithMenus = DB::table('menus')
+    
+        // Fetch top categories based on total orders
+        $topCategoriesWithOrders = DB::table('orders')
+            ->join('menus', 'orders.menu_name', '=', 'menus.name')
             ->join('categories', 'menus.category', '=', 'categories.category')
-            ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
+            ->select(
+                'categories.category',
+                'categories.image',
+                DB::raw('SUM(orders.quantity) as menu_count') // Count orders (sum of quantities)
+            )
             ->groupBy('categories.category', 'categories.image')
             ->orderBy('menu_count', 'desc')
             ->get();
-
-        // Fetch remaining categories that have no menus, limited to complete the top 5 list
+    
+        // Fetch remaining categories with no orders, limited to complete the top 5 list
         $remainingCategories = DB::table('categories')
             ->leftJoin('menus', 'categories.category', '=', 'menus.category')
-            ->select('categories.category', 'categories.image', DB::raw('COUNT(menus.id) as menu_count'))
+            ->leftJoin('orders', 'menus.name', '=', 'orders.menu_name')
+            ->select(
+                'categories.category',
+                'categories.image',
+                DB::raw('IFNULL(SUM(orders.quantity), 0) as menu_count') // Handle categories with no orders
+            )
             ->groupBy('categories.category', 'categories.image')
             ->havingRaw('menu_count = 0')
-            ->take(5 - $topCategoriesWithMenus->count())
+            ->take(5 - $topCategoriesWithOrders->count())
             ->get();
-
-        // Merge both results, ensuring there are exactly 5 items
-        $topCategories = $topCategoriesWithMenus->merge($remainingCategories)->take(5);
-
+    
+        // Merge and limit to 5 top categories
+        $topCategories = $topCategoriesWithOrders->merge($remainingCategories)->take(5);
+    
         // Fetch the 4 latest menus and calculate average ratings
         $latestMenus = DB::table('menus')
             ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.created_at')
@@ -62,7 +165,7 @@ class UserController extends Controller
                     ->count();
                 return $menu;
             });
-
+    
         // Fetch the 4 most popular menus based on order count, including average ratings
         $popularMenus = DB::table('orders')
             ->join('menus', 'orders.menu_name', '=', 'menus.name')
@@ -81,7 +184,7 @@ class UserController extends Controller
                     ->count();
                 return $menu;
             });
-
+    
         // Fetch the 4 highest-rated menus
         $highestRatedMenus = DB::table('menus')
             ->select('id', 'name', 'image', 'price', 'rating')
@@ -95,21 +198,22 @@ class UserController extends Controller
                     ->count();
                 return $menu;
             });
-
-
+    
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
             ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
-
+    
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
-
+    
         return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount', 'highestRatedMenus'));
     }
+    
+
 
     public function userUpdate(Request $request)
     {
@@ -148,6 +252,67 @@ class UserController extends Controller
     }
 
     // Modified menu method in your Controller
+    // public function menu(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Fetch all categories, including those with zero menus
+    //     $categories = DB::table('categories')
+    //         ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+    //         ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
+    //         ->groupBy('categories.category')
+    //         ->orderByDesc('menu_count')
+    //         ->get();
+
+    //     $selectedCategory = $request->input('category', 'All Menus');
+    //     $search = $request->input('search', ''); // Search keyword
+    //     $sort = $request->input('sort', 'Cheapest'); // Sort criteria
+
+    //     // Base query for menus
+    //     $menusQuery = Menu::query();
+
+    //     // Filter menus by category
+    //     if ($selectedCategory !== 'All Menus') {
+    //         $menusQuery->where('category', $selectedCategory);
+    //     }
+
+    //     // Filter menus by search keyword
+    //     if (!empty($search)) {
+    //         $menusQuery->where('name', 'LIKE', '%' . $search . '%');
+    //     }
+
+    //     // Apply sorting by price
+    //     $menusQuery->orderBy('price', $sort === 'Expensive' ? 'desc' : 'asc');
+
+    //     // Retrieve menus with average ratings and rating counts
+    //     $menus = $menusQuery->get()->map(function ($menu) {
+    //         $menu->rating = DB::table('feedback')
+    //             ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //             ->avg('rating');
+    //         $menu->ratingCount = DB::table('feedback')
+    //             ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //             ->count();
+    //         return $menu;
+    //     });
+
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
+    //         ->count();
+
+    //     // Count pending or active orders
+    //     $pendingOrdersCount = DB::table('deliveries')
+    //         ->where('email', $user->email)
+    //         ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
+    //         ->count();
+
+    //     // Return the view with required data
+    //     return view('user.menu', compact('menus', 'pendingOrdersCount', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
+    // }
+
     public function menu(Request $request)
     {
         /** @var User $user */
@@ -155,7 +320,7 @@ class UserController extends Controller
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
 
-        // Fetch all categories, including those with zero menus
+        // Fetch all categories
         $categories = DB::table('categories')
             ->leftJoin('menus', 'categories.category', '=', 'menus.category')
             ->select('categories.category as category', DB::raw('count(menus.id) as menu_count'))
@@ -180,8 +345,12 @@ class UserController extends Controller
             $menusQuery->where('name', 'LIKE', '%' . $search . '%');
         }
 
-        // Apply sorting by price
-        $menusQuery->orderBy('price', $sort === 'Expensive' ? 'desc' : 'asc');
+        // Apply sorting by price or rating
+        if ($sort === 'Rating') {
+            $menusQuery->orderByDesc(DB::raw('(SELECT AVG(rating) FROM feedback WHERE feedback.menu_items LIKE CONCAT("%", menus.name, "%"))'));
+        } else {
+            $menusQuery->orderBy('price', $sort === 'Expensive' ? 'desc' : 'asc');
+        }
 
         // Retrieve menus with average ratings and rating counts
         $menus = $menusQuery->get()->map(function ($menu) {
@@ -208,7 +377,6 @@ class UserController extends Controller
         // Return the view with required data
         return view('user.menu', compact('menus', 'pendingOrdersCount', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     }
-
 
 
     public function menuView($id)

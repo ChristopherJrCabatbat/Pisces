@@ -100,67 +100,67 @@ class FeedbackController extends Controller
     // }
 
     public function store(Request $request)
-{
-    // Validate input fields
-    $validated = $request->validate([
-        'feedback_text' => 'nullable|string|max:1000',
-        'rating' => 'required|numeric|min:1|max:5',
-        'menu_items' => 'required|string',
-    ]);
-
-    $user = Auth::user(); // Get the currently authenticated user
-
-    // Check for existing feedback
-    $existingFeedback = Feedback::where('customer_name', $user->first_name . ' ' . $user->last_name)
-        ->where('menu_items', $validated['menu_items'])
-        ->first();
-
-    if ($existingFeedback) {
-        $existingFeedback->update([
-            'feedback_text' => $validated['feedback_text'],
-            'rating' => $validated['rating'],
+    {
+        // Validate input fields
+        $validated = $request->validate([
+            'feedback_text' => 'nullable|string|max:1000',
+            'rating' => 'required|numeric|min:1|max:5',
+            'menu_items' => 'required|string',
         ]);
-        session()->flash('toast', ['message' => 'Feedback updated successfully!', 'type' => 'success']);
-    } else {
-        $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-        Feedback::create([
-            'customer_name' => $user->first_name . ' ' . $user->last_name,
-            'order_number' => $orderNumber,
-            'menu_items' => $validated['menu_items'],
-            'feedback_text' => $validated['feedback_text'],
-            'rating' => $validated['rating'],
+
+        $user = Auth::user(); // Get the currently authenticated user
+
+        // Check for existing feedback
+        $existingFeedback = Feedback::where('customer_name', $user->first_name . ' ' . $user->last_name)
+            ->where('menu_items', $validated['menu_items'])
+            ->first();
+
+        if ($existingFeedback) {
+            $existingFeedback->update([
+                'feedback_text' => $validated['feedback_text'],
+                'rating' => $validated['rating'],
+            ]);
+            session()->flash('toast', ['message' => 'Feedback updated successfully!', 'type' => 'success']);
+        } else {
+            $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            Feedback::create([
+                'customer_name' => $user->first_name . ' ' . $user->last_name,
+                'order_number' => $orderNumber,
+                'menu_items' => $validated['menu_items'],
+                'feedback_text' => $validated['feedback_text'],
+                'rating' => $validated['rating'],
+            ]);
+            session()->flash('toast', ['message' => 'Feedback submitted successfully!', 'type' => 'success']);
+        }
+
+        // Update menu's rating
+        $menu = \App\Models\Menu::where('name', $validated['menu_items'])->first();
+        if ($menu) {
+            $menu->rating = round($validated['rating'], 1);
+            $menu->save();
+        }
+
+        // Format the message
+        $feedbackText = $validated['feedback_text'] ? sprintf(' "%s"', ucfirst($validated['feedback_text'])) : '';
+        $messageText = sprintf(
+            "I would like to share my feedback on '%s'.%s I rate it %d star%s.",
+            $validated['menu_items'],
+            $feedbackText,
+            $validated['rating'],
+            $validated['rating'] > 1 ? 's' : ''
+        );
+
+        // Send the formatted message to the admin (userId: 1 as an example)
+        Message::create([
+            'user_id' => $user->id,
+            'receiver_id' => 1, // Admin or target user ID
+            'sender_role' => 'User',
+            'message_text' => $messageText,
         ]);
-        session()->flash('toast', ['message' => 'Feedback submitted successfully!', 'type' => 'success']);
+
+        // Redirect back
+        return redirect()->back();
     }
-
-    // Update menu's rating
-    $menu = \App\Models\Menu::where('name', $validated['menu_items'])->first();
-    if ($menu) {
-        $menu->rating = round($validated['rating'], 1);
-        $menu->save();
-    }
-
-    // Format the message
-    $feedbackText = $validated['feedback_text'] ? sprintf(' "%s"', ucfirst($validated['feedback_text'])) : '';
-    $messageText = sprintf(
-        "I would like to share my feedback on '%s'.%s I rate it %d star%s.",
-        $validated['menu_items'],
-        $feedbackText,
-        $validated['rating'],
-        $validated['rating'] > 1 ? 's' : ''
-    );
-
-    // Send the formatted message to the admin (userId: 1 as an example)
-    Message::create([
-        'user_id' => $user->id,
-        'receiver_id' => 1, // Admin or target user ID
-        'sender_role' => 'User',
-        'message_text' => $messageText,
-    ]);
-
-    // Redirect back
-    return redirect()->back();
-}
 
 
 

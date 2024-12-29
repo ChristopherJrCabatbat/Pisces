@@ -86,7 +86,7 @@
 
             <div class="container text-center mt-4">
                 <div class="row gap-full-screen justify-content-center g-4">
-                    @forelse ($topCategories as $category)
+                    {{-- @forelse ($topCategories as $category)
                         <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex flex-column align-items-center">
                             <!-- Wrap the category image and text inside a link -->
                             <a href="{{ route('user.menu', ['category' => $category->category]) }}"
@@ -106,7 +106,27 @@
                         <div class="col">
                             <p>No category available.</p>
                         </div>
-                    @endforelse
+                    @endforelse --}}
+                    @forelse ($topCategories as $category)
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-flex flex-column align-items-center">
+        <a href="{{ route('user.menu', ['category' => $category->category]) }}" class="text-decoration-none">
+            <div class="position-relative" style="width: 150px; height: 150px;">
+                <img src="{{ asset('storage/' . $category->image) }}" class="rounded-circle shadow mb-3"
+                     style="width: 100%; height: 100%; object-fit: cover; border: 3px solid #f81d0b;"
+                     alt="{{ $category->category }}">
+            </div>
+            <div class="fw-bold fs-5 text-black text-center mt-1">{{ $category->category }}</div>
+            <small class="text-center text-black" style="font-size: 0.9rem;">
+                {{ $category->menu_count }} Orders
+            </small>
+        </a>
+    </div>
+@empty
+    <div class="col">
+        <p>No category available.</p>
+    </div>
+@endforelse
+
                 </div>
             </div>
 

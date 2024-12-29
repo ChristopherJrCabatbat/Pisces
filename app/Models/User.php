@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'cart_count',
         'favorites_count',
+        'last_login_at',
     ];
 
     /**
@@ -69,5 +70,16 @@ class User extends Authenticatable
     public function receivedMessages()
     {
         return $this->hasMany(Message::class, 'receiver_id'); // 'receiver_id' is the recipient
+    }
+
+    // Check if the user qualifies for a "We Miss You" discount
+    public function checkInactivityDiscount(): bool
+    {
+        if (!$this->last_login_at) {
+            return false; // No previous login record
+        }
+
+        // Calculate the difference in days since the last login
+        return now()->diffInDays($this->last_login_at) > 5;
     }
 }
