@@ -24,12 +24,6 @@
 
 <body>
 
-    @if (session('discount'))
-    <script>
-        alert("{{ session('discount') }}");
-    </script>
-@endif
-
     @yield('modals')
 
     <!-- Product Details Modal -->
@@ -348,6 +342,17 @@
     </script>
 
     @yield('scripts')
+
+    @if (session('discount'))
+        <script>
+            alert("{{ session('discount') }}");
+        </script>
+    @else
+        <script>
+            console.log("Session flash not found.");
+        </script>
+    @endif
+
 
     {{-- Icon Actions Toast Message --}}
     <div id="customToastBox"></div>

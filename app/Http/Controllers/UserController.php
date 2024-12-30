@@ -118,7 +118,7 @@ class UserController extends Controller
         $user = Auth::user();
         $userCart = $user->cart;
         $userFavorites = $user->favoriteItems()->count();
-    
+
         // Fetch top categories based on total orders
         $topCategoriesWithOrders = DB::table('orders')
             ->join('menus', 'orders.menu_name', '=', 'menus.name')
@@ -131,7 +131,7 @@ class UserController extends Controller
             ->groupBy('categories.category', 'categories.image')
             ->orderBy('menu_count', 'desc')
             ->get();
-    
+
         // Fetch remaining categories with no orders, limited to complete the top 5 list
         $remainingCategories = DB::table('categories')
             ->leftJoin('menus', 'categories.category', '=', 'menus.category')
@@ -145,10 +145,10 @@ class UserController extends Controller
             ->havingRaw('menu_count = 0')
             ->take(5 - $topCategoriesWithOrders->count())
             ->get();
-    
+
         // Merge and limit to 5 top categories
         $topCategories = $topCategoriesWithOrders->merge($remainingCategories)->take(5);
-    
+
         // Fetch the 4 latest menus and calculate average ratings
         $latestMenus = DB::table('menus')
             ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.created_at')
@@ -165,7 +165,7 @@ class UserController extends Controller
                     ->count();
                 return $menu;
             });
-    
+
         // Fetch the 4 most popular menus based on order count, including average ratings
         $popularMenus = DB::table('orders')
             ->join('menus', 'orders.menu_name', '=', 'menus.name')
@@ -184,7 +184,7 @@ class UserController extends Controller
                     ->count();
                 return $menu;
             });
-    
+
         // Fetch the 4 highest-rated menus
         $highestRatedMenus = DB::table('menus')
             ->select('id', 'name', 'image', 'price', 'rating')
@@ -198,21 +198,21 @@ class UserController extends Controller
                     ->count();
                 return $menu;
             });
-    
+
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
             ->where('email', $user->email)
             ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
             ->count();
-    
+
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
-    
+
         return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount', 'highestRatedMenus'));
     }
-    
+
 
 
     public function userUpdate(Request $request)
@@ -691,7 +691,32 @@ class UserController extends Controller
         return view('user.menuDetails', compact('menu', 'pendingOrdersCount', 'user', 'userCart', 'userFavorites', 'favoritesCount', 'unreadCount'));
     }
 
+    // public function menuDetailsOrder($id)
+    // {
+    //     // Get the authenticated user
+    //     $user = Auth::user();
 
+    //     // Retrieve the specific menu item by ID
+    //     $menu = Menu::find($id);
+
+    //     // Check if the menu item exists
+    //     if (!$menu) {
+    //         return redirect()->route('user.menu')->with('error', 'Menu item not found');
+    //     }
+
+    //     // Fetch the quantity from the request, default to 1
+    //     $quantity = request()->input('quantity', 1);
+
+    //     // Calculate the original total price
+    //     $originalTotal = $menu->price * $quantity;
+
+    //     // Apply a 5% discount if the user is eligible
+    //     $hasDiscount = session('discount') && !$user->has_discount;
+    //     $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
+
+    //     // Pass the variables to the view
+    //     return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount'));
+    // }
 
     public function menuDetailsOrder($id)
     {
@@ -709,12 +734,19 @@ class UserController extends Controller
         // Fetch the quantity from the request, default to 1
         $quantity = request()->input('quantity', 1);
 
-        // Calculate total price
-        $totalPrice = $menu->price * $quantity;
+        // Calculate the original total price
+        $originalTotal = $menu->price * $quantity;
 
-        // Pass the menu item, user, quantity, and total price to the view
-        return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'totalPrice'));
+        // Determine if the user is eligible for a discount
+        $hasDiscount = !$user->has_discount; // Eligible if has_discount is `false` (0)
+        $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
+
+        // Pass the variables to the view
+        return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount'));
     }
+
+
+
 
 
     public function orders(Request $request)

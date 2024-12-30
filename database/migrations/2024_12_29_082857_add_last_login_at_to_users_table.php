@@ -10,6 +10,7 @@ class AddLastLoginAtToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->timestamp('last_login_at')->nullable()->after('favorites');
+            $table->boolean('has_discount')->default(false);
         });
     }
 
@@ -17,6 +18,7 @@ class AddLastLoginAtToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('last_login_at');
+            $table->dropColumn('has_discount');
         });
     }
 }

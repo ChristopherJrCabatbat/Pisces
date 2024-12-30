@@ -24,7 +24,9 @@ return new class extends Migration
             $table->integer('cart')->default(0);
             $table->integer('favorites')->default(0);
 
-            // $table->timestamp('last_login_at')->nullable(); di pa na-migrate, delete mo yung add_last_login
+            // di pa na-migrate, delete mo yung add_last_login
+            // $table->timestamp('last_login_at')->nullable();
+            // $table->boolean('has_discount')->default(false);
 
             $table->rememberToken();
             $table->timestamps();

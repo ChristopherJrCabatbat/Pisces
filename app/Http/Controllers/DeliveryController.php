@@ -21,18 +21,18 @@ class DeliveryController extends Controller
      */
 
     public function index()
-{
-    $deliveries = Delivery::orderBy('created_at', 'desc')->paginate(6); // Paginate 5 deliveries per page
-    $riders = Rider::all(); // Assuming you have a Rider model
+    {
+        $deliveries = Delivery::orderBy('created_at', 'desc')->paginate(6); // Paginate 5 deliveries per page
+        $riders = Rider::all(); // Assuming you have a Rider model
 
-    foreach ($deliveries as $delivery) {
-        $orders = explode(', ', $delivery->order);
-        $menuImages = Menu::whereIn('name', $orders)->pluck('image', 'name')->toArray();
-        $delivery->menu_images = $menuImages;
+        foreach ($deliveries as $delivery) {
+            $orders = explode(', ', $delivery->order);
+            $menuImages = Menu::whereIn('name', $orders)->pluck('image', 'name')->toArray();
+            $delivery->menu_images = $menuImages;
+        }
+
+        return view('admin.delivery', compact('deliveries', 'riders'));
     }
-
-    return view('admin.delivery', compact('deliveries', 'riders'));
-}
 
     public function deliveryCreateRider()
     {
@@ -355,8 +355,6 @@ class DeliveryController extends Controller
         return redirect()->route('user.menu');
     }
 
-
-
     // public function orderStore(Request $request)
     // {
     //     $request->validate([
@@ -388,6 +386,9 @@ class DeliveryController extends Controller
 
     //     $orderString = implode(', ', $orderItems);
 
+    //     // Determine order status based on payment method
+    //     $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
     //     // Insert the order into the deliveries table
     //     $deliveryId = DB::table('deliveries')->insertGetId([
     //         'name' => $request->input('fullName'),
@@ -399,7 +400,7 @@ class DeliveryController extends Controller
     //         'shipping_method' => $request->input('shippingMethod'),
     //         'mode_of_payment' => $request->input('paymentMethod'),
     //         'note' => $request->input('note'),
-    //         'status' => 'Pending',
+    //         'status' => $status,
     //         'total_price' => $totalPrice, // Save total price
     //         'created_at' => now(),
     //         'updated_at' => now(),
@@ -417,6 +418,21 @@ class DeliveryController extends Controller
     //         ]);
     //     }
 
+    //     // Handle GCash-specific logic
+    //     if ($request->input('paymentMethod') === 'GCash') {
+    //         // Admin sends a message to the user
+    //         $this->sendMessage(
+    //             new Request([
+    //                 'message_text' => 'Please complete your GCash transaction. Here are the details: 
+    //             GCash Number: 09123456789. Kindly send the payment and notify us once done.',
+    //             ]),
+    //             Auth::id() // Assume the current authenticated user is the recipient
+    //         );
+
+    //         // Redirect to the GCash-specific page
+    //         return redirect()->route('user.messagesPisces');
+    //     }
+
     //     // Add toast message to session
     //     session()->flash('toast', [
     //         'message' => 'Order placed successfully!',
@@ -425,6 +441,36 @@ class DeliveryController extends Controller
 
     //     return redirect()->route('user.menu');
     // }
+
+    
+    public function menuDetailsOrder($id)
+    {
+        // Get the authenticated user
+        $user = Auth::user();
+    
+        // Retrieve the specific menu item by ID
+        $menu = Menu::find($id);
+    
+        // Check if the menu item exists
+        if (!$menu) {
+            return redirect()->route('user.menu')->with('error', 'Menu item not found');
+        }
+    
+        // Fetch the quantity from the request, default to 1
+        $quantity = request()->input('quantity', 1);
+    
+        // Calculate the original total price
+        $originalTotal = $menu->price * $quantity;
+    
+        // Apply a 5% discount if the user is eligible
+        $hasDiscount = session('discount') && !$user->has_discount;
+        $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
+    
+        // Pass the variables to the view
+        $totalPrice = $finalTotal; // Ensure compatibility with the Blade template
+        return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'totalPrice'));
+    }
+    
 
 
 
@@ -455,96 +501,6 @@ class DeliveryController extends Controller
             ],
         ]);
     }
-
-    public function orderStore(Request $request)
-    {
-        $request->validate([
-            'fullName' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'contactNumber' => 'required|string|max:20',
-            'address' => 'required|string',
-            'shippingMethod' => 'required|string',
-            'paymentMethod' => 'required|string',
-            'note' => 'nullable|string',
-            'menu_names' => 'required|array',
-            'quantities' => 'required|array',
-        ]);
-
-        $orderItems = [];
-        $totalQuantity = 0;
-        $totalPrice = 0; // Initialize total price
-        $orderQuantities = implode(', ', $request->quantities);
-
-        // Construct the order string and calculate total price
-        foreach ($request->menu_names as $index => $menuName) {
-            $quantity = $request->quantities[$index];
-            $menu = Menu::where('name', $menuName)->firstOrFail();
-            $itemTotal = $menu->price * $quantity; // Calculate total for each item
-            $orderItems[] = "{$menuName} (x{$quantity})";
-            $totalQuantity += $quantity;
-            $totalPrice += $itemTotal; // Add to total price
-        }
-
-        $orderString = implode(', ', $orderItems);
-
-        // Determine order status based on payment method
-        $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
-
-        // Insert the order into the deliveries table
-        $deliveryId = DB::table('deliveries')->insertGetId([
-            'name' => $request->input('fullName'),
-            'email' => $request->input('email'),
-            'contact_number' => $request->input('contactNumber'),
-            'order' => $orderString,
-            'address' => $request->input('address'),
-            'quantity' => $orderQuantities,
-            'shipping_method' => $request->input('shippingMethod'),
-            'mode_of_payment' => $request->input('paymentMethod'),
-            'note' => $request->input('note'),
-            'status' => $status,
-            'total_price' => $totalPrice, // Save total price
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // Store each order item in the orders table
-        foreach ($request->menu_names as $index => $menuName) {
-            $quantity = $request->quantities[$index];
-            DB::table('orders')->insert([
-                'delivery_id' => $deliveryId,
-                'menu_name' => $menuName,
-                'quantity' => $quantity,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        // Handle GCash-specific logic
-        if ($request->input('paymentMethod') === 'GCash') {
-            // Admin sends a message to the user
-            $this->sendMessage(
-                new Request([
-                    'message_text' => 'Please complete your GCash transaction. Here are the details: 
-                GCash Number: 09123456789. Kindly send the payment and notify us once done.',
-                ]),
-                Auth::id() // Assume the current authenticated user is the recipient
-            );
-
-            // Redirect to the GCash-specific page
-            return redirect()->route('user.messagesPisces');
-        }
-
-        // Add toast message to session
-        session()->flash('toast', [
-            'message' => 'Order placed successfully!',
-            'type' => 'success',
-        ]);
-
-        return redirect()->route('user.menu');
-    }
-
-
-
 
     /**
      * Display the specified resource.
