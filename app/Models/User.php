@@ -26,6 +26,7 @@ class User extends Authenticatable
         'cart_count',
         'favorites_count',
         'last_login_at',
+        'has_discount',
     ];
 
     /**

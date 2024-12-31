@@ -105,6 +105,7 @@
                         <option value="Expensive">Highest first</option>
                         <option value="Cheap">Lowest first</option>
                         <option value="Rating">Sort by Rating</option>
+                        <option value="Availability">Sort by Availability</option>
                     </select>
                     <div class="position-relative custom-search" id="search-form">
                         <form action="">
@@ -118,19 +119,33 @@
                 <div class="menu-list">
                     <div id="menu-container" class="row row-cols-1 row-cols-md-3 g-4">
                         @forelse($menus as $menu)
-                            <div class="col menu-item" data-price="{{ $menu->price }}"
-                                data-rating="{{ $menu->rating ?? 0 }}" data-name="{{ strtolower($menu->name) }}">
-                                <div class="card card-shadow card-hover h-100 position-relative">
-                                    {{-- Menu Content --}}
-                                    <div class="img-container">
-                                        @if ($menu->image)
-                                            <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
-                                                alt="{{ $menu->name }}">
-                                        @else
-                                            <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken"
-                                                alt="No Image">
-                                        @endif
-
+                        <div class="col menu-item" 
+                            data-price="{{ $menu->price }}"
+                            data-rating="{{ $menu->rating ?? 0 }}"
+                            data-name="{{ strtolower($menu->name) }}"
+                            data-availability="{{ $menu->availability }}">
+                            <div class="card card-shadow card-hover h-100 position-relative">
+                                {{-- Overlay for Unavailable Menus --}}
+                                @if ($menu->availability !== 'Available')
+                                    <div class="unavailable-overlay d-flex align-items-center justify-content-center">
+                                        <div class="text-center">
+                                            <i class="fa-solid fa-ban fs-3 text-white"></i>
+                                            <p class="text-white fw-bold mb-0">Unavailable</p>
+                                        </div>
+                                    </div>
+                                @endif
+                    
+                                {{-- Menu Content --}}
+                                <div class="img-container">
+                                    @if ($menu->image)
+                                        <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
+                                            alt="{{ $menu->name }}">
+                                    @else
+                                        <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken"
+                                            alt="No Image">
+                                    @endif
+                    
+                                    @if ($menu->availability === 'Available')
                                         <div class="icon-overlay text-white">
                                             {{-- Add to Cart --}}
                                             <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
@@ -141,13 +156,13 @@
                                                         class="fa-solid fa-cart-plus text-white"
                                                         title="Add to Cart"></i></button>
                                             </form>
-
+                    
                                             {{-- Share Menu --}}
                                             <button type="button" class="icon-buttons"
                                                 onclick="copyMenuLink({{ $menu->id }})">
                                                 <i class="fa-solid fa-share" title="Share Menu"></i>
                                             </button>
-
+                    
                                             {{-- View Menu --}}
                                             <form action="" method="GET">
                                                 @csrf
@@ -155,7 +170,7 @@
                                                         class="fa-solid fa-search view-menu-btn" title="View Menu"
                                                         data-id="{{ $menu->id }}"></i></button>
                                             </form>
-
+                    
                                             {{-- Add to Favorites --}}
                                             <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
                                                 enctype="multipart/form-data">
@@ -168,50 +183,52 @@
                                                     </i>
                                                 </button>
                                             </form>
-
                                         </div>
-                                    </div>
-                                    <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
-                                        class="menu-body">
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ $menu->name }}</h5>
-                                            <p class="price fw-bold mb-0">₱{{ number_format($menu->price, 2) }}</p>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="stars d-flex">
-                                                    @for ($i = 1; $i <= 5; $i++)
-                                                        @if ($i <= floor($menu->rating))
-                                                            <i class="fa-solid fa-star"></i>
-                                                        @elseif ($i - $menu->rating < 1)
-                                                            <i class="fa-solid fa-star-half-stroke"></i>
-                                                        @else
-                                                            <i class="fa-regular fa-star"></i>
-                                                        @endif
-                                                    @endfor
-                                                </div>
-                                                <div class="star-label">
-                                                    @if ($menu->ratingCount > 0)
-                                                        ({{ number_format($menu->rating, 1) }})
-                                                        {{ $menu->ratingCount }}
-                                                        review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                    @endif
+                                </div>
+                    
+                                <a href="{{ $menu->availability === 'Available' ? route('user.menuDetails', $menu->id) : '#' }}" 
+                                    data-id="{{ $menu->id }}" 
+                                    class="menu-body {{ $menu->availability !== 'Available' ? 'disabled-link' : '' }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ $menu->name }}</h5>
+                                        <p class="price fw-bold mb-0">₱{{ number_format($menu->price, 2) }}</p>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="stars d-flex">
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    @if ($i <= floor($menu->rating))
+                                                        <i class="fa-solid fa-star"></i>
+                                                    @elseif ($i - $menu->rating < 1)
+                                                        <i class="fa-solid fa-star-half-stroke"></i>
                                                     @else
-                                                        No Rating
+                                                        <i class="fa-regular fa-star"></i>
                                                     @endif
-                                                </div>
+                                                @endfor
+                                            </div>
+                                            <div class="star-label">
+                                                @if ($menu->ratingCount > 0)
+                                                    ({{ number_format($menu->rating, 1) }})
+                                                    {{ $menu->ratingCount }}
+                                                    review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                                @else
+                                                    No Rating
+                                                @endif
                                             </div>
                                         </div>
-                                    </a>
-                                </div>
+                                    </div>
+                                </a>
                             </div>
-                        @empty
-                            <div class="order-container border rounded p-4">
-                                <div class="d-flex align-items-center fs-5">
-                                    <i class="fa-regular fa-circle-question me-2"></i> No menus available.
-                                </div>
+                        </div>
+                    @empty
+                        <div class="order-container border rounded p-4">
+                            <div class="d-flex align-items-center fs-5">
+                                <i class="fa-regular fa-circle-question me-2"></i> No menus available.
                             </div>
-                        @endforelse
+                        </div>
+                    @endforelse
+                    
                     </div>
                 </div>
-
 
             </div>
 
@@ -222,55 +239,6 @@
 
 @section('scripts')
     {{-- <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sortSelect = document.getElementById('sort-select');
-            const searchInput = document.getElementById('search-input');
-            const menuContainer = document.getElementById('menu-container');
-            const menuItems = [...document.querySelectorAll('.menu-item')]; // Convert NodeList to Array
-    
-            // Function to render menus
-            function renderMenus(filteredMenus) {
-                menuContainer.innerHTML = ''; // Clear existing menus
-                if (filteredMenus.length === 0) {
-                    menuContainer.innerHTML = `<div class="order-container ms-2 border rounded p-3">
-                                <div class="d-flex align-items-center fs-5">
-                                    <i class="fa-regular fa-circle-question me-2"></i> No menus available.
-                                </div>
-                            </div>`;
-                } else {
-                    filteredMenus.forEach(menu => menuContainer.appendChild(menu));
-                }
-            }
-    
-            // Combined function for sorting and searching
-            function updateMenus() {
-                const sortValue = sortSelect.value;
-                const query = searchInput.value.toLowerCase();
-    
-                // Filter menus by search query
-                let filteredMenus = menuItems.filter(menu => {
-                    const menuName = menu.getAttribute('data-name');
-                    return menuName.includes(query);
-                });
-    
-                // Sort filtered menus
-                filteredMenus = filteredMenus.sort((a, b) => {
-                    const priceA = parseFloat(a.getAttribute('data-price'));
-                    const priceB = parseFloat(b.getAttribute('data-price'));
-                    return sortValue === 'Expensive' ? priceB - priceA : priceA - priceB;
-                });
-    
-                // Render updated menus
-                renderMenus(filteredMenus);
-            }
-    
-            // Event listeners
-            sortSelect.addEventListener('change', updateMenus);
-            searchInput.addEventListener('input', updateMenus);
-        });
-    </script> --}}
-
-    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sortSelect = document.getElementById('sort-select');
             const searchInput = document.getElementById('search-input');
@@ -314,6 +282,69 @@
                         return sortValue === 'Expensive' ? priceB - priceA : priceA - priceB;
                     }
                 });
+
+                // Render updated menus
+                renderMenus(filteredMenus);
+            }
+
+            // Event listeners
+            sortSelect.addEventListener('change', updateMenus);
+            searchInput.addEventListener('input', updateMenus);
+        });
+    </script> --}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sortSelect = document.getElementById('sort-select');
+            const searchInput = document.getElementById('search-input');
+            const menuContainer = document.getElementById('menu-container');
+            const menuItems = [...document.querySelectorAll('.menu-item')]; // Convert NodeList to Array
+
+            // Function to render menus
+            function renderMenus(filteredMenus) {
+                menuContainer.innerHTML = ''; // Clear existing menus
+                if (filteredMenus.length === 0) {
+                    menuContainer.innerHTML = `<div class="order-container ms-2 border rounded p-3">
+                <div class="d-flex align-items-center fs-5">
+                    <i class="fa-regular fa-circle-question me-2"></i> No menus available.
+                </div>
+            </div>`;
+                } else {
+                    filteredMenus.forEach(menu => menuContainer.appendChild(menu));
+                }
+            }
+
+            // Combined function for sorting and searching
+            function updateMenus() {
+                const sortValue = sortSelect.value;
+                const query = searchInput.value.toLowerCase();
+
+                // Filter menus by search query
+                let filteredMenus = menuItems.filter(menu => {
+                    const menuName = menu.getAttribute('data-name').toLowerCase();
+                    return menuName.includes(query);
+                });
+
+                // Sort filtered menus
+                if (sortValue === 'Availability') {
+                    // Filter menus by availability
+                    filteredMenus = filteredMenus.filter(menu => menu.getAttribute('data-availability') ===
+                        'Available');
+                } else if (sortValue === 'Rating') {
+                    // Sort by rating
+                    filteredMenus = filteredMenus.sort((a, b) => {
+                        const ratingA = parseFloat(a.getAttribute('data-rating')) || 0;
+                        const ratingB = parseFloat(b.getAttribute('data-rating')) || 0;
+                        return ratingB - ratingA; // Descending order
+                    });
+                } else {
+                    // Sort by price
+                    filteredMenus = filteredMenus.sort((a, b) => {
+                        const priceA = parseFloat(a.getAttribute('data-price'));
+                        const priceB = parseFloat(b.getAttribute('data-price'));
+                        return sortValue === 'Expensive' ? priceB - priceA : priceA - priceB;
+                    });
+                }
 
                 // Render updated menus
                 renderMenus(filteredMenus);

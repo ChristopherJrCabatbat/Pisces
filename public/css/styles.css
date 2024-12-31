@@ -124,6 +124,27 @@ body {
     filter: brightness(30%);
 }
 
+.unavailable-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+    z-index: 2; /* Place it above other content */
+    pointer-events: none; /* Prevent interactions with the overlay */
+}
+
+.unavailable-overlay .text-center {
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.disabled-link {
+    pointer-events: none; /* Disable clicks on the link */
+    cursor: not-allowed; /* Show a "not-allowed" cursor */
+}
+
 /* Icon Footer */
 .icons a {
     text-decoration: none;
@@ -603,13 +624,15 @@ th {
     padding: 0.25rem 0.5rem;
 }
 
-.shop-updates, .shop-messagess {
+.shop-updates,
+.shop-messagess {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.15); /* Stronger and deeper shadow */
     border: 1px solid rgba(0, 0, 0, 0.2); /* Adds a subtle outline */
     transition: box-shadow 0.3s ease-in-out; /* Smooth shadow animation on hover */
 }
 
-.shop-updates:hover, .shop-messagess:hover {
+.shop-updates:hover,
+.shop-messagess:hover {
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.2); /* Much more intense shadow on hover */
 }
 
@@ -631,13 +654,15 @@ th {
     background-color: #bbbbbb;
 }
 
-.tab-pane .a-container, .order-container {
+.tab-pane .a-container,
+.order-container {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.15); /* Stronger and deeper shadow */
     border: 1px solid rgba(0, 0, 0, 0.2); /* Adds a subtle outline */
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
 }
 
-.tab-pane .a-container:hover, .order-container:hover {
+.tab-pane .a-container:hover,
+.order-container:hover {
     transform: scale(1.02); /* Slightly increase the size */
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.2); /* Much more intense shadow on hover */
 }
@@ -776,16 +801,16 @@ a.more:hover {
         display: flex;
         align-items: center;
     }
-    
+
     .navbar-nav .dropdown-menu {
         margin-top: 90px;
     }
 }
 
-.fa-star, .fa-star-half-stroke {
+.fa-star,
+.fa-star-half-stroke {
     color: #ffc107;
 }
-
 
 .timeline-item .line {
     /* height: 19.4%; */
@@ -803,7 +828,6 @@ a.more:hover {
     transform: translateX(11px);
     background-color: rgb(113, 113, 136, 0.4);
 }
-
 
 /* Custom search input with icon */
 .custom-search {
@@ -837,7 +861,6 @@ a.more:hover {
 .head-message:hover {
     text-decoration: underline;
 }
-
 
 /* Edit Profile Modal */
 .custom-modal-overlay {
