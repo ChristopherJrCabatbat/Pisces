@@ -19,7 +19,7 @@
 
     <div class="container">
         <div class="d-flex">
-            
+
             {{-- Combined Form --}}
             <form action="{{ route('user.orderStore') }}" method="POST" class="d-flex w-100">
                 @csrf
@@ -110,11 +110,6 @@
                     <div class="products border-bottom pb-4 mb-4">
                         <div class="mb-3">Menu:</div>
 
-                        @php
-                            $quantity = old('quantity', request()->input('quantity', 1)); // Fetch quantity from request
-                            $itemTotal = $menu->price * $quantity;
-                        @endphp
-
                         <div class="d-flex gap-3 justify-content-between align-items-center">
                             <div class="picture border border-3">
                                 <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid" width="70"
@@ -122,30 +117,44 @@
                             </div>
                             <div class="menu-name d-flex flex-column align-items-center">
                                 <div class="name">{{ $menu->name }}</div>
-                                <div class="size">
-                                    ({{ $quantity }})
-                                </div>
+                                <div class="size">({{ $quantity }})</div>
                             </div>
                             <div class="price fw-bold">
-                                ₱{{ number_format($itemTotal, 2) }}
+                                ₱{{ number_format($originalTotal, 2) }}
                             </div>
 
                             <!-- Hidden Inputs for Order Data -->
                             <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
                             <input type="hidden" name="quantities[]" value="{{ $quantity }}">
                         </div>
-
                     </div>
 
                     <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
+                        <!-- Discount (if applicable) -->
+                        @if ($hasDiscount)
+                            <!-- Original Total -->
+                            <div class="d-flex justify-content-between fw-bold align-items-center">
+                                <div>Original Total:</div>
+                                <div class="fs-4">₱{{ number_format($originalTotal, 2) }}</div>
+                            </div>
+
+                            <div class="d-flex justify-content-between fw-bold align-items-center text-success">
+                                <div>Discount (5%):</div>
+                                <div class="fs-4">₱{{ number_format($originalTotal * 0.05, 2) }}</div>
+                            </div>
+                        @endif
+
+                        <!-- Final Total -->
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Total:</div>
-                            <div class="fs-4">₱{{ number_format($totalPrice, 2) }}</div>
+                            <div class="fs-4">₱{{ number_format($finalTotal, 2) }}</div>
                         </div>
                     </div>
-                    <input type="hidden" name="total_price" value="{{ $totalPrice }}">
-                    
+
+                    <input type="hidden" name="total_price" value="{{ $finalTotal }}">
+
                 </div>
+
             </form>
 
         </div>

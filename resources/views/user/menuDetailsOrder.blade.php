@@ -135,11 +135,6 @@
 
                     <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
                         <!-- Discount (if applicable) -->
-                        @if (!$hasDiscount)
-                            <script>
-                                console.log("alskdfj")
-                            </script>
-                        @endif
                         @if ($hasDiscount)
                             <!-- Original Total -->
                             <div class="d-flex justify-content-between fw-bold align-items-center">
@@ -150,12 +145,6 @@
                             <div class="d-flex justify-content-between fw-bold align-items-center text-success">
                                 <div>Discount (5%):</div>
                                 <div class="fs-4">₱{{ number_format($originalTotal * 0.05, 2) }}</div>
-                            </div>
-
-                            <!-- Final Total -->
-                            <div class="d-flex justify-content-between fw-bold align-items-center">
-                                <div>Final Total:</div>
-                                <div class="fs-4">₱{{ number_format($finalTotal, 2) }}</div>
                             </div>
                         @endif
 
@@ -169,7 +158,6 @@
                     <input type="hidden" name="total_price" value="{{ $finalTotal }}">
 
                 </div>
-
 
             </form>
 

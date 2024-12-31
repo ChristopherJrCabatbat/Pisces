@@ -65,7 +65,7 @@
         <div class="d-flex flex-column container p-0">
 
             {{-- Table --}}
-            <table class="table text-center mb-5">
+            <table class="table text-center mb-5 shop-messagess">
                 <thead class="table-light">
                     <tr>
                         <th scope="col">Image</th>
@@ -76,70 +76,6 @@
                         <th scope="col">Delete</th>
                     </tr>
                 </thead>
-
-                <!-- Update the table rows with data attributes for menu-id and price -->
-                {{-- <tbody id="menu-table-body">
-                    @forelse ($menus as $menu)
-                        <tr class="menu-row" data-menu-id="{{ $menu->id }}" data-price="{{ $menu->price }}">
-                            <!-- Image Column -->
-                            <td>
-                                @if ($menu->image)
-                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
-                                        class="img-fluid" width="50">
-                                @else
-                                    <span>No Image</span>
-                                @endif
-                            </td>
-                            <td>{{ $menu->name }}</td>
-                            <td>{{ $menu->category }}</td>
-
-                            <!-- Price Column with Item Price -->
-                            <td class="menu-price">
-                                ₱{{ number_format($menu->price, 2) }}
-                            </td>
-
-                            <!-- Quantity Column -->
-                            <td class="text-center">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <button type="button" class="btn qty-btn rounded-circle"
-                                        onclick="decrementQuantity(this)">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-
-                                    <input type="text" readonly name="quantity" value="{{ $menu->quantity ?? 1 }}"
-                                        min="1" class="form-control text-center mx-2 quantity-input"
-                                        style="width: 60px;" data-menu-id="{{ $menu->id }}">
-
-
-
-                                    <!-- Add data-menu-id here -->
-                                    <button type="button" class="btn qty-btn rounded-circle"
-                                        onclick="incrementQuantity(this)">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                </div>
-                            </td>
-
-
-                            <!-- Delete Button -->
-                            <td>
-                                <form action="{{ route('user.removeCart', $menu->cart_item_id) }}" method="POST"
-                                    style="display:inline;"
-                                    onsubmit="return confirm('Are you sure you want to remove this menu?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr id="no-menus-row">
-                            <td colspan="6">There are no menus added to cart.</td>
-                        </tr>
-                    @endforelse
-                </tbody> --}}
 
                 <tbody id="menu-table-body">
                     @php
@@ -234,7 +170,7 @@
             </div>
 
             {{-- Cart Totals --}}
-            <div class="cart-totals-container mb-5 p-4 text-black" style="border: 1px solid #ddd; width: 400px;">
+            <div class="cart-totals-container mb-5 p-4 text-black shop-messagess" style="width: 400px;">
                 <h5 class="fw-bold mb-3 border-bottom pb-2">Cart Totals</h5>
 
                 @php

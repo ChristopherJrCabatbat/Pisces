@@ -280,80 +280,170 @@ class DeliveryController extends Controller
      */
 
 
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'fullName' => 'required|string|max:255',
+    //         'email' => 'required|email|max:255',
+    //         'contactNumber' => 'required|string|max:20',
+    //         'address' => 'required|string',
+    //         'shippingMethod' => 'required|string',
+    //         'paymentMethod' => 'required|string',
+    //         'note' => 'nullable|string',
+    //         'menu_names' => 'required|array',
+    //         'quantities' => 'required|array',
+    //     ]);
+
+    //     $orderItems = [];
+    //     $totalQuantity = 0;
+    //     $orderQuantities = implode(', ', $request->quantities);
+
+    //     // Construct the order string
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         $orderItems[] = "{$menuName} (x{$quantity})";
+    //         $totalQuantity += $quantity;
+    //     }
+
+    //     $orderString = implode(', ', $orderItems);
+
+    //     // Insert the order into the deliveries table
+    //     $deliveryId = DB::table('deliveries')->insertGetId([
+    //         'name' => $request->input('fullName'),
+    //         'email' => $request->input('email'),
+    //         'contact_number' => $request->input('contactNumber'),
+    //         'order' => $orderString,
+    //         'address' => $request->input('address'),
+    //         'quantity' => $orderQuantities,
+    //         'shipping_method' => $request->input('shippingMethod'),
+    //         'mode_of_payment' => $request->input('paymentMethod'),
+    //         'note' => $request->input('note'),
+    //         'total_price' => $request->input('total_price'),
+    //         'status' => 'Pending',
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+
+    //     // Store each order item in the orders table
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         DB::table('orders')->insert([
+    //             'delivery_id' => $deliveryId,
+    //             'menu_name' => $menuName,
+    //             'quantity' => $quantity,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ]);
+    //     }
+
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Remove all cart items for the logged-in user
+    //     DB::table('cart_items')->where('user_id', $user->id)->delete();
+
+    //     // Reset the user's 'cart' field to 0
+    //     $user->cart = 0;
+    //     $user->save();
+
+    //     // Add toast message to session
+    //     session()->flash('toast', [
+    //         'message' => 'Order placed successfully!',
+    //         'type' => 'success',
+    //     ]);
+
+    //     return redirect()->route('user.menu');
+    // }
+
     public function store(Request $request)
-    {
-        $request->validate([
-            'fullName' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'contactNumber' => 'required|string|max:20',
-            'address' => 'required|string',
-            'shippingMethod' => 'required|string',
-            'paymentMethod' => 'required|string',
-            'note' => 'nullable|string',
-            'menu_names' => 'required|array',
-            'quantities' => 'required|array',
-        ]);
+{
+    $request->validate([
+        'fullName' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'contactNumber' => 'required|string|max:20',
+        'address' => 'required|string',
+        'shippingMethod' => 'required|string',
+        'paymentMethod' => 'required|string',
+        'note' => 'nullable|string',
+        'menu_names' => 'required|array',
+        'quantities' => 'required|array',
+        'total_price' => 'required|numeric', // Ensure total_price is passed from the front-end
+    ]);
 
-        $orderItems = [];
-        $totalQuantity = 0;
-        $orderQuantities = implode(', ', $request->quantities);
+    /** @var User $user */
+    $user = Auth::user();
 
-        // Construct the order string
-        foreach ($request->menu_names as $index => $menuName) {
-            $quantity = $request->quantities[$index];
-            $orderItems[] = "{$menuName} (x{$quantity})";
-            $totalQuantity += $quantity;
-        }
+    $orderItems = [];
+    $totalQuantity = 0;
+    $totalPrice = 0; // Initialize total price
+    $orderQuantities = implode(', ', $request->quantities);
 
-        $orderString = implode(', ', $orderItems);
+    // Construct the order string and calculate total price
+    foreach ($request->menu_names as $index => $menuName) {
+        $quantity = $request->quantities[$index];
+        $menu = Menu::where('name', $menuName)->firstOrFail();
+        $itemTotal = $menu->price * $quantity; // Calculate total for each item
+        $orderItems[] = "{$menuName} (x{$quantity})";
+        $totalQuantity += $quantity;
+        $totalPrice += $itemTotal; // Add to total price
+    }
 
-        // Insert the order into the deliveries table
-        $deliveryId = DB::table('deliveries')->insertGetId([
-            'name' => $request->input('fullName'),
-            'email' => $request->input('email'),
-            'contact_number' => $request->input('contactNumber'),
-            'order' => $orderString,
-            'address' => $request->input('address'),
-            'quantity' => $orderQuantities,
-            'shipping_method' => $request->input('shippingMethod'),
-            'mode_of_payment' => $request->input('paymentMethod'),
-            'note' => $request->input('note'),
-            'total_price' => $request->input('total_price'),
-            'status' => 'Pending',
+    // Determine if the user has a discount
+    $hasDiscount = $user->has_discount;
+
+    // Use the discounted total price if the user has a discount
+    if ($hasDiscount) {
+        $totalPrice = $totalPrice * 0.95; // Apply a 5% discount
+        $user->update(['has_discount' => false]); // Mark discount as used
+    }
+
+    $orderString = implode(', ', $orderItems);
+
+    // Insert the order into the deliveries table
+    $deliveryId = DB::table('deliveries')->insertGetId([
+        'name' => $request->input('fullName'),
+        'email' => $request->input('email'),
+        'contact_number' => $request->input('contactNumber'),
+        'order' => $orderString,
+        'address' => $request->input('address'),
+        'quantity' => $orderQuantities,
+        'shipping_method' => $request->input('shippingMethod'),
+        'mode_of_payment' => $request->input('paymentMethod'),
+        'note' => $request->input('note'),
+        'total_price' => $totalPrice, // Save the discounted or original total price
+        'status' => 'Pending',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    // Store each order item in the orders table
+    foreach ($request->menu_names as $index => $menuName) {
+        $quantity = $request->quantities[$index];
+        DB::table('orders')->insert([
+            'delivery_id' => $deliveryId,
+            'menu_name' => $menuName,
+            'quantity' => $quantity,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-
-        // Store each order item in the orders table
-        foreach ($request->menu_names as $index => $menuName) {
-            $quantity = $request->quantities[$index];
-            DB::table('orders')->insert([
-                'delivery_id' => $deliveryId,
-                'menu_name' => $menuName,
-                'quantity' => $quantity,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        /** @var User $user */
-        $user = Auth::user();
-
-        // Remove all cart items for the logged-in user
-        DB::table('cart_items')->where('user_id', $user->id)->delete();
-
-        // Reset the user's 'cart' field to 0
-        $user->cart = 0;
-        $user->save();
-
-        // Add toast message to session
-        session()->flash('toast', [
-            'message' => 'Order placed successfully!',
-            'type' => 'success',
-        ]);
-
-        return redirect()->route('user.menu');
     }
+
+    // Remove all cart items for the logged-in user
+    DB::table('cart_items')->where('user_id', $user->id)->delete();
+
+    // Reset the user's 'cart' field to 0
+    $user->cart = 0;
+    $user->save();
+
+    // Add toast message to session
+    session()->flash('toast', [
+        'message' => 'Order placed successfully!',
+        'type' => 'success',
+    ]);
+
+    return redirect()->route('user.menu');
+}
+
 
     // public function orderStore(Request $request)
     // {
@@ -401,7 +491,7 @@ class DeliveryController extends Controller
     //         'mode_of_payment' => $request->input('paymentMethod'),
     //         'note' => $request->input('note'),
     //         'status' => $status,
-    //         'total_price' => $totalPrice, // Save total price
+    //         'total_price' => $totalPrice,
     //         'created_at' => now(),
     //         'updated_at' => now(),
     //     ]);
@@ -442,35 +532,133 @@ class DeliveryController extends Controller
     //     return redirect()->route('user.menu');
     // }
 
-    
+    public function orderStore(Request $request)
+    {
+        $request->validate([
+            'fullName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'contactNumber' => 'required|string|max:20',
+            'address' => 'required|string',
+            'shippingMethod' => 'required|string',
+            'paymentMethod' => 'required|string',
+            'note' => 'nullable|string',
+            'menu_names' => 'required|array',
+            'quantities' => 'required|array',
+            'total_price' => 'required|numeric', // Ensure total_price is passed from the front-end
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        $orderItems = [];
+        $totalQuantity = 0;
+        $totalPrice = 0; // Initialize total price
+        $orderQuantities = implode(', ', $request->quantities);
+
+        // Construct the order string and calculate total price
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            $menu = Menu::where('name', $menuName)->firstOrFail();
+            $itemTotal = $menu->price * $quantity; // Calculate total for each item
+            $orderItems[] = "{$menuName} (x{$quantity})";
+            $totalQuantity += $quantity;
+            $totalPrice += $itemTotal; // Add to total price
+        }
+
+        // Determine if the user has a discount
+        $hasDiscount = $user->has_discount;
+
+        // Use the discounted total price if the user has a discount
+        if ($hasDiscount) {
+            $totalPrice = $totalPrice * 0.95; // Apply a 5% discount
+            $user->update(['has_discount' => false]); // Mark discount as used
+        }
+
+        $orderString = implode(', ', $orderItems);
+
+        // Determine order status based on payment method
+        $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
+        // Insert the order into the deliveries table
+        $deliveryId = DB::table('deliveries')->insertGetId([
+            'name' => $request->input('fullName'),
+            'email' => $request->input('email'),
+            'contact_number' => $request->input('contactNumber'),
+            'order' => $orderString,
+            'address' => $request->input('address'),
+            'quantity' => $orderQuantities,
+            'shipping_method' => $request->input('shippingMethod'),
+            'mode_of_payment' => $request->input('paymentMethod'),
+            'note' => $request->input('note'),
+            'status' => $status,
+            'total_price' => $totalPrice, // Save the discounted or original total price
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Store each order item in the orders table
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            DB::table('orders')->insert([
+                'delivery_id' => $deliveryId,
+                'menu_name' => $menuName,
+                'quantity' => $quantity,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Handle GCash-specific logic
+        if ($request->input('paymentMethod') === 'GCash') {
+            // Admin sends a message to the user
+            $this->sendMessage(
+                new Request([
+                    'message_text' => 'Please complete your GCash transaction. Here are the details: 
+            GCash Number: 09123456789. Kindly send the payment and notify us once done.',
+                ]),
+                Auth::id() // Assume the current authenticated user is the recipient
+            );
+
+            // Redirect to the GCash-specific page
+            return redirect()->route('user.messagesPisces');
+        }
+
+        // Add toast message to session
+        session()->flash('toast', [
+            'message' => 'Order placed successfully!',
+            'type' => 'success',
+        ]);
+
+        return redirect()->route('user.menu');
+    }
     public function menuDetailsOrder($id)
     {
         // Get the authenticated user
         $user = Auth::user();
-    
+
         // Retrieve the specific menu item by ID
         $menu = Menu::find($id);
-    
+
         // Check if the menu item exists
         if (!$menu) {
             return redirect()->route('user.menu')->with('error', 'Menu item not found');
         }
-    
+
         // Fetch the quantity from the request, default to 1
         $quantity = request()->input('quantity', 1);
-    
+
         // Calculate the original total price
         $originalTotal = $menu->price * $quantity;
-    
+
         // Apply a 5% discount if the user is eligible
         $hasDiscount = session('discount') && !$user->has_discount;
         $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
-    
+
         // Pass the variables to the view
         $totalPrice = $finalTotal; // Ensure compatibility with the Blade template
         return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'totalPrice'));
     }
-    
+
 
 
 

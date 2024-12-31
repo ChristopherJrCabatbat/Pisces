@@ -73,25 +73,29 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-    
+
         $request->session()->regenerate();
-    
+
         $user = $request->user();
-    
+
         Log::info('User last login at: ' . $user->last_login_at);
         Log::info('Current time: ' . now());
-    
+
         // Check if the user is inactive for more than 5 days
         if ($user->last_login_at && Carbon::parse($user->last_login_at)->lte(now()->subDays(5))) {
+            // Update has_discount to true
+            $user->update(['has_discount' => true]);
+
+            // Flash a discount message to the session
             session()->flash('discount', 'Welcome back! Here’s a 5% discount on your next order.');
-            Log::info('Discount flash message set for user: ' . $user->id);
+            Log::info('Discount flash message set and has_discount updated for user: ' . $user->id);
         } else {
             Log::info('No discount for user: ' . $user->id);
         }
-    
+
         // Update the last login timestamp
         $user->update(['last_login_at' => now()]);
-    
+
         // Redirect to appropriate dashboard
         if ($user->role === 'Admin') {
             return redirect('admin/dashboard');
@@ -101,7 +105,6 @@ class AuthenticatedSessionController extends Controller
             return redirect('user/dashboard');
         }
     }
-
 
 
     /**

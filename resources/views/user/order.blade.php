@@ -117,25 +117,26 @@
                         <div class="d-flex flex-column gap-3">
                             @foreach ($menus as $menu)
                                 @php
-                                    $itemTotal = $menu['price'] * $menu['quantity'];
-                                    $totalPrice += $itemTotal;
+                                    $quantity = $menu->pivot->quantity ?? 1; // Fetch quantity from pivot
+                                    $itemTotal = $menu->price * $quantity; // Calculate item total
+                                    $totalPrice += $itemTotal; // Update total price
                                 @endphp
 
                                 <div class="d-flex gap-3 justify-content-between align-items-center">
                                     <div class="picture border border-1">
-                                        <img src="{{ asset('storage/' . $menu['image']) }}" class="img-fluid"
+                                        <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid"
                                             width="70" alt="Picture">
                                     </div>
                                     <div class="menu-name d-flex flex-column align-items-center">
-                                        <div class="name">{{ $menu['name'] }} ({{ $menu['quantity'] }})</div>
+                                        <div class="name">{{ $menu->name }} ({{ $quantity }})</div>
                                     </div>
                                     <div class="price fw-bold">
                                         ₱{{ number_format($itemTotal, 2) }}
                                     </div>
 
                                     <!-- Hidden Inputs for Order Data -->
-                                    <input type="hidden" name="menu_names[]" value="{{ $menu['name'] }}">
-                                    <input type="hidden" name="quantities[]" value="{{ $menu['quantity'] }}">
+                                    <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
+                                    <input type="hidden" name="quantities[]" value="{{ $quantity }}">
                                 </div>
                             @endforeach
                         </div>
@@ -151,52 +152,72 @@
                 </div> --}}
 
                 {{-- Right Section (Products Summary) --}}
-<div class="right d-flex flex-column py-5 ps-5">
-    <div class="products border-bottom pb-4 mb-4">
-        <div class="mb-3">Menu(s):</div>
+                <div class="right d-flex flex-column py-5 ps-5">
+                    <div class="products border-bottom pb-4 mb-4">
+                        <div class="mb-3">Menu(s):</div>
 
-        @php
-            $totalPrice = 0;
-        @endphp
+                        @php
+                            $totalPrice = 0;
+                        @endphp
 
-        <div class="d-flex flex-column gap-3">
-            @foreach ($menus as $menu)
-                @php
-                    $quantity = $menu->pivot->quantity ?? 1; // Fetch quantity from pivot
-                    $itemTotal = $menu->price * $quantity; // Calculate item total
-                    $totalPrice += $itemTotal; // Update total price
-                @endphp
+                        <div class="d-flex flex-column gap-3">
+                            @foreach ($menus as $menu)
+                                @php
+                                    $quantity = $menu->pivot->quantity ?? 1; // Fetch quantity from pivot
+                                    $itemTotal = $menu->price * $quantity; // Calculate item total
+                                    $totalPrice += $itemTotal; // Update total price
+                                @endphp
 
-                <div class="d-flex gap-3 justify-content-between align-items-center">
-                    <div class="picture border border-1">
-                        <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid"
-                             width="70" alt="Picture">
+                                <div class="d-flex gap-3 justify-content-between align-items-center">
+                                    <div class="picture border border-1">
+                                        <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid"
+                                            width="70" alt="Picture">
+                                    </div>
+                                    <div class="menu-name d-flex flex-column align-items-center">
+                                        <div class="name">{{ $menu->name }} ({{ $quantity }})</div>
+                                    </div>
+                                    <div class="price fw-bold">
+                                        ₱{{ number_format($itemTotal, 2) }}
+                                    </div>
+
+                                    <!-- Hidden Inputs for Order Data -->
+                                    <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
+                                    <input type="hidden" name="quantities[]" value="{{ $quantity }}">
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                    <div class="menu-name d-flex flex-column align-items-center">
-                        <div class="name">{{ $menu->name }} ({{ $quantity }})</div>
-                    </div>
-                    <div class="price fw-bold">
-                        ₱{{ number_format($itemTotal, 2) }}
-                    </div>
 
-                    <!-- Hidden Inputs for Order Data -->
-                    <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
-                    <input type="hidden" name="quantities[]" value="{{ $quantity }}">
+                    {{-- Total Price Section --}}
+                    @php
+                        $hasDiscount = $user->has_discount; // Check user eligibility for discount
+                        $discountAmount = $hasDiscount ? $totalPrice * 0.05 : 0; // Calculate discount
+                        $finalTotal = $totalPrice - $discountAmount; // Calculate final total
+                    @endphp
+
+                    <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
+                        @if ($hasDiscount)
+                            <!-- Original Total -->
+                            <div class="d-flex justify-content-between fw-bold align-items-center">
+                                <div>Original Total:</div>
+                                <div class="fs-4">₱{{ number_format($totalPrice, 2) }}</div>
+                            </div>
+
+                            <!-- Discount -->
+                            <div class="d-flex justify-content-between fw-bold align-items-center text-success">
+                                <div>Discount (5%):</div>
+                                <div class="fs-4">₱{{ number_format($discountAmount, 2) }}</div>
+                            </div>
+                        @endif
+
+                        <!-- Final Total -->
+                        <div class="d-flex justify-content-between fw-bold align-items-center">
+                            <div>Total:</div>
+                            <div class="fs-4">₱{{ number_format($finalTotal, 2) }}</div>
+                        </div>
+                        <input type="hidden" name="total_price" value="{{ $finalTotal }}">
+                    </div>
                 </div>
-            @endforeach
-        </div>
-    </div>
-
-    {{-- Total Price Section --}}
-    <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
-        <div class="d-flex justify-content-between fw-bold align-items-center">
-            <div>Total:</div>
-            <div class="fs-4">₱{{ number_format($totalPrice, 2) }}</div>
-            <input type="hidden" name="total_price" value="{{ $totalPrice }}">
-        </div>
-    </div>
-</div>
-
 
 
             </form>
