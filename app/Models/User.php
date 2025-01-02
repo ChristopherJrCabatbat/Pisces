@@ -27,6 +27,7 @@ class User extends Authenticatable
         'favorites_count',
         'last_login_at',
         'has_discount',
+        'newsletter_subscription',
     ];
 
     /**

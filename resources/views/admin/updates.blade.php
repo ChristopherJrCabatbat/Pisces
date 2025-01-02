@@ -70,7 +70,8 @@
                 <!-- Left Section -->
                 <div class="left d-flex">
                     <div class="d-flex me-3 gap-2">
-                        <select id="delivery-filter" class="form-select" aria-label="Select delivery status">
+                        {{-- inalis form select --}}
+                        <select id="delivery-filter" class="" aria-label="Select delivery status">
                             <option value="default" {{ $filter === 'default' ? 'selected' : '' }}>Default</option>
                             <option value="alphabetical" {{ $filter === 'alphabetical' ? 'selected' : '' }}>Alphabetical
                             </option>

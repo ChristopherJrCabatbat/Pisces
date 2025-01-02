@@ -28,28 +28,62 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+    // public function store(Request $request): RedirectResponse
+    // {
+    //     $request->validate([
+    //         // 'name' => ['required', 'string', 'max:255'],
+    //         'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+    //         'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    //     ]);
+
+    //     $user = User::create([
+    //         // 'name' => $request->name,
+    //         'first_name' => $request->first_name,
+    //         'last_name' => $request->last_name,
+    //         'contact_number' => $request->contact_number,
+    //         'email' => $request->email,
+    //         'password' => Hash::make($request->password),
+    //     ]);
+
+    //     event(new Registered($user));
+
+    //     Auth::login($user);
+
+    //     // return redirect(route('dashboard', absolute: false));
+    //     if ($request->user()->role === 'Admin') {
+    //         return redirect('admin/dashboard');
+    //     } elseif ($request->user()->role === 'Staff') {
+    //         return redirect('staff/dashboard');
+    //     } else {
+    //         return redirect('user/dashboard');
+    //     }
+    // }
+
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            // 'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'contact_number' => ['required', 'string', 'max:20'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Set the newsletter_subscription to true if the checkbox is checked
         $user = User::create([
-            // 'name' => $request->name,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'contact_number' => $request->contact_number,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'newsletter_subscription' => $request->has('newsletter_subscription'), // Sets to true if checkbox is checked
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        // return redirect(route('dashboard', absolute: false));
+        // Redirect based on user role
         if ($request->user()->role === 'Admin') {
             return redirect('admin/dashboard');
         } elseif ($request->user()->role === 'Staff') {

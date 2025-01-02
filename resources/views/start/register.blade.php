@@ -13,10 +13,35 @@
             }
 
         }
+
+        .newsletter-subscription {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .newsletter-subscription input[type="checkbox"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-top: 0.4rem;
+            accent-color: #ff5e57;
+            cursor: pointer;
+        }
+
+        .newsletter-subscription label {
+            font-size: 1.4rem;
+            font-weight: normal;
+            margin: 0;
+            line-height: 1.5;
+            color: #333;
+            cursor: pointer;
+        }
     </style>
 @endsection
 
 @section('main-content')
+
     <section class="section hero has-bg-image" id="home" aria-label="home"
         style="background-image: url('./home-assets/images/hero-bg.png')">
         <div class="container">
@@ -24,17 +49,16 @@
             <figure class="hero-banner" data-reveal>
 
                 <img src="./home-assets/images/hero-banner.png" width="680" height="720" alt="hero banner" class="w-100">
-                
-                <img src="{{ asset('home-assets/images/pisces-white.jpg') }}" width="280" height="120" alt="shape"
-                class="shape shape-1">
 
-            <img src="{{ asset('home-assets/images/ilang-white.jpg') }}" width="217" height="80" alt="shape"
-            class="shape shape-2">
+                <img src="{{ asset('home-assets/images/pisces-white.jpg') }}" width="280" height="120" alt="shape"
+                    class="shape shape-1">
+
+                <img src="{{ asset('home-assets/images/ilang-white.jpg') }}" width="217" height="80" alt="shape"
+                    class="shape shape-2">
 
             </figure>
 
             <div class="hero-content" data-reveal="right">
-                {{-- <h1 class="h1 hero-title">The Best Restaurants In Your Home</h1> --}}
                 <h1 class="h1 hero-title">Sign up</h1>
 
                 <p class="hero-text">
@@ -104,6 +128,14 @@
                         @enderror
                     </div>
 
+                    <!-- Newsletter Subscription -->
+                    <div class="form-group newsletter-subscription">
+                        <input type="checkbox" id="newsletter_subscription" name="newsletter_subscription" value="1">
+                        <label for="newsletter_subscription">
+                            I want to receive updates about new menu items, discounts, and events.
+                        </label>
+                    </div>
+
                     <div class="actions">
                         <button type="submit" class="btn btn-secondary has-after">Sign up</button>
                         {{-- <a href="{{ route('login') }}" class="btn btn-secondary has-after">Log in</a> --}}
@@ -116,6 +148,7 @@
                 </form>
 
             </div>
+
         </div>
     </section>
 

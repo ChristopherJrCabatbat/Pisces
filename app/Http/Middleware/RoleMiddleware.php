@@ -22,6 +22,7 @@ class RoleMiddleware
         // Define the allowed route names for each role
         $allowedRoutes = [
             'Admin' => [
+                'admin.test-email',
                 'admin.dashboard',
 
                 'admin.userUpdate',

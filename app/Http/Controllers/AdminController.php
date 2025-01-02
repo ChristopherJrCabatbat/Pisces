@@ -85,6 +85,42 @@ class AdminController extends Controller
         ));
     }
 
+    // public function userUpdate(Request $request)
+    // {
+    //     $request->validate([
+    //         'first_name' => 'required|string|max:255',
+    //         'last_name' => 'required|string|max:255',
+    //         'contact_number' => 'required|string|max:20',
+    //         'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
+    //         'password' => 'nullable|string|min:8|confirmed', // Only validate if provided
+    //     ]);
+
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     $user->update([
+    //         'first_name' => $request->first_name,
+    //         'last_name' => $request->last_name,
+    //         'contact_number' => $request->contact_number,
+    //         'email' => $request->email,
+    //     ]);
+
+    //     // Update password if provided
+    //     if ($request->filled('password')) {
+    //         $user->update([
+    //             'password' => Hash::make($request->password),
+    //         ]);
+    //     }
+
+    //     // Set a toast session with the success message
+    //     session()->flash('toast', [
+    //         'message' => 'Profile updated successfully.',
+    //         'type' => 'success', // 'success' or 'error'
+    //     ]);
+
+    //     return redirect()->back()->with('success', 'Profile updated successfully!');
+    // }
+
     public function userUpdate(Request $request)
     {
         $request->validate([
@@ -92,7 +128,7 @@ class AdminController extends Controller
             'last_name' => 'required|string|max:255',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
-            'password' => 'nullable|string|min:8|confirmed', // Only validate if provided
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         /** @var User $user */
@@ -103,6 +139,7 @@ class AdminController extends Controller
             'last_name' => $request->last_name,
             'contact_number' => $request->contact_number,
             'email' => $request->email,
+            'newsletter_subscription' => $request->has('newsletter_subscription'), // Updates newsletter_subscription
         ]);
 
         // Update password if provided
@@ -120,7 +157,6 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Profile updated successfully!');
     }
-
 
 
     public function menu()

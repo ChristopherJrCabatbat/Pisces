@@ -11,6 +11,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FeedbackController;
 
+use Illuminate\Support\Facades\Mail;
+
 use Illuminate\Support\Facades\Auth;
 
 // Route::get('/', function () {
@@ -57,6 +59,15 @@ Route::group([
     'as' => 'admin.',
     'middleware' => ['auth', 'verified', 'login'],
 ], function () {
+
+    // Route::get('/test-email', function () {
+    //     Mail::raw('Pre pa-check nga kung gumagana.', function ($message) {
+    //         $message->to('zhyryllposadas@gmail.com')
+    //             ->subject('Test Email');
+    //     });
+    
+    //     return 'Email sent successfully!';
+    // })->name('test-email');
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
