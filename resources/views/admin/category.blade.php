@@ -5,8 +5,22 @@
 @section('styles-links')
     <style>
         /* .table-container {
-                padding: 1rem 2rem 0rem 2rem;
-            } */
+                            padding: 1rem 2rem 0rem 2rem;
+                        } */
+    </style>
+    <!-- Add CSS -->
+    <style>
+        /* Remove right border radius for the search input */
+        .no-right-radius {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        /* Remove left border radius for the search button */
+        .no-left-radius {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
     </style>
 @endsection
 
@@ -66,19 +80,42 @@
 
                 <!-- Left Section -->
                 <div class="left d-flex">
-                    <div class="d-flex custom-filter me-3">
+                    {{-- <div class="d-flex custom-filter me-3">
                         <!-- Category Filter Section -->
                         <form action="{{ route('admin.category.index') }}" method="GET" id="filter-form" class="d-flex">
                             <select name="filter" id="categoryFilter" class="form-select custom-select"
                                 aria-label="Category Filter">
                                 <option value="" {{ request('filter') == '' ? 'selected' : '' }}>Default</option>
-                                <option value="asc" {{ request('filter') == 'asc' ? 'selected' : '' }}>Ascending
+                                <option value="asc" {{ request('filter') == 'asc' ? 'selected' : '' }}>A - Z
                                 </option>
-                                <option value="desc" {{ request('filter') == 'desc' ? 'selected' : '' }}>Descending
+                                <option value="desc" {{ request('filter') == 'desc' ? 'selected' : '' }}>Z - A
                                 </option>
                             </select>
                             <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
                                 <i class="fa-solid fa-sort me-2"></i>Apply
+                            </button>
+                        </form>
+                    </div> --}}
+                    <div class="d-flex justify-content-between gap-1">
+                        <!-- Filter Form -->
+                        <form action="{{ route('admin.category.index') }}" method="GET" id="filter-form" class="d-flex">
+                            <select name="filter" id="categoryFilter" class="form-select custom-select">
+                                <option value="" {{ request('filter') == '' ? 'selected' : '' }}>Default</option>
+                                <option value="asc" {{ request('filter') == 'asc' ? 'selected' : '' }}>A - Z</option>
+                                <option value="desc" {{ request('filter') == 'desc' ? 'selected' : '' }}>Z - A</option>
+                            </select>
+                            <!-- Preserve search value when filtering -->
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        </form>
+
+                        <!-- Search Form -->
+                        <form action="{{ route('admin.category.index') }}" method="GET" id="search-form" class="d-flex">
+                            <input type="search" name="search" placeholder="Search something..."
+                                class="form-control no-right-radius" id="search-input" value="{{ request('search') }}">
+                            <!-- Preserve filter value when searching -->
+                            <input type="hidden" name="filter" value="{{ request('filter') }}">
+                            <button type="submit" class="btn btn-primary no-left-radius">
+                                <i class="fas fa-search"></i>
                             </button>
                         </form>
                     </div>
@@ -86,14 +123,14 @@
 
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
-                    <div class="position-relative custom-search" id="search-form">
+                    {{-- <div class="position-relative custom-search" id="search-form">
                         <!-- Search Form -->
                         <form action="{{ route('admin.category.index') }}" method="GET">
                             <input type="search" name="search" placeholder="Search something..." class="form-control"
                                 id="search-input" value="{{ $search ?? '' }}">
                             <i class="fas fa-search custom-search-icon"></i>
                         </form>
-                    </div>
+                    </div> --}}
 
                     {{-- <div class="position-relative custom-search" id="search-form">
                         <form action="{{ route('admin.category.index') }}" method="GET" id="search-form">
@@ -169,71 +206,22 @@
                 {{ $categories->appends(request()->query())->links('pagination::bootstrap-4') }}
             </div>
 
-
-            {{-- Table --}}
-            {{-- <table class="table text-center">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Image</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="menu-table-body">
-                    @forelse ($categories as $category)
-                        <tr class="menu-row">
-                            <td>
-                                @if ($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
-                                        class="img-fluid" width="50">
-                                @else
-                                    <span>No Image</span>
-                                @endif
-                            </td>
-                            <td>{{ $category->category }}</td>
-                            <td style="width: 16vw;">
-                                <a href="{{ route('admin.category.show', $category->id) }}" class="btn btn-sm btn-info"
-                                    title="View">
-                                    <i class="fa fa-eye"></i>
-                                </a>
-                                <a href="{{ route('admin.category.edit', $category->id) }}" class="btn btn-sm btn-warning"
-                                    title="Edit">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <form action="{{ route('admin.category.destroy', $category->id) }}" method="POST"
-                                    style="display:inline;"
-                                    onsubmit="return confirm('Are you sure you want to delete this category?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr id="no-menus-row">
-                            <td colspan="6">No categories found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-
-            <!-- Pagination -->
-            @if (!$search)
-                <div class="d-flex justify-content-center">
-                    {{ $categories->appends(request()->query())->links('pagination::bootstrap-4') }}
-                </div>
-            @endif --}}
-
         </div>
 
     </div>
 @endsection
 
 @section('scripts')
-    <!-- Filter-Search Script -->
+    <!-- Add JavaScript -->
     <script>
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            document.getElementById('filter-form')
+                .submit(); // Auto-submit the filter form when a new option is selected
+        });
+    </script>
+
+    <!-- Filter-Search Script -->
+    {{-- <script>
         function filterTable() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const categoryRows = document.querySelectorAll('#menu-table-body .menu-row');
@@ -266,40 +254,6 @@
         }
 
         document.getElementById('search-input').addEventListener('input', filterTable);
-    </script>
-
-    {{-- <script>
-        const searchInput = document.getElementById('search-input');
-        const menuTableBody = document.getElementById('menu-table-body');
-        const noCategoriesRow = document.getElementById('no-menus-row');
-    
-        searchInput.addEventListener('input', function () {
-            const searchTerm = searchInput.value.trim();
-    
-            fetch(`{{ route('admin.category.index') }}?search=${searchTerm}`)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-    
-                    // Extract the updated rows and "no categories" row from response
-                    const newRows = doc.querySelector('#menu-table-body').innerHTML;
-                    const newNoCategoriesRow = doc.querySelector('#no-menus-row');
-    
-                    // Replace the current table body with the new rows
-                    menuTableBody.innerHTML = newRows;
-    
-                    // Handle the visibility of the "No categories found" row
-                    if (newNoCategoriesRow) {
-                        noCategoriesRow.style.display = '';
-                    } else {
-                        noCategoriesRow.style.display = 'none';
-                    }
-                })
-                .catch(err => {
-                    console.error('Error fetching search results:', err);
-                });
-        });
     </script> --}}
 
 @endsection

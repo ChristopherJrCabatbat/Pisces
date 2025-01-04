@@ -15,7 +15,7 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    
+
     // public function index(Request $request)
     // {
     //     // Fetch search, filter, and sort parameters
@@ -37,44 +37,23 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         // Fetch search, filter, and sort parameters
-        $search = $request->input('search');
-        $filter = $request->input('filter', ''); // Default is empty for no specific order
+        $search = $request->input('search'); // Search term
+        $filter = $request->input('filter', ''); // Sorting direction (asc/desc)
 
         // Query categories with filtering, searching, and sorting
-        $categories = Category::when($search, function ($query, $search) {
-            $query->where('category', 'like', '%' . $search . '%');
-        })
+        $categories = Category::query()
+            ->when($search, function ($query, $search) {
+                $query->where('category', 'like', '%' . $search . '%'); // Apply search filter
+            })
             ->when($filter, function ($query, $filter) {
-                $query->orderBy('category', $filter); // Apply sorting only if filter is set
+                $query->orderBy('category', $filter); // Apply sorting filter
             })
             ->paginate(4) // Paginate with 4 items per page
-            ->appends(['search' => $search, 'filter' => $filter]); // Append query parameters for pagination links
+            ->appends(['search' => $search, 'filter' => $filter]); // Preserve query parameters in pagination
 
+        // Pass variables to the view
         return view('admin.category', compact('categories', 'search', 'filter'));
     }
-
-
-    // public function index(Request $request)
-    // {
-    //     // Fetch search, filter, and sort parameters
-    //     $search = $request->input('search');
-    //     $filter = $request->input('filter', ''); // Default is empty for no specific order
-
-    //     // Build the query for categories
-    //     $categoriesQuery = Category::when($search, function ($query, $search) {
-    //         $query->where('category', 'like', '%' . $search . '%');
-    //     })
-    //     ->when($filter, function ($query, $filter) {
-    //         $query->orderBy('category', $filter); // Apply sorting only if filter is set
-    //     });
-
-    //     // Fetch all records if a search term is provided, else paginate
-    //     $categories = $search ? $categoriesQuery->get() : $categoriesQuery->paginate(4);
-
-    //     // Pass results to the view
-    //     return view('admin.category', compact('categories', 'search', 'filter'));
-    // }
-
 
 
     /**
@@ -88,10 +67,6 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(Request $request)
-    // {
-    //     //
-    // }
 
     public function store(Request $request)
     {
