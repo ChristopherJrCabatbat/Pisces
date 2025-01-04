@@ -4,9 +4,9 @@
 
 @section('styles-links')
     <style>
-        .table-container {
-            padding: 1rem 2rem 0rem 2rem;
-        }
+        /* .table-container {
+                padding: 1rem 2rem 0rem 2rem;
+            } */
     </style>
 @endsection
 
@@ -63,6 +63,7 @@
         <div class="table-container">
 
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
+
                 <!-- Left Section -->
                 <div class="left d-flex">
                     <div class="d-flex custom-filter me-3">
@@ -93,12 +94,22 @@
                             <i class="fas fa-search custom-search-icon"></i>
                         </form>
                     </div>
+
+                    {{-- <div class="position-relative custom-search" id="search-form">
+                        <form action="{{ route('admin.category.index') }}" method="GET" id="search-form">
+                            <input type="search" name="search" placeholder="Search something..." class="form-control"
+                                id="search-input" value="{{ $search ?? '' }}" />
+                            <i class="fas fa-search custom-search-icon"></i>
+                        </form>
+                    </div> --}}
+
                     <div>
                         <a href="{{ route('admin.category.create') }}" class="btn btn-primary">
                             <i class="fa-solid fa-plus me-2"></i>Add
                         </a>
                     </div>
                 </div>
+
             </div>
 
             {{-- Table --}}
@@ -158,6 +169,63 @@
                 {{ $categories->appends(request()->query())->links('pagination::bootstrap-4') }}
             </div>
 
+
+            {{-- Table --}}
+            {{-- <table class="table text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Image</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="menu-table-body">
+                    @forelse ($categories as $category)
+                        <tr class="menu-row">
+                            <td>
+                                @if ($category->image)
+                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
+                                        class="img-fluid" width="50">
+                                @else
+                                    <span>No Image</span>
+                                @endif
+                            </td>
+                            <td>{{ $category->category }}</td>
+                            <td style="width: 16vw;">
+                                <a href="{{ route('admin.category.show', $category->id) }}" class="btn btn-sm btn-info"
+                                    title="View">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                                <a href="{{ route('admin.category.edit', $category->id) }}" class="btn btn-sm btn-warning"
+                                    title="Edit">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <form action="{{ route('admin.category.destroy', $category->id) }}" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger" type="submit" title="Delete">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr id="no-menus-row">
+                            <td colspan="6">No categories found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            @if (!$search)
+                <div class="d-flex justify-content-center">
+                    {{ $categories->appends(request()->query())->links('pagination::bootstrap-4') }}
+                </div>
+            @endif --}}
+
         </div>
 
     </div>
@@ -199,4 +267,39 @@
 
         document.getElementById('search-input').addEventListener('input', filterTable);
     </script>
+
+    {{-- <script>
+        const searchInput = document.getElementById('search-input');
+        const menuTableBody = document.getElementById('menu-table-body');
+        const noCategoriesRow = document.getElementById('no-menus-row');
+    
+        searchInput.addEventListener('input', function () {
+            const searchTerm = searchInput.value.trim();
+    
+            fetch(`{{ route('admin.category.index') }}?search=${searchTerm}`)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+    
+                    // Extract the updated rows and "no categories" row from response
+                    const newRows = doc.querySelector('#menu-table-body').innerHTML;
+                    const newNoCategoriesRow = doc.querySelector('#no-menus-row');
+    
+                    // Replace the current table body with the new rows
+                    menuTableBody.innerHTML = newRows;
+    
+                    // Handle the visibility of the "No categories found" row
+                    if (newNoCategoriesRow) {
+                        noCategoriesRow.style.display = '';
+                    } else {
+                        noCategoriesRow.style.display = 'none';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching search results:', err);
+                });
+        });
+    </script> --}}
+
 @endsection

@@ -467,6 +467,4 @@
         });
     </script>
 
-
-
 @endsection

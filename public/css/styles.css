@@ -11,7 +11,7 @@ body {
     color: white;
 }
 
-nav {
+nav.navss{
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
@@ -89,6 +89,23 @@ nav {
 
 .img-container {
     position: relative;
+}
+
+.img-container {
+    position: relative;
+    width: 100%;
+    height: 300px; /* Set a fixed height for the container */
+    overflow: hidden; /* Ensures the image doesn't overflow the container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.img-container img {
+    width: 100%; /* Fill the container's width */
+    height: 100%; /* Fill the container's height */
+    object-fit: cover; /* Ensures the image scales properly */
+    object-position: center; /* Centers the image */
 }
 
 /* Image Transition */

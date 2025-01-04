@@ -117,7 +117,7 @@
 
     <header>
         {{-- Top Nav --}}
-        <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">
+        <nav class="navbar navss navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">
             <div class="container d-flex justify-content-between align-items-center">
                 <!-- Burger Icon -->
                 <button class="burger-icon" id="burgerBtn">&#9776;</button>
