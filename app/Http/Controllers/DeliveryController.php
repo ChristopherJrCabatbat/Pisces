@@ -20,19 +20,19 @@ class DeliveryController extends Controller
      * Display a listing of the resource.
      */
 
-    public function index()
-    {
-        $deliveries = Delivery::orderBy('created_at', 'desc')->paginate(6); // Paginate 5 deliveries per page
-        $riders = Rider::all(); // Assuming you have a Rider model
-
-        foreach ($deliveries as $delivery) {
-            $orders = explode(', ', $delivery->order);
-            $menuImages = Menu::whereIn('name', $orders)->pluck('image', 'name')->toArray();
-            $delivery->menu_images = $menuImages;
-        }
-
-        return view('admin.delivery', compact('deliveries', 'riders'));
-    }
+     public function index()
+     {
+         $deliveries = Delivery::orderBy('created_at', 'desc')->get(); // Fetch all deliveries
+         $riders = Rider::all(); // Assuming you have a Rider model
+     
+         foreach ($deliveries as $delivery) {
+             $orders = explode(', ', $delivery->order);
+             $menuImages = Menu::whereIn('name', $orders)->pluck('image', 'name')->toArray();
+             $delivery->menu_images = $menuImages;
+         }
+     
+         return view('admin.delivery', compact('deliveries', 'riders'));
+     }
 
     public function deliveryCreateRider()
     {

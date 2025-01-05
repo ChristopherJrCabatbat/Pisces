@@ -73,9 +73,9 @@
             color: #f81d0b;
         }
 
-        .table-container {
+        /* .table-container {
             padding: 1rem 2rem 0rem 2rem;
-        }
+        } */
         
     </style>
 @endsection
@@ -218,17 +218,29 @@
                     </div>
                 </div>
 
-                <!-- Right Section -->
+                {{-- <!-- Right Section -->
                 <div class="right d-flex gap-3">
                     <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
-                        <form action="#">
+                        <form>
                             <input type="search" placeholder="Search something..." class="form-control"
                                 id="search-input" value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
                         </form>
                     </div>
-                </div>
+                </div> --}}
+
+                <!-- Right Section -->
+<div class="right d-flex gap-3">
+    <!-- Search -->
+    <div class="position-relative custom-search" method="GET" id="search-form">
+        <form onsubmit="return false;"> <!-- Prevent form submission -->
+            <input type="search" placeholder="Search something..." class="form-control"
+                id="search-input" value="{{ request('search') }}">
+            <i class="fas fa-search custom-search-icon"></i> <!-- FontAwesome search icon -->
+        </form>
+    </div>
+</div>
 
             </div>
 
@@ -307,9 +319,9 @@
             </table>
 
             <!-- Pagination -->
-            <div class="d-flex justify-content-center">
+            {{-- <div class="d-flex justify-content-center">
                 {{ $deliveries->appends(request()->query())->links('pagination::bootstrap-4') }}
-            </div>
+            </div> --}}
 
         </div>
 
@@ -441,7 +453,7 @@
     </script>
 
     {{-- Filter-Search Table --}}
-    <script>
+    {{-- <script>
         function filterTable() {
             const selectedStatus = document.getElementById('delivery-filter').value.toLowerCase();
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
@@ -480,7 +492,59 @@
 
         document.getElementById('filter-button').addEventListener('click', filterTable);
         document.getElementById('search-input').addEventListener('input', filterTable);
-    </script>
+    </script> --}}
+
+    {{-- Filter-Search Table --}}
+<script>
+    function filterTable() {
+        const selectedStatus = document.getElementById('delivery-filter').value.toLowerCase();
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const deliveryRows = document.querySelectorAll('#menu-table-body .menu-row');
+        let hasVisibleRow = false;
+
+        deliveryRows.forEach(row => {
+            const statusSelect = row.querySelector('td:nth-child(3) select'); // Get the <select> element
+            const status = statusSelect ? statusSelect.value.toLowerCase() : ''; // Get the selected value
+            const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            const order = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+            // Check if the row matches the selected status and search term
+            const matchesStatus = selectedStatus === "" || status === selectedStatus;
+            const matchesSearch = name.includes(searchTerm) || order.includes(searchTerm);
+
+            // Show or hide the row based on the matches
+            if (matchesStatus && matchesSearch) {
+                row.style.display = "";
+                hasVisibleRow = true;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // Show or hide the "No deliveries found" row
+        const noDeliveriesRow = document.getElementById('no-menus-row');
+        if (hasVisibleRow) {
+            noDeliveriesRow.style.display = "none";
+        } else {
+            noDeliveriesRow.style.display = "";
+            noDeliveriesRow.innerHTML =
+                `<td colspan="6">There are no delivery records matching your filters.</td>`;
+        }
+    }
+
+    // Prevent the page reload on 'Enter' key press
+    document.getElementById('search-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent page reload
+            filterTable(); // Trigger the filter logic
+        }
+    });
+
+    // Trigger filter logic on search input and filter button
+    document.getElementById('filter-button').addEventListener('click', filterTable);
+    document.getElementById('search-input').addEventListener('input', filterTable);
+</script>
+
 
     {{-- Modal --}}
     <script>

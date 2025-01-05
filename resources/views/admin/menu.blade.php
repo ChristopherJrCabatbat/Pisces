@@ -9,9 +9,9 @@
         }
 
         /* .table-container {
-                        min-width: 681px;
-                        padding: 1rem 2rem 0rem 2rem;
-                    } */
+                                min-width: 681px;
+                                padding: 1rem 2rem 0rem 2rem;
+                            } */
     </style>
 
     <style>
@@ -94,8 +94,7 @@
     <div class="modal fade" id="categoriesModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <form method="GET" action="{{ route('admin.menu.index') }}">
-                <input type="hidden" name="search" value="{{ request('search') }}">
-                <input type="hidden" name="mainFilter" value="{{ request('mainFilter') }}">
+
 
                 <div class="modal-content">
                     <div class="modal-header">
@@ -128,8 +127,7 @@
         <div class="modal-dialog">
 
             <form method="GET" action="{{ route('admin.menu.index') }}">
-                <input type="hidden" name="search" value="{{ request('search') }}">
-                <input type="hidden" name="mainFilter" value="{{ request('mainFilter') }}">
+
 
                 <div class="modal-content">
                     <div class="modal-header">
@@ -161,8 +159,7 @@
     <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <form method="GET" action="{{ route('admin.menu.index') }}">
-                <input type="hidden" name="search" value="{{ request('search') }}">
-                <input type="hidden" name="mainFilter" value="{{ request('mainFilter') }}">
+
 
                 <div class="modal-content">
                     <div class="modal-header">
@@ -191,32 +188,33 @@
     </div>
 
     <!-- Analytics Modal -->
-    <div class="modal fade" id="analyticsModal" tabindex="-1" aria-labelledby="analyticsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="analyticsModalLabel">Filter by Analytics</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="analyticsModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="analyticsModalLabel">Filter by Analytics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <input type="radio" id="best-sellers" name="analyticsFilter" class="analytics-option" value="best-sellers">
+                    <label for="best-sellers">Best Sellers</label>
                 </div>
-                <div class="modal-body">
-                    <div>
-                        <input type="radio" id="best-sellers" name="analyticsFilter" class="analytics-option"
-                            value="best-sellers">
-                        <label for="best-sellers">Best Sellers</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="customer-favorites" name="analyticsFilter" class="analytics-option"
-                            value="customer-favorites">
-                        <label for="customer-favorites">Customer Favorites</label>
-                    </div>
+                <div>
+                    <input type="radio" id="customer-favorites" name="analyticsFilter" class="analytics-option" value="customer-favorites">
+                    <label for="customer-favorites">Customer Favorites</label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary apply-filter" data-filter="analytics">Apply</button>
+                <div>
+                    <input type="radio" id="highest-rated" name="analyticsFilter" class="analytics-option" value="highest-rated">
+                    <label for="highest-rated">Highest Rated</label>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary apply-filter" data-filter="analytics">Apply</button>
             </div>
         </div>
     </div>
+</div>
 
 
 @endsection
@@ -250,20 +248,6 @@
                             <option value="unavailable">Unavailable</option> <!-- New Filter -->
                         </select>
 
-                        <!-- Main Filter Form -->
-                        {{-- <form id="filter-form" class="d-flex"> --}}
-                        {{-- <select id="mainFilter" name="mainFilter" class="form-select custom-select no-right-radius"
-                                onchange="applyFilter(this.value)">
-                                <option value="filterBy" selected disabled>Filter by</option>
-                                <option value="default">Default</option>
-                                <option value="categoriesModal">Categories</option>
-                                <option value="priceModal">Price</option>
-                                <option value="dateModal">Date</option>
-                                <option value="analyticsModal">Analytics</option>
-                                <option value="unavailable">Unavailable</option>
-                            </select> --}}
-                        {{-- </form> --}}
-
                     </div>
 
                 </div>
@@ -278,24 +262,14 @@
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
 
-                    {{-- <!-- Search -->
+                    <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
                         <form action="">
                             <input type="text" id="search-input" class="form-control"
                                 placeholder="Search menus..." />
                             <i class="fas fa-search custom-search-icon"></i>
                         </form>
-                    </div> --}}
-
-                    <!-- Search Form -->
-                    <form action="{{ route('admin.menu.index') }}" method="GET" id="search-form" class="d-flex">
-                        <input type="search" name="search" id="search-input" class="form-control no-right-radius"
-                            placeholder="Search menus..." value="{{ request('search') }}">
-                        <input type="hidden" name="mainFilter" value="{{ request('mainFilter') }}">
-                        <button type="submit" class="btn btn-primary no-left-radius">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </form>
+                    </div>
 
                     <div><a href="menu/create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</a></div>
                 </div>
@@ -311,7 +285,7 @@
                         <th scope="col">Category</th>
                         <th scope="col">Price</th>
                         <th scope="col">Description</th>
-                        {{-- <th scope="col">Availability</th> --}}
+                        <th scope="col">Rating</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -337,12 +311,13 @@
                                 @endif
                             </td>
                             <td style="width: 25vw !important;">{{ $menu->description }}</td>
-                            {{-- <td>
-                                <span
-                                    class="badge {{ $menu->availability === 'Available' ? 'bg-success' : 'bg-danger' }}">
-                                    {{ $menu->availability }}
-                                </span>
-                            </td> --}}
+                            <td>
+                                @if ($menu->review_count > 0)
+                                    {{ number_format($menu->rating, 1) }} <i class="fa-solid fa-star"></i> ({{ $menu->review_count }})
+                                @else
+                                    <span>No Rating</span>
+                                @endif
+                            </td>
                             <td>
                                 <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info"
                                     title="View">
@@ -375,9 +350,9 @@
             </table>
 
             <!-- Pagination -->
-            <div class="d-flex justify-content-center">
+            {{-- <div class="d-flex justify-content-center">
                 {{ $menus->appends(request()->query())->links('pagination::bootstrap-4') }}
-            </div>
+            </div> --}}
 
         </div>
 
@@ -453,7 +428,7 @@
 
     {{-- Search / Filter Script --}}
     <script>
-        function filterTable(categoryFilter = '', priceFilter = '', dateFilter = '', analyticsFilter = '') {
+        function filterTable(searchTerm, categoryFilter = '', priceFilter = '', dateFilter = '', analyticsFilter = '') {
             const menuRows = document.querySelectorAll('#menu-table-body .menu-row');
             let hasVisibleRow = false;
 
@@ -476,6 +451,13 @@
                     row.style.display = 'none';
                 }
             });
+
+             // Show or hide the "No menu available" row
+             const noMenusRow = document.getElementById('no-menus-row');
+            if (noMenusRow) {
+                noMenusRow.style.display = hasVisibleRow ? 'none' : '';
+            }
+        
         }
 
         document.getElementById('mainFilter').addEventListener('change', function() {
@@ -490,103 +472,57 @@
             }
         });
 
+        // document.querySelectorAll('.apply-filter').forEach(button => {
+        //     button.addEventListener('click', function() {
+        //         const filterType = this.getAttribute('data-filter');
+        //         let selectedValue = '';
+
+        //         if (filterType === 'categories') {
+        //             selectedValue = document.querySelector('.category-option:checked')?.value || '';
+        //         } else if (filterType === 'price') {
+        //             selectedValue = document.querySelector('.price-option:checked')?.value || '';
+        //         } else if (filterType === 'date') {
+        //             selectedValue = document.querySelector('.date-option:checked')?.value || '';
+        //         } else if (filterType === 'analytics') {
+        //             selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
+        //         }
+
+        //         bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
+
+        //         filterTable(document.getElementById('search-input').value.toLowerCase(), selectedValue);
+
+        //     });
+        // });
+
         document.querySelectorAll('.apply-filter').forEach(button => {
-            button.addEventListener('click', function() {
-                const filterType = this.getAttribute('data-filter');
-                let selectedValue = '';
+        button.addEventListener('click', function () {
+            const filterType = this.getAttribute('data-filter');
+            let selectedValue = '';
 
-                if (filterType === 'categories') {
-                    selectedValue = document.querySelector('.category-option:checked')?.value || '';
-                } else if (filterType === 'price') {
-                    selectedValue = document.querySelector('.price-option:checked')?.value || '';
-                } else if (filterType === 'date') {
-                    selectedValue = document.querySelector('.date-option:checked')?.value || '';
-                } else if (filterType === 'analytics') {
-                    selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
-                }
+            if (filterType === 'categories') {
+                selectedValue = document.querySelector('.category-option:checked')?.value || '';
+            } else if (filterType === 'price') {
+                selectedValue = document.querySelector('.price-option:checked')?.value || '';
+            } else if (filterType === 'date') {
+                selectedValue = document.querySelector('.date-option:checked')?.value || '';
+            } else if (filterType === 'analytics') {
+                selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
+            }
 
+            if (selectedValue === 'highest-rated') {
+                // Perform the "Highest Rated" filter logic dynamically
+                window.location.href = `/admin/menu?analyticsFilter=highest-rated`;
+            } else {
                 bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
-
-                filterTable(document.getElementById('search-input').value.toLowerCase(), selectedValue);
-
-            });
+                window.location.href = `/admin/menu?analyticsFilter=${selectedValue}`;
+            }
         });
+    });
 
         document.getElementById('search-input').addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             filterTable(searchTerm);
         });
     </script>
-
-    {{-- Search / Filter Script --}}
-    {{-- <script>
-        let activeFilters = {
-            category: '',
-            price: '',
-            date: '',
-            analytics: '',
-        };
-
-        function filterTable(searchTerm = '', filters = {}) {
-            const menuRows = document.querySelectorAll('#menu-table-body .menu-row');
-            let hasVisibleRow = false;
-
-            menuRows.forEach(row => {
-                const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const price = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-                const description = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
-
-                const matchesCategory = !filters.category || category === filters.category.toLowerCase();
-                const matchesPrice = !filters.price || price === filters.price.toLowerCase();
-                const matchesSearch = !searchTerm ||
-                    name.includes(searchTerm) ||
-                    description.includes(searchTerm) ||
-                    price.includes(searchTerm);
-
-                if (matchesCategory && matchesPrice && matchesSearch) {
-                    row.style.display = '';
-                    hasVisibleRow = true;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            if (!hasVisibleRow) {
-                document.getElementById('no-results-message').style.display = '';
-            } else {
-                document.getElementById('no-results-message').style.display = 'none';
-            }
-        }
-
-        document.getElementById('search-input').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            filterTable(searchTerm, activeFilters);
-        });
-
-        document.querySelectorAll('.apply-filter').forEach(button => {
-            button.addEventListener('click', function() {
-                const filterType = this.getAttribute('data-filter');
-                let selectedValue = '';
-
-                if (filterType === 'categories') {
-                    selectedValue = document.querySelector('.category-option:checked')?.value || '';
-                    activeFilters.category = selectedValue;
-                } else if (filterType === 'price') {
-                    selectedValue = document.querySelector('.price-option:checked')?.value || '';
-                    activeFilters.price = selectedValue;
-                } else if (filterType === 'date') {
-                    selectedValue = document.querySelector('.date-option:checked')?.value || '';
-                    activeFilters.date = selectedValue;
-                } else if (filterType === 'analytics') {
-                    selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
-                    activeFilters.analytics = selectedValue;
-                }
-
-                bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
-                filterTable(document.getElementById('search-input').value.toLowerCase(), activeFilters);
-            });
-        });
-    </script> --}}
 
 @endsection
