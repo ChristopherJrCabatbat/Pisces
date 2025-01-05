@@ -4,12 +4,6 @@
 
 @section('styles-links')
     <style>
-        /* .table-container {
-                            padding: 1rem 2rem 0rem 2rem;
-                        } */
-    </style>
-    <!-- Add CSS -->
-    <style>
         /* Remove right border radius for the search input */
         .no-right-radius {
             border-top-right-radius: 0;
@@ -21,6 +15,10 @@
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }
+
+        /* .table-container {
+            padding: 1rem 2rem 0rem 2rem;
+        } */
     </style>
 @endsection
 
@@ -96,6 +94,7 @@
                             </button>
                         </form>
                     </div> --}}
+                    
                     <div class="d-flex justify-content-between gap-1">
                         <!-- Filter Form -->
                         <form action="{{ route('admin.category.index') }}" method="GET" id="filter-form" class="d-flex">
@@ -108,7 +107,7 @@
                             <input type="hidden" name="search" value="{{ request('search') }}">
                         </form>
 
-                        <!-- Search Form -->
+                        {{-- <!-- Search Form -->
                         <form action="{{ route('admin.category.index') }}" method="GET" id="search-form" class="d-flex">
                             <input type="search" name="search" placeholder="Search something..."
                                 class="form-control no-right-radius" id="search-input" value="{{ request('search') }}">
@@ -117,12 +116,12 @@
                             <button type="submit" class="btn btn-primary no-left-radius">
                                 <i class="fas fa-search"></i>
                             </button>
-                        </form>
+                        </form> --}}
                     </div>
                 </div>
 
                 <!-- Right Section -->
-                <div class="right d-flex gap-3">
+                <div class="right d-flex gap-2">
                     {{-- <div class="position-relative custom-search" id="search-form">
                         <!-- Search Form -->
                         <form action="{{ route('admin.category.index') }}" method="GET">
@@ -139,6 +138,16 @@
                             <i class="fas fa-search custom-search-icon"></i>
                         </form>
                     </div> --}}
+                    <!-- Search Form -->
+                    <form action="{{ route('admin.category.index') }}" method="GET" id="search-form" class="d-flex">
+                        <input type="search" name="search" placeholder="Search something..."
+                            class="form-control no-right-radius" id="search-input" value="{{ request('search') }}">
+                        <!-- Preserve filter value when searching -->
+                        <input type="hidden" name="filter" value="{{ request('filter') }}">
+                        <button type="submit" class="btn btn-primary no-left-radius">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
 
                     <div>
                         <a href="{{ route('admin.category.create') }}" class="btn btn-primary">

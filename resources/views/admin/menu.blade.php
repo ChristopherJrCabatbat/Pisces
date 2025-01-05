@@ -8,9 +8,33 @@
             color: black;
         }
 
-        .table-container {
-            min-width: 681px;
-            padding: 1rem 2rem 0rem 2rem;
+        /* .table-container {
+                        min-width: 681px;
+                        padding: 1rem 2rem 0rem 2rem;
+                    } */
+    </style>
+
+    <style>
+        .no-right-radius {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .no-left-radius {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .custom-search {
+            position: relative;
+        }
+
+        .custom-search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
         }
     </style>
 @endsection
@@ -70,6 +94,8 @@
     <div class="modal fade" id="categoriesModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <form method="GET" action="{{ route('admin.menu.index') }}">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+                <input type="hidden" name="mainFilter" value="{{ request('mainFilter') }}">
 
                 <div class="modal-content">
                     <div class="modal-header">
@@ -102,6 +128,9 @@
         <div class="modal-dialog">
 
             <form method="GET" action="{{ route('admin.menu.index') }}">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+                <input type="hidden" name="mainFilter" value="{{ request('mainFilter') }}">
+
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="priceModalLabel">Filter by Price</h5>
@@ -132,6 +161,9 @@
     <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <form method="GET" action="{{ route('admin.menu.index') }}">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+                <input type="hidden" name="mainFilter" value="{{ request('mainFilter') }}">
+
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="dateModalLabel">Filter by Date</h5>
@@ -218,6 +250,20 @@
                             <option value="unavailable">Unavailable</option> <!-- New Filter -->
                         </select>
 
+                        <!-- Main Filter Form -->
+                        {{-- <form id="filter-form" class="d-flex"> --}}
+                        {{-- <select id="mainFilter" name="mainFilter" class="form-select custom-select no-right-radius"
+                                onchange="applyFilter(this.value)">
+                                <option value="filterBy" selected disabled>Filter by</option>
+                                <option value="default">Default</option>
+                                <option value="categoriesModal">Categories</option>
+                                <option value="priceModal">Price</option>
+                                <option value="dateModal">Date</option>
+                                <option value="analyticsModal">Analytics</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select> --}}
+                        {{-- </form> --}}
+
                     </div>
 
                 </div>
@@ -231,14 +277,25 @@
 
                 <!-- Right Section -->
                 <div class="right d-flex gap-3">
-                    <!-- Search -->
+
+                    {{-- <!-- Search -->
                     <div class="position-relative custom-search" method="GET" id="search-form">
                         <form action="">
                             <input type="text" id="search-input" class="form-control"
                                 placeholder="Search menus..." />
                             <i class="fas fa-search custom-search-icon"></i>
                         </form>
-                    </div>
+                    </div> --}}
+
+                    <!-- Search Form -->
+                    <form action="{{ route('admin.menu.index') }}" method="GET" id="search-form" class="d-flex">
+                        <input type="search" name="search" id="search-input" class="form-control no-right-radius"
+                            placeholder="Search menus..." value="{{ request('search') }}">
+                        <input type="hidden" name="mainFilter" value="{{ request('mainFilter') }}">
+                        <button type="submit" class="btn btn-primary no-left-radius">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
 
                     <div><a href="menu/create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Add</a></div>
                 </div>
@@ -396,7 +453,7 @@
 
     {{-- Search / Filter Script --}}
     <script>
-        function filterTable(searchTerm, categoryFilter = '', priceFilter = '', dateFilter = '', analyticsFilter = '') {
+        function filterTable(categoryFilter = '', priceFilter = '', dateFilter = '', analyticsFilter = '') {
             const menuRows = document.querySelectorAll('#menu-table-body .menu-row');
             let hasVisibleRow = false;
 
@@ -419,12 +476,6 @@
                     row.style.display = 'none';
                 }
             });
-
-            // Show or hide the "No menu available" row
-            const noMenusRow = document.getElementById('no-menus-row');
-            if (noMenusRow) {
-                noMenusRow.style.display = hasVisibleRow ? 'none' : '';
-            }
         }
 
         document.getElementById('mainFilter').addEventListener('change', function() {
@@ -466,5 +517,76 @@
             filterTable(searchTerm);
         });
     </script>
+
+    {{-- Search / Filter Script --}}
+    {{-- <script>
+        let activeFilters = {
+            category: '',
+            price: '',
+            date: '',
+            analytics: '',
+        };
+
+        function filterTable(searchTerm = '', filters = {}) {
+            const menuRows = document.querySelectorAll('#menu-table-body .menu-row');
+            let hasVisibleRow = false;
+
+            menuRows.forEach(row => {
+                const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const price = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                const description = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+
+                const matchesCategory = !filters.category || category === filters.category.toLowerCase();
+                const matchesPrice = !filters.price || price === filters.price.toLowerCase();
+                const matchesSearch = !searchTerm ||
+                    name.includes(searchTerm) ||
+                    description.includes(searchTerm) ||
+                    price.includes(searchTerm);
+
+                if (matchesCategory && matchesPrice && matchesSearch) {
+                    row.style.display = '';
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (!hasVisibleRow) {
+                document.getElementById('no-results-message').style.display = '';
+            } else {
+                document.getElementById('no-results-message').style.display = 'none';
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            filterTable(searchTerm, activeFilters);
+        });
+
+        document.querySelectorAll('.apply-filter').forEach(button => {
+            button.addEventListener('click', function() {
+                const filterType = this.getAttribute('data-filter');
+                let selectedValue = '';
+
+                if (filterType === 'categories') {
+                    selectedValue = document.querySelector('.category-option:checked')?.value || '';
+                    activeFilters.category = selectedValue;
+                } else if (filterType === 'price') {
+                    selectedValue = document.querySelector('.price-option:checked')?.value || '';
+                    activeFilters.price = selectedValue;
+                } else if (filterType === 'date') {
+                    selectedValue = document.querySelector('.date-option:checked')?.value || '';
+                    activeFilters.date = selectedValue;
+                } else if (filterType === 'analytics') {
+                    selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
+                    activeFilters.analytics = selectedValue;
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
+                filterTable(document.getElementById('search-input').value.toLowerCase(), activeFilters);
+            });
+        });
+    </script> --}}
 
 @endsection
