@@ -195,8 +195,13 @@ class AdminController extends Controller
             ->when($filter === 'rating', function ($query) {
                 $query->orderBy('rating', 'desc'); // By rating descending
             })
-            ->paginate(4) // Adjust pagination as needed
-            ->appends(['search' => $search, 'filter' => $filter]); // Preserve query parameters in pagination links
+            ->when($filter === 'withoutResponse', function ($query) {
+                $query->whereNull('response'); // Feedbacks without response
+            })
+            ->when($filter === 'default', function ($query) {
+                $query->orderBy('created_at', 'desc'); // Sort by newest feedback first
+            })
+            ->get(); // Retrieve all results without pagination
 
         return view('admin.feedback', compact('feedbacks', 'filter', 'search'));
     }
@@ -205,17 +210,60 @@ class AdminController extends Controller
     public function respondFeedback(Request $request)
     {
         $feedback = Feedback::findOrFail($request->feedback_id);
+    
+        // Find the user by matching the customer_name in feedback with first_name and last_name in users
+        $user = User::where(DB::raw("CONCAT(first_name, ' ', last_name)"), $feedback->customer_name)->first();
+    
+        if (!$user) {
+            // If no user is found, show an error message
+            session()->flash('toast', [
+                'message' => 'Error: Unable to send the response message because the user could not be identified.',
+                'type' => 'error',
+            ]);
+            return redirect()->back();
+        }
+    
         $feedback->response = $request->response;
         $feedback->save();
-
-        // Set a toast session with the success message
+    
+        $menuItems = $feedback->menu_items;
+        $customerName = $feedback->customer_name;
+    
+        $messageText = "Hi, {$customerName}!\n\nThank you for your feedback on {$menuItems}. Here's our response: {$feedback->response}\n\n";
+    
+        // Send the message to the identified user
+        try {
+            $message = Message::create([
+                'user_id' => Auth::id(), // The ID of the admin sending the message
+                'receiver_id' => $user->id, // The ID of the customer receiving the message
+                'sender_role' => 'Admin',
+                'message_text' => $messageText,
+                'image_url' => null,
+                'is_read' => false,
+            ]);
+    
+            if (!$message) {
+                throw new \Exception('Failed to send the message.');
+            }
+        } catch (\Exception $e) {
+            logger('Error in sending message:', [$e->getMessage()]);
+            session()->flash('toast', [
+                'message' => 'Response submitted, but failed to send the message to the user.',
+                'type' => 'error',
+            ]);
+            return redirect()->back();
+        }
+    
         session()->flash('toast', [
-            'message' => 'Response has been submitted successfully.',
-            'type' => 'success', // 'success' or 'error'
+            'message' => 'Response has been submitted successfully, and the user has been notified.',
+            'type' => 'success',
         ]);
-
+    
         return redirect()->back();
     }
+    
+    
+
 
 
     public function customerMessages(Request $request)
@@ -473,30 +521,6 @@ class AdminController extends Controller
     // }
 
 
-    // public function updates(Request $request)
-    // {
-    //     // Fetch only users with the 'User' role
-    //     $query = User::where('role', 'User');
-
-    //     // Apply filters based on the selected option
-    //     if ($request->has('filter')) {
-    //         switch ($request->filter) {
-    //             case 'alphabetical':
-    //                 $query->orderBy('first_name')->orderBy('last_name');
-    //                 break;
-    //             case 'new_customers':
-    //                 $query->orderBy('created_at', 'desc');
-    //                 break;
-    //             case 'old_customers':
-    //                 $query->orderBy('created_at', 'asc');
-    //                 break;
-    //         }
-    //     }
-
-    //     $users = $query->get();
-    //     return view('admin.updates', compact('users'));
-    // }
-
     public function updates(Request $request)
     {
         // Fetch search and filter parameters
@@ -520,11 +544,11 @@ class AdminController extends Controller
             ->when($filter === 'old', function ($query) {
                 $query->orderBy('created_at', 'asc'); // Old customers first
             })
-            ->paginate(3) // Paginate results
-            ->appends(['search' => $search, 'filter' => $filter]); // Preserve query parameters in pagination
+            ->get(); // Retrieve all results without pagination
 
         return view('admin.updates', compact('users', 'search', 'filter'));
     }
+
 
 
     // public function viewOrders($userId)

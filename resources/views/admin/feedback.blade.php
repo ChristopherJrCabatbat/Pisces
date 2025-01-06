@@ -7,13 +7,15 @@
         .modal-content {
             color: black;
         }
-        .table-container {
-            padding: 1rem 2rem 0rem 2rem;
-        }
+
+        /* .table-container {
+                padding: 1rem 2rem 0rem 2rem;
+            } */
     </style>
 @endsection
 
 @section('modals')
+
     {{-- View Modal --}}
     <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" id="modasldfkj">
@@ -107,6 +109,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 @section('sidebar')
@@ -178,6 +181,8 @@
                             <option value="name" {{ $filter === 'name' ? 'selected' : '' }}>Customer</option>
                             <option value="menu" {{ $filter === 'menu' ? 'selected' : '' }}>Menu</option>
                             <option value="rating" {{ $filter === 'rating' ? 'selected' : '' }}>Rating</option>
+                            <option value="withoutResponse" {{ $filter === 'withoutResponse' ? 'selected' : '' }}>Without
+                                Response</option>
                         </select>
                         <button id="filterButton" class="btn btn-primary custom-filter-btn button-wid">
                             <i class="fa-solid fa-sort me-2"></i>Filter
@@ -200,7 +205,6 @@
             </div>
 
             {{-- Feedback Table --}}
-            {{-- Feedback Table --}}
             <table class="table text-center">
                 <thead class="table-light">
                     <tr>
@@ -217,7 +221,13 @@
                             <td>{{ $feedback->customer_name }}</td>
                             <td>{{ $feedback->menu_items }}</td>
                             <td>{{ $feedback->feedback_text ?: 'No feedback' }}</td>
-                            <td>{{ $feedback->rating }}</td>
+                            <td>
+                                @if ($feedback->rating > 0)
+                                    {{ $feedback->rating }} <i class="fa-solid fa-star"></i>
+                                @else
+                                    <span>No Rating</span>
+                                @endif
+                            </td>
                             <td>
                                 <button type="button" class="btn btn-primary view-feedback"
                                     data-feedback="{{ $feedback }}">
@@ -233,17 +243,17 @@
                         <tr id="">
                             <td colspan="5" class="text-center">No feedback available.</td>
                         </tr>
-                        @endforelse
-                        <tr id="no-feedback-row" style="display: none;">
-                            <td colspan="5" class="text-center">No feedback available.</td>
-                        </tr>
+                    @endforelse
+                    <tr id="no-feedback-row" style="display: none;">
+                        <td colspan="5" class="text-center">No feedback available.</td>
+                    </tr>
                 </tbody>
             </table>
 
-             <!-- Pagination -->
+            {{-- <!-- Pagination -->
              <div class="d-flex justify-content-center">
                 {{ $feedbacks->appends(request()->query())->links('pagination::bootstrap-4') }}
-            </div>
+            </div> --}}
 
 
         </div>

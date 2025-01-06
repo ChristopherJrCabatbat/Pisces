@@ -4,9 +4,9 @@
 
 @section('styles-links')
     <style>
-        .table-container {
+        /* .table-container {
             padding: 1rem 2rem 0rem 2rem;
-        }
+        } */
     </style>
 @endsection
 
@@ -71,7 +71,7 @@
                 <div class="left d-flex">
                     <div class="d-flex me-3 gap-2">
                         {{-- inalis form select --}}
-                        <select id="delivery-filter" class="" aria-label="Select delivery status">
+                        <select id="delivery-filter" class="form-select" aria-label="Select delivery status">
                             <option value="default" {{ $filter === 'default' ? 'selected' : '' }}>Default</option>
                             <option value="alphabetical" {{ $filter === 'alphabetical' ? 'selected' : '' }}>Alphabetical
                             </option>
@@ -134,9 +134,9 @@
             </table>
 
             <!-- Pagination -->
-            <div class="d-flex justify-content-center">
+            {{-- <div class="d-flex justify-content-center">
                 {{ $users->appends(request()->query())->links('pagination::bootstrap-4') }}
-            </div>
+            </div> --}}
 
         </div>
 

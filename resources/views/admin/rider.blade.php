@@ -4,9 +4,9 @@
 
 @section('styles-links')
     <style>
-        .table-container {
+        /* .table-container {
             padding: 1rem 2rem 0rem 2rem;
-        }
+        } */
     </style>
 @endsection
 
@@ -122,7 +122,13 @@
                     @forelse ($riders as $rider)
                         <tr class="menu-row">
                             <td>{{ $rider->name }}</td>
-                            <td>{{ $rider->rating ?? 'No Rating' }}</td>
+                            <td>
+                                @if ($rider->rating > 0)
+                                    {{ number_format($rider->rating, 1) }} <i class="fa-solid fa-star"></i>
+                                @else
+                                    <span>No Rating</span>
+                                @endif
+                            </td>
                             <td style="width: 18vw;">
                                 <a href="{{ route('admin.rider.show', $rider->id) }}" class="btn btn-sm btn-info"
                                     title="View">
@@ -147,18 +153,18 @@
                         <tr>
                             <td colspan="3">No riders found.</td>
                         </tr>
-                        @endforelse
-                        <tr class="" id="no-menus-row" style="display: none;">
-                            <td colspan="3">No riders found.</td>
-                        </tr>
+                    @endforelse
+                    <tr class="" id="no-menus-row" style="display: none;">
+                        <td colspan="3">No riders found.</td>
+                    </tr>
                 </tbody>
             </table>
 
 
             {{-- Pagination Links --}}
-            <div class="d-flex justify-content-center">
+            {{-- <div class="d-flex justify-content-center">
                 {{ $riders->links('pagination::bootstrap-4') }}
-            </div>
+            </div> --}}
 
         </div>
 
@@ -167,8 +173,8 @@
 
 @section('scripts')
 
-     <!-- Filter-Search Script -->
-     <script>
+    <!-- Filter-Search Script -->
+    <script>
         function filterTable() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const categoryRows = document.querySelectorAll('#menu-table-body .menu-row');
@@ -180,7 +186,7 @@
 
                 // Check if the row matches the search term
                 const matchesSearch = name.includes(searchTerm) ||
-                rating.includes(searchTerm);
+                    rating.includes(searchTerm);
 
                 // Show or hide the row based on the match
                 if (matchesSearch) {
