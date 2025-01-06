@@ -9,9 +9,9 @@
         }
 
         /* .table-container {
-                                min-width: 681px;
-                                padding: 1rem 2rem 0rem 2rem;
-                            } */
+                min-width: 681px;
+                padding: 1rem 2rem 0rem 2rem;
+            } */
     </style>
 
     <style>
@@ -205,33 +205,37 @@
     </div>
 
     <!-- Analytics Modal -->
-<div class="modal fade" id="analyticsModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="analyticsModalLabel">Filter by Analytics</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div>
-                    <input type="radio" id="best-sellers" name="analyticsFilter" class="analytics-option" value="best-sellers">
-                    <label for="best-sellers">Best Sellers</label>
+    <div class="modal fade" id="analyticsModal" tabindex="-1" aria-labelledby="analyticsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="analyticsModalLabel">Filter by Analytics</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div>
-                    <input type="radio" id="customer-favorites" name="analyticsFilter" class="analytics-option" value="customer-favorites">
-                    <label for="customer-favorites">Customer Favorites</label>
+                <div class="modal-body">
+                    <div>
+                        <input type="radio" id="best-sellers" name="analyticsFilter" class="analytics-option"
+                            value="best-sellers">
+                        <label for="best-sellers">Best Sellers</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="customer-favorites" name="analyticsFilter" class="analytics-option"
+                            value="customer-favorites">
+                        <label for="customer-favorites">Customer Favorites</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="highest-rated" name="analyticsFilter" class="analytics-option"
+                            value="highest-rated">
+                        <label for="highest-rated">Highest Rated</label>
+                    </div>
                 </div>
-                <div>
-                    <input type="radio" id="highest-rated" name="analyticsFilter" class="analytics-option" value="highest-rated">
-                    <label for="highest-rated">Highest Rated</label>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary apply-filter" data-filter="analytics">Apply</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary apply-filter" data-filter="analytics">Apply</button>
             </div>
         </div>
     </div>
-</div>
 
 
 @endsection
@@ -263,6 +267,7 @@
                             <option value="dateModal">Date</option>
                             <option value="analyticsModal">Analytics</option>
                             <option value="unavailable">Unavailable</option> <!-- New Filter -->
+                            <option value="available">Available</option>
                         </select>
 
                     </div>
@@ -330,7 +335,8 @@
                             <td style="width: 25vw !important;">{{ $menu->description }}</td>
                             <td>
                                 @if ($menu->review_count > 0)
-                                    {{ number_format($menu->rating, 1) }} <i class="fa-solid fa-star"></i> ({{ $menu->review_count }})
+                                    {{ number_format($menu->rating, 1) }} <i class="fa-solid fa-star"></i>
+                                    ({{ $menu->review_count }})
                                 @else
                                     <span>No Rating</span>
                                 @endif
@@ -406,6 +412,9 @@
                 case "unavailable": // New Filter
                     window.location.href = "/admin/menu?mainFilter=unavailable";
                     break;
+                case "available": // Handle Available filter
+                    window.location.href = "/admin/menu?mainFilter=available";
+                    break;
                 default:
                     break;
             }
@@ -469,12 +478,12 @@
                 }
             });
 
-             // Show or hide the "No menu available" row
-             const noMenusRow = document.getElementById('no-menus-row');
+            // Show or hide the "No menu available" row
+            const noMenusRow = document.getElementById('no-menus-row');
             if (noMenusRow) {
                 noMenusRow.style.display = hasVisibleRow ? 'none' : '';
             }
-        
+
         }
 
         document.getElementById('mainFilter').addEventListener('change', function() {
@@ -489,52 +498,30 @@
             }
         });
 
-        // document.querySelectorAll('.apply-filter').forEach(button => {
-        //     button.addEventListener('click', function() {
-        //         const filterType = this.getAttribute('data-filter');
-        //         let selectedValue = '';
-
-        //         if (filterType === 'categories') {
-        //             selectedValue = document.querySelector('.category-option:checked')?.value || '';
-        //         } else if (filterType === 'price') {
-        //             selectedValue = document.querySelector('.price-option:checked')?.value || '';
-        //         } else if (filterType === 'date') {
-        //             selectedValue = document.querySelector('.date-option:checked')?.value || '';
-        //         } else if (filterType === 'analytics') {
-        //             selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
-        //         }
-
-        //         bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
-
-        //         filterTable(document.getElementById('search-input').value.toLowerCase(), selectedValue);
-
-        //     });
-        // });
-
         document.querySelectorAll('.apply-filter').forEach(button => {
-        button.addEventListener('click', function () {
-            const filterType = this.getAttribute('data-filter');
-            let selectedValue = '';
+            button.addEventListener('click', function() {
+                const filterType = this.getAttribute('data-filter');
+                let selectedValue = '';
 
-            if (filterType === 'categories') {
-                selectedValue = document.querySelector('.category-option:checked')?.value || '';
-            } else if (filterType === 'price') {
-                selectedValue = document.querySelector('.price-option:checked')?.value || '';
-            } else if (filterType === 'date') {
-                selectedValue = document.querySelector('.date-option:checked')?.value || '';
-            } else if (filterType === 'analytics') {
-                selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
-            }
+                if (filterType === 'categories') {
+                    selectedValue = document.querySelector('.category-option:checked')?.value || '';
+                } else if (filterType === 'price') {
+                    selectedValue = document.querySelector('.price-option:checked')?.value || '';
+                } else if (filterType === 'date') {
+                    selectedValue = document.querySelector('.date-option:checked')?.value || '';
+                } else if (filterType === 'analytics') {
+                    selectedValue = document.querySelector('.analytics-option:checked')?.value || '';
+                }
 
-            if (selectedValue === 'highest-rated') {
-                // Perform the "Highest Rated" filter logic dynamically
-                window.location.href = `/admin/menu?analyticsFilter=highest-rated`;
-            } else {
-                bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
-                window.location.href = `/admin/menu?analyticsFilter=${selectedValue}`;
-            }
+                if (selectedValue === 'highest-rated') {
+                    // Perform the "Highest Rated" filter logic dynamically
+                    window.location.href = `/admin/menu?analyticsFilter=highest-rated`;
+                } else {
+                    bootstrap.Modal.getInstance(document.getElementById(`${filterType}Modal`)).hide();
+                    window.location.href = `/admin/menu?analyticsFilter=${selectedValue}`;
+                }
+            });
         });
-    });
 
         document.getElementById('search-input').addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();

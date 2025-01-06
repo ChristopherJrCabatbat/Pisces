@@ -144,11 +144,11 @@ class AdminController extends Controller
         // Fetch unread message data
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
-    
+
         // Fetch search and filter parameters
         $search = $request->input('search', '');
         $filter = $request->input('filter', 'default'); // Default to "default"
-    
+
         // Query feedbacks with search and filter
         $feedbacks = Feedback::when($search, function ($query, $search) {
             $query->where('customer_name', 'like', '%' . $search . '%')
@@ -171,11 +171,11 @@ class AdminController extends Controller
                 $query->orderBy('created_at', 'desc'); // Sort by newest feedback first
             })
             ->get(); // Retrieve all results without pagination
-    
+
         // Pass variables to the view
         return view('admin.feedback', compact('feedbacks', 'filter', 'search', 'totalUnreadCount'));
     }
-    
+
 
 
     public function respondFeedback(Request $request)
@@ -233,80 +233,77 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
-
     public function customerMessages(Request $request, UnreadMessagesController $unreadMessagesController)
-{
-    /** @var User $authenticatedUser */
-    $authenticatedUser = Auth::user();
+    {
+        /** @var User $authenticatedUser */
+        $authenticatedUser = Auth::user();
 
-    if (!$authenticatedUser) {
-        abort(403, 'Unauthorized access.');
-    }
+        if (!$authenticatedUser) {
+            abort(403, 'Unauthorized access.');
+        }
 
-    // Fetch unread message data
-    $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
-    $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-    // Fetch search and filter parameters
-    $search = $request->input('search', '');
-    $filter = $request->input('filter', 'recent'); // Default to "recent"
+        // Fetch search and filter parameters
+        $search = $request->input('search', '');
+        $filter = $request->input('filter', 'recent'); // Default to "recent"
 
-    // Fetch users with the role "User" and apply search and filter
-    $users = User::where('role', 'User')
-        ->when($search, function ($query, $search) {
-            $query->where(function ($subQuery) use ($search) {
-                $subQuery->where('first_name', 'like', '%' . $search . '%')
-                    ->orWhere('last_name', 'like', '%' . $search . '%');
+        // Fetch users with the role "User" and apply search and filter
+        $users = User::where('role', 'User')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('first_name', 'like', '%' . $search . '%')
+                        ->orWhere('last_name', 'like', '%' . $search . '%');
+                });
+            })
+            ->get();
+
+        // Fetch the latest message and unread message count for each user
+        $userMessages = $users->map(function ($user) use ($authenticatedUser) {
+            $latestMessage = Message::where(function ($query) use ($user, $authenticatedUser) {
+                $query->where(function ($q) use ($user, $authenticatedUser) {
+                    $q->where('user_id', $authenticatedUser->id)
+                        ->where('receiver_id', $user->id);
+                })->orWhere(function ($q) use ($user, $authenticatedUser) {
+                    $q->where('user_id', $user->id)
+                        ->where('receiver_id', $authenticatedUser->id);
+                });
+            })
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            // Count unread messages sent by the user to the admin
+            $unreadCount = Message::where('user_id', $user->id)
+                ->where('receiver_id', $authenticatedUser->id)
+                ->where('is_read', false)
+                ->count();
+
+            return [
+                'user' => $user,
+                'latestMessage' => $latestMessage,
+                'unreadCount' => $unreadCount,
+            ];
+        });
+
+        // Apply filtering based on the selected filter
+        if ($filter === 'recent') {
+            $userMessages = $userMessages->sortByDesc(function ($data) {
+                return optional($data['latestMessage'])->created_at;
             });
-        })
-        ->get();
-
-    // Fetch the latest message and unread message count for each user
-    $userMessages = $users->map(function ($user) use ($authenticatedUser) {
-        $latestMessage = Message::where(function ($query) use ($user, $authenticatedUser) {
-            $query->where(function ($q) use ($user, $authenticatedUser) {
-                $q->where('user_id', $authenticatedUser->id)
-                    ->where('receiver_id', $user->id);
-            })->orWhere(function ($q) use ($user, $authenticatedUser) {
-                $q->where('user_id', $user->id)
-                    ->where('receiver_id', $authenticatedUser->id);
+        } elseif ($filter === 'oldest') {
+            $userMessages = $userMessages->sortBy(function ($data) {
+                return optional($data['latestMessage'])->created_at;
             });
-        })
-            ->orderBy('created_at', 'desc')
-            ->first();
+        } elseif ($filter === 'alphabetical') {
+            $userMessages = $userMessages->sortBy(function ($data) {
+                return strtolower($data['user']->first_name . ' ' . $data['user']->last_name);
+            });
+        }
 
-        // Count unread messages sent by the user to the admin
-        $unreadCount = Message::where('user_id', $user->id)
-            ->where('receiver_id', $authenticatedUser->id)
-            ->where('is_read', false)
-            ->count();
-
-        return [
-            'user' => $user,
-            'latestMessage' => $latestMessage,
-            'unreadCount' => $unreadCount,
-        ];
-    });
-
-    // Apply filtering based on the selected filter
-    if ($filter === 'recent') {
-        $userMessages = $userMessages->sortByDesc(function ($data) {
-            return optional($data['latestMessage'])->created_at;
-        });
-    } elseif ($filter === 'oldest') {
-        $userMessages = $userMessages->sortBy(function ($data) {
-            return optional($data['latestMessage'])->created_at;
-        });
-    } elseif ($filter === 'alphabetical') {
-        $userMessages = $userMessages->sortBy(function ($data) {
-            return strtolower($data['user']->first_name . ' ' . $data['user']->last_name);
-        });
+        return view('admin.customerMessages', compact('userMessages', 'filter', 'search', 'totalUnreadCount'));
     }
-
-    return view('admin.customerMessages', compact('userMessages', 'filter', 'search', 'totalUnreadCount'));
-}
-
-
 
     public function markMessagesAsRead($userId)
     {
@@ -398,11 +395,11 @@ class AdminController extends Controller
         // Fetch unread message data
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
-    
+
         // Fetch search and filter parameters
         $search = $request->input('search', '');
         $filter = $request->input('filter', 'default'); // Default filter
-    
+
         // Query users with search and filter
         $users = User::where('role', 'User')
             ->when($search, function ($query, $search) {
@@ -421,11 +418,11 @@ class AdminController extends Controller
                 $query->orderBy('created_at', 'asc'); // Old customers first
             })
             ->get(); // Retrieve all results without pagination
-    
+
         // Pass variables to the view
         return view('admin.updates', compact('users', 'search', 'filter', 'totalUnreadCount'));
     }
-    
+
 
 
     // public function viewOrders($userId)
