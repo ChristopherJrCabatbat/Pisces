@@ -37,14 +37,15 @@
                     class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i
                         class="fa-solid fa-comments me-2"></i>Feedback
                     Collection</a></li>
-            {{-- <li><a href="{{ route('admin.monitoring') }}"
-                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
-                    <span class="monitor-margin">Monitoring</span></a></li> --}}
-
             <li><a href="{{ route('admin.customerMessages') }}"
                     class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }} active-customer"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+                        class="fa-solid fa-message me-2"></i> Customer Messages
+                    @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                        <span class="badge bg-danger">
+                            {{ $totalUnreadCount }}
+                        </span>
+                    @endif
+                </a></li>
         </ul>
     </li>
 
@@ -69,9 +70,11 @@
                     <div class="d-flex custom-filter me-3">
                         <form action="{{ route('admin.customerMessages') }}" method="GET" id="filter-form" class="d-flex">
                             <select name="filter" id="categoryFilter" class="form-select custom-select">
-                                <option value="recent" {{ request('filter') == 'recent' ? 'selected' : '' }}>Recent</option>
+                                <option value="recent" {{ request('filter') == 'recent' ? 'selected' : '' }}>Recent
+                                </option>
                                 <option value="oldest" {{ request('filter') == 'oldest' ? 'selected' : '' }}>Old</option>
-                                <option value="alphabetical" {{ request('filter') == 'alphabetical' ? 'selected' : '' }}>Alphabetical</option>
+                                <option value="alphabetical" {{ request('filter') == 'alphabetical' ? 'selected' : '' }}>
+                                    Alphabetical</option>
                             </select>
                             <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
                                 <i class="fa-solid fa-sort me-2"></i>Filter
@@ -79,18 +82,19 @@
                         </form>
                     </div>
                 </div>
-            
+
                 <!-- Search Section -->
                 <div class="right d-flex gap-3">
                     <div class="position-relative custom-search">
                         <form action="{{ route('admin.customerMessages') }}" method="GET" id="search-form">
-                            <input type="text" name="search" placeholder="Search by name..." class="form-control" id="search-input" value="{{ request('search') }}">
+                            <input type="text" name="search" placeholder="Search by name..." class="form-control"
+                                id="search-input" value="{{ request('search') }}">
                             <i class="fas fa-search custom-search-icon"></i>
                         </form>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Customer Messages Section -->
             <div class="messages-section">
                 <div class="message-container" id="message-container">
@@ -101,13 +105,14 @@
                             $latestMessage = $data['latestMessage'];
                             $unreadCount = $data['unreadCount'];
                         @endphp
-            
+
                         <a href="{{ route('admin.messageUser', $user->id) }}" class="message-a message-row">
                             <div class="message-f">
                                 <div class="message-avatar position-relative">
                                     <i class="fa-solid fa-user"></i>
                                     @if ($unreadCount > 0)
-                                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
+                                        <span
+                                            class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
                                     @endif
                                 </div>
                                 <div class="message-content">
@@ -140,11 +145,11 @@
                     @endforelse
                 </div>
             </div>
-              <!-- No Messages -->
-              <div class="message-f fs-5 text-black" id="no-messages-row" style="display: none;">
+            <!-- No Messages -->
+            <div class="message-f fs-5 text-black" id="no-messages-row" style="display: none;">
                 <i class="fa-regular fa-circle-question me-2"></i> No customer match your search.
             </div>
-            
+
 
 
         </div>

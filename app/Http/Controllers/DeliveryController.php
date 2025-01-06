@@ -20,19 +20,43 @@ class DeliveryController extends Controller
      * Display a listing of the resource.
      */
 
-     public function index()
-     {
-         $deliveries = Delivery::orderBy('created_at', 'desc')->get(); // Fetch all deliveries
-         $riders = Rider::all(); // Assuming you have a Rider model
-     
-         foreach ($deliveries as $delivery) {
-             $orders = explode(', ', $delivery->order);
-             $menuImages = Menu::whereIn('name', $orders)->pluck('image', 'name')->toArray();
-             $delivery->menu_images = $menuImages;
-         }
-     
-         return view('admin.delivery', compact('deliveries', 'riders'));
-     }
+    //  public function index()
+    //  {
+    //      $deliveries = Delivery::orderBy('created_at', 'desc')->get(); // Fetch all deliveries
+    //      $riders = Rider::all(); // Assuming you have a Rider model
+
+    //      foreach ($deliveries as $delivery) {
+    //          $orders = explode(', ', $delivery->order);
+    //          $menuImages = Menu::whereIn('name', $orders)->pluck('image', 'name')->toArray();
+    //          $delivery->menu_images = $menuImages;
+    //      }
+
+    //      return view('admin.delivery', compact('deliveries', 'riders'));
+    //  }
+
+    public function index(UnreadMessagesController $unreadMessagesController)
+    {
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        // Fetch all deliveries
+        $deliveries = Delivery::orderBy('created_at', 'desc')->get();
+
+        // Fetch all riders
+        $riders = Rider::all(); // Assuming you have a Rider model
+
+        // Process deliveries to include menu images
+        foreach ($deliveries as $delivery) {
+            $orders = explode(', ', $delivery->order);
+            $menuImages = Menu::whereIn('name', $orders)->pluck('image', 'name')->toArray();
+            $delivery->menu_images = $menuImages;
+        }
+
+        // Pass variables to the view
+        return view('admin.delivery', compact('deliveries', 'riders', 'totalUnreadCount'));
+    }
+
 
     public function deliveryCreateRider()
     {
@@ -356,93 +380,93 @@ class DeliveryController extends Controller
     // }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'fullName' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'contactNumber' => 'required|string|max:20',
-        'address' => 'required|string',
-        'shippingMethod' => 'required|string',
-        'paymentMethod' => 'required|string',
-        'note' => 'nullable|string',
-        'menu_names' => 'required|array',
-        'quantities' => 'required|array',
-        'total_price' => 'required|numeric', // Ensure total_price is passed from the front-end
-    ]);
+    {
+        $request->validate([
+            'fullName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'contactNumber' => 'required|string|max:20',
+            'address' => 'required|string',
+            'shippingMethod' => 'required|string',
+            'paymentMethod' => 'required|string',
+            'note' => 'nullable|string',
+            'menu_names' => 'required|array',
+            'quantities' => 'required|array',
+            'total_price' => 'required|numeric', // Ensure total_price is passed from the front-end
+        ]);
 
-    /** @var User $user */
-    $user = Auth::user();
+        /** @var User $user */
+        $user = Auth::user();
 
-    $orderItems = [];
-    $totalQuantity = 0;
-    $totalPrice = 0; // Initialize total price
-    $orderQuantities = implode(', ', $request->quantities);
+        $orderItems = [];
+        $totalQuantity = 0;
+        $totalPrice = 0; // Initialize total price
+        $orderQuantities = implode(', ', $request->quantities);
 
-    // Construct the order string and calculate total price
-    foreach ($request->menu_names as $index => $menuName) {
-        $quantity = $request->quantities[$index];
-        $menu = Menu::where('name', $menuName)->firstOrFail();
-        $itemTotal = $menu->price * $quantity; // Calculate total for each item
-        $orderItems[] = "{$menuName} (x{$quantity})";
-        $totalQuantity += $quantity;
-        $totalPrice += $itemTotal; // Add to total price
-    }
+        // Construct the order string and calculate total price
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            $menu = Menu::where('name', $menuName)->firstOrFail();
+            $itemTotal = $menu->price * $quantity; // Calculate total for each item
+            $orderItems[] = "{$menuName} (x{$quantity})";
+            $totalQuantity += $quantity;
+            $totalPrice += $itemTotal; // Add to total price
+        }
 
-    // Determine if the user has a discount
-    $hasDiscount = $user->has_discount;
+        // Determine if the user has a discount
+        $hasDiscount = $user->has_discount;
 
-    // Use the discounted total price if the user has a discount
-    if ($hasDiscount) {
-        $totalPrice = $totalPrice * 0.95; // Apply a 5% discount
-        $user->update(['has_discount' => false]); // Mark discount as used
-    }
+        // Use the discounted total price if the user has a discount
+        if ($hasDiscount) {
+            $totalPrice = $totalPrice * 0.95; // Apply a 5% discount
+            $user->update(['has_discount' => false]); // Mark discount as used
+        }
 
-    $orderString = implode(', ', $orderItems);
+        $orderString = implode(', ', $orderItems);
 
-    // Insert the order into the deliveries table
-    $deliveryId = DB::table('deliveries')->insertGetId([
-        'name' => $request->input('fullName'),
-        'email' => $request->input('email'),
-        'contact_number' => $request->input('contactNumber'),
-        'order' => $orderString,
-        'address' => $request->input('address'),
-        'quantity' => $orderQuantities,
-        'shipping_method' => $request->input('shippingMethod'),
-        'mode_of_payment' => $request->input('paymentMethod'),
-        'note' => $request->input('note'),
-        'total_price' => $totalPrice, // Save the discounted or original total price
-        'status' => 'Pending',
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-
-    // Store each order item in the orders table
-    foreach ($request->menu_names as $index => $menuName) {
-        $quantity = $request->quantities[$index];
-        DB::table('orders')->insert([
-            'delivery_id' => $deliveryId,
-            'menu_name' => $menuName,
-            'quantity' => $quantity,
+        // Insert the order into the deliveries table
+        $deliveryId = DB::table('deliveries')->insertGetId([
+            'name' => $request->input('fullName'),
+            'email' => $request->input('email'),
+            'contact_number' => $request->input('contactNumber'),
+            'order' => $orderString,
+            'address' => $request->input('address'),
+            'quantity' => $orderQuantities,
+            'shipping_method' => $request->input('shippingMethod'),
+            'mode_of_payment' => $request->input('paymentMethod'),
+            'note' => $request->input('note'),
+            'total_price' => $totalPrice, // Save the discounted or original total price
+            'status' => 'Pending',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Store each order item in the orders table
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            DB::table('orders')->insert([
+                'delivery_id' => $deliveryId,
+                'menu_name' => $menuName,
+                'quantity' => $quantity,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Remove all cart items for the logged-in user
+        DB::table('cart_items')->where('user_id', $user->id)->delete();
+
+        // Reset the user's 'cart' field to 0
+        $user->cart = 0;
+        $user->save();
+
+        // Add toast message to session
+        session()->flash('toast', [
+            'message' => 'Order placed successfully!',
+            'type' => 'success',
+        ]);
+
+        return redirect()->route('user.menu');
     }
-
-    // Remove all cart items for the logged-in user
-    DB::table('cart_items')->where('user_id', $user->id)->delete();
-
-    // Reset the user's 'cart' field to 0
-    $user->cart = 0;
-    $user->save();
-
-    // Add toast message to session
-    session()->flash('toast', [
-        'message' => 'Order placed successfully!',
-        'type' => 'success',
-    ]);
-
-    return redirect()->route('user.menu');
-}
 
 
     // public function orderStore(Request $request)

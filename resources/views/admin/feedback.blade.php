@@ -9,8 +9,8 @@
         }
 
         /* .table-container {
-                padding: 1rem 2rem 0rem 2rem;
-            } */
+                    padding: 1rem 2rem 0rem 2rem;
+                } */
     </style>
 @endsection
 
@@ -151,7 +151,13 @@
                     <span class="monitor-margin">Monitoring</span></a></li> --}}
             <li><a href="{{ route('admin.customerMessages') }}"
                     class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+                        class="fa-solid fa-message me-2"></i> Customer Messages
+                    @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                        <span class="badge bg-danger">
+                            {{ $totalUnreadCount }}
+                        </span>
+                    @endif
+                </a></li>
 
         </ul>
     </li>

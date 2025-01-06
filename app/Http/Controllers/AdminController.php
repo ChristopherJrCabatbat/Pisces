@@ -18,7 +18,7 @@ use App\Models\Feedback;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function dashboard(UnreadMessagesController $unreadMessagesController)
     {
         $userCount = User::where('role', 'User')->count();
         $deliveryCount = Delivery::count();
@@ -46,7 +46,6 @@ class AdminController extends Controller
         $highestRatedMenus = Menu::select('menus.id', 'menus.name', 'menus.image', 'menus.category', 'menus.price')
             ->get()
             ->map(function ($menu) {
-                // Calculate average rating and count of ratings dynamically
                 $menu->rating = DB::table('feedback')
                     ->where('menu_items', 'LIKE', "%{$menu->name}%")
                     ->avg('rating');
@@ -56,13 +55,10 @@ class AdminController extends Controller
                 return $menu;
             })
             ->filter(function ($menu) {
-                // Filter out menus without ratings
                 return $menu->review_count > 0;
             })
-            ->sortByDesc('rating') // Sort by highest rating
-            ->take(5); // Limit to top 5
-
-
+            ->sortByDesc('rating')
+            ->take(5);
 
         // Calculate total sales for each month (only 'Delivered' orders)
         $monthlySales = Delivery::select(
@@ -74,6 +70,10 @@ class AdminController extends Controller
             ->orderBy(DB::raw("MONTH(created_at)"))
             ->pluck('total_sales', 'month_name');
 
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
         return view('admin.dashboard', compact(
             'userCount',
             'deliveryCount',
@@ -81,45 +81,10 @@ class AdminController extends Controller
             'categoryCount',
             'topPicks',
             'highestRatedMenus',
-            'monthlySales'
+            'monthlySales',
+            'totalUnreadCount'
         ));
     }
-
-    // public function userUpdate(Request $request)
-    // {
-    //     $request->validate([
-    //         'first_name' => 'required|string|max:255',
-    //         'last_name' => 'required|string|max:255',
-    //         'contact_number' => 'required|string|max:20',
-    //         'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
-    //         'password' => 'nullable|string|min:8|confirmed', // Only validate if provided
-    //     ]);
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     $user->update([
-    //         'first_name' => $request->first_name,
-    //         'last_name' => $request->last_name,
-    //         'contact_number' => $request->contact_number,
-    //         'email' => $request->email,
-    //     ]);
-
-    //     // Update password if provided
-    //     if ($request->filled('password')) {
-    //         $user->update([
-    //             'password' => Hash::make($request->password),
-    //         ]);
-    //     }
-
-    //     // Set a toast session with the success message
-    //     session()->flash('toast', [
-    //         'message' => 'Profile updated successfully.',
-    //         'type' => 'success', // 'success' or 'error'
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Profile updated successfully!');
-    // }
 
     public function userUpdate(Request $request)
     {
@@ -174,12 +139,16 @@ class AdminController extends Controller
         return view('admin.customers');
     }
 
-    public function feedback(Request $request)
+    public function feedback(Request $request, UnreadMessagesController $unreadMessagesController)
     {
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+    
         // Fetch search and filter parameters
         $search = $request->input('search', '');
         $filter = $request->input('filter', 'default'); // Default to "default"
-
+    
         // Query feedbacks with search and filter
         $feedbacks = Feedback::when($search, function ($query, $search) {
             $query->where('customer_name', 'like', '%' . $search . '%')
@@ -202,18 +171,20 @@ class AdminController extends Controller
                 $query->orderBy('created_at', 'desc'); // Sort by newest feedback first
             })
             ->get(); // Retrieve all results without pagination
-
-        return view('admin.feedback', compact('feedbacks', 'filter', 'search'));
+    
+        // Pass variables to the view
+        return view('admin.feedback', compact('feedbacks', 'filter', 'search', 'totalUnreadCount'));
     }
+    
 
 
     public function respondFeedback(Request $request)
     {
         $feedback = Feedback::findOrFail($request->feedback_id);
-    
+
         // Find the user by matching the customer_name in feedback with first_name and last_name in users
         $user = User::where(DB::raw("CONCAT(first_name, ' ', last_name)"), $feedback->customer_name)->first();
-    
+
         if (!$user) {
             // If no user is found, show an error message
             session()->flash('toast', [
@@ -222,15 +193,15 @@ class AdminController extends Controller
             ]);
             return redirect()->back();
         }
-    
+
         $feedback->response = $request->response;
         $feedback->save();
-    
+
         $menuItems = $feedback->menu_items;
         $customerName = $feedback->customer_name;
-    
+
         $messageText = "Hi, {$customerName}!\n\nThank you for your feedback on {$menuItems}. Here's our response: {$feedback->response}\n\n";
-    
+
         // Send the message to the identified user
         try {
             $message = Message::create([
@@ -241,7 +212,7 @@ class AdminController extends Controller
                 'image_url' => null,
                 'is_read' => false,
             ]);
-    
+
             if (!$message) {
                 throw new \Exception('Failed to send the message.');
             }
@@ -253,122 +224,88 @@ class AdminController extends Controller
             ]);
             return redirect()->back();
         }
-    
+
         session()->flash('toast', [
             'message' => 'Response has been submitted successfully, and the user has been notified.',
             'type' => 'success',
         ]);
-    
+
         return redirect()->back();
     }
-    
-    
 
 
+    public function customerMessages(Request $request, UnreadMessagesController $unreadMessagesController)
+{
+    /** @var User $authenticatedUser */
+    $authenticatedUser = Auth::user();
 
-    public function customerMessages(Request $request)
-    {
-        /** @var User $authenticatedUser */
-        $authenticatedUser = Auth::user();
-
-        if (!$authenticatedUser) {
-            abort(403, 'Unauthorized access.');
-        }
-
-        // Fetch search and filter parameters
-        $search = $request->input('search', '');
-        $filter = $request->input('filter', 'recent'); // Default to "recent"
-
-        // Fetch users with the role "User" and apply search and filter
-        $users = User::where('role', 'User')
-            ->when($search, function ($query, $search) {
-                $query->where(function ($subQuery) use ($search) {
-                    $subQuery->where('first_name', 'like', '%' . $search . '%')
-                        ->orWhere('last_name', 'like', '%' . $search . '%');
-                });
-            })
-            ->get();
-
-        // Fetch the latest message and unread message count for each user
-        $userMessages = $users->map(function ($user) use ($authenticatedUser) {
-            $latestMessage = Message::where(function ($query) use ($user, $authenticatedUser) {
-                $query->where(function ($q) use ($user, $authenticatedUser) {
-                    $q->where('user_id', $authenticatedUser->id)
-                        ->where('receiver_id', $user->id);
-                })->orWhere(function ($q) use ($user, $authenticatedUser) {
-                    $q->where('user_id', $user->id)
-                        ->where('receiver_id', $authenticatedUser->id);
-                });
-            })
-                ->orderBy('created_at', 'desc')
-                ->first();
-
-            // Count unread messages sent by the user to the admin
-            $unreadCount = Message::where('user_id', $user->id)
-                ->where('receiver_id', $authenticatedUser->id)
-                ->where('is_read', false)
-                ->count();
-
-            return [
-                'user' => $user,
-                'latestMessage' => $latestMessage,
-                'unreadCount' => $unreadCount,
-            ];
-        });
-
-        // Apply filtering based on the selected filter
-        if ($filter === 'recent') {
-            $userMessages = $userMessages->sortByDesc(function ($data) {
-                return optional($data['latestMessage'])->created_at;
-            });
-        } elseif ($filter === 'oldest') {
-            $userMessages = $userMessages->sortBy(function ($data) {
-                return optional($data['latestMessage'])->created_at;
-            });
-        } elseif ($filter === 'alphabetical') {
-            $userMessages = $userMessages->sortBy(function ($data) {
-                return strtolower($data['user']->first_name . ' ' . $data['user']->last_name);
-            });
-        }
-
-        return view('admin.customerMessages', compact('userMessages', 'filter', 'search'));
+    if (!$authenticatedUser) {
+        abort(403, 'Unauthorized access.');
     }
 
+    // Fetch unread message data
+    $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+    $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+    // Fetch search and filter parameters
+    $search = $request->input('search', '');
+    $filter = $request->input('filter', 'recent'); // Default to "recent"
 
+    // Fetch users with the role "User" and apply search and filter
+    $users = User::where('role', 'User')
+        ->when($search, function ($query, $search) {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%');
+            });
+        })
+        ->get();
 
-    // public function messageUser($userId)
-    // {
-    //     /** @var User $authenticatedUser */
-    //     $authenticatedUser = Auth::user();
+    // Fetch the latest message and unread message count for each user
+    $userMessages = $users->map(function ($user) use ($authenticatedUser) {
+        $latestMessage = Message::where(function ($query) use ($user, $authenticatedUser) {
+            $query->where(function ($q) use ($user, $authenticatedUser) {
+                $q->where('user_id', $authenticatedUser->id)
+                    ->where('receiver_id', $user->id);
+            })->orWhere(function ($q) use ($user, $authenticatedUser) {
+                $q->where('user_id', $user->id)
+                    ->where('receiver_id', $authenticatedUser->id);
+            });
+        })
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-    //     if (!$authenticatedUser) {
-    //         abort(403, 'Unauthorized access.');
-    //     }
+        // Count unread messages sent by the user to the admin
+        $unreadCount = Message::where('user_id', $user->id)
+            ->where('receiver_id', $authenticatedUser->id)
+            ->where('is_read', false)
+            ->count();
 
-    //     $user = User::findOrFail($userId);
+        return [
+            'user' => $user,
+            'latestMessage' => $latestMessage,
+            'unreadCount' => $unreadCount,
+        ];
+    });
 
-    //     // Fetch messages between the authenticated user and the specified user
-    //     $messages = Message::where(function ($query) use ($userId, $authenticatedUser) {
-    //         $query->where(function ($q) use ($userId, $authenticatedUser) {
-    //             $q->where('user_id', $authenticatedUser->id)
-    //                 ->where('receiver_id', $userId);
-    //         })->orWhere(function ($q) use ($userId, $authenticatedUser) {
-    //             $q->where('user_id', $userId)
-    //                 ->where('receiver_id', $authenticatedUser->id);
-    //         });
-    //     })
-    //         ->orderBy('created_at', 'asc')
-    //         ->get();
+    // Apply filtering based on the selected filter
+    if ($filter === 'recent') {
+        $userMessages = $userMessages->sortByDesc(function ($data) {
+            return optional($data['latestMessage'])->created_at;
+        });
+    } elseif ($filter === 'oldest') {
+        $userMessages = $userMessages->sortBy(function ($data) {
+            return optional($data['latestMessage'])->created_at;
+        });
+    } elseif ($filter === 'alphabetical') {
+        $userMessages = $userMessages->sortBy(function ($data) {
+            return strtolower($data['user']->first_name . ' ' . $data['user']->last_name);
+        });
+    }
 
-    //     // Mark all unread messages sent by the specified user as read
-    //     Message::where('user_id', $userId)
-    //         ->where('receiver_id', $authenticatedUser->id)
-    //         ->where('is_read', false)
-    //         ->update(['is_read' => true]);
+    return view('admin.customerMessages', compact('userMessages', 'filter', 'search', 'totalUnreadCount'));
+}
 
-    //     return view('admin.messageUser', compact('user', 'messages'));
-    // }
 
 
     public function markMessagesAsRead($userId)
@@ -379,35 +316,6 @@ class AdminController extends Controller
 
         return response()->json(['status' => 'success']);
     }
-
-
-    // public function sendMessage(Request $request, $userId)
-    // {
-    //     $validated = $request->validate([
-    //         'message_text' => 'required|string',
-    //     ]);
-
-    //     $authUser = Auth::user();
-    //     if (!$authUser) {
-    //         return response()->json(['error' => 'Admin not authenticated'], 403);
-    //     }
-
-    //     // Create the message
-    //     $message = Message::create([
-    //         'user_id' => $authUser->id, // Admin is the sender
-    //         'receiver_id' => $userId, // User is the recipient
-    //         'sender_role' => 'Admin',
-    //         'message_text' => $validated['message_text'],
-    //     ]);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => [
-    //             'message_text' => $message->message_text,
-    //             'created_at' => $message->created_at->diffForHumans(),
-    //         ],
-    //     ]);
-    // }
 
     public function messageUser($userId)
     {
@@ -485,48 +393,16 @@ class AdminController extends Controller
     }
 
 
-    // public function sendMessage(Request $request, $userId)
-    // {
-    //     try {
-    //         // Validate input for message_text or image
-    //         $request->validate([
-    //             'message_text' => 'nullable|required_without:image',
-    //             'image' => 'nullable|required_without:message_text|image|max:2048',
-    //         ]);
-
-    //         $imageFile = $request->file('image');
-    //         $imageUrl = null;
-
-    //         // Handle image upload if present
-    //         if ($imageFile) {
-    //             $imagePath = $imageFile->store('messages', 'public'); // Store in the 'public/messages' directory
-    //             $imageUrl = asset('storage/' . $imagePath);
-    //         }
-
-    //         // Create the message
-    //         $message = Message::create([
-    //             'user_id' => Auth::id(),
-    //             'receiver_id' => (int) $userId, // Ensure it's an integer
-    //             'sender_role' => 'Admin',
-    //             'message_text' => $request->input('message_text'), // Can be null
-    //             'image_url' => $imageUrl,
-    //             'is_read' => false,
-    //         ]);
-
-    //         return response()->json(['success' => true, 'message' => $message], 201);
-    //     } catch (\Exception $e) {
-    //         Log::error('Error sending message:', ['error' => $e->getMessage()]);
-    //         return response()->json(['success' => false, 'message' => 'Failed to send the message.'], 500);
-    //     }
-    // }
-
-
-    public function updates(Request $request)
+    public function updates(Request $request, UnreadMessagesController $unreadMessagesController)
     {
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+    
         // Fetch search and filter parameters
         $search = $request->input('search', '');
         $filter = $request->input('filter', 'default'); // Default filter
-
+    
         // Query users with search and filter
         $users = User::where('role', 'User')
             ->when($search, function ($query, $search) {
@@ -545,10 +421,11 @@ class AdminController extends Controller
                 $query->orderBy('created_at', 'asc'); // Old customers first
             })
             ->get(); // Retrieve all results without pagination
-
-        return view('admin.updates', compact('users', 'search', 'filter'));
+    
+        // Pass variables to the view
+        return view('admin.updates', compact('users', 'search', 'filter', 'totalUnreadCount'));
     }
-
+    
 
 
     // public function viewOrders($userId)

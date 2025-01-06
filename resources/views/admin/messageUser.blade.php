@@ -112,9 +112,9 @@
                                 <!-- Message Text -->
                                 <div class="message bg-white border px-3 py-2 rounded shadow-sm {{ $message->is_read ? '' : 'fw-bold' }}"
                                     style="max-width: 70%; 
-                    display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }};
-                    {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
-                                    @if ($message->message_text && $message->message_text !== 'Sent an image')
+                                display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }};
+                                {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                                @if ($message->message_text && $message->message_text !== 'Sent an image')
                                         <p class="m-0">{{ $message->message_text }}</p>
                                     @endif
                                 </div>

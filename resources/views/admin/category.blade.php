@@ -31,31 +31,48 @@
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
 
-    <li class="sidebar-item" id="customersDropdown">
+    <li class="sidebar-item position-relative" id="customersDropdown">
         <a href="javascript:void(0)"
             class="fs-5 sidebar-font d-flex customers justify-content-between {{ request()->is('admin/updates', 'admin/feedback', 'admin/monitoring') ? 'active' : '' }}">
-            <div><i class="fa-solid fa-users me-3"></i>Customers</div>
+            <div>
+                <i class="fa-solid fa-users me-3"></i>Customers
+            </div>
+            <!-- Unread messages badge -->
+            @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                <span class="badge bg-danger position-absolute translate-middle" style="left: 10.5rem; top: 1rem;">
+                    {{ $totalUnreadCount }}
+                </span>
+            @endif
             <div class="caret-icon">
                 <i class="fa-solid fa-caret-right"></i>
             </div>
         </a>
         <!-- Dropdown menu -->
         <ul class="dropdown-customers" style="display: none;">
-            <li><a href="{{ route('admin.updates') }}"
-                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
+            <li>
+                <a href="{{ route('admin.updates') }}"
+                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}">
+                    <i class="fa-solid fa-user-pen me-2"></i>Customer Updates
+                </a>
             </li>
-            <li><a href="{{ route('admin.feedback') }}"
-                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-comments me-2"></i>Feedback
-                    Collection</a></li>
-            <li><a href="{{ route('admin.monitoring') }}"
-                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-users-gear me-2"></i>Customer Activity
-                    <span class="monitor-margin">Monitoring</span></a></li>
-            <li><a href="{{ route('admin.customerMessages') }}"
-                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+            <li>
+                <a href="{{ route('admin.feedback') }}"
+                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}">
+                    <i class="fa-solid fa-comments me-2"></i>Feedback Collection
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.customerMessages') }}"
+                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}">
+                    <i class="fa-solid fa-message"></i> Customer Messages
+                    <!-- Individual unread messages badge -->
+                    @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                        <span class="badge bg-danger">
+                            {{ $totalUnreadCount }}
+                        </span>
+                    @endif
+                </a>
+            </li>
         </ul>
     </li>
 
@@ -122,14 +139,14 @@
 
                 <!-- Right Section -->
                 <div class="right d-flex gap-2">
-                    {{-- <div class="position-relative custom-search" id="search-form">
+                    <div class="position-relative custom-search" id="search-form">
                         <!-- Search Form -->
                         <form action="{{ route('admin.category.index') }}" method="GET">
                             <input type="search" name="search" placeholder="Search something..." class="form-control"
                                 id="search-input" value="{{ $search ?? '' }}">
                             <i class="fas fa-search custom-search-icon"></i>
                         </form>
-                    </div> --}}
+                    </div>
 
                     {{-- <div class="position-relative custom-search" id="search-form">
                         <form action="{{ route('admin.category.index') }}" method="GET" id="search-form">
@@ -137,7 +154,7 @@
                                 id="search-input" value="{{ $search ?? '' }}" />
                             <i class="fas fa-search custom-search-icon"></i>
                         </form>
-                    </div> --}}
+                    </div>
                     <!-- Search Form -->
                     <form action="{{ route('admin.category.index') }}" method="GET" id="search-form" class="d-flex">
                         <input type="search" name="search" placeholder="Search something..."
@@ -147,7 +164,7 @@
                         <button type="submit" class="btn btn-primary no-left-radius">
                             <i class="fas fa-search"></i>
                         </button>
-                    </form>
+                    </form> --}}
 
                     <div>
                         <a href="{{ route('admin.category.create') }}" class="btn btn-primary">
@@ -211,9 +228,9 @@
             </table>
 
             <!-- Pagination -->
-            <div class="d-flex justify-content-center">
+            {{-- <div class="d-flex justify-content-center">
                 {{ $categories->appends(request()->query())->links('pagination::bootstrap-4') }}
-            </div>
+            </div> --}}
 
         </div>
 
@@ -230,7 +247,7 @@
     </script>
 
     <!-- Filter-Search Script -->
-    {{-- <script>
+    <script>
         function filterTable() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const categoryRows = document.querySelectorAll('#menu-table-body .menu-row');
@@ -263,6 +280,6 @@
         }
 
         document.getElementById('search-input').addEventListener('input', filterTable);
-    </script> --}}
+    </script>
 
 @endsection
