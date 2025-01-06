@@ -113,7 +113,7 @@
                                 <div class="message bg-white border px-3 py-2 rounded shadow-sm {{ $message->is_read ? '' : 'fw-bold' }}"
                                     style="max-width: 70%; 
                                 display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }};
-                                {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
                                                 @if ($message->message_text && $message->message_text !== 'Sent an image')
                                         <p class="m-0">{{ $message->message_text }}</p>
                                     @endif
@@ -126,7 +126,7 @@
                                 @endif
 
                                 <!-- Message Timestamp -->
-                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') === false)
                                     <span class="text-muted align-self-center small ms-3">
                                         {{ $message->created_at->diffForHumans() }}
                                     </span>
@@ -136,7 +136,7 @@
                             <!-- Message from Admin -->
                             <div class="d-flex align-items-start justify-content-end mb-4">
                                 <!-- Message Timestamp -->
-                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') === false)
+                                @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') === false)
                                     <span class="text-muted align-self-center small me-3">
                                         {{ $message->created_at->diffForHumans() }}
                                     </span>
@@ -152,7 +152,7 @@
                                 <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
                                     style="max-width: 70%; 
                     display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }};
-                    {{ strpos($message->message_text, 'Please complete your GCash transaction. Here are the details:') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                    {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
                                     @if ($message->message_text && $message->message_text !== 'Sent an image')
                                         <p class="m-0">
                                             {{ $message->message_text }}
@@ -330,7 +330,7 @@
             messages.forEach(message => {
                 // Check if message text contains GCash-related keywords
                 if (message.textContent.includes(
-                        'Please complete your GCash transaction. Here are the details:')) {
+                        'Please complete your GCash transaction. Kindly send the payment: ₱')) {
                     message.classList.add('gcash-message'); // Apply specific styling
                     message.style.margin = "0 auto"; // Center the message
                     message.style.maxWidth = "80%"; // Adjust width for centered messages

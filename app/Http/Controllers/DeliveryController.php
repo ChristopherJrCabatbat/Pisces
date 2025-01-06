@@ -303,7 +303,6 @@ class DeliveryController extends Controller
      * Store a newly created resource in storage.
      */
 
-
     // public function store(Request $request)
     // {
     //     $request->validate([
@@ -316,17 +315,34 @@ class DeliveryController extends Controller
     //         'note' => 'nullable|string',
     //         'menu_names' => 'required|array',
     //         'quantities' => 'required|array',
+    //         'total_price' => 'required|numeric', // Ensure total_price is passed from the front-end
     //     ]);
+
+    //     /** @var User $user */
+    //     $user = Auth::user();
 
     //     $orderItems = [];
     //     $totalQuantity = 0;
+    //     $totalPrice = 0; // Initialize total price
     //     $orderQuantities = implode(', ', $request->quantities);
 
-    //     // Construct the order string
+    //     // Construct the order string and calculate total price
     //     foreach ($request->menu_names as $index => $menuName) {
     //         $quantity = $request->quantities[$index];
+    //         $menu = Menu::where('name', $menuName)->firstOrFail();
+    //         $itemTotal = $menu->price * $quantity; // Calculate total for each item
     //         $orderItems[] = "{$menuName} (x{$quantity})";
     //         $totalQuantity += $quantity;
+    //         $totalPrice += $itemTotal; // Add to total price
+    //     }
+
+    //     // Determine if the user has a discount
+    //     $hasDiscount = $user->has_discount;
+
+    //     // Use the discounted total price if the user has a discount
+    //     if ($hasDiscount) {
+    //         $totalPrice = $totalPrice * 0.95; // Apply a 5% discount
+    //         $user->update(['has_discount' => false]); // Mark discount as used
     //     }
 
     //     $orderString = implode(', ', $orderItems);
@@ -342,7 +358,7 @@ class DeliveryController extends Controller
     //         'shipping_method' => $request->input('shippingMethod'),
     //         'mode_of_payment' => $request->input('paymentMethod'),
     //         'note' => $request->input('note'),
-    //         'total_price' => $request->input('total_price'),
+    //         'total_price' => $totalPrice, // Save the discounted or original total price
     //         'status' => 'Pending',
     //         'created_at' => now(),
     //         'updated_at' => now(),
@@ -359,9 +375,6 @@ class DeliveryController extends Controller
     //             'updated_at' => now(),
     //         ]);
     //     }
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
 
     //     // Remove all cart items for the logged-in user
     //     DB::table('cart_items')->where('user_id', $user->id)->delete();
@@ -423,6 +436,9 @@ class DeliveryController extends Controller
 
         $orderString = implode(', ', $orderItems);
 
+        // Determine order status based on payment method
+        $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
         // Insert the order into the deliveries table
         $deliveryId = DB::table('deliveries')->insertGetId([
             'name' => $request->input('fullName'),
@@ -434,8 +450,8 @@ class DeliveryController extends Controller
             'shipping_method' => $request->input('shippingMethod'),
             'mode_of_payment' => $request->input('paymentMethod'),
             'note' => $request->input('note'),
+            'status' => $status,
             'total_price' => $totalPrice, // Save the discounted or original total price
-            'status' => 'Pending',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -451,6 +467,21 @@ class DeliveryController extends Controller
                 'updated_at' => now(),
             ]);
         }
+
+        // Handle GCash-specific logic
+        if ($request->input('paymentMethod') === 'GCash') {
+            // Admin sends a message to the user with dynamic total price
+            $this->sendMessage(
+                new Request([
+                    'message_text' => 'Please complete your GCash transaction. Kindly send the payment: ₱' . number_format($totalPrice, 2) . ' and notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.',
+                ]),
+                Auth::id() // Assume the current authenticated user is the recipient
+            );
+
+            // Redirect to the GCash-specific page
+            return redirect()->route('user.messagesPisces');
+        }
+
 
         // Remove all cart items for the logged-in user
         DB::table('cart_items')->where('user_id', $user->id)->delete();
@@ -468,93 +499,6 @@ class DeliveryController extends Controller
         return redirect()->route('user.menu');
     }
 
-
-    // public function orderStore(Request $request)
-    // {
-    //     $request->validate([
-    //         'fullName' => 'required|string|max:255',
-    //         'email' => 'required|email|max:255',
-    //         'contactNumber' => 'required|string|max:20',
-    //         'address' => 'required|string',
-    //         'shippingMethod' => 'required|string',
-    //         'paymentMethod' => 'required|string',
-    //         'note' => 'nullable|string',
-    //         'menu_names' => 'required|array',
-    //         'quantities' => 'required|array',
-    //     ]);
-
-    //     $orderItems = [];
-    //     $totalQuantity = 0;
-    //     $totalPrice = 0; // Initialize total price
-    //     $orderQuantities = implode(', ', $request->quantities);
-
-    //     // Construct the order string and calculate total price
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         $menu = Menu::where('name', $menuName)->firstOrFail();
-    //         $itemTotal = $menu->price * $quantity; // Calculate total for each item
-    //         $orderItems[] = "{$menuName} (x{$quantity})";
-    //         $totalQuantity += $quantity;
-    //         $totalPrice += $itemTotal; // Add to total price
-    //     }
-
-    //     $orderString = implode(', ', $orderItems);
-
-    //     // Determine order status based on payment method
-    //     $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
-
-    //     // Insert the order into the deliveries table
-    //     $deliveryId = DB::table('deliveries')->insertGetId([
-    //         'name' => $request->input('fullName'),
-    //         'email' => $request->input('email'),
-    //         'contact_number' => $request->input('contactNumber'),
-    //         'order' => $orderString,
-    //         'address' => $request->input('address'),
-    //         'quantity' => $orderQuantities,
-    //         'shipping_method' => $request->input('shippingMethod'),
-    //         'mode_of_payment' => $request->input('paymentMethod'),
-    //         'note' => $request->input('note'),
-    //         'status' => $status,
-    //         'total_price' => $totalPrice,
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     // Store each order item in the orders table
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         DB::table('orders')->insert([
-    //             'delivery_id' => $deliveryId,
-    //             'menu_name' => $menuName,
-    //             'quantity' => $quantity,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ]);
-    //     }
-
-    //     // Handle GCash-specific logic
-    //     if ($request->input('paymentMethod') === 'GCash') {
-    //         // Admin sends a message to the user
-    //         $this->sendMessage(
-    //             new Request([
-    //                 'message_text' => 'Please complete your GCash transaction. Here are the details: 
-    //             GCash Number: 09123456789. Kindly send the payment and notify us once done.',
-    //             ]),
-    //             Auth::id() // Assume the current authenticated user is the recipient
-    //         );
-
-    //         // Redirect to the GCash-specific page
-    //         return redirect()->route('user.messagesPisces');
-    //     }
-
-    //     // Add toast message to session
-    //     session()->flash('toast', [
-    //         'message' => 'Order placed successfully!',
-    //         'type' => 'success',
-    //     ]);
-
-    //     return redirect()->route('user.menu');
-    // }
 
     public function orderStore(Request $request)
     {
@@ -634,11 +578,10 @@ class DeliveryController extends Controller
 
         // Handle GCash-specific logic
         if ($request->input('paymentMethod') === 'GCash') {
-            // Admin sends a message to the user
+            // Admin sends a message to the user with dynamic total price
             $this->sendMessage(
                 new Request([
-                    'message_text' => 'Please complete your GCash transaction. Here are the details: 
-            GCash Number: 09123456789. Kindly send the payment and notify us once done.',
+                    'message_text' => 'Please complete your GCash transaction. Kindly send the payment: ₱' . number_format($totalPrice, 2) . ' and notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.',
                 ]),
                 Auth::id() // Assume the current authenticated user is the recipient
             );
@@ -646,6 +589,7 @@ class DeliveryController extends Controller
             // Redirect to the GCash-specific page
             return redirect()->route('user.messagesPisces');
         }
+
 
         // Add toast message to session
         session()->flash('toast', [
@@ -655,6 +599,7 @@ class DeliveryController extends Controller
 
         return redirect()->route('user.menu');
     }
+
     public function menuDetailsOrder($id)
     {
         // Get the authenticated user
@@ -683,9 +628,6 @@ class DeliveryController extends Controller
         return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'totalPrice'));
     }
 
-
-
-
     public function sendMessage(Request $request, $userId)
     {
         $validated = $request->validate([
@@ -694,14 +636,15 @@ class DeliveryController extends Controller
 
         $authUser = Auth::user();
         if (!$authUser) {
-            return response()->json(['error' => 'Admin not authenticated'], 403);
+            return response()->json(['error' => 'User not authenticated'], 403);
         }
 
         // Create the message
         $message = Message::create([
-            'user_id' => $authUser->id, // Admin is the sender
-            'receiver_id' => $userId, // User is the recipient
-            'sender_role' => 'Admin',
+            // 'user_id' => $authUser->id, // Admin is the sender
+            'user_id' => Auth::id(), // Admin is the sender
+            'receiver_id' => '1', // User is the recipient
+            'sender_role' => 'User',
             'message_text' => $validated['message_text'],
         ]);
 

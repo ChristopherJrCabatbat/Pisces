@@ -227,113 +227,121 @@ class MenuController extends Controller
     // }
 
     public function index(Request $request, UnreadMessagesController $unreadMessagesController)
-{
-    // Fetch unread message data
-    $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
-    $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
-
-    $query = Menu::query();
-    $toastMessage = null;
-    $activeFilter = 'Default view'; // Default description
-
-    // Handle Default Filter
-    if ($request->has('default') && $request->default === 'true') {
-        $toastMessage = 'Default view applied. Showing all menus!';
-    }
-
-    // Apply Available Filter
-    if ($request->has('mainFilter') && $request->mainFilter === 'available') {
-        $query->where('availability', 'Available');
-        $toastMessage = 'Successfully filtered by Availability: Available';
-        $activeFilter = 'Availability: Available';
-    }
-
-    // Handle other filters (category, price, date, etc.)
-    if ($request->has('categoryFilter') && $request->categoryFilter) {
-        $query->where('category', $request->categoryFilter);
-        $toastMessage = 'Successfully filtered by Category: ' . $request->categoryFilter;
-        $activeFilter = 'Category: ' . $request->categoryFilter;
-    }
-
-    if ($request->has('priceFilter')) {
-        $query->when($request->priceFilter === 'expensive', function ($q) {
-            $q->orderBy('price', 'desc');
-        })->when($request->priceFilter === 'cheap', function ($q) {
-            $q->orderBy('price', 'asc');
-        });
-
-        $toastMessage = 'Successfully filtered by Price: ' . ucfirst($request->priceFilter);
-        $activeFilter = 'Price: ' . ucfirst($request->priceFilter);
-    }
-
-    if ($request->has('dateFilter')) {
-        $query->when($request->dateFilter === 'recent', function ($q) {
-            $q->orderBy('created_at', 'desc');
-        })->when($request->dateFilter === 'oldest', function ($q) {
-            $q->orderBy('created_at', 'asc');
-        });
-
-        $toastMessage = 'Successfully filtered by Date: ' . ucfirst($request->dateFilter);
-        $activeFilter = 'Date: ' . ucfirst($request->dateFilter);
-    }
-
-    if ($request->has('analyticsFilter')) {
-        if ($request->analyticsFilter === 'best-sellers') {
-            $bestSellerMenus = DB::table('orders')
-                ->select('menu_name', DB::raw('SUM(quantity) as total_quantity'))
-                ->groupBy('menu_name')
-                ->orderByDesc('total_quantity')
-                ->pluck('menu_name');
-
-            $query->whereIn('name', $bestSellerMenus);
-        } elseif ($request->analyticsFilter === 'customer-favorites') {
-            $favoriteMenuIds = DB::table('favorite_items')
-                ->select('menu_id', DB::raw('COUNT(user_id) as total_favorites'))
-                ->groupBy('menu_id')
-                ->orderByDesc('total_favorites')
-                ->pluck('menu_id');
-
-            $query->whereIn('id', $favoriteMenuIds);
-        } elseif ($request->analyticsFilter === 'highest-rated') {
-            $query->get()->map(function ($menu) {
-                $menu->rating = DB::table('feedback')
-                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                    ->avg('rating');
-                $menu->review_count = DB::table('feedback')
-                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                    ->count();
-                return $menu;
-            })->sortByDesc('rating');
-            $toastMessage = 'Successfully filtered by Analytics: Highest Rated';
-            $activeFilter = 'Analytics: Highest Rated';
+    {
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+    
+        $query = Menu::query();
+        $toastMessage = null;
+        $activeFilter = 'Default view'; // Default description
+    
+        // Handle Default Filter
+        if ($request->has('default') && $request->default === 'true') {
+            $toastMessage = 'Default view applied. Showing all menus!';
         }
+    
+        // Apply Available Filter
+        if ($request->has('mainFilter') && $request->mainFilter === 'available') {
+            $query->where('availability', 'Available');
+            $toastMessage = 'Successfully filtered by Availability: Available';
+            $activeFilter = 'Availability: Available';
+        }
+    
+        // Apply Unavailable Filter
+        if ($request->has('mainFilter') && $request->mainFilter === 'unavailable') {
+            $query->where('availability', 'Unavailable');
+            $toastMessage = 'Successfully filtered by Availability: Unavailable';
+            $activeFilter = 'Availability: Unavailable';
+        }
+    
+        // Handle other filters (category, price, date, etc.)
+        if ($request->has('categoryFilter') && $request->categoryFilter) {
+            $query->where('category', $request->categoryFilter);
+            $toastMessage = 'Successfully filtered by Category: ' . $request->categoryFilter;
+            $activeFilter = 'Category: ' . $request->categoryFilter;
+        }
+    
+        if ($request->has('priceFilter')) {
+            $query->when($request->priceFilter === 'expensive', function ($q) {
+                $q->orderBy('price', 'desc');
+            })->when($request->priceFilter === 'cheap', function ($q) {
+                $q->orderBy('price', 'asc');
+            });
+    
+            $toastMessage = 'Successfully filtered by Price: ' . ucfirst($request->priceFilter);
+            $activeFilter = 'Price: ' . ucfirst($request->priceFilter);
+        }
+    
+        if ($request->has('dateFilter')) {
+            $query->when($request->dateFilter === 'recent', function ($q) {
+                $q->orderBy('created_at', 'desc');
+            })->when($request->dateFilter === 'oldest', function ($q) {
+                $q->orderBy('created_at', 'asc');
+            });
+    
+            $toastMessage = 'Successfully filtered by Date: ' . ucfirst($request->dateFilter);
+            $activeFilter = 'Date: ' . ucfirst($request->dateFilter);
+        }
+    
+        if ($request->has('analyticsFilter')) {
+            if ($request->analyticsFilter === 'best-sellers') {
+                $bestSellerMenus = DB::table('orders')
+                    ->select('menu_name', DB::raw('SUM(quantity) as total_quantity'))
+                    ->groupBy('menu_name')
+                    ->orderByDesc('total_quantity')
+                    ->pluck('menu_name');
+    
+                $query->whereIn('name', $bestSellerMenus);
+            } elseif ($request->analyticsFilter === 'customer-favorites') {
+                $favoriteMenuIds = DB::table('favorite_items')
+                    ->select('menu_id', DB::raw('COUNT(user_id) as total_favorites'))
+                    ->groupBy('menu_id')
+                    ->orderByDesc('total_favorites')
+                    ->pluck('menu_id');
+    
+                $query->whereIn('id', $favoriteMenuIds);
+            } elseif ($request->analyticsFilter === 'highest-rated') {
+                $query->get()->map(function ($menu) {
+                    $menu->rating = DB::table('feedback')
+                        ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                        ->avg('rating');
+                    $menu->review_count = DB::table('feedback')
+                        ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                        ->count();
+                    return $menu;
+                })->sortByDesc('rating');
+                $toastMessage = 'Successfully filtered by Analytics: Highest Rated';
+                $activeFilter = 'Analytics: Highest Rated';
+            }
+        }
+    
+        // Retrieve menus and calculate ratings and review counts
+        $menus = $query->get()->map(function ($menu) {
+            $menu->rating = DB::table('feedback')
+                ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                ->avg('rating');
+            $menu->review_count = DB::table('feedback')
+                ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                ->count();
+            return $menu;
+        });
+    
+        // Sort menus by highest rating
+        $menus = $menus->sortByDesc('rating')->values();
+    
+        $categories = DB::table('categories')->select('category')->distinct()->get();
+    
+        if (!is_null($toastMessage)) {
+            session()->flash('toast', [
+                'message' => $toastMessage,
+                'type' => 'success',
+            ]);
+        }
+    
+        return view('admin.menu', compact('menus', 'categories', 'activeFilter', 'totalUnreadCount'));
     }
-
-    // Retrieve menus and calculate ratings and review counts
-    $menus = $query->get()->map(function ($menu) {
-        $menu->rating = DB::table('feedback')
-            ->where('menu_items', 'LIKE', "%{$menu->name}%")
-            ->avg('rating');
-        $menu->review_count = DB::table('feedback')
-            ->where('menu_items', 'LIKE', "%{$menu->name}%")
-            ->count();
-        return $menu;
-    });
-
-    // Sort menus by highest rating
-    $menus = $menus->sortByDesc('rating')->values();
-
-    $categories = DB::table('categories')->select('category')->distinct()->get();
-
-    if (!is_null($toastMessage)) {
-        session()->flash('toast', [
-            'message' => $toastMessage,
-            'type' => 'success',
-        ]);
-    }
-
-    return view('admin.menu', compact('menus', 'categories', 'activeFilter', 'totalUnreadCount'));
-}
+    
 
 
 

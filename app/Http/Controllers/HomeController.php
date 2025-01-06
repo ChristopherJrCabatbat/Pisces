@@ -60,7 +60,7 @@ class HomeController extends Controller
             )
             ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.description', 'menus.category')
             ->orderByDesc('order_count')
-            ->take(4)
+            ->take(3)
             ->get()
             ->map(function ($menu) {
                 // Add rating and ratingCount dynamically

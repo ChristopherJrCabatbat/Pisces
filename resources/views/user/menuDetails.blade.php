@@ -247,7 +247,7 @@
                 <!-- Additional Info -->
                 <div class="extra-info">
                     <span><i class="fa-solid fa-heart me-1" style="color: red;"></i> {{ $favoritesCount }} Favorites</span>
-                    <span><i class="fa-solid fa-ticket me-1" style="color: blue;"></i> Free Shipping</span>
+                    {{-- <span><i class="fa-solid fa-ticket me-1" style="color: blue;"></i> Free Shipping</span> --}}
                 </div>
 
 

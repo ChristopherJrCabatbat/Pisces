@@ -865,45 +865,45 @@ class UserController extends Controller
     // }
 
     public function sendMessage(Request $request, $userId)
-{
-    try {
-        // Validate input for either message_text or image
-        $request->validate([
-            'message_text' => 'nullable|required_without:image',
-            'image' => 'nullable|required_without:message_text|image|max:2048',
-        ]);
+    {
+        try {
+            // Validate input for either message_text or image
+            $request->validate([
+                'message_text' => 'nullable|required_without:image',
+                'image' => 'nullable|required_without:message_text|image|max:2048',
+            ]);
 
-        $imageFile = $request->file('image');
-        $imageUrl = null;
-        $messageText = $request->input('message_text');
+            $imageFile = $request->file('image');
+            $imageUrl = null;
+            $messageText = $request->input('message_text');
 
-        // Handle image upload if present
-        if ($imageFile) {
-            $imagePath = $imageFile->store('messages', 'public');
-            $imageUrl = asset('storage/' . $imagePath);
+            // Handle image upload if present
+            if ($imageFile) {
+                $imagePath = $imageFile->store('messages', 'public');
+                $imageUrl = asset('storage/' . $imagePath);
 
-            // Set the message text to "Sent an image" if it's an image-only message
-            if (!$messageText) {
-                $messageText = 'Sent an image';
+                // Set the message text to "Sent an image" if it's an image-only message
+                if (!$messageText) {
+                    $messageText = 'Sent an image';
+                }
             }
+
+            // Create the message
+            $message = Message::create([
+                'user_id' => Auth::id(),
+                'receiver_id' => $userId,
+                'sender_role' => 'User',
+                'message_text' => $messageText,
+                'image_url' => $imageUrl,
+                'is_read' => false,
+            ]);
+
+            return response()->json(['success' => true, 'message' => $message], 201);
+        } catch (\Exception $e) {
+            logger('Error in sending message:', [$e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Failed to send the message.'], 500);
         }
-
-        // Create the message
-        $message = Message::create([
-            'user_id' => Auth::id(),
-            'receiver_id' => $userId,
-            'sender_role' => 'User',
-            'message_text' => $messageText,
-            'image_url' => $imageUrl,
-            'is_read' => false,
-        ]);
-
-        return response()->json(['success' => true, 'message' => $message], 201);
-    } catch (\Exception $e) {
-        logger('Error in sending message:', [$e->getMessage()]);
-        return response()->json(['success' => false, 'message' => 'Failed to send the message.'], 500);
     }
-}
 
 
 

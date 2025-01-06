@@ -174,6 +174,27 @@
         .fa-star-half-stroke {
             color: #F81D0B;
         }
+
+        
+/* Image container styling */
+.img-container {
+    position: relative;
+    width: 100%;
+    height: 300px; /* Set height to keep images consistent */
+    overflow: hidden;
+}
+
+/* Image within the container */
+.img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the container */
+}
+
+/* Darken overlay on hover */
+.img-container:hover .darken {
+    filter: brightness(30%);
+}
     </style>
 
 
@@ -323,7 +344,7 @@
                         Discover our latest dishes, made to satisfy every craving. Don’t miss out – try them today!
                     </p>
 
-                    <ul class="grid-list">
+                    {{-- <ul class="grid-list">
                         @foreach ($latestMenus as $index => $menu)
                             <li data-reveal="{{ $index % 2 == 0 ? 'left' : 'right' }}">
                                 <div class="instruction-card">
@@ -344,7 +365,30 @@
                                 </div>
                             </li>
                         @endforeach
+                    </ul> --}}
+
+                    <ul class="grid-list">
+                        @foreach ($latestMenus as $index => $menu)
+                            <li data-reveal="{{ $index % 2 == 0 ? 'left' : 'right' }}">
+                                <div class="instruction-card">
+                                    <figure class="img-container">
+                                        <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}">
+                                    </figure>
+                                    <div class="card-content">
+                                        <h3 class="h5 card-title">
+                                            <span class="span">{{ sprintf('%02d', $index + 1) }}</span>
+                                            {{ $menu->name }}
+                                        </h3>
+                                        <p class="card-text">
+                                            {{ $menu->description }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        @endforeach
                     </ul>
+                    
+                    
                 </div>
             </section>
 

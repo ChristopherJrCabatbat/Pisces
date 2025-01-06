@@ -266,8 +266,8 @@
                             <option value="priceModal">Price</option>
                             <option value="dateModal">Date</option>
                             <option value="analyticsModal">Analytics</option>
-                            <option value="unavailable">Unavailable</option> <!-- New Filter -->
                             <option value="available">Available</option>
+                            <option value="unavailable">Unavailable</option> <!-- New Filter -->
                         </select>
 
                     </div>
