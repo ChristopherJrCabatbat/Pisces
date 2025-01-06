@@ -82,8 +82,7 @@
 
 
                     <!-- Shipping Details -->
-
-
+                    
                     <!-- Timeline -->
                     <div class="timeline">
                         <!-- Items -->

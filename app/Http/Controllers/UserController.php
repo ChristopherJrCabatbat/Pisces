@@ -1040,38 +1040,46 @@ class UserController extends Controller
     //     // Parse the orders and quantities from the database
     //     $orders = explode(',', $delivery->order); // Split items by commas
     //     $items = [];
+    //     $totalPrice = 0; // Initialize total price
 
     //     foreach ($orders as $order) {
-    //         // Extract the menu item name (removing the quantity part " (x1)")
+    //         // Extract the menu item name and quantity (e.g., "Burger (x2)")
     //         preg_match('/^(.*?)\s*\(x(\d+)\)$/', trim($order), $matches);
-    //         $itemName = $matches[1] ?? trim($order); // Extracted name or fallback to the original
-    //         $quantity = $matches[2] ?? 1; // Default quantity is 1 if not found
+    //         $itemName = $matches[1] ?? trim($order); // Extracted name or fallback to original
+    //         $quantity = (int) ($matches[2] ?? 1); // Default to 1 if not found
 
     //         // Find the menu item by name
-    //         $menu = Menu::where('name', $itemName)->first();
+    //         $menu = Menu::where('name', trim($itemName))->first();
 
     //         if ($menu) {
+    //             $itemTotal = $menu->price * $quantity; // Calculate item's total price
+    //             $totalPrice += $itemTotal; // Add to the overall total price
+
     //             $items[] = [
     //                 'name' => $menu->name,
-    //                 'price' => $menu->price * $quantity, // Calculate total price
+    //                 'price' => $menu->price,
+    //                 'total_price' => $itemTotal,
     //                 'image' => $menu->image,
     //                 'quantity' => $quantity,
     //             ];
     //         } else {
-    //             // Log a warning for unmatched menu items
-    //             Log::warning('Menu item not found for order: ' . $order);
-
     //             // Fallback for missing menu items
+    //             Log::warning('Menu item not found: ' . $order);
     //             $items[] = [
     //                 'name' => $itemName,
-    //                 'price' => 0, // Total price is 0 for missing items
+    //                 'price' => 0,
+    //                 'total_price' => 0,
     //                 'image' => null,
     //                 'quantity' => $quantity,
     //             ];
     //         }
     //     }
 
-    //     // Count unread messages from the admin
+    //     // Update the total price in the delivery table if necessary
+    //     $delivery->total_price = $totalPrice;
+    //     $delivery->save();
+
+    //     // Count unread messages
     //     $unreadCount = Message::where('receiver_id', $user->id)
     //         ->where('is_read', false)
     //         ->count();
@@ -1079,80 +1087,80 @@ class UserController extends Controller
     //     // Count pending or active orders
     //     $pendingOrdersCount = DB::table('deliveries')
     //         ->where('email', $user->email)
-    //         ->whereIn('status', ['Pending', 'Preparing', 'Out for Delivery'])
+    //         ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
     //         ->count();
 
-
-    //     // Return the view with the parsed items
-    //     return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items'));
+    //     // Return the view with parsed data
+    //     return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items', 'totalPrice'));
     // }
 
     public function reviewOrder(Request $request, $deliveryId)
-    {
-        /** @var User $user */
-        $user = Auth::user();
+{
+    /** @var User $user */
+    $user = Auth::user();
 
-        // Fetch the delivery by ID and ensure it belongs to the authenticated user
-        $delivery = Delivery::where('id', $deliveryId)
-            ->where('email', $user->email) // Match with the user's email to validate
-            ->firstOrFail();
+    // Fetch the delivery by ID and ensure it belongs to the authenticated user
+    $delivery = Delivery::where('id', $deliveryId)
+        ->where('email', $user->email) // Match with the user's email to validate
+        ->firstOrFail();
 
-        // Parse the orders and quantities from the database
-        $orders = explode(',', $delivery->order); // Split items by commas
-        $items = [];
-        $totalPrice = 0; // Initialize total price
+    // Parse the orders and quantities from the database
+    $orders = explode(',', $delivery->order); // Split items by commas
+    $items = [];
+    $totalPrice = 0; // Initialize total price
 
-        foreach ($orders as $order) {
-            // Extract the menu item name and quantity (e.g., "Burger (x2)")
-            preg_match('/^(.*?)\s*\(x(\d+)\)$/', trim($order), $matches);
-            $itemName = $matches[1] ?? trim($order); // Extracted name or fallback to original
-            $quantity = (int) ($matches[2] ?? 1); // Default to 1 if not found
+    foreach ($orders as $order) {
+        // Extract the menu item name and quantity (e.g., "Burger (x2)")
+        preg_match('/^(.*?)\s*\(x(\d+)\)$/', trim($order), $matches);
+        $itemName = $matches[1] ?? trim($order); // Extracted name or fallback to original
+        $quantity = (int) ($matches[2] ?? 1); // Default to 1 if not found
 
-            // Find the menu item by name
-            $menu = Menu::where('name', trim($itemName))->first();
+        // Find the menu item by name
+        $menu = Menu::where('name', trim($itemName))->first();
 
-            if ($menu) {
-                $itemTotal = $menu->price * $quantity; // Calculate item's total price
-                $totalPrice += $itemTotal; // Add to the overall total price
+        if ($menu && is_object($menu)) {
+            $itemTotal = $menu->price * $quantity; // Calculate item's total price
+            $totalPrice += $itemTotal; // Add to the overall total price
 
-                $items[] = [
-                    'name' => $menu->name,
-                    'price' => $menu->price,
-                    'total_price' => $itemTotal,
-                    'image' => $menu->image,
-                    'quantity' => $quantity,
-                ];
-            } else {
-                // Fallback for missing menu items
-                Log::warning('Menu item not found: ' . $order);
-                $items[] = [
-                    'name' => $itemName,
-                    'price' => 0,
-                    'total_price' => 0,
-                    'image' => null,
-                    'quantity' => $quantity,
-                ];
-            }
+            $items[] = [
+                'name' => $menu->name,
+                'price' => $menu->price,
+                'total_price' => $itemTotal,
+                'image' => $menu->image,
+                'quantity' => $quantity,
+            ];
+        } else {
+            // Fallback for missing menu items
+            Log::warning('Menu item not found: ' . $order);
+            $items[] = [
+                'name' => $itemName,
+                'price' => 0, // Default price for missing items
+                'total_price' => 0,
+                'image' => null,
+                'quantity' => $quantity,
+            ];
         }
-
-        // Update the total price in the delivery table if necessary
-        $delivery->total_price = $totalPrice;
-        $delivery->save();
-
-        // Count unread messages
-        $unreadCount = Message::where('receiver_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        // Count pending or active orders
-        $pendingOrdersCount = DB::table('deliveries')
-            ->where('email', $user->email)
-            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
-            ->count();
-
-        // Return the view with parsed data
-        return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items', 'totalPrice'));
     }
+
+    // Update the total price in the delivery table if necessary
+    $delivery->total_price = $totalPrice;
+    $delivery->save();
+
+    // Count unread messages
+    $unreadCount = Message::where('receiver_id', $user->id)
+        ->where('is_read', false)
+        ->count();
+
+    // Count pending or active orders
+    $pendingOrdersCount = DB::table('deliveries')
+        ->where('email', $user->email)
+        ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
+        ->count();
+
+    // Return the view with parsed data
+    return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items', 'totalPrice'));
+}
+
 
 
 

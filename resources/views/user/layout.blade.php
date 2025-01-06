@@ -386,7 +386,7 @@
 
             setTimeout(() => {
                 customToast.remove();
-            }, 3000);
+            }, 4500);
         }
 
         // Check if a toast message exists in the session

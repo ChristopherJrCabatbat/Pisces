@@ -161,30 +161,32 @@
                         @endphp
 
                         <div class="d-flex flex-column gap-3">
+
                             @foreach ($menus as $menu)
                                 @php
-                                    $quantity = $menu->pivot->quantity ?? 1; // Fetch quantity from pivot
-                                    $itemTotal = $menu->price * $quantity; // Calculate item total
+                                    $quantity = $menu['quantity'] ?? 1; // Ensure quantity is set
+                                    $itemTotal = $menu['price'] * $quantity; // Calculate item total
                                     $totalPrice += $itemTotal; // Update total price
                                 @endphp
 
                                 <div class="d-flex gap-3 justify-content-between align-items-center">
                                     <div class="picture border border-1">
-                                        <img src="{{ asset('storage/' . $menu->image) }}" class="img-fluid"
-                                            width="70" alt="Picture">
+                                        <img src="{{ $menu['image'] ? asset('storage/' . $menu['image']) : asset('images/default.jpg') }}"
+                                            class="img-fluid" width="70" alt="Picture">
                                     </div>
                                     <div class="menu-name d-flex flex-column align-items-center">
-                                        <div class="name">{{ $menu->name }} ({{ $quantity }})</div>
+                                        <div class="name">{{ $menu['name'] }} ({{ $quantity }})</div>
                                     </div>
                                     <div class="price fw-bold">
                                         ₱{{ number_format($itemTotal, 2) }}
                                     </div>
 
                                     <!-- Hidden Inputs for Order Data -->
-                                    <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
+                                    <input type="hidden" name="menu_names[]" value="{{ $menu['name'] }}">
                                     <input type="hidden" name="quantities[]" value="{{ $quantity }}">
                                 </div>
                             @endforeach
+
                         </div>
                     </div>
 

@@ -171,11 +171,6 @@ class DeliveryController extends Controller
         ]);
     }
 
-
-
-
-
-
     public function deliveryUpdate(Request $request)
     {
         // Validate the request if needed
@@ -225,37 +220,6 @@ class DeliveryController extends Controller
         ]);
     }
 
-    // public function orderRepeat($deliveryId)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Fetch delivery details
-    //     $delivery = Delivery::findOrFail($deliveryId);
-
-    //     // Fetch related orders
-    //     $orders = $delivery->orders; // Fetch using the 'orders' relationship
-
-    //     // Ensure there are orders associated with the delivery
-    //     if ($orders->isEmpty()) {
-    //         abort(404, 'No orders found for this delivery.');
-    //     }
-
-    //     // Prepare data to pass to the order page
-    //     $menus = [];
-    //     foreach ($orders as $order) {
-    //         $menus[] = [
-    //             'name' => $order->menu_name,
-    //             'quantity' => $order->quantity,
-    //             'price' => 0,
-    //             'image' => '',
-    //         ];
-    //     }
-
-    //     // Redirect to order.blade.php with data
-    //     return view('user.order', compact('menus', 'user', 'delivery'));
-    // }
-
     public function orderRepeat($deliveryId)
     {
         /** @var User $user */
@@ -280,14 +244,15 @@ class DeliveryController extends Controller
             $menus[] = [
                 'name' => $order->menu_name,
                 'quantity' => $order->quantity,
-                'price' => $menu ? $menu->price : 0, // Fallback to 0 if no menu is found
-                'image' => $menu ? $menu->image : '', // Fallback to empty string if no menu is found
+                'price' => $menu->price ?? 0, // Fallback to 0 if no menu is found
+                'image' => $menu->image ?? '', // Fallback to empty string if no menu is found
             ];
         }
 
         // Redirect to order.blade.php with data
         return view('user.order', compact('menus', 'user', 'delivery'));
     }
+
 
 
 
@@ -303,94 +268,6 @@ class DeliveryController extends Controller
      * Store a newly created resource in storage.
      */
 
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'fullName' => 'required|string|max:255',
-    //         'email' => 'required|email|max:255',
-    //         'contactNumber' => 'required|string|max:20',
-    //         'address' => 'required|string',
-    //         'shippingMethod' => 'required|string',
-    //         'paymentMethod' => 'required|string',
-    //         'note' => 'nullable|string',
-    //         'menu_names' => 'required|array',
-    //         'quantities' => 'required|array',
-    //         'total_price' => 'required|numeric', // Ensure total_price is passed from the front-end
-    //     ]);
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     $orderItems = [];
-    //     $totalQuantity = 0;
-    //     $totalPrice = 0; // Initialize total price
-    //     $orderQuantities = implode(', ', $request->quantities);
-
-    //     // Construct the order string and calculate total price
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         $menu = Menu::where('name', $menuName)->firstOrFail();
-    //         $itemTotal = $menu->price * $quantity; // Calculate total for each item
-    //         $orderItems[] = "{$menuName} (x{$quantity})";
-    //         $totalQuantity += $quantity;
-    //         $totalPrice += $itemTotal; // Add to total price
-    //     }
-
-    //     // Determine if the user has a discount
-    //     $hasDiscount = $user->has_discount;
-
-    //     // Use the discounted total price if the user has a discount
-    //     if ($hasDiscount) {
-    //         $totalPrice = $totalPrice * 0.95; // Apply a 5% discount
-    //         $user->update(['has_discount' => false]); // Mark discount as used
-    //     }
-
-    //     $orderString = implode(', ', $orderItems);
-
-    //     // Insert the order into the deliveries table
-    //     $deliveryId = DB::table('deliveries')->insertGetId([
-    //         'name' => $request->input('fullName'),
-    //         'email' => $request->input('email'),
-    //         'contact_number' => $request->input('contactNumber'),
-    //         'order' => $orderString,
-    //         'address' => $request->input('address'),
-    //         'quantity' => $orderQuantities,
-    //         'shipping_method' => $request->input('shippingMethod'),
-    //         'mode_of_payment' => $request->input('paymentMethod'),
-    //         'note' => $request->input('note'),
-    //         'total_price' => $totalPrice, // Save the discounted or original total price
-    //         'status' => 'Pending',
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     // Store each order item in the orders table
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         DB::table('orders')->insert([
-    //             'delivery_id' => $deliveryId,
-    //             'menu_name' => $menuName,
-    //             'quantity' => $quantity,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ]);
-    //     }
-
-    //     // Remove all cart items for the logged-in user
-    //     DB::table('cart_items')->where('user_id', $user->id)->delete();
-
-    //     // Reset the user's 'cart' field to 0
-    //     $user->cart = 0;
-    //     $user->save();
-
-    //     // Add toast message to session
-    //     session()->flash('toast', [
-    //         'message' => 'Order placed successfully!',
-    //         'type' => 'success',
-    //     ]);
-
-    //     return redirect()->route('user.menu');
-    // }
 
     public function store(Request $request)
     {
@@ -470,10 +347,21 @@ class DeliveryController extends Controller
 
         // Handle GCash-specific logic
         if ($request->input('paymentMethod') === 'GCash') {
-            // Admin sends a message to the user with dynamic total price
+            // Generate the order string dynamically
+            $orderItems = [];
+            foreach ($request->menu_names as $index => $menuName) {
+                $quantity = $request->quantities[$index];
+                $orderItems[] = "{$menuName} (x{$quantity})";
+            }
+            $orderString = implode(', ', $orderItems);
+
+            // Admin sends a message to the user with dynamic total price and order details
             $this->sendMessage(
                 new Request([
-                    'message_text' => 'Please complete your GCash transaction. Kindly send the payment: ₱' . number_format($totalPrice, 2) . ' and notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.',
+                    'message_text' => 'Please complete your GCash transaction. Kindly send the payment for the following orders: '
+                        . $orderString
+                        . ' with a total of ₱' . number_format($totalPrice, 2)
+                        . ' and notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.',
                 ]),
                 Auth::id() // Assume the current authenticated user is the recipient
             );
@@ -481,6 +369,7 @@ class DeliveryController extends Controller
             // Redirect to the GCash-specific page
             return redirect()->route('user.messagesPisces');
         }
+
 
 
         // Remove all cart items for the logged-in user
@@ -492,7 +381,7 @@ class DeliveryController extends Controller
 
         // Add toast message to session
         session()->flash('toast', [
-            'message' => 'Order placed successfully!',
+            'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
             'type' => 'success',
         ]);
 
@@ -578,10 +467,21 @@ class DeliveryController extends Controller
 
         // Handle GCash-specific logic
         if ($request->input('paymentMethod') === 'GCash') {
-            // Admin sends a message to the user with dynamic total price
+            // Generate the order string dynamically
+            $orderItems = [];
+            foreach ($request->menu_names as $index => $menuName) {
+                $quantity = $request->quantities[$index];
+                $orderItems[] = "{$menuName} (x{$quantity})";
+            }
+            $orderString = implode(', ', $orderItems);
+
+            // Admin sends a message to the user with dynamic total price and order details
             $this->sendMessage(
                 new Request([
-                    'message_text' => 'Please complete your GCash transaction. Kindly send the payment: ₱' . number_format($totalPrice, 2) . ' and notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.',
+                    'message_text' => 'Please complete your GCash transaction. Kindly send the payment for the following orders: '
+                        . $orderString
+                        . ' with a total of ₱' . number_format($totalPrice, 2)
+                        . ' and notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.',
                 ]),
                 Auth::id() // Assume the current authenticated user is the recipient
             );
@@ -590,10 +490,9 @@ class DeliveryController extends Controller
             return redirect()->route('user.messagesPisces');
         }
 
-
         // Add toast message to session
         session()->flash('toast', [
-            'message' => 'Order placed successfully!',
+            'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
             'type' => 'success',
         ]);
 

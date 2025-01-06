@@ -178,14 +178,14 @@
                             @if ($message->user_id === $user->id)
                                 {{-- User --}}
                                 <div class="d-flex align-items-start justify-content-end mb-4">
-                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') === false)
+                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
                                         <span
                                             class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
                                     @endif
                                     <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
                                         style="max-width: 70%; 
                                         display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }}; 
-                                        {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                        {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') !== false ? 'margin: 0 auto; max-width: 73%;' : '' }}">
                                         @if ($message->message_text && $message->message_text !== 'Sent an image')
                                             <p class="m-0">{{ $message->message_text }}</p>
                                         @endif
@@ -194,7 +194,7 @@
                                         <img src="{{ $message->image_url }}" alt="Sent Image"
                                             class="mt-2 rounded shadow-sm" height="310px" width="auto">
                                     @endif
-                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') === false)
+                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
                                         <div class="message-avatar bg-primary text-white">
                                             <i class="fa-solid fa-user"></i>
                                         </div>
@@ -211,14 +211,14 @@
                                     @endif
                                     <div class="message bg-white text-dark px-3 py-2 rounded shadow-sm"
                                         style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }}; 
-                                        {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') !== false ? 'margin: 0 auto; max-width: 80%;' : '' }}">
+                                        {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') !== false ? 'margin: 0 auto; max-width: 73%;' : '' }}">
                                         @if ($message->message_text)
                                             <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
                                                 {{ $message->message_text }}
                                             </p>
                                         @endif
                                     </div>
-                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment: ₱') === false)
+                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
                                         <span
                                             class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
                                     @endif
@@ -336,7 +336,7 @@
     
         // Append message to chat body
         function appendMessage(message) {
-            const isGCashMessage = message.message_text && message.message_text.includes('Please complete your GCash transaction. Kindly send the payment: ₱');
+            const isGCashMessage = message.message_text && message.message_text.includes('Please complete your GCash transaction. Kindly send the payment for the following orders:');
             const isImageOnlyMessage = message.message_text === 'Sent an image';
             
             let newMessage = `
@@ -344,7 +344,7 @@
                     ${!isGCashMessage ? `<span class="text-muted align-self-center small me-3">Just now</span>` : ''}
                     ${!isImageOnlyMessage ? `
                         <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
-                             style="max-width: ${isGCashMessage ? '80%' : '70%'}; 
+                             style="max-width: ${isGCashMessage ? '73%' : '70%'}; 
                              ${isGCashMessage ? 'margin: 0 auto;' : ''};
                              display: ${message.message_text && message.message_text !== 'Sent an image' ? 'block' : 'none'};">
                             ${message.message_text && message.message_text !== 'Sent an image' ? `<p class="m-0">${message.message_text}</p>` : ''}
@@ -379,10 +379,10 @@
             messages.forEach(message => {
                 // Check if message text contains GCash-related keywords
                 if (message.textContent.includes(
-                        'Please complete your GCash transaction. Kindly send the payment: ₱')) {
+                        'Please complete your GCash transaction. Kindly send the payment for the following orders:')) {
                     message.classList.add('gcash-message'); // Apply specific styling
                     message.style.margin = "0 auto"; // Center the message
-                    message.style.maxWidth = "80%"; // Adjust width for centered messages
+                    message.style.maxWidth = "73%"; // Adjust width for centered messages
                 }
             });
         });
