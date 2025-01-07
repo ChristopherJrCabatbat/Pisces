@@ -15,6 +15,7 @@ class Feedback extends Model
         'menu_items',
         'feedback_text',
         'rating',
+        'rider_rating',
         'sentiment',
         'response',
     ];

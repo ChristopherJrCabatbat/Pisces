@@ -696,6 +696,7 @@ class UserController extends Controller
             }
 
             $order->menuDetails = $menuDetails;
+            $order->rider_name = $order->rider;
             return $order;
         });
 

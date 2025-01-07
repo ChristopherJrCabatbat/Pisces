@@ -36,7 +36,6 @@ class FeedbackController extends Controller
      * Store a newly created resource in storage.
      */
 
-
     // public function store(Request $request)
     // {
     //     // Validate input fields
@@ -79,10 +78,11 @@ class FeedbackController extends Controller
     //     }
 
     //     // Format the message
+    //     $feedbackText = $validated['feedback_text'] ? sprintf(' "%s"', ucfirst($validated['feedback_text'])) : '';
     //     $messageText = sprintf(
-    //         "I would like to share my feedback on '%s'. \"%s\" I rate it %d star%s.",
+    //         "I would like to share my feedback on '%s'.%s I rate it %d star%s.",
     //         $validated['menu_items'],
-    //         ucfirst($validated['feedback_text']),
+    //         $feedbackText,
     //         $validated['rating'],
     //         $validated['rating'] > 1 ? 's' : ''
     //     );
@@ -104,13 +104,15 @@ class FeedbackController extends Controller
         // Validate input fields
         $validated = $request->validate([
             'feedback_text' => 'nullable|string|max:1000',
-            'rating' => 'required|numeric|min:1|max:5',
+            'rating' => 'required|numeric|min:1|max:5', // Menu rating
             'menu_items' => 'required|string',
+            'rider_rating' => 'nullable|numeric|min:1|max:5', // Rider rating
+            'rider_name' => 'nullable|string', // Rider's name
         ]);
 
         $user = Auth::user(); // Get the currently authenticated user
 
-        // Check for existing feedback
+        // Check for existing feedback for the menu item
         $existingFeedback = Feedback::where('customer_name', $user->first_name . ' ' . $user->last_name)
             ->where('menu_items', $validated['menu_items'])
             ->first();
@@ -118,17 +120,22 @@ class FeedbackController extends Controller
         if ($existingFeedback) {
             $existingFeedback->update([
                 'feedback_text' => $validated['feedback_text'],
-                'rating' => $validated['rating'],
+                'rating' => $validated['rating'], // Update menu rating
+                'rider_rating' => $validated['rider_rating'], // Update rider rating if provided
+                'rider_name' => $validated['rider_name'], // Update rider name if provided
             ]);
             session()->flash('toast', ['message' => 'Feedback updated successfully!', 'type' => 'success']);
         } else {
+            // Generate a unique order number for feedback
             $orderNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
             Feedback::create([
                 'customer_name' => $user->first_name . ' ' . $user->last_name,
                 'order_number' => $orderNumber,
                 'menu_items' => $validated['menu_items'],
                 'feedback_text' => $validated['feedback_text'],
-                'rating' => $validated['rating'],
+                'rating' => $validated['rating'], // Save menu rating
+                'rider_rating' => $validated['rider_rating'], // Save rider rating if provided
+                'rider_name' => $validated['rider_name'], // Save rider name if provided
             ]);
             session()->flash('toast', ['message' => 'Feedback submitted successfully!', 'type' => 'success']);
         }
@@ -136,8 +143,22 @@ class FeedbackController extends Controller
         // Update menu's rating
         $menu = \App\Models\Menu::where('name', $validated['menu_items'])->first();
         if ($menu) {
-            $menu->rating = round($validated['rating'], 1);
+            $menu->rating = Feedback::where('menu_items', $menu->name)->avg('rating'); // Calculate the average rating
             $menu->save();
+        }
+
+        // Update the rider's rating if provided
+        if (!empty($validated['rider_name']) && !empty($validated['rider_rating'])) {
+            $rider = \App\Models\Rider::where('name', $validated['rider_name'])->first();
+
+            if ($rider) {
+                // Calculate the average rider rating
+                $averageRiderRating = Feedback::where('rider_name', $validated['rider_name'])
+                    ->whereNotNull('rider_rating') // Ensure the rider rating is not null
+                    ->avg('rider_rating');
+
+                $rider->update(['rating' => round($averageRiderRating, 1)]); // Save the updated rating
+            }
         }
 
         // Format the message
@@ -161,6 +182,7 @@ class FeedbackController extends Controller
         // Redirect back
         return redirect()->back();
     }
+
 
 
 

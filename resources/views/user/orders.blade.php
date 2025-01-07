@@ -46,7 +46,7 @@
 
                         <!-- Star Rating -->
                         <div class="mb-3">
-                            <label for="rating" class="form-label">Rating</label>
+                            <label for="rating" class="form-label">Rate</label>
                             <div id="starRating" class="star-rating">
                                 @for ($i = 5; $i >= 1; $i--)
                                     <input type="radio" required id="star{{ $i }}" name="rating"
@@ -55,6 +55,23 @@
                                 @endfor
                             </div>
                         </div>
+
+                        <!-- Rider Rating -->
+                        <div class="mb-3">
+                            <label for="riderRating" class="form-label">
+                                You can also rate <span id="riderName">the rider</span> for his/her service:
+                            </label>
+                            <div id="riderRating" class="star-rating">
+                                @for ($i = 5; $i >= 1; $i--)
+                                    <input type="radio" required id="riderStar{{ $i }}" name="rider_rating"
+                                        value="{{ $i }}">
+                                    <label for="riderStar{{ $i }}" class="star">★</label>
+                                @endfor
+                            </div>
+                        </div>
+                        <!-- Hidden input to store rider's name -->
+                        <input type="hidden" name="rider_name" id="riderNameInput">
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -107,20 +124,23 @@
             <div class="sub-tabs-container">
                 <ul class="nav nav-tabs justify-content-center" id="ordersTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link text-black active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all"
-                            type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
+                        <button class="nav-link text-black active" id="all-tab" data-bs-toggle="tab"
+                            data-bs-target="#all" type="button" role="tab" aria-controls="all"
+                            aria-selected="true">All</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link text-black" id="pending-gcash-transaction-tab" data-bs-toggle="tab" data-bs-target="#pending-gcash-transaction"
-                            type="button" role="tab" aria-controls="pending-gcash-transaction" aria-selected="false">Pending GCash</button>
+                        <button class="nav-link text-black" id="pending-gcash-transaction-tab" data-bs-toggle="tab"
+                            data-bs-target="#pending-gcash-transaction" type="button" role="tab"
+                            aria-controls="pending-gcash-transaction" aria-selected="false">Pending GCash</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link text-black" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
-                            type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
+                        <button class="nav-link text-black" id="pending-tab" data-bs-toggle="tab"
+                            data-bs-target="#pending" type="button" role="tab" aria-controls="pending"
+                            aria-selected="false">Pending</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link text-black" id="preparing-tab" data-bs-toggle="tab" data-bs-target="#preparing"
-                            type="button" role="tab" aria-controls="preparing"
+                        <button class="nav-link text-black" id="preparing-tab" data-bs-toggle="tab"
+                            data-bs-target="#preparing" type="button" role="tab" aria-controls="preparing"
                             aria-selected="false">Preparing</button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -129,13 +149,14 @@
                             aria-controls="out-for-delivery" aria-selected="false">Out for Delivery</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link text-black" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered"
-                            type="button" role="tab" aria-controls="delivered"
+                        <button class="nav-link text-black" id="delivered-tab" data-bs-toggle="tab"
+                            data-bs-target="#delivered" type="button" role="tab" aria-controls="delivered"
                             aria-selected="false">Delivered</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link text-black" id="returns-tab" data-bs-toggle="tab" data-bs-target="#returns"
-                            type="button" role="tab" aria-controls="returns" aria-selected="false">Returns</button>
+                        <button class="nav-link text-black" id="returns-tab" data-bs-toggle="tab"
+                            data-bs-target="#returns" type="button" role="tab" aria-controls="returns"
+                            aria-selected="false">Returns</button>
                     </li>
                 </ul>
             </div>
@@ -172,7 +193,8 @@
 
 @section('scripts')
 
-    <script>
+    {{-- Rider Modal --}}
+    {{-- <script>
         document.querySelectorAll('.to-review').forEach(button => {
             button.addEventListener('click', function() {
                 const menuName = this.getAttribute('data-menu-name') || 'N/A';
@@ -198,7 +220,39 @@
                 }
             });
         });
+    </script> --}}
+
+    <script>
+        document.querySelectorAll('.to-review').forEach(button => {
+            button.addEventListener('click', function() {
+                const menuName = this.getAttribute('data-menu-name') || 'N/A';
+                const menuImage = this.getAttribute('data-menu-image') || '';
+                const riderName = this.getAttribute('data-rider-name') || 'the rider';
+
+                // Target modal elements
+                const nameElement = document.getElementById('menuName');
+                const imageElement = document.getElementById('menuImage');
+                const hiddenInputElement = document.getElementById('menuItemInput');
+                const riderNameElement = document.getElementById('riderName');
+                const hiddenRiderInput = document.getElementById('riderNameInput');
+
+                // Update modal content
+                if (nameElement && imageElement && hiddenInputElement && riderNameElement &&
+                    hiddenRiderInput) {
+                    nameElement.textContent = menuName;
+                    imageElement.src = menuImage;
+                    imageElement.alt = menuName;
+                    hiddenInputElement.value = menuName;
+
+                    riderNameElement.textContent = riderName;
+                    hiddenRiderInput.value = riderName;
+                } else {
+                    console.error('Modal elements not found!');
+                }
+            });
+        });
     </script>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

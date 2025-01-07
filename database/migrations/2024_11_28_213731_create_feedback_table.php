@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('menu_items'); // List of menu items related to the feedback
             $table->text('feedback_text')->nullable(); // Optional feedback text from the customer
             $table->decimal('rating', 2, 1)->nullable(); // Optional numeric rating (e.g., 1 to 5)
+            $table->decimal('rider_rating', 2, 1)->nullable();
+            $table->string('rider_name')->nullable();
             $table->string('sentiment')->nullable(); // Optional sentiment analysis result (e.g., 'Positive', 'Negative')
             $table->text('response')->nullable(); // Optional response from admin or staff
             $table->timestamps(); // Created_at and Updated_at

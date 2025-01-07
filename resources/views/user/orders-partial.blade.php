@@ -25,22 +25,21 @@
     @foreach ($order->menuDetails as $menu)
         <div class="@if ($order->status == 'Delivered') d-flex justify-content-between align-items-center @endif">
             <div class="d-flex align-items-center mb-2">
-                {{-- Menu Image --}}
                 <img src="{{ url($menu->image) }}" alt="{{ $menu->name }}" class="rounded me-3"
                     style="width: 80px; height: 80px; object-fit: cover;">
                 <div>
                     <p class="fw-bold mb-1">{{ $menu->name }} (x{{ $menu->quantity }})</p>
                     <p class="text-muted mb-0">₱{{ number_format($menu->price * $menu->quantity, 2) }}</p>
-                    {{-- <p class="text-muted mb-0">₱{{ number_format($menu->price * $menu->pivot->quantity, 2) }}</p> --}}
                 </div>
             </div>
             @if ($order->status == 'Delivered')
                 <button type="button" class="btn btn-warning to-review h-25" data-bs-toggle="modal"
                     data-bs-target="#feedbackModal" data-menu-name="{{ $menu->name }}"
-                    data-menu-image="{{ url($menu->image) }}">
+                    data-menu-image="{{ url($menu->image) }}" data-rider-name="{{ $order->rider_name }}">
                     To Review
                 </button>
             @endif
+
         </div>
     @endforeach
 </div>
