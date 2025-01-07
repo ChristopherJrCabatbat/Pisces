@@ -26,6 +26,7 @@ return new class extends Migration
 
             // di pa na-migrate, delete mo yung add_last_login
             // $table->timestamp('last_login_at')->nullable();
+            // $table->timestamp('last_order')->nullable();
             // $table->boolean('has_discount')->default(false);
             // $table->boolean('newsletter_subscription')->default(false);
 

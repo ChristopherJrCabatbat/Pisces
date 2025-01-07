@@ -268,7 +268,6 @@ class DeliveryController extends Controller
      * Store a newly created resource in storage.
      */
 
-
     public function store(Request $request)
     {
         $request->validate([
@@ -281,7 +280,7 @@ class DeliveryController extends Controller
             'note' => 'nullable|string',
             'menu_names' => 'required|array',
             'quantities' => 'required|array',
-            'total_price' => 'required|numeric', // Ensure total_price is passed from the front-end
+            'total_price' => 'required|numeric',
         ]);
 
         /** @var User $user */
@@ -289,34 +288,28 @@ class DeliveryController extends Controller
 
         $orderItems = [];
         $totalQuantity = 0;
-        $totalPrice = 0; // Initialize total price
+        $totalPrice = 0;
         $orderQuantities = implode(', ', $request->quantities);
 
-        // Construct the order string and calculate total price
         foreach ($request->menu_names as $index => $menuName) {
             $quantity = $request->quantities[$index];
             $menu = Menu::where('name', $menuName)->firstOrFail();
-            $itemTotal = $menu->price * $quantity; // Calculate total for each item
+            $itemTotal = $menu->price * $quantity;
             $orderItems[] = "{$menuName} (x{$quantity})";
             $totalQuantity += $quantity;
-            $totalPrice += $itemTotal; // Add to total price
+            $totalPrice += $itemTotal;
         }
 
-        // Determine if the user has a discount
         $hasDiscount = $user->has_discount;
 
-        // Use the discounted total price if the user has a discount
         if ($hasDiscount) {
-            $totalPrice = $totalPrice * 0.95; // Apply a 5% discount
-            $user->update(['has_discount' => false]); // Mark discount as used
+            $totalPrice *= 0.95;
+            $user->update(['has_discount' => false]);
         }
 
         $orderString = implode(', ', $orderItems);
-
-        // Determine order status based on payment method
         $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
 
-        // Insert the order into the deliveries table
         $deliveryId = DB::table('deliveries')->insertGetId([
             'name' => $request->input('fullName'),
             'email' => $request->input('email'),
@@ -328,12 +321,11 @@ class DeliveryController extends Controller
             'mode_of_payment' => $request->input('paymentMethod'),
             'note' => $request->input('note'),
             'status' => $status,
-            'total_price' => $totalPrice, // Save the discounted or original total price
+            'total_price' => $totalPrice,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // Store each order item in the orders table
         foreach ($request->menu_names as $index => $menuName) {
             $quantity = $request->quantities[$index];
             DB::table('orders')->insert([
@@ -345,41 +337,13 @@ class DeliveryController extends Controller
             ]);
         }
 
-        // Handle GCash-specific logic
-        if ($request->input('paymentMethod') === 'GCash') {
-            // Generate the order string dynamically
-            $orderItems = [];
-            foreach ($request->menu_names as $index => $menuName) {
-                $quantity = $request->quantities[$index];
-                $orderItems[] = "{$menuName} (x{$quantity})";
-            }
-            $orderString = implode(', ', $orderItems);
+        // Update the user's last_order field
+        $user->update(['last_order' => now()]);
 
-            // Admin sends a message to the user with dynamic total price and order details
-            $this->sendMessage(
-                new Request([
-                    'message_text' => 'Please complete your GCash transaction. Kindly send the payment for the following orders: '
-                        . $orderString
-                        . ' with a total of ₱' . number_format($totalPrice, 2)
-                        . ' and notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.',
-                ]),
-                Auth::id() // Assume the current authenticated user is the recipient
-            );
-
-            // Redirect to the GCash-specific page
-            return redirect()->route('user.messagesPisces');
-        }
-
-
-
-        // Remove all cart items for the logged-in user
         DB::table('cart_items')->where('user_id', $user->id)->delete();
-
-        // Reset the user's 'cart' field to 0
         $user->cart = 0;
         $user->save();
 
-        // Add toast message to session
         session()->flash('toast', [
             'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
             'type' => 'success',
@@ -387,7 +351,6 @@ class DeliveryController extends Controller
 
         return redirect()->route('user.menu');
     }
-
 
     public function orderStore(Request $request)
     {
@@ -401,7 +364,7 @@ class DeliveryController extends Controller
             'note' => 'nullable|string',
             'menu_names' => 'required|array',
             'quantities' => 'required|array',
-            'total_price' => 'required|numeric', // Ensure total_price is passed from the front-end
+            'total_price' => 'required|numeric',
         ]);
 
         /** @var User $user */
@@ -409,34 +372,28 @@ class DeliveryController extends Controller
 
         $orderItems = [];
         $totalQuantity = 0;
-        $totalPrice = 0; // Initialize total price
+        $totalPrice = 0;
         $orderQuantities = implode(', ', $request->quantities);
 
-        // Construct the order string and calculate total price
         foreach ($request->menu_names as $index => $menuName) {
             $quantity = $request->quantities[$index];
             $menu = Menu::where('name', $menuName)->firstOrFail();
-            $itemTotal = $menu->price * $quantity; // Calculate total for each item
+            $itemTotal = $menu->price * $quantity;
             $orderItems[] = "{$menuName} (x{$quantity})";
             $totalQuantity += $quantity;
-            $totalPrice += $itemTotal; // Add to total price
+            $totalPrice += $itemTotal;
         }
 
-        // Determine if the user has a discount
         $hasDiscount = $user->has_discount;
 
-        // Use the discounted total price if the user has a discount
         if ($hasDiscount) {
-            $totalPrice = $totalPrice * 0.95; // Apply a 5% discount
-            $user->update(['has_discount' => false]); // Mark discount as used
+            $totalPrice *= 0.95;
+            $user->update(['has_discount' => false]);
         }
 
         $orderString = implode(', ', $orderItems);
-
-        // Determine order status based on payment method
         $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
 
-        // Insert the order into the deliveries table
         $deliveryId = DB::table('deliveries')->insertGetId([
             'name' => $request->input('fullName'),
             'email' => $request->input('email'),
@@ -448,12 +405,11 @@ class DeliveryController extends Controller
             'mode_of_payment' => $request->input('paymentMethod'),
             'note' => $request->input('note'),
             'status' => $status,
-            'total_price' => $totalPrice, // Save the discounted or original total price
+            'total_price' => $totalPrice,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // Store each order item in the orders table
         foreach ($request->menu_names as $index => $menuName) {
             $quantity = $request->quantities[$index];
             DB::table('orders')->insert([
@@ -465,32 +421,9 @@ class DeliveryController extends Controller
             ]);
         }
 
-        // Handle GCash-specific logic
-        if ($request->input('paymentMethod') === 'GCash') {
-            // Generate the order string dynamically
-            $orderItems = [];
-            foreach ($request->menu_names as $index => $menuName) {
-                $quantity = $request->quantities[$index];
-                $orderItems[] = "{$menuName} (x{$quantity})";
-            }
-            $orderString = implode(', ', $orderItems);
+        // Update the user's last_order field
+        $user->update(['last_order' => now()]);
 
-            // Admin sends a message to the user with dynamic total price and order details
-            $this->sendMessage(
-                new Request([
-                    'message_text' => 'Please complete your GCash transaction. Kindly send the payment for the following orders: '
-                        . $orderString
-                        . ' with a total of ₱' . number_format($totalPrice, 2)
-                        . ' and notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.',
-                ]),
-                Auth::id() // Assume the current authenticated user is the recipient
-            );
-
-            // Redirect to the GCash-specific page
-            return redirect()->route('user.messagesPisces');
-        }
-
-        // Add toast message to session
         session()->flash('toast', [
             'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
             'type' => 'success',
@@ -498,6 +431,7 @@ class DeliveryController extends Controller
 
         return redirect()->route('user.menu');
     }
+
 
     public function menuDetailsOrder($id)
     {

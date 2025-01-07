@@ -12,18 +12,20 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->timestamp('last_login_at')->nullable()->after('favorites');
-            $table->boolean('has_discount')->default(false)->after('favorites');
             $table->boolean('newsletter_subscription')->default(false)->after('favorites');
+            $table->boolean('has_discount')->default(false)->after('favorites');
+            $table->timestamp('last_order')->nullable()->after('favorites');
+            $table->timestamp('last_login_at')->nullable()->after('favorites');
         });
     }
 
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('newsletter_subscription');
+            $table->dropColumn('last_order');
             $table->dropColumn('last_login_at');
             $table->dropColumn('has_discount');
-            $table->dropColumn('newsletter_subscription');
         });
     }
 };
