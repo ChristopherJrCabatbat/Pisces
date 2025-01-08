@@ -16,6 +16,7 @@ class Feedback extends Model
         'feedback_text',
         'rating',
         'rider_rating',
+        'rider_name',
         'sentiment',
         'response',
     ];
