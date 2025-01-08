@@ -430,39 +430,6 @@ class AdminController extends Controller
         return view('admin.updates', compact('users', 'search', 'filter', 'totalUnreadCount'));
     }
 
-
-
-    // public function viewOrders($userId)
-    // {
-    //     // Fetch user by ID
-    //     $user = User::findOrFail($userId);
-
-    //     // Fetch deliveries linked to the user via email
-    //     $deliveries = Delivery::where('email', $user->email)->with('orders')->get();
-
-    //     // Process each delivery to find the menu image with the highest quantity
-    //     $deliveriesWithImages = $deliveries->map(function ($delivery) {
-    //         $orders = $delivery->orders;
-
-    //         if ($orders->isNotEmpty()) {
-    //             // Get the order with the highest quantity
-    //             $highestQuantityOrder = $orders->sortByDesc('quantity')->first();
-
-    //             if ($highestQuantityOrder) {
-    //                 // Get the menu item associated with the highest quantity order
-    //                 $menu = Menu::where('name', $highestQuantityOrder->menu_name)->first();
-
-    //                 // Add the image URL to the delivery for rendering in Blade
-    //                 $delivery->image_url = $menu ? asset('storage/' . $menu->image) : null;
-    //             }
-    //         }
-
-    //         return $delivery;
-    //     });
-
-    //     return view('admin.viewOrders', compact('deliveriesWithImages'));
-    // }
-
     public function viewOrders($userId)
     {
         $user = User::findOrFail($userId);
@@ -489,78 +456,89 @@ class AdminController extends Controller
         return view('admin.viewOrders', compact('deliveriesWithImages'));
     }
 
-
     // public function getOrderDetails($id)
     // {
     //     $delivery = Delivery::find($id);
 
     //     if (!$delivery) {
-    //         return response()->json(['success' => false, 'message' => 'Delivery not found']);
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Delivery not found'
+    //         ]);
     //     }
 
+    //     // Get orders and quantities from delivery
     //     $orders = explode(', ', $delivery->order);
     //     $quantities = explode(', ', $delivery->quantity);
-    //     $menuImages = Menu::whereIn('name', $orders)
+
+    //     // Normalize menu names
+    //     $plainMenuNames = array_map(function ($order) {
+    //         return trim(strtolower(preg_replace('/\s*\(x\d+\)$/', '', $order)));
+    //     }, $orders);
+
+    //     // Retrieve menu images
+    //     $menuImages = Menu::whereIn('name', $plainMenuNames)
     //         ->pluck('image', 'name')
-    //         ->map(fn($image) => $image ? asset('storage/' . $image) : asset('images/logo.jpg'))
+    //         ->mapWithKeys(fn($image, $name) => [
+    //             strtolower(trim($name)) => $image ? asset('storage/' . $image) : asset('images/logo.jpg')
+    //         ])
     //         ->toArray();
+
+    //     // Log for debugging
+    //     Log::info('Normalized Menu Names: ', $plainMenuNames);
+    //     Log::info('Retrieved Menu Images: ', $menuImages);
+
+    //     // Match normalized names to images
+    //     $imageUrls = [];
+    //     foreach ($plainMenuNames as $name) {
+    //         $imageUrls[] = $menuImages[$name] ?? asset('images/logo.jpg');
+    //     }
 
     //     return response()->json([
     //         'success' => true,
     //         'delivery' => $delivery,
-    //         'menu_images' => $menuImages,
+    //         'menu_images' => $imageUrls,
     //         'quantities' => $quantities
     //     ]);
     // }
 
     public function getOrderDetails($id)
-    {
-        $delivery = Delivery::find($id);
+{
+    // Find the delivery record by ID or fail with a 404
+    $delivery = Delivery::findOrFail($id);
 
-        if (!$delivery) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Delivery not found'
-            ]);
-        }
+    // Split orders to extract menu names
+    $orders = explode(', ', $delivery->order);
 
-        // Get orders and quantities from delivery
-        $orders = explode(', ', $delivery->order);
-        $quantities = explode(', ', $delivery->quantity);
+    // Remove the quantity part (e.g., "(x5)") from each menu name
+    $plainMenuNames = array_map(function ($order) {
+        return preg_replace('/\s*\(x\d+\)$/', '', $order);
+    }, $orders);
 
-        // Normalize menu names
-        $plainMenuNames = array_map(function ($order) {
-            return trim(strtolower(preg_replace('/\s*\(x\d+\)$/', '', $order)));
-        }, $orders);
+    // Fetch menu images using the cleaned menu names
+    $menuImages = Menu::whereIn('name', $plainMenuNames)
+        ->pluck('image', 'name')
+        ->map(function ($image) {
+            // Use fallback image if the menu item doesn't have an image
+            return $image ? asset('storage/' . $image) : asset('images/logo.jpg');
+        })
+        ->toArray();
 
-        // Retrieve menu images
-        $menuImages = Menu::whereIn('name', $plainMenuNames)
-            ->pluck('image', 'name')
-            ->mapWithKeys(fn($image, $name) => [
-                strtolower(trim($name)) => $image ? asset('storage/' . $image) : asset('images/logo.jpg')
-            ])
-            ->toArray();
-
-        // Log for debugging
-        Log::info('Normalized Menu Names: ', $plainMenuNames);
-        Log::info('Retrieved Menu Images: ', $menuImages);
-
-        // Match normalized names to images
-        $imageUrls = [];
-        foreach ($plainMenuNames as $name) {
-            $imageUrls[] = $menuImages[$name] ?? asset('images/logo.jpg');
-        }
-
-        return response()->json([
-            'success' => true,
-            'delivery' => $delivery,
-            'menu_images' => $imageUrls,
-            'quantities' => $quantities
-        ]);
-    }
-
-
-
+    return response()->json([
+        'success' => true,
+        'delivery' => [
+            'name' => $delivery->name,
+            'email' => $delivery->email,
+            'contact_number' => $delivery->contact_number,
+            'address' => $delivery->address,
+            'total_price' => $delivery->total_price,
+            'status' => $delivery->status,
+            'order' => $delivery->order,
+            'quantity' => $delivery->quantity,
+        ],
+        'menu_images' => $menuImages, // Include menu images in the response
+    ]);
+}
 
 
     public function monitoring()

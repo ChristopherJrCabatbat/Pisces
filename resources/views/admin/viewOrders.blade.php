@@ -50,6 +50,7 @@
 @endsection
 
 @section('modals')
+
     <!-- Order Details Modal -->
     <div class="modal fade text-black" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel"
         aria-hidden="true">
@@ -68,6 +69,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 
@@ -158,8 +160,10 @@
 @endsection
 
 @section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+
+    {{-- Modal Script --}}
+    {{-- <script>
+        const initializeModalListeners = () => {
             document.querySelectorAll('.view-order-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const deliveryId = this.getAttribute('data-id');
@@ -170,8 +174,8 @@
                     fetch(`/admin/getOrderDetails/${deliveryId}`, {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]').content
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
                             }
                         })
                         .then(response => response.json())
@@ -185,14 +189,94 @@
                                     const imageUrl = data.menu_images[order.trim()] ||
                                         fallbackImageUrl;
                                     return `
-                                    <tr>
-                                        <td><img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Order Image"></td>
-                                        <td>${order}</td>
-                                    </tr>
-                                `;
+                                <tr>
+                                    <td><img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Order Image"></td>
+                                    <td>${order}</td>
+                                </tr>
+                            `;
                                 }).join("");
 
                                 contentDiv.innerHTML = `
+                            <table class="table table-bordered text-center align-middle">
+                                <thead class="table-light">
+                                    <tr><th colspan="2">Order Details</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Name:</strong> ${data.delivery.name}</td>
+                                        <td><strong>Email:</strong> ${data.delivery.email}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Contact:</strong> ${data.delivery.contact_number}</td>
+                                        <td><strong>Address:</strong> ${data.delivery.address}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total Price:</strong> ₱${Number(data.delivery.total_price).toFixed(2)}</td>
+                                        <td><strong>Status:</strong> ${data.delivery.status}</td>
+                                    </tr>
+                                </tbody>
+                                <thead class="table-light">
+                                    <tr><th>Image</th><th>Order</th></tr>
+                                </thead>
+                                <tbody>${orderRows}</tbody>
+                            </table>
+                        `;
+                            } else {
+                                contentDiv.innerHTML =
+                                    '<p class="text-center text-danger">Failed to load order details.</p>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching order details:', error);
+                            contentDiv.innerHTML =
+                                '<p class="text-center text-danger">An error occurred while fetching order details.</p>';
+                        });
+                });
+            });
+        };
+    </script> --}}
+
+    <script>
+        const initializeModalListeners = () => {
+            document.querySelectorAll('.view-order-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const deliveryId = this.getAttribute('data-id');
+                    const contentDiv = document.getElementById('orderDetailsContent');
+    
+                    // Show loading state
+                    contentDiv.innerHTML = '<p class="text-center text-muted">Loading...</p>';
+    
+                    // Fetch order details via AJAX
+                    fetch(`/admin/getOrderDetails/${deliveryId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const orders = data.delivery.order.split(', ');
+                            const quantities = data.delivery.quantity.split(', ');
+                            const fallbackImageUrl = "{{ asset('images/logo.jpg') }}";
+    
+                            // Generate order rows
+                            const orderRows = orders.map((order, index) => {
+                                const cleanedOrderName = order.trim();
+                                const imageUrl = data.menu_images[cleanedOrderName] || fallbackImageUrl;
+    
+                                return `
+                                    <tr>
+                                        <td>
+                                            <img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Order Image">
+                                        </td>
+                                        <td>${cleanedOrderName}</td>
+                                    </tr>
+                                `;
+                            }).join("");
+    
+                            // Populate modal content
+                            contentDiv.innerHTML = `
                                 <table class="table table-bordered text-center align-middle">
                                     <thead class="table-light">
                                         <tr><th colspan="2">Order Details</th></tr>
@@ -217,21 +301,20 @@
                                     <tbody>${orderRows}</tbody>
                                 </table>
                             `;
-                            } else {
-                                contentDiv.innerHTML =
-                                    '<p class="text-center text-danger">Failed to load order details.</p>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching order details:', error);
-                            contentDiv.innerHTML =
-                                '<p class="text-center text-danger">An error occurred while fetching order details.</p>';
-                        });
+                        } else {
+                            contentDiv.innerHTML = '<p class="text-center text-danger">Failed to load order details.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching order details:', error);
+                        contentDiv.innerHTML = '<p class="text-center text-danger">An error occurred while fetching order details.</p>';
+                    });
                 });
             });
-        });
+        };
     </script>
 
+    {{-- Search Script --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const filterButton = document.getElementById('filter-button');
@@ -240,80 +323,82 @@
             const ordersContainer = document.getElementById('orders-container');
             let deliveries = @json($deliveriesWithImages); // Pass PHP data to JavaScript
 
-            // Render deliveries to the container
             const renderDeliveries = (filteredDeliveries) => {
                 if (filteredDeliveries.length === 0) {
                     ordersContainer.innerHTML = `
-                <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 fs-5 border rounded shadow-sm">
-                    <i class="fa-regular fa-circle-question me-2"></i> No orders found.
-                </div>
-            `;
+                    <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 fs-5 border rounded shadow-sm">
+                        <i class="fa-regular fa-circle-question me-2"></i> No orders found.
+                    </div>
+                `;
                 } else {
                     ordersContainer.innerHTML = filteredDeliveries
                         .map(
                             (delivery) => `
-                        <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
-                            <div class="order-image me-3">
-                                <img src="${delivery.image_url || '{{ asset('default-image.jpg') }}'}" 
-                                     alt="Order Image" class="rounded" style="width: 80px; height: 80px;">
-                            </div>
-                            <div class="order-details flex-grow-1">
-                                <p class="m-0 text-truncate fw-bold">${delivery.order}</p>
-                                <p class="m-0 text-truncate">₱${parseFloat(delivery.total_price).toFixed(2)}</p>
-                                <p class="text-muted small m-0">${delivery.address}</p>
-                                <p class="text-muted small m-0">${new Date(delivery.created_at).toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric',
-                                })}</p>
-                            </div>
-                            <div class="order-actions text-end">
-                                <button type="button" class="btn btn-primary mb-2 view-order-btn" 
-                                    data-id="${delivery.id}" data-bs-toggle="modal" data-bs-target="#viewOrderModal">
-                                    View Order
-                                </button>
-                            </div>
+                    <div class="order-card bg-light text-black d-flex align-items-center mb-3 p-3 border rounded shadow-sm">
+                        <div class="order-image me-3">
+                            <img src="${delivery.image_url || '{{ asset('default-image.jpg') }}'}" 
+                                 alt="Order Image" class="rounded" style="width: 80px; height: 80px;">
                         </div>
-                    `
+                        <div class="order-details flex-grow-1">
+                            <p class="m-0 text-truncate fw-bold">${delivery.order}</p>
+                            <p class="m-0 text-truncate">₱${parseFloat(delivery.total_price).toFixed(2)}</p>
+                            <p class="text-muted small m-0">${delivery.address}</p>
+                            <p class="text-muted small m-0">${new Date(delivery.created_at).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                            })}</p>
+                        </div>
+                        <div class="order-actions text-end">
+                            <button type="button" class="btn btn-primary mb-2 view-order-btn" 
+                                data-id="${delivery.id}" data-bs-toggle="modal" data-bs-target="#viewOrderModal">
+                                View Order
+                            </button>
+                        </div>
+                    </div>
+                `
                         )
                         .join('');
+
+                    // Reinitialize modal event listeners after rendering
+                    initializeModalListeners();
                 }
             };
 
-            // Filter and search deliveries
             const filterAndSearchDeliveries = () => {
                 const filterValue = deliveryFilter.value;
                 const searchTerm = searchInput.value.toLowerCase();
 
                 let filteredDeliveries = [...deliveries];
 
-                // Apply sorting
                 if (filterValue === 'newest') {
                     filteredDeliveries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 } else if (filterValue === 'oldest') {
                     filteredDeliveries.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
                 }
 
-                // Apply search
                 if (searchTerm) {
                     filteredDeliveries = filteredDeliveries.filter(
                         (delivery) =>
                         delivery.order.toLowerCase().includes(searchTerm) ||
                         delivery.address.toLowerCase().includes(searchTerm) ||
-                        delivery.created_at.toLowerCase().includes(searchTerm)
+                        new Date(delivery.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                        }).toLowerCase().includes(searchTerm)
                     );
                 }
 
-                // Render the filtered and searched deliveries
                 renderDeliveries(filteredDeliveries);
             };
 
-            // Event listeners for filter and search
             filterButton.addEventListener('click', filterAndSearchDeliveries);
             searchInput.addEventListener('input', filterAndSearchDeliveries);
 
-            // Initial render
             renderDeliveries(deliveries);
         });
     </script>
+
+
 @endsection

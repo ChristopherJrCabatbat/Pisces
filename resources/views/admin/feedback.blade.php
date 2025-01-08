@@ -9,8 +9,8 @@
         }
 
         /* .table-container {
-                    padding: 1rem 2rem 0rem 2rem;
-                } */
+            padding: 1rem 2rem 0rem 2rem;
+        } */
     </style>
 @endsection
 
