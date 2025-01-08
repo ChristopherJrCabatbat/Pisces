@@ -13,6 +13,7 @@ class Menu extends Model
         'name',
         'category',
         'price',
+        'discount',
         'description',
         'image',
         'rating',

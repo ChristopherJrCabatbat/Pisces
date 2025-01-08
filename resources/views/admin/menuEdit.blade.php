@@ -73,11 +73,27 @@
                 </div>
 
                 <div class="mb-3 w-100 d-flex justify-content-center align-items-start gap-2">
+
                     <!-- Price -->
                     <div class="w-75">
                         <label for="price" class="form-label">Price:</label>
                         <input type="text" name="price" class="form-control" id="price"
                             value="{{ old('price', $menus->price) }}" required>
+                    </div>
+
+                    <!-- Discount -->
+                    <div class="w-100 d-flex flex-column h-50">
+                        <label for="discount" class="form-label">Discount (%):</label>
+                        <div class="d-flex gap-1">
+                            <div>
+                                <input type="number" name="discount" class="form-control" id="discount"
+                                    value="{{ old('discount', $menus->discount) }}" min="0" max="100" required>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-danger" id="removeDiscountButton">Remove
+                                    Discount</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Category -->
@@ -144,6 +160,14 @@
 @endsection
 
 @section('scripts')
+    {{-- Remove Discount --}}
+    <script>
+        document.getElementById('removeDiscountButton').addEventListener('click', function() {
+            document.getElementById('discount').value = 0; // Reset discount to 0
+        });
+    </script>
+
+    {{-- Availability --}}
     <script>
         const availabilityToggle = document.getElementById('availability');
         const availabilityLabel = availabilityToggle.nextElementSibling;

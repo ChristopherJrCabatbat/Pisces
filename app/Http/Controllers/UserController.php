@@ -59,12 +59,15 @@ class UserController extends Controller
 
         // Fetch the 4 latest menus and calculate average ratings
         $latestMenus = DB::table('menus')
-            ->select('id', 'name', 'image', 'price', 'availability', 'created_at')
+            ->select('id', 'name', 'image', 'price', 'discount', 'availability', 'created_at')
             ->where('availability', 'Available') // Include only available menus
             ->orderBy('created_at', 'desc')
             ->take(4)
             ->get()
             ->map(function ($menu) {
+                $menu->discounted_price = $menu->discount > 0
+                    ? round($menu->price * (1 - $menu->discount / 100), 2)
+                    : $menu->price;
                 $menu->rating = DB::table('feedback')
                     ->where('menu_items', 'LIKE', "%{$menu->name}%")
                     ->avg('rating');
@@ -78,13 +81,16 @@ class UserController extends Controller
         // Fetch the 4 most popular menus based on order count, including average ratings
         $popularMenus = DB::table('orders')
             ->join('menus', 'orders.menu_name', '=', 'menus.name')
-            ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.availability', DB::raw('COUNT(orders.id) as order_count'))
+            ->select('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.discount', 'menus.availability', DB::raw('COUNT(orders.id) as order_count'))
             ->where('menus.availability', 'Available') // Include only available menus
-            ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.availability')
+            ->groupBy('menus.id', 'menus.name', 'menus.image', 'menus.price', 'menus.discount', 'menus.availability')
             ->orderByDesc('order_count')
             ->take(4)
             ->get()
             ->map(function ($menu) {
+                $menu->discounted_price = $menu->discount > 0
+                    ? round($menu->price * (1 - $menu->discount / 100), 2)
+                    : $menu->price;
                 $menu->rating = DB::table('feedback')
                     ->where('menu_items', 'LIKE', "%{$menu->name}%")
                     ->avg('rating');
@@ -97,18 +103,41 @@ class UserController extends Controller
 
         // Fetch the 4 highest-rated menus
         $highestRatedMenus = DB::table('menus')
-            ->select('id', 'name', 'image', 'price', 'availability', 'rating')
+            ->select('id', 'name', 'image', 'price', 'discount', 'availability', 'rating')
             ->where('availability', 'Available') // Include only available menus
             ->whereNotNull('rating')
             ->orderByDesc('rating')
             ->take(4)
             ->get()
             ->map(function ($menu) {
+                $menu->discounted_price = $menu->discount > 0
+                    ? round($menu->price * (1 - $menu->discount / 100), 2)
+                    : $menu->price;
                 $menu->ratingCount = DB::table('feedback')
                     ->where('menu_items', 'LIKE', "%{$menu->name}%")
                     ->count();
                 return $menu;
             });
+
+        // Fetch 5 menus with the highest discount
+        $bestDeals = DB::table('menus')
+            ->select('id', 'name', 'image', 'price', 'discount', 'availability')
+            ->where('availability', 'Available') // Include only available menus
+            ->where('discount', '>', 0) // Only menus with a discount
+            ->orderByDesc('discount') // Order by discount descending
+            ->take(5) // Limit to 5 menus
+            ->get()
+            ->map(function ($menu) {
+                $menu->rating = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->avg('rating');
+                $menu->rating = round($menu->rating, 1);
+                $menu->ratingCount = DB::table('feedback')
+                    ->where('menu_items', 'LIKE', "%{$menu->name}%")
+                    ->count();
+                return $menu;
+            });
+
 
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
@@ -121,7 +150,7 @@ class UserController extends Controller
             ->where('is_read', false)
             ->count();
 
-        return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount', 'highestRatedMenus'));
+        return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount', 'highestRatedMenus', 'bestDeals'));
     }
 
     public function userUpdate(Request $request)
@@ -1060,71 +1089,71 @@ class UserController extends Controller
     // }
 
     public function reviewOrder(Request $request, $deliveryId)
-{
-    /** @var User $user */
-    $user = Auth::user();
+    {
+        /** @var User $user */
+        $user = Auth::user();
 
-    // Fetch the delivery by ID and ensure it belongs to the authenticated user
-    $delivery = Delivery::where('id', $deliveryId)
-        ->where('email', $user->email) // Match with the user's email to validate
-        ->firstOrFail();
+        // Fetch the delivery by ID and ensure it belongs to the authenticated user
+        $delivery = Delivery::where('id', $deliveryId)
+            ->where('email', $user->email) // Match with the user's email to validate
+            ->firstOrFail();
 
-    // Parse the orders and quantities from the database
-    $orders = explode(',', $delivery->order); // Split items by commas
-    $items = [];
-    $totalPrice = 0; // Initialize total price
+        // Parse the orders and quantities from the database
+        $orders = explode(',', $delivery->order); // Split items by commas
+        $items = [];
+        $totalPrice = 0; // Initialize total price
 
-    foreach ($orders as $order) {
-        // Extract the menu item name and quantity (e.g., "Burger (x2)")
-        preg_match('/^(.*?)\s*\(x(\d+)\)$/', trim($order), $matches);
-        $itemName = $matches[1] ?? trim($order); // Extracted name or fallback to original
-        $quantity = (int) ($matches[2] ?? 1); // Default to 1 if not found
+        foreach ($orders as $order) {
+            // Extract the menu item name and quantity (e.g., "Burger (x2)")
+            preg_match('/^(.*?)\s*\(x(\d+)\)$/', trim($order), $matches);
+            $itemName = $matches[1] ?? trim($order); // Extracted name or fallback to original
+            $quantity = (int) ($matches[2] ?? 1); // Default to 1 if not found
 
-        // Find the menu item by name
-        $menu = Menu::where('name', trim($itemName))->first();
+            // Find the menu item by name
+            $menu = Menu::where('name', trim($itemName))->first();
 
-        if ($menu && is_object($menu)) {
-            $itemTotal = $menu->price * $quantity; // Calculate item's total price
-            $totalPrice += $itemTotal; // Add to the overall total price
+            if ($menu && is_object($menu)) {
+                $itemTotal = $menu->price * $quantity; // Calculate item's total price
+                $totalPrice += $itemTotal; // Add to the overall total price
 
-            $items[] = [
-                'name' => $menu->name,
-                'price' => $menu->price,
-                'total_price' => $itemTotal,
-                'image' => $menu->image,
-                'quantity' => $quantity,
-            ];
-        } else {
-            // Fallback for missing menu items
-            Log::warning('Menu item not found: ' . $order);
-            $items[] = [
-                'name' => $itemName,
-                'price' => 0, // Default price for missing items
-                'total_price' => 0,
-                'image' => null,
-                'quantity' => $quantity,
-            ];
+                $items[] = [
+                    'name' => $menu->name,
+                    'price' => $menu->price,
+                    'total_price' => $itemTotal,
+                    'image' => $menu->image,
+                    'quantity' => $quantity,
+                ];
+            } else {
+                // Fallback for missing menu items
+                Log::warning('Menu item not found: ' . $order);
+                $items[] = [
+                    'name' => $itemName,
+                    'price' => 0, // Default price for missing items
+                    'total_price' => 0,
+                    'image' => null,
+                    'quantity' => $quantity,
+                ];
+            }
         }
+
+        // Update the total price in the delivery table if necessary
+        $delivery->total_price = $totalPrice;
+        $delivery->save();
+
+        // Count unread messages
+        $unreadCount = Message::where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        // Count pending or active orders
+        $pendingOrdersCount = DB::table('deliveries')
+            ->where('email', $user->email)
+            ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
+            ->count();
+
+        // Return the view with parsed data
+        return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items', 'totalPrice'));
     }
-
-    // Update the total price in the delivery table if necessary
-    $delivery->total_price = $totalPrice;
-    $delivery->save();
-
-    // Count unread messages
-    $unreadCount = Message::where('receiver_id', $user->id)
-        ->where('is_read', false)
-        ->count();
-
-    // Count pending or active orders
-    $pendingOrdersCount = DB::table('deliveries')
-        ->where('email', $user->email)
-        ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
-        ->count();
-
-    // Return the view with parsed data
-    return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items', 'totalPrice'));
-}
 
 
 

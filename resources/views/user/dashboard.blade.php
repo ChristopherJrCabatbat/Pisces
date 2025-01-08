@@ -118,52 +118,113 @@
                 Best Deals For You
             </div>
             <div>
-                <div class="card card-best card-shadow mb-3">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <!-- Image with overlay -->
-                            <div class="img-container">
-                                <img src="{{ asset('images/logo.jpg') }}" class="img-fluid rounded-start darken"
-                                    alt="...">
-                                <div class="icon-overlay">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                    <i class="fa-solid fa-share"></i>
-                                    <i class="fa-solid fa-search"></i>
-                                    <i class="fa-solid fa-heart"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">Dark Coffee</h5>
-                                <div class="price-container d-flex align-items-center gap-3 mb-2">
-                                    <div class="price fw-bold fs-5">$10.00</div>
-                                    <div class="price-line">$12.00</div>
-                                    <div class="off text-success">-10% Off</div>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
+                <div class="row row-cols-1 row-cols-md-4 g-4">
+                    @forelse ($bestDeals as $menu)
+                        <div class="col">
+                            <div class="card h-100 card-shadow">
+                                <div class="img-container">
+                                    <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
+                                        alt="{{ $menu->name }}">
+                                    <div class="icon-overlay text-white">
+                                        {{-- Add to Cart --}}
+                                        <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="icon-buttons"><i
+                                                    class="fa-solid fa-cart-plus text-white"
+                                                    title="Add to Cart"></i></button>
+                                        </form>
 
-                                    <div class="stars d-flex">
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-solid fa-star"></i>
-                                        <i class="fa-regular fa-star"></i>
+                                        {{-- Share Menu --}}
+                                        <form action="" method="GET">
+                                            @csrf
+                                            <button type="button" class="icon-buttons">
+                                                <!-- Share Button -->
+                                                <i class="fa-solid fa-share" title="Share Menu"
+                                                    onclick="copyMenuLink({{ $menu->id }})"></i>
+                                            </button>
+                                        </form>
+
+                                        {{-- View Menu --}}
+                                        <form action="" method="GET">
+                                            @csrf
+                                            <button type="button" class="icon-buttons"><i
+                                                    class="fa-solid fa-search view-menu-btn" title="View Menu"
+                                                    data-id="{{ $menu->id }}"></i></button>
+                                        </form>
+
+                                        {{-- Add to Favorites --}}
+                                        <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="icon-buttons">
+                                                <i class="fa-solid fa-heart"
+                                                    style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
+                                                    title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                                </i>
+                                            </button>
+                                        </form>
+
                                     </div>
-                                    <div class="star-label">(2)</div>
-
                                 </div>
-                                <p class="card-text mt-2">
-                                    <small class="text-body-secondary">Bold and intense, our dark coffee offers deep, rich
-                                        flavors with a smooth finish. Perfect for those who enjoy a strong, full-bodied
-                                        brew.</small>
-                                </p>
+                                <a href="{{ route('user.menuDetails', $menu->id) }}" data-id="{{ $menu->id }}"
+                                    class="menu-body">
+                                    <div class="card-body card-body-mt">
+                                        <h5 class="card-title">{{ $menu->name }}</h5>
+
+                                        <div class="price-container d-flex align-items-center gap-3 mb-2">
+                                            {{-- Display the discounted price --}}
+                                            <div class="price fw-bold">
+                                                ₱{{ number_format($menu->price * (1 - $menu->discount / 100), 2) }}
+                                            </div>
+                                            {{-- Display the original price with a strike-through line --}}
+                                            <div class="price-line text-muted text-decoration-line-through">
+                                                @if (floor($menu->price) == $menu->price)
+                                                    ₱{{ number_format($menu->price, 0) }}
+                                                @else
+                                                    ₱{{ number_format($menu->price, 2) }}
+                                                @endif
+                                            </div>
+                                            {{-- Display the discount percentage --}}
+                                            <div class="off text-success">(-{{ $menu->discount }}% OFF)</div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="stars d-flex">
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    @if ($i <= floor($menu->rating))
+                                                        <i class="fa-solid fa-star"></i>
+                                                    @elseif ($i - $menu->rating < 1)
+                                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                                    @else
+                                                        <i class="fa-regular fa-star"></i>
+                                                    @endif
+                                                @endfor
+                                            </div>
+                                            <div class="star-label">
+                                                @if ($menu->ratingCount > 0)
+                                                    ({{ number_format($menu->rating, 1) }})
+                                                    {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                                @else
+                                                    No Rating
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
-                    </div>
+                    @empty
+                        <div class="col">
+                            <p>No best deals available.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
+
 
         {{-- Popular Menus --}}
         <div class="w-100 mb-5">
@@ -232,13 +293,22 @@
                                     class="menu-body">
                                     <div class="card-body card-body-mt">
                                         <h5 class="card-title">{{ $menu->name }}</h5>
+
                                         <div class="price fw-bold mb-2">
-                                            @if (floor($menu->price) == $menu->price)
-                                                ₱{{ number_format($menu->price, 0) }}
+                                            @if ($menu->discount > 0)
+                                                {{-- Display discounted price with discount percentage --}}
+                                                ₱{{ number_format($menu->price * (1 - $menu->discount / 100), 2) }}
+                                                <span class="text-success">(-{{ $menu->discount }}% OFF)</span>
                                             @else
-                                                ₱{{ number_format($menu->price, 2) }}
+                                                {{-- Display original price --}}
+                                                @if (floor($menu->price) == $menu->price)
+                                                    ₱{{ number_format($menu->price, 0) }}
+                                                @else
+                                                    ₱{{ number_format($menu->price, 2) }}
+                                                @endif
                                             @endif
                                         </div>
+
 
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="stars d-flex">
@@ -346,11 +416,19 @@
                                     class="menu-body">
                                     <div class="card-body card-body-mt">
                                         <h5 class="card-title">{{ $menu->name }}</h5>
-                                        <div class="price fw-bold mb-2">
-                                            @if (floor($menu->price) == $menu->price)
-                                                ₱{{ number_format($menu->price, 0) }}
+
+                                       <div class="price fw-bold mb-2">
+                                            @if ($menu->discount > 0)
+                                                {{-- Display discounted price with discount percentage --}}
+                                                ₱{{ number_format($menu->price * (1 - $menu->discount / 100), 2) }}
+                                                <span class="text-success">(-{{ $menu->discount }}% OFF)</span>
                                             @else
-                                                ₱{{ number_format($menu->price, 2) }}
+                                                {{-- Display original price --}}
+                                                @if (floor($menu->price) == $menu->price)
+                                                    ₱{{ number_format($menu->price, 0) }}
+                                                @else
+                                                    ₱{{ number_format($menu->price, 2) }}
+                                                @endif
                                             @endif
                                         </div>
 
@@ -457,11 +535,19 @@
                                     class="menu-body">
                                     <div class="card-body card-body-mt">
                                         <h5 class="card-title">{{ $menu->name }}</h5>
-                                        <div class="price fw-bold mb-2">
-                                            @if (floor($menu->price) == $menu->price)
-                                                ₱{{ number_format($menu->price, 0) }}
+
+                                      <div class="price fw-bold mb-2">
+                                            @if ($menu->discount > 0)
+                                                {{-- Display discounted price with discount percentage --}}
+                                                ₱{{ number_format($menu->price * (1 - $menu->discount / 100), 2) }}
+                                                <span class="text-success">(-{{ $menu->discount }}% OFF)</span>
                                             @else
-                                                ₱{{ number_format($menu->price, 2) }}
+                                                {{-- Display original price --}}
+                                                @if (floor($menu->price) == $menu->price)
+                                                    ₱{{ number_format($menu->price, 0) }}
+                                                @else
+                                                    ₱{{ number_format($menu->price, 2) }}
+                                                @endif
                                             @endif
                                         </div>
 

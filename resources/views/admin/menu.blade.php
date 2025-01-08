@@ -9,9 +9,9 @@
         }
 
         /* .table-container {
-                min-width: 681px;
-                padding: 1rem 2rem 0rem 2rem;
-            } */
+                    min-width: 681px;
+                    padding: 1rem 2rem 0rem 2rem;
+                } */
     </style>
 
     <style>
@@ -325,15 +325,18 @@
                             </td>
                             <td>{{ $menu->name }}</td>
                             <td>{{ $menu->category }}</td>
-                            <td>
-                                @if (floor($menu->price) == $menu->price)
-                                    ₱{{ number_format($menu->price, 0) }}
+
+                            <td style="width: 132px;">
+                                @if (!is_null($menu->discount) && $menu->discount > 0)
+                                    ₱{{ number_format($menu->discounted_price, 2) }}
+                                    <span class="text-success">({{ $menu->discount }}% off)</span>
                                 @else
                                     ₱{{ number_format($menu->price, 2) }}
                                 @endif
                             </td>
+
                             <td style="width: 25vw !important;">{{ $menu->description }}</td>
-                            <td>
+                            <td style="width: 82px;">
                                 @if ($menu->review_count > 0)
                                     {{ number_format($menu->rating, 1) }} <i class="fa-solid fa-star"></i>
                                     ({{ $menu->review_count }})
@@ -341,7 +344,7 @@
                                     <span>No Rating</span>
                                 @endif
                             </td>
-                            <td>
+                            <td style="width: 121px;">
                                 <a href="{{ route('admin.menu.show', $menu->id) }}" class="btn btn-sm btn-info"
                                     title="View">
                                     <i class="fa fa-eye"></i>
