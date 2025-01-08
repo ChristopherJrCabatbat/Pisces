@@ -831,40 +831,6 @@ class UserController extends Controller
         return view('user.messagesPisces', compact('messages', 'pendingOrdersCount', 'userCart', 'user', 'userFavorites'));
     }
 
-    // public function sendMessage(Request $request, $userId)
-    // {
-    //     try {
-    //         // Validate input for either message_text or image
-    //         $request->validate([
-    //             'message_text' => 'nullable|required_without:image',
-    //             'image' => 'nullable|required_without:message_text|image|max:2048',
-    //         ]);
-
-    //         $imageFile = $request->file('image');
-    //         $imageUrl = null;
-
-    //         // Handle image upload if present
-    //         if ($imageFile) {
-    //             $imagePath = $imageFile->store('messages', 'public');
-    //             $imageUrl = asset('storage/' . $imagePath);
-    //         }
-
-    //         // Create the message
-    //         $message = Message::create([
-    //             'user_id' => Auth::id(),
-    //             'receiver_id' => $userId,
-    //             'sender_role' => 'User',
-    //             'message_text' => $request->input('message_text'), // Can be null
-    //             'image_url' => $imageUrl,
-    //             'is_read' => false,
-    //         ]);
-
-    //         return response()->json(['success' => true, 'message' => $message], 201);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['success' => false, 'message' => 'Failed to send the message.'], 500);
-    //     }
-    // }
-
     public function sendMessage(Request $request, $userId)
     {
         try {
@@ -905,8 +871,6 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to send the message.'], 500);
         }
     }
-
-
 
     public function markMessagesAsRead($userId)
     {

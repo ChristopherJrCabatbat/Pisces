@@ -358,13 +358,19 @@ class AdminController extends Controller
 
             $imageFile = $request->file('image');
             $imageUrl = null;
+            $messageText = $request->input('message_text');
 
-            // Handle image upload
+            // Handle image upload if present
             if ($imageFile) {
                 $imagePath = $imageFile->store('messages', 'public');
                 $imageUrl = asset('storage/' . $imagePath);
 
                 logger('Image URL:', [$imageUrl]); // Debug image path
+
+                // Set the message text to "Sent an image" if it's an image-only message
+                if (!$messageText) {
+                    $messageText = 'Sent an image';
+                }
             }
 
             // Save message to database
@@ -372,7 +378,7 @@ class AdminController extends Controller
                 'user_id' => Auth::id(),
                 'receiver_id' => $userId,
                 'sender_role' => 'Admin',
-                'message_text' => $request->input('message_text'),
+                'message_text' => $messageText,
                 'image_url' => $imageUrl,
                 'is_read' => false,
             ]);
@@ -388,6 +394,7 @@ class AdminController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
 
 
     public function updates(Request $request, UnreadMessagesController $unreadMessagesController)

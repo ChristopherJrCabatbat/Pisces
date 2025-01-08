@@ -178,14 +178,16 @@
                             @if ($message->user_id === $user->id)
                                 {{-- User --}}
                                 <div class="d-flex align-items-start justify-content-end mb-4">
-                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
+                                    @if (strpos(
+                                            $message->message_text,
+                                            'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
                                         <span
                                             class="text-muted align-self-center small me-3">{{ $message->created_at->diffForHumans() }}</span>
                                     @endif
                                     <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
                                         style="max-width: 70%; 
-                                        display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }}; 
-                                        {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') !== false ? 'margin: 0 auto; max-width: 73%;' : '' }}">
+                                display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }}; 
+                                {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') !== false ? 'margin: 0 auto; max-width: 73%;' : '' }}">
                                         @if ($message->message_text && $message->message_text !== 'Sent an image')
                                             <p class="m-0">{{ $message->message_text }}</p>
                                         @endif
@@ -194,7 +196,9 @@
                                         <img src="{{ $message->image_url }}" alt="Sent Image"
                                             class="mt-2 rounded shadow-sm" height="310px" width="auto">
                                     @endif
-                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
+                                    @if (strpos(
+                                            $message->message_text,
+                                            'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
                                         <div class="message-avatar bg-primary text-white">
                                             <i class="fa-solid fa-user"></i>
                                         </div>
@@ -210,15 +214,18 @@
                                             class="mt-2 rounded shadow-sm" height="310px" width="auto">
                                     @endif
                                     <div class="message bg-white text-dark px-3 py-2 rounded shadow-sm"
-                                        style="max-width: 70%; display: {{ $message->message_text ? 'block' : 'none' }}; 
-                                        {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') !== false ? 'margin: 0 auto; max-width: 73%;' : '' }}">
-                                        @if ($message->message_text)
+                                        style="max-width: 70%; 
+                                display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }}; 
+                                {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') !== false ? 'margin: 0 auto; max-width: 73%;' : '' }}">
+                                        @if ($message->message_text && $message->message_text !== 'Sent an image')
                                             <p class="m-0 {{ $message->is_read ? '' : 'fw-bold' }}">
                                                 {{ $message->message_text }}
                                             </p>
                                         @endif
                                     </div>
-                                    @if (strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
+                                    @if (strpos(
+                                            $message->message_text,
+                                            'Please complete your GCash transaction. Kindly send the payment for the following orders:') === false)
                                         <span
                                             class="text-muted align-self-center small ms-3">{{ $message->created_at->diffForHumans() }}</span>
                                     @endif
@@ -260,32 +267,32 @@
         const messageInput = document.getElementById('messageInput');
         const imageInput = document.getElementById('imageUpload');
         const chatBody = document.getElementById('chatBody');
-    
+
         // Handle form submission for text and image
-        sendMessageForm.addEventListener('submit', async function (e) {
+        sendMessageForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-    
+
             const formData = new FormData();
             const messageText = messageInput.value.trim();
             const imageFile = imageInput.files[0];
-    
+
             // Validate input
             if (!messageText && !imageFile) {
                 alert('Please enter a message or upload an image.');
                 return;
             }
-    
+
             if (messageText) formData.append('message_text', messageText);
             if (imageFile) formData.append('image', imageFile);
-    
+
             formData.append('_token', '{{ csrf_token() }}'); // CSRF token
-    
+
             try {
                 const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
                     method: 'POST',
                     body: formData,
                 });
-    
+
                 const result = await response.json();
                 if (response.ok && result.success) {
                     // Append the new message to the chat body
@@ -301,24 +308,24 @@
                 alert('An error occurred. Please try again.');
             }
         });
-    
+
         // Automatically send the image when selected
-        imageInput.addEventListener('change', async function () {
+        imageInput.addEventListener('change', async function() {
             if (imageInput.files.length === 0) return;
-    
+
             const formData = new FormData();
             const imageFile = imageInput.files[0];
-    
+
             formData.append('image', imageFile);
             formData.append('message_text', 'Sent an image'); // Automatically set message text for images
             formData.append('_token', '{{ csrf_token() }}'); // CSRF token
-    
+
             try {
                 const response = await fetch('{{ route('user.sendMessage', ['userId' => 1]) }}', {
                     method: 'POST',
                     body: formData,
                 });
-    
+
                 const result = await response.json();
                 if (response.ok && result.success) {
                     // Append the new image message to the chat body
@@ -333,23 +340,24 @@
                 alert('An error occurred. Please try again.');
             }
         });
-    
+
         // Append message to chat body
         function appendMessage(message) {
-            const isGCashMessage = message.message_text && message.message_text.includes('Please complete your GCash transaction. Kindly send the payment for the following orders:');
+            const isGCashMessage = message.message_text && message.message_text.includes(
+                'Please complete your GCash transaction. Kindly send the payment for the following orders:');
             const isImageOnlyMessage = message.message_text === 'Sent an image';
-            
+
             let newMessage = `
                 <div class="d-flex align-items-start justify-content-end mb-4">
                     ${!isGCashMessage ? `<span class="text-muted align-self-center small me-3">Just now</span>` : ''}
                     ${!isImageOnlyMessage ? `
-                        <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
-                             style="max-width: ${isGCashMessage ? '73%' : '70%'}; 
-                             ${isGCashMessage ? 'margin: 0 auto;' : ''};
-                             display: ${message.message_text && message.message_text !== 'Sent an image' ? 'block' : 'none'};">
-                            ${message.message_text && message.message_text !== 'Sent an image' ? `<p class="m-0">${message.message_text}</p>` : ''}
-                        </div>
-                    ` : ''}
+                                <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
+                                     style="max-width: ${isGCashMessage ? '73%' : '70%'}; 
+                                     ${isGCashMessage ? 'margin: 0 auto;' : ''};
+                                     display: ${message.message_text && message.message_text !== 'Sent an image' ? 'block' : 'none'};">
+                                    ${message.message_text && message.message_text !== 'Sent an image' ? `<p class="m-0">${message.message_text}</p>` : ''}
+                                </div>
+                            ` : ''}
                     ${message.image_url ? `<img src="${message.image_url}" alt="Sent Image" class="mt-2 rounded shadow-sm" height="310px" width="auto">` : ''}
                     <div class="message-avatar bg-primary text-white">
                         <i class="fa-solid fa-user"></i>
@@ -357,13 +365,13 @@
                 </div>
             `;
             chatBody.insertAdjacentHTML('beforeend', newMessage);
-    
+
             // Scroll to the bottom of the chat body
             setTimeout(() => {
                 chatBody.scrollTop = chatBody.scrollHeight;
             }, 100);
         }
-    
+
         // Scroll chat body to the bottom on page load
         window.addEventListener('load', () => {
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -379,7 +387,8 @@
             messages.forEach(message => {
                 // Check if message text contains GCash-related keywords
                 if (message.textContent.includes(
-                        'Please complete your GCash transaction. Kindly send the payment for the following orders:')) {
+                        'Please complete your GCash transaction. Kindly send the payment for the following orders:'
+                    )) {
                     message.classList.add('gcash-message'); // Apply specific styling
                     message.style.margin = "0 auto"; // Center the message
                     message.style.maxWidth = "73%"; // Adjust width for centered messages

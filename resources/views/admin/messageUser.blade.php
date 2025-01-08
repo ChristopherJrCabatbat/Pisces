@@ -116,7 +116,7 @@
                                 <!-- Message Text -->
                                 <div class="message bg-white border px-3 py-2 rounded shadow-sm 
                                     {{ $message->is_read || strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') !== false ? '' : 'fw-bold' }}"
-                                                                        style="max-width: 70%; 
+                                    style="max-width: 70%; 
                                     display: {{ $message->message_text && $message->message_text !== 'Sent an image' ? 'block' : 'none' }};
                                     {{ strpos($message->message_text, 'Please complete your GCash transaction. Kindly send the payment for the following orders:') !== false ? 'margin: 0 auto; max-width: 78% !important;' : '' }}">
 
@@ -277,6 +277,54 @@
         });
 
         // Automatically send the image when selected
+        // imageInput.addEventListener('change', async function() {
+        //     if (imageInput.files.length === 0) return;
+
+        //     const formData = new FormData();
+        //     const imageFile = imageInput.files[0];
+
+        //     formData.append('image', imageFile);
+        //     formData.append('_token', '{{ csrf_token() }}'); // CSRF token
+
+        //     try {
+        //         const response = await fetch('{{ route('admin.sendMessage', ['userId' => 1]) }}', {
+        //             method: 'POST',
+        //             body: formData,
+        //         });
+
+        //         const result = await response.json();
+        //         if (response.ok && result.success) {
+        //             // Append the new image message to the chat body
+        //             const newMessage = `
+    //         <div class="d-flex align-items-start justify-content-end mb-4">
+    //             <span class="text-muted align-self-center small me-3">Just now</span>
+    //             ${
+    //                 result.message.image_url
+    //                     ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">`
+    //                     : ''
+    //             }
+    //               <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
+    //                             alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
+    //         </div>
+    //     `;
+        //             chatBody.insertAdjacentHTML('beforeend', newMessage);
+
+        //             // Clear the file input
+        //             imageInput.value = '';
+
+        //             // Scroll to the bottom of the chat body
+        //             setTimeout(() => {
+        //                 chatBody.scrollTop = chatBody.scrollHeight;
+        //             }, 100);
+        //         } else {
+        //             alert('Failed to send the image. Please try again.');
+        //         }
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //         alert('An error occurred. Please try again.');
+        //     }
+        // });
+
         imageInput.addEventListener('change', async function() {
             if (imageInput.files.length === 0) return;
 
@@ -287,32 +335,27 @@
             formData.append('_token', '{{ csrf_token() }}'); // CSRF token
 
             try {
-                const response = await fetch('{{ route('admin.sendMessage', ['userId' => 1]) }}', {
+                const response = await fetch('{{ route('admin.sendMessage', $user->id) }}', {
                     method: 'POST',
                     body: formData,
                 });
 
                 const result = await response.json();
                 if (response.ok && result.success) {
-                    // Append the new image message to the chat body
                     const newMessage = `
                 <div class="d-flex align-items-start justify-content-end mb-4">
                     <span class="text-muted align-self-center small me-3">Just now</span>
-                    ${
-                        result.message.image_url
-                            ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">`
-                            : ''
+                    ${result.message.image_url
+                        ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">`
+                        : ''
                     }
-                      <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
-                                    alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
+                    <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
+                        alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
                 </div>
             `;
                     chatBody.insertAdjacentHTML('beforeend', newMessage);
 
-                    // Clear the file input
-                    imageInput.value = '';
-
-                    // Scroll to the bottom of the chat body
+                    imageInput.value = ''; // Clear the input
                     setTimeout(() => {
                         chatBody.scrollTop = chatBody.scrollHeight;
                     }, 100);
@@ -342,7 +385,7 @@
                 // Check if message text contains GCash-related keywords
                 if (message.textContent.includes(
                         'Please complete your GCash transaction. Kindly send the payment for the following orders:'
-                        )) {
+                    )) {
                     message.classList.add('gcash-message'); // Apply specific styling
                     message.style.margin = "0 auto"; // Center the message
                     message.style.maxWidth = "78%"; // Adjust width for centered messages

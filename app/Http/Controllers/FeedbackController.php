@@ -121,7 +121,6 @@ class FeedbackController extends Controller
         return redirect()->back();
     }
 
-
     public function updateSentiment(Request $request, $id)
     {
         // Validate the new sentiment
