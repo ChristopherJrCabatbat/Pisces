@@ -132,7 +132,7 @@
                                 <p class="m-0 text-truncate fw-bold">{{ $delivery->order }}</p>
                                 <p class="m-0 text-truncate">₱{{ number_format($delivery->total_price, 2) }}</p>
                                 <p class="text-muted small m-0">{{ $delivery->address }}</p>
-                                <p class="text-muted small m-0">{{ $delivery->created_at->format('M. d, Y') }}</p>
+                                <p class="text-muted small m-0">{{ $delivery->status }} - {{ $delivery->created_at->format('M. d, Y') }}</p>
                             </div>
 
                             <!-- Right Action Section -->
@@ -162,90 +162,16 @@
 @section('scripts')
 
     {{-- Modal Script --}}
-    {{-- <script>
-        const initializeModalListeners = () => {
-            document.querySelectorAll('.view-order-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const deliveryId = this.getAttribute('data-id');
-                    const contentDiv = document.getElementById('orderDetailsContent');
-
-                    contentDiv.innerHTML = '<p class="text-center text-muted">Loading...</p>';
-
-                    fetch(`/admin/getOrderDetails/${deliveryId}`, {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                const orders = data.delivery.order.split(', ');
-                                const quantities = data.delivery.quantity.split(', ');
-                                const fallbackImageUrl = "{{ asset('images/logo.jpg') }}";
-
-                                const orderRows = orders.map((order, index) => {
-                                    const imageUrl = data.menu_images[order.trim()] ||
-                                        fallbackImageUrl;
-                                    return `
-                                <tr>
-                                    <td><img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Order Image"></td>
-                                    <td>${order}</td>
-                                </tr>
-                            `;
-                                }).join("");
-
-                                contentDiv.innerHTML = `
-                            <table class="table table-bordered text-center align-middle">
-                                <thead class="table-light">
-                                    <tr><th colspan="2">Order Details</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Name:</strong> ${data.delivery.name}</td>
-                                        <td><strong>Email:</strong> ${data.delivery.email}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Contact:</strong> ${data.delivery.contact_number}</td>
-                                        <td><strong>Address:</strong> ${data.delivery.address}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Total Price:</strong> ₱${Number(data.delivery.total_price).toFixed(2)}</td>
-                                        <td><strong>Status:</strong> ${data.delivery.status}</td>
-                                    </tr>
-                                </tbody>
-                                <thead class="table-light">
-                                    <tr><th>Image</th><th>Order</th></tr>
-                                </thead>
-                                <tbody>${orderRows}</tbody>
-                            </table>
-                        `;
-                            } else {
-                                contentDiv.innerHTML =
-                                    '<p class="text-center text-danger">Failed to load order details.</p>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching order details:', error);
-                            contentDiv.innerHTML =
-                                '<p class="text-center text-danger">An error occurred while fetching order details.</p>';
-                        });
-                });
-            });
-        };
-    </script> --}}
-
     <script>
         const initializeModalListeners = () => {
             document.querySelectorAll('.view-order-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const deliveryId = this.getAttribute('data-id');
                     const contentDiv = document.getElementById('orderDetailsContent');
-    
+        
                     // Show loading state
                     contentDiv.innerHTML = '<p class="text-center text-muted">Loading...</p>';
-    
+        
                     // Fetch order details via AJAX
                     fetch(`/admin/getOrderDetails/${deliveryId}`, {
                         headers: {
@@ -255,26 +181,31 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        console.log('Fetched order details:', data); // Log entire response
+    
                         if (data.success) {
                             const orders = data.delivery.order.split(', ');
                             const quantities = data.delivery.quantity.split(', ');
                             const fallbackImageUrl = "{{ asset('images/logo.jpg') }}";
-    
+        
                             // Generate order rows
                             const orderRows = orders.map((order, index) => {
-                                const cleanedOrderName = order.trim();
+                                // Extract only the menu name by removing the quantity suffix
+                                const cleanedOrderName = order.replace(/\s*\(x\d+\)$/, '').trim();
                                 const imageUrl = data.menu_images[cleanedOrderName] || fallbackImageUrl;
     
+                                console.log(`Order: ${cleanedOrderName}, Image URL: ${imageUrl}`); // Log each image URL
+        
                                 return `
                                     <tr>
                                         <td>
                                             <img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Order Image">
                                         </td>
-                                        <td>${cleanedOrderName}</td>
+                                        <td>${order}</td>
                                     </tr>
                                 `;
                             }).join("");
-    
+        
                             // Populate modal content
                             contentDiv.innerHTML = `
                                 <table class="table table-bordered text-center align-middle">
@@ -302,11 +233,12 @@
                                 </table>
                             `;
                         } else {
+                            console.error('Failed to load order details:', data); // Log failure case
                             contentDiv.innerHTML = '<p class="text-center text-danger">Failed to load order details.</p>';
                         }
                     })
                     .catch(error => {
-                        console.error('Error fetching order details:', error);
+                        console.error('Error fetching order details:', error); // Log error details
                         contentDiv.innerHTML = '<p class="text-center text-danger">An error occurred while fetching order details.</p>';
                     });
                 });
@@ -343,7 +275,7 @@
                             <p class="m-0 text-truncate fw-bold">${delivery.order}</p>
                             <p class="m-0 text-truncate">₱${parseFloat(delivery.total_price).toFixed(2)}</p>
                             <p class="text-muted small m-0">${delivery.address}</p>
-                            <p class="text-muted small m-0">${new Date(delivery.created_at).toLocaleDateString('en-US', {
+                            <p class="text-muted small m-0">${delivery.status} - ${new Date(delivery.created_at).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
                                 year: 'numeric',
@@ -382,6 +314,7 @@
                         (delivery) =>
                         delivery.order.toLowerCase().includes(searchTerm) ||
                         delivery.address.toLowerCase().includes(searchTerm) ||
+                        delivery.status.toLowerCase().includes(searchTerm) ||
                         new Date(delivery.created_at).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',

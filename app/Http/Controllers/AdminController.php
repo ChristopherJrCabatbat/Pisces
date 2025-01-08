@@ -456,56 +456,13 @@ class AdminController extends Controller
         return view('admin.viewOrders', compact('deliveriesWithImages'));
     }
 
-    // public function getOrderDetails($id)
-    // {
-    //     $delivery = Delivery::find($id);
-
-    //     if (!$delivery) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Delivery not found'
-    //         ]);
-    //     }
-
-    //     // Get orders and quantities from delivery
-    //     $orders = explode(', ', $delivery->order);
-    //     $quantities = explode(', ', $delivery->quantity);
-
-    //     // Normalize menu names
-    //     $plainMenuNames = array_map(function ($order) {
-    //         return trim(strtolower(preg_replace('/\s*\(x\d+\)$/', '', $order)));
-    //     }, $orders);
-
-    //     // Retrieve menu images
-    //     $menuImages = Menu::whereIn('name', $plainMenuNames)
-    //         ->pluck('image', 'name')
-    //         ->mapWithKeys(fn($image, $name) => [
-    //             strtolower(trim($name)) => $image ? asset('storage/' . $image) : asset('images/logo.jpg')
-    //         ])
-    //         ->toArray();
-
-    //     // Log for debugging
-    //     Log::info('Normalized Menu Names: ', $plainMenuNames);
-    //     Log::info('Retrieved Menu Images: ', $menuImages);
-
-    //     // Match normalized names to images
-    //     $imageUrls = [];
-    //     foreach ($plainMenuNames as $name) {
-    //         $imageUrls[] = $menuImages[$name] ?? asset('images/logo.jpg');
-    //     }
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'delivery' => $delivery,
-    //         'menu_images' => $imageUrls,
-    //         'quantities' => $quantities
-    //     ]);
-    // }
-
     public function getOrderDetails($id)
 {
     // Find the delivery record by ID or fail with a 404
     $delivery = Delivery::findOrFail($id);
+
+    // Log the delivery data
+    Log::info('Delivery data fetched:', ['delivery' => $delivery]);
 
     // Split orders to extract menu names
     $orders = explode(', ', $delivery->order);
@@ -515,6 +472,9 @@ class AdminController extends Controller
         return preg_replace('/\s*\(x\d+\)$/', '', $order);
     }, $orders);
 
+    // Log cleaned menu names
+    Log::info('Cleaned menu names:', ['menu_names' => $plainMenuNames]);
+
     // Fetch menu images using the cleaned menu names
     $menuImages = Menu::whereIn('name', $plainMenuNames)
         ->pluck('image', 'name')
@@ -523,6 +483,9 @@ class AdminController extends Controller
             return $image ? asset('storage/' . $image) : asset('images/logo.jpg');
         })
         ->toArray();
+
+    // Log menu images
+    Log::info('Menu images fetched:', ['menu_images' => $menuImages]);
 
     return response()->json([
         'success' => true,
