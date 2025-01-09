@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Order</title>
+    <title>Pisces Coffee Hub</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-home.png') }}">
 
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
@@ -35,7 +35,7 @@
 
                         <!-- Full Name -->
                         <div class="mb-3">
-                            <label for="fullName" class="form-label">Full Name</label>
+                            <label for="fullName" class="form-label">Full Name:</label>
                             <input type="text" class="form-control" id="fullName" name="fullName"
                                 value="{{ old('fullName', $user->first_name . ' ' . $user->last_name) }}" required>
                         </div>
@@ -43,39 +43,50 @@
                         <div class="d-flex gap-4 mb-3">
                             <!-- Email -->
                             <div class="w-50">
-                                <label for="email" class="form-label">Email Address</label>
+                                <label for="email" class="form-label">Email Address:</label>
                                 <input type="email" class="form-control" id="email" name="email"
                                     value="{{ old('email', $user->email) }}" required>
                             </div>
 
                             <!-- Contact Number -->
                             <div class="w-50">
-                                <label for="contactNumber" class="form-label">Contact Number</label>
+                                <label for="contactNumber" class="form-label">Contact Number:</label>
                                 <input type="text" class="form-control" id="contactNumber" name="contactNumber"
                                     value="{{ old('contactNumber', $user->contact_number) }}" required>
                             </div>
                         </div>
+                       
+                        {{-- Address --}}
+                        <div class="d-flex gap-2 mb-3">
+                            <!-- House Number -->
+                            <div class="w-25">
+                                <label for="house_number" class="form-label">House Num:</label>
+                                <input type="text" class="form-control" id="house_number" name="house_number" placeholder="123" required>
+                            </div>
 
-                        <!-- Full Address -->
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Full Address</label>
-                            <input type="text" class="form-control" id="address" name="address" autofocus
-                                placeholder="#123 Barangay ABC SCCP" value="{{ old('address') }}" required>
+                            <!-- Barangay -->
+                            <div class="w-100">
+                                <label for="barangay" class="form-label">Barangay:</label>
+                                <select class="form-control" id="barangay" name="barangay" required>
+                                    <option value="">Select Barangay</option>
+                                </select>
+                            </div>
+                          
+                            <!-- Purok -->
+                            <div class="" style="width: 40% !important">
+                                <label for="purok" class="form-label">Purok (optional):</label>
+                                <input type="number" class="form-control" id="purok" name="purok" min="0" max="20" placeholder="1">
+                            </div>
                         </div>
 
-                        <!-- Shipping Method -->
-                        <label for="shippingMethod" class="form-label">Shipping Method</label>
-                        <div class="form-check form-control p-2 ps-5 mb-3">
-                            <input class="form-check-input" type="radio" name="shippingMethod" id="freeShipping"
-                                value="Free Shipping"
-                                {{ old('shippingMethod', 'Free Shipping') == 'Free Shipping' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="freeShipping">
-                                Delivery - <strong>Free shipping</strong>
-                            </label>
+                         <!-- Shipping -->
+                         <div class="mb-3">
+                            <label for="shippingMethod" class="form-label">Shippin Fee:</label>
+                            <input type="text" class="form-control" id="shippingMethod" name="shippingMethod" value="₱20" readonly required>
                         </div>
 
                         <!-- Payment Method -->
-                        <label for="paymentMethod" class="form-label">Mode of Payment</label>
+                        <label for="paymentMethod" class="form-label">Mode of Payment:</label>
                         <div class="form-check form-control p-2 ps-5 mb-1">
                             <input class="form-check-input" type="radio" name="paymentMethod" id="cod"
                                 value="COD" {{ old('paymentMethod', 'COD') == 'COD' ? 'checked' : '' }}>
@@ -89,8 +100,9 @@
 
                         <!-- Note -->
                         <div class="mb-3">
-                            <label for="note" class="form-label">Note</label>
-                            <textarea class="form-control" id="note" name="note" style="height: 100px" placeholder="Leave a note here...">{{ old('note') }}</textarea>
+                            <label for="note" class="form-label">Note:</label>
+                            <textarea class="form-control" id="note" name="note" style="height: 100px"
+                                placeholder="Leave a note here...">{{ old('note') }}</textarea>
                         </div>
 
                         <!-- Submit Button -->
@@ -103,6 +115,7 @@
                             </button>
                         </div>
                     </div>
+
                 </div>
 
                 {{-- Right Section (Product Summary) --}}
@@ -139,20 +152,20 @@
                                     ₱{{ number_format($originalTotal, 2) }}
                                 </div>
                             </div>
-                    
+
                             {{-- Discount Section --}}
                             <div class="d-flex justify-content-between fw-bold align-items-center text-success">
                                 <div>Discount (5%):</div>
                                 <div class="fs-4">₱{{ number_format($originalTotal * 0.05, 2) }}</div>
                             </div>
                         @endif
-                    
+
                         {{-- Final Total --}}
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Total:</div>
                             <div class="fs-4">₱{{ number_format($finalTotal) }}</div>
                         </div>
-                    </div> 
+                    </div>
 
                     <input type="hidden" name="total_price" value="{{ round($finalTotal) }}">
 
@@ -168,6 +181,35 @@
 
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const barangayDropdown = document.getElementById('barangay');
+    
+            // Complete list of Barangays in San Carlos City, Pangasinan
+            const barangays = [
+                "Abanon", "Agdao", "Anando", "Ano", "Antipangol", "Aponit", "Bacnar", "Balaya", "Balayong",
+                "Baldog", "Balite Sur", "Balococ", "Bani", "Bega", "Bocboc", "Bogaoan", "Bolingit", "Bolosan",
+                "Bonifacio", "Buenglat", "Bugallon-Posadas Street", "Burgos Padlan", "Cacaritan", "Caingal",
+                "Calobaoan", "Calomboyan", "Caoayan-Kiling", "Capataan", "Cobol", "Coliling", "Cruz", "Doyong",
+                "Gamata", "Guelew", "Ilang", "Inerangan", "Isla", "Libas", "Lilimasan", "Longos", "Lucban",
+                "M. Soriano", "Mabalbalino", "Mabini", "Magtaking", "Malacañang", "Maliwara", "Mamarlao", "Manzon",
+                "Matagdem", "Mestizo Norte", "Naguilayan", "Nilentap", "Padilla-Gomez", "Pagal", "Paitan-Panoypoy",
+                "Palaming", "Palaris", "Palospos", "Pangalangan", "Pangoloan", "Pangpang", "Parayao", "Payapa",
+                "Payar", "Perez Boulevard", "PNR Station Site", "Polo", "Quezon Boulevard", "Quintong", "Rizal",
+                "Roxas Boulevard", "Salinap", "San Juan", "San Pedro-Taloy", "Sapinit", "Supo", "Talang", "Tamayo",
+                "Tandang Sora", "Tandoc", "Tarece", "Tarectec", "Tayambani", "Tebag", "Turac"
+            ];
+    
+            barangays.forEach(barangay => {
+                const option = document.createElement('option');
+                option.value = barangay;
+                option.text = barangay;
+                barangayDropdown.appendChild(option);
+            });
+        });
+    </script>
+    
 
 </body>
 
