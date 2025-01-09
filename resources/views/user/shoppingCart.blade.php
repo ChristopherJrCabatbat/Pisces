@@ -25,7 +25,7 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
             ORDERS
             @if ($pendingOrdersCount > 0)
@@ -35,7 +35,7 @@
             @endif
         </a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES
             @if ($unreadCount > 0)
                 <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
@@ -116,7 +116,13 @@
 
                             <!-- Price Column with Item Price -->
                             <td class="menu-price">
-                                ₱{{ number_format($menu->price, 2) }}
+                                @if ($menu->discount > 0)
+                                    {{-- Display discounted price with discount percentage --}}
+                                    ₱{{ number_format($menu->price * (1 - $menu->discount / 100), 2) }}
+                                @else
+                                    {{-- Display original price --}}
+                                    ₱{{ number_format($menu->price, 2) }}
+                                @endif
                             </td>
 
                             <!-- Quantity Column -->
@@ -129,7 +135,8 @@
 
                                     <input type="text" readonly name="quantity" value="{{ $menu->quantity ?? 1 }}"
                                         min="1" class="form-control text-center mx-2 quantity-input"
-                                        style="width: 60px;" data-menu-id="{{ $menu->id }}">
+                                        style="width: 60px;" data-menu-id="{{ $menu->id }}"
+                                        data-price="{{ $menu->price }}" data-discount="{{ $menu->discount }}">
 
                                     <button type="button" class="btn qty-btn rounded-circle"
                                         onclick="incrementQuantity(this)">
@@ -137,6 +144,7 @@
                                     </button>
                                 </div>
                             </td>
+
 
                             <!-- Delete Button -->
                             <td>
@@ -158,8 +166,6 @@
                     @endforelse
                 </tbody>
 
-
-
             </table>
 
             {{-- Divider with Cart Icon --}}
@@ -179,25 +185,19 @@
 
                 @foreach ($menus as $menu)
                     @php
-                        $quantity = $menu->pivot->quantity ?? 1;
-                        $itemTotal = $menu->price * $quantity;
-                        $totalPrice += $itemTotal;
+                        $totalPrice += $menu->total_price;
                     @endphp
                     <div class="d-flex justify-content-between mb-2 pb-2 border-bottom cart-item-{{ $menu->id }}">
                         <span>
                             {{ $menu->name }}
                             <span class="cart-item-quantity">
-                                @if ($quantity > 1)
-                                    ({{ $quantity }})
+                                @if ($menu->quantity > 1)
+                                    ({{ $menu->quantity }})
                                 @endif
                             </span>
                         </span>
                         <span class="cart-item-total">
-                            @if (floor($itemTotal) == $itemTotal)
-                                ₱{{ number_format($itemTotal, 0) }}
-                            @else
-                                ₱{{ number_format($itemTotal, 2) }}
-                            @endif
+                            ₱{{ number_format($menu->total_price, 2) }}
                         </span>
                     </div>
                 @endforeach
@@ -205,11 +205,7 @@
                 <div class="fw-bold d-flex justify-content-between font-weight-bold border-bottom pb-2">
                     <span>Total</span>
                     <span id="total-price">
-                        @if (floor($totalPrice) == $totalPrice)
-                            ₱{{ number_format($totalPrice, 0) }}
-                        @else
-                            ₱{{ number_format($totalPrice, 2) }}
-                        @endif
+                        ₱{{ round($totalPrice) }}
                     </span>
                 </div>
 
@@ -221,10 +217,7 @@
                         Check Out
                     </button>
                 </form>
-
-
             </div>
-
 
             {{-- Divider --}}
             <hr class="mb-5">

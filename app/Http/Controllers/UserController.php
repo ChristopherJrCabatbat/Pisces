@@ -325,40 +325,80 @@ class UserController extends Controller
     }
 
 
+    // public function menuView($id)
+    // {
+    //     $menu = Menu::find($id);
+
+    //     if (!$menu) {
+    //         return response()->json(['error' => 'Menu not found'], 404);
+    //     }
+
+    //     // Fetch the total number of users who marked this menu as favorite
+    //     $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
+
+    //     // Fetch dynamic rating and review count
+    //     $rating = DB::table('feedback')
+    //         ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //         ->avg('rating');
+    //     $ratingCount = DB::table('feedback')
+    //         ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //         ->count();
+
+    //     // Calculate discounted price if applicable
+    //     $discountedPrice = $menu->discount > 0
+    //         ? round($menu->price * (1 - $menu->discount / 100), 2)
+    //         : $menu->price;
+
+    //     return response()->json([
+    //         'name' => $menu->name,
+    //         'category' => $menu->category,
+    //         'price' => $menu->price,
+    //         'discountedPrice' => $discountedPrice, // Add discounted price
+    //         'discount' => $menu->discount, // Include discount percentage
+    //         'description' => $menu->description,
+    //         'image' => $menu->image,
+    //         'rating' => $rating ?: 0,
+    //         'ratingCount' => $ratingCount ?: 0,
+    //         'favoriteCount' => $favoriteCount, // Include total favorites count
+    //     ]);
+    // }
 
     public function menuView($id)
-    {
-        $menu = Menu::find($id);
+{
+    $menu = Menu::find($id); // Find menu by its primary key
 
-        if (!$menu) {
-            return response()->json(['error' => 'Menu not found'], 404);
-        }
-
-        // Fetch the total number of users who marked this menu as favorite
-        $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
-
-        // Fetch dynamic rating and review count
-        $rating = DB::table('feedback')
-            ->where('menu_items', 'LIKE', "%{$menu->name}%")
-            ->avg('rating');
-        $ratingCount = DB::table('feedback')
-            ->where('menu_items', 'LIKE', "%{$menu->name}%")
-            ->count();
-
-        return response()->json([
-            'name' => $menu->name,
-            'category' => $menu->category,
-            'price' => $menu->price,
-            'description' => $menu->description,
-            'image' => $menu->image,
-            'rating' => $rating ?: 0,
-            'ratingCount' => $ratingCount ?: 0,
-            'favoriteCount' => $favoriteCount, // Include total favorites count
-        ]);
+    if (!$menu) {
+        return response()->json(['error' => 'Menu not found'], 404);
     }
 
+    // Calculate discounted price
+    $discountedPrice = $menu->discount > 0
+        ? round($menu->price * (1 - $menu->discount / 100), 2)
+        : $menu->price;
 
+    // Fetch total favorites and ratings
+    $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
+    $rating = DB::table('feedback')
+        ->where('menu_items', 'LIKE', "%{$menu->name}%")
+        ->avg('rating');
+    $ratingCount = DB::table('feedback')
+        ->where('menu_items', 'LIKE', "%{$menu->name}%")
+        ->count();
 
+    // Return JSON response
+    return response()->json([
+        'name' => $menu->name,
+        'category' => $menu->category,
+        'price' => $menu->price,
+        'discountedPrice' => $discountedPrice,
+        'discount' => $menu->discount,
+        'description' => $menu->description,
+        'image' => $menu->image,
+        'rating' => $rating ?: 0,
+        'ratingCount' => $ratingCount ?: 0,
+        'favoriteCount' => $favoriteCount,
+    ]);
+}
 
 
     // Add To Cart Bawal Duplicate
@@ -392,6 +432,34 @@ class UserController extends Controller
 
     // Add To Cart Pwede Duplicate
 
+    // public function shoppingCart()
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Get menus added to cart by the current user along with their cart_items IDs and quantities
+    //     $menus = DB::table('menus')
+    //         ->join('cart_items', 'menus.id', '=', 'cart_items.menu_id')
+    //         ->where('cart_items.user_id', $user->id)
+    //         ->select('menus.*', 'cart_items.id as cart_item_id', 'cart_items.quantity') // Include quantity here
+    //         ->get();
+
+    //     // Count pending or active orders
+    //     $pendingOrdersCount = DB::table('deliveries')
+    //         ->where('email', $user->email)
+    //         ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
+    //         ->count();
+
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
+    //         ->count();
+
+    //     return view('user.shoppingCart', compact('user', 'pendingOrdersCount', 'menus', 'userCart', 'userFavorites', 'unreadCount'));
+    // }
+
     public function shoppingCart()
     {
         /** @var User $user */
@@ -403,8 +471,23 @@ class UserController extends Controller
         $menus = DB::table('menus')
             ->join('cart_items', 'menus.id', '=', 'cart_items.menu_id')
             ->where('cart_items.user_id', $user->id)
-            ->select('menus.*', 'cart_items.id as cart_item_id', 'cart_items.quantity') // Include quantity here
+            ->select(
+                'menus.*',
+                'cart_items.id as cart_item_id',
+                'cart_items.quantity',
+                DB::raw('CASE 
+                        WHEN menus.discount > 0 THEN menus.price * (1 - menus.discount / 100) 
+                        ELSE menus.price 
+                     END AS discounted_price'),
+                DB::raw('CASE 
+                        WHEN menus.discount > 0 THEN menus.price * (1 - menus.discount / 100) * cart_items.quantity
+                        ELSE menus.price * cart_items.quantity 
+                     END AS total_price')
+            ) // Include calculated prices
             ->get();
+
+        // Calculate the total cart price
+        $totalPrice = $menus->sum('total_price');
 
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
@@ -417,8 +500,9 @@ class UserController extends Controller
             ->where('is_read', false)
             ->count();
 
-        return view('user.shoppingCart', compact('user', 'pendingOrdersCount', 'menus', 'userCart', 'userFavorites', 'unreadCount'));
+        return view('user.shoppingCart', compact('user', 'pendingOrdersCount', 'menus', 'userCart', 'userFavorites', 'unreadCount', 'totalPrice'));
     }
+
 
     public function addToFavorites(Request $request, $menuId)
     {
@@ -449,12 +533,69 @@ class UserController extends Controller
         ]);
     }
 
+    // public function favorites(Request $request)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch categories with counts of favorite menus for the logged-in user
+    //     $categories = DB::table('categories')
+    //         ->leftJoin('menus', 'categories.category', '=', 'menus.category')
+    //         ->leftJoin('favorite_items', function ($join) use ($user) {
+    //             $join->on('menus.id', '=', 'favorite_items.menu_id')
+    //                 ->where('favorite_items.user_id', '=', $user->id);
+    //         })
+    //         ->select('categories.category as category', DB::raw('count(favorite_items.id) as menu_count'))
+    //         ->groupBy('categories.category')
+    //         ->orderByDesc('menu_count')
+    //         ->get();
+
+    //     $selectedCategory = $request->input('category', 'All Menus');
+    //     $userCart = $user->cart;
+    //     $userFavorites = $user->favoriteItems()->count();
+
+    //     // Retrieve favorite menus filtered by the selected category
+    //     if ($selectedCategory == 'All Menus') {
+    //         $menus = $user->favoriteItems; // Get all favorite items
+    //     } else {
+    //         $menus = $user->favoriteItems
+    //             ->filter(function ($menu) use ($selectedCategory) {
+    //                 return $menu->category === $selectedCategory; // Filter by category
+    //             });
+    //     }
+
+    //     // Enhance each menu item with its rating and review count
+    //     $menus = $menus->map(function ($menu) {
+    //         $menu->rating = DB::table('feedback')
+    //             ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //             ->avg('rating') ?: 0; // Default to 0 if no rating
+    //         $menu->ratingCount = DB::table('feedback')
+    //             ->where('menu_items', 'LIKE', "%{$menu->name}%")
+    //             ->count(); // Count reviews
+    //         return $menu;
+    //     });
+
+    //     // Count pending or active orders
+    //     $pendingOrdersCount = DB::table('deliveries')
+    //         ->where('email', $user->email)
+    //         ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
+    //         ->count();
+
+    //     // Count unread messages from the admin
+    //     $unreadCount = Message::where('receiver_id', $user->id)
+    //         ->where('is_read', false)
+    //         ->count();
+
+    //     return view('user.favorites', compact('menus', 'pendingOrdersCount', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
+    // }
+
+   
     public function favorites(Request $request)
     {
         /** @var User $user */
         $user = Auth::user();
 
-        // Fetch categories with counts of favorite menus for the logged-in user
+        // Fetch all categories with counts of favorite menus
         $categories = DB::table('categories')
             ->leftJoin('menus', 'categories.category', '=', 'menus.category')
             ->leftJoin('favorite_items', function ($join) use ($user) {
@@ -467,29 +608,46 @@ class UserController extends Controller
             ->get();
 
         $selectedCategory = $request->input('category', 'All Menus');
-        $userCart = $user->cart;
-        $userFavorites = $user->favoriteItems()->count();
+        $search = $request->input('search', ''); // Search keyword
+        $sort = $request->input('sort', 'Cheapest'); // Sort criteria
 
-        // Retrieve favorite menus filtered by the selected category
-        if ($selectedCategory == 'All Menus') {
-            $menus = $user->favoriteItems; // Get all favorite items
-        } else {
-            $menus = $user->favoriteItems
-                ->filter(function ($menu) use ($selectedCategory) {
-                    return $menu->category === $selectedCategory; // Filter by category
-                });
+        // Base query for the user's favorite menus
+        $menusQuery = Menu::join('favorite_items', 'menus.id', '=', 'favorite_items.menu_id')
+            ->where('favorite_items.user_id', $user->id)
+            ->select('menus.*'); // Ensure we get the original menu ID
+
+        // Filter by selected category
+        if ($selectedCategory !== 'All Menus') {
+            $menusQuery->where('menus.category', $selectedCategory);
         }
 
-        // Enhance each menu item with its rating and review count
-        $menus = $menus->map(function ($menu) {
+        // Search by menu name
+        if (!empty($search)) {
+            $menusQuery->where('menus.name', 'LIKE', '%' . $search . '%');
+        }
+
+        // Apply sorting by price, availability, or rating
+        if ($sort === 'Availability') {
+            $menusQuery->where('menus.availability', 'Available');
+        } elseif ($sort === 'Rating') {
+            $menusQuery->orderByDesc(DB::raw('(SELECT AVG(rating) FROM feedback WHERE feedback.menu_items LIKE CONCAT("%", menus.name, "%"))'));
+        } else {
+            $menusQuery->orderBy('menus.price', $sort === 'Expensive' ? 'desc' : 'asc');
+        }
+
+        // Retrieve favorite menus with additional rating and review count
+        $menus = $menusQuery->get()->map(function ($menu) {
             $menu->rating = DB::table('feedback')
                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                ->avg('rating') ?: 0; // Default to 0 if no rating
+                ->avg('rating');
             $menu->ratingCount = DB::table('feedback')
                 ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                ->count(); // Count reviews
+                ->count();
             return $menu;
         });
+
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
 
         // Count pending or active orders
         $pendingOrdersCount = DB::table('deliveries')
@@ -502,8 +660,9 @@ class UserController extends Controller
             ->where('is_read', false)
             ->count();
 
-        return view('user.favorites', compact('menus', 'pendingOrdersCount', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
+        return view('user.favorites', compact('menus', 'categories', 'selectedCategory', 'search', 'sort', 'userCart', 'userFavorites', 'pendingOrdersCount', 'unreadCount', 'user'));
     }
+
 
 
     public function updateQuantity(Request $request)
@@ -560,16 +719,23 @@ class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // Fetch cart items with pivot data
-        $menus = $user->cartItems()->withPivot('quantity')->get();
+        // Fetch cart items with pivot data and calculate discounted prices
+        $menus = $user->cartItems()->withPivot('quantity')->get()->map(function ($menu) {
+            $menu->discounted_price = $menu->discount > 0
+                ? round($menu->price * (1 - $menu->discount / 100), 2)
+                : $menu->price;
+
+            return $menu;
+        });
 
         // Pass data to the order view
         return view('user.order', compact('user', 'menus'));
     }
 
+
     public function orderView($id)
     {
-        // Get the current authenticated user
+        // Get the authenticated user
         $user = Auth::user();
 
         // Retrieve the specific menu item by ID
@@ -583,15 +749,23 @@ class UserController extends Controller
         // Fetch the quantity from the request, default to 1
         $quantity = request()->input('quantity', 1);
 
-        // Calculate the original total price
-        $originalTotal = $menu->price * $quantity;
+        // Calculate the menu's discounted price if it has a discount
+        $discountedPrice = $menu->discount > 0
+            ? round($menu->price * (1 - $menu->discount / 100), 2)
+            : $menu->price;
+
+        // Calculate the original total price using the discounted price
+        $originalTotal = $discountedPrice * $quantity;
 
         // Determine if the user is eligible for a discount
-        $hasDiscount = $user->has_discount; // Eligible if has_discount is `true` (1)
-        $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal; // Apply 5% discount if eligible
+        $hasDiscount = $user->has_discount; // Eligible if has_discount is `true`
+        $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
+
+        // Round the final total
+        $finalTotal = round($finalTotal);
 
         // Pass the variables to the view
-        return view('user.orderView', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount'));
+        return view('user.orderView', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'discountedPrice'));
     }
 
 
@@ -599,6 +773,11 @@ class UserController extends Controller
     {
         // Fetch the single menu item based on the provided ID
         $menu = Menu::findOrFail($id);
+
+        // Add discounted price to the menu
+        $menu->discounted_price = $menu->discount > 0
+            ? round($menu->price * (1 - $menu->discount / 100), 2)
+            : $menu->price;
 
         // Count the number of users who added this menu to their favorites
         $favoritesCount = DB::table('favorite_items')->where('menu_id', $menu->id)->count();
@@ -630,32 +809,6 @@ class UserController extends Controller
         return view('user.menuDetails', compact('menu', 'pendingOrdersCount', 'user', 'userCart', 'userFavorites', 'favoritesCount', 'unreadCount'));
     }
 
-    // public function menuDetailsOrder($id)
-    // {
-    //     // Get the authenticated user
-    //     $user = Auth::user();
-
-    //     // Retrieve the specific menu item by ID
-    //     $menu = Menu::find($id);
-
-    //     // Check if the menu item exists
-    //     if (!$menu) {
-    //         return redirect()->route('user.menu')->with('error', 'Menu item not found');
-    //     }
-
-    //     // Fetch the quantity from the request, default to 1
-    //     $quantity = request()->input('quantity', 1);
-
-    //     // Calculate the original total price
-    //     $originalTotal = $menu->price * $quantity;
-
-    //     // Apply a 5% discount if the user is eligible
-    //     $hasDiscount = session('discount') && !$user->has_discount;
-    //     $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
-
-    //     // Pass the variables to the view
-    //     return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount'));
-    // }
 
     public function menuDetailsOrder($id)
     {
@@ -673,16 +826,22 @@ class UserController extends Controller
         // Fetch the quantity from the request, default to 1
         $quantity = request()->input('quantity', 1);
 
-        // Calculate the original total price
-        $originalTotal = $menu->price * $quantity;
+        // Calculate the menu's discounted price if it has a discount
+        $discountedPrice = $menu->discount > 0
+            ? round($menu->price * (1 - $menu->discount / 100), 2)
+            : $menu->price;
+
+        // Calculate the original total price using the discounted price
+        $originalTotal = $discountedPrice * $quantity;
 
         // Determine if the user is eligible for a discount
-        $hasDiscount = $user->has_discount; // Eligible if has_discount is `false` (0)
+        $hasDiscount = $user->has_discount; // Eligible if has_discount is `true`
         $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
 
         // Pass the variables to the view
-        return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount'));
+        return view('user.menuDetailsOrder', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'discountedPrice'));
     }
+
 
 
     public function orders(Request $request)

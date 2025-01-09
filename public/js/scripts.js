@@ -96,35 +96,45 @@ function updateCartItemQuantity(menuId, quantity) {
         .catch((error) => console.error("Error updating cart item:", error));
 }
 
+// Shopping Cart Total Update Script
 function updateCartTotals() {
     let rows = document.querySelectorAll(".menu-row");
     let totalPrice = 0;
 
     rows.forEach((row) => {
-        let price = parseFloat(row.dataset.price); // Get original price from data attribute
-        let quantity = parseInt(row.querySelector(".quantity-input").value); // Get updated quantity
-        let itemTotal = price * quantity; // Calculate item total
+        let price = parseFloat(row.querySelector(".quantity-input").dataset.price); // Original price
+        let discount = parseFloat(row.querySelector(".quantity-input").dataset.discount); // Discount
+        let quantity = parseInt(row.querySelector(".quantity-input").value); // Updated quantity
 
-        // Update the quantity in Cart Totals display
-        let cartItem = document.querySelector(
-            `.cart-item-${row.dataset.menuId}`
-        );
-        cartItem.querySelector(".cart-item-quantity").textContent =
-            quantity > 1 ? `(${quantity})` : ""; // Show quantity if more than 1
-        cartItem.querySelector(".cart-item-total").textContent =
-            formatPrice(itemTotal);
+        // Calculate discounted price
+        let finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
+        let itemTotal = finalPrice * quantity; // Calculate item total
 
-        totalPrice += itemTotal; // Add to total price
+        // Update the quantity and item total in the Cart Totals section
+        let cartItem = document.querySelector(`.cart-item-${row.dataset.menuId}`);
+        if (cartItem) {
+            cartItem.querySelector(".cart-item-quantity").textContent = quantity > 1 ? `(${quantity})` : ""; // Show quantity if > 1
+            cartItem.querySelector(".cart-item-total").textContent = formatPrice(itemTotal); // Two decimal places for item totals
+        }
+
+        totalPrice += itemTotal; // Accumulate total price
     });
 
-    document.querySelector("#total-price").textContent =
-        formatPrice(totalPrice); // Update total price
+    // Update the grand total (rounded to nearest integer)
+    document.querySelector("#total-price").textContent = formatRoundedPrice(totalPrice);
 }
 
-// Helper function to format price
+// Helper to format price with two decimal places (₱XXX.XX)
 function formatPrice(price) {
-    return price % 1 === 0 ? `₱${price}` : `₱${price.toFixed(2)}`;
+    return "₱" + price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
 }
+
+// Helper to format and round price (₱XXX)
+function formatRoundedPrice(price) {
+    return "₱" + Math.round(price).toLocaleString(); // Rounds and formats the total
+}
+
+
 
 // Function to open the image modal
 function enlargeImage(imageSrc) {
@@ -152,22 +162,21 @@ document.querySelectorAll("#menu-table-body img").forEach((img) => {
     img.addEventListener("click", () => enlargeImage(img.src));
 });
 
-
 // Open modal without scrolling to the top
 function openModal(event, modalId) {
     event.preventDefault(); // Prevent default link behavior
     const overlay = document.getElementById(modalId);
-    const modal = overlay.querySelector('.custom-modal');
+    const modal = overlay.querySelector(".custom-modal");
 
-    overlay.classList.add('active');
-    modal.classList.add('active');
+    overlay.classList.add("active");
+    modal.classList.add("active");
 }
 
 // Close modal
 function closeModal(modalId) {
     const overlay = document.getElementById(modalId);
-    const modal = overlay.querySelector('.custom-modal');
+    const modal = overlay.querySelector(".custom-modal");
 
-    overlay.classList.remove('active');
-    modal.classList.remove('active');
+    overlay.classList.remove("active");
+    modal.classList.remove("active");
 }

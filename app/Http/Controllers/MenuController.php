@@ -116,17 +116,6 @@ class MenuController extends Controller
             }
         }
 
-        // // Retrieve menus and calculate ratings and review counts
-        // $menus = $query->get()->map(function ($menu) {
-        //     $menu->rating = DB::table('feedback')
-        //         ->where('menu_items', 'LIKE', "%{$menu->name}%")
-        //         ->avg('rating');
-        //     $menu->review_count = DB::table('feedback')
-        //         ->where('menu_items', 'LIKE', "%{$menu->name}%")
-        //         ->count();
-        //     return $menu;
-        // });
-
         // Add discounted price calculation in the `map` function
         $menus = $query->get()->map(function ($menu) {
             $menu->rating = DB::table('feedback')

@@ -132,7 +132,7 @@
     <li class="nav-item">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.menu') }}">MENU</a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.orders') }}">
             ORDERS
             @if ($pendingOrdersCount > 0)
@@ -142,7 +142,7 @@
             @endif
         </a>
     </li>
-     <li class="nav-item position-relative">
+    <li class="nav-item position-relative">
         <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES
             @if ($unreadCount > 0)
                 <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
@@ -197,18 +197,32 @@
                     </div>
                     <div class="star-label">
                         @if ($menu->ratingCount > 0)
-                            ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                            ({{ number_format($menu->rating, 1) }}) {{ $menu->ratingCount }}
+                            review{{ $menu->ratingCount > 1 ? 's' : '' }}
                         @else
                             No Rating
                         @endif
                     </div>
-                </div>    
+                </div>
 
                 <!-- Pricing Section -->
-                <div class="pricing">
-                    <span id="discountedPrice" class="discounted-price">₱{{ $menu->price }}</span>
-                    {{-- <span id="originalPrice" class="original-price">₱1000.00</span>
-                        <span id="discountPercentage" class="discount">20% OFF</span> --}}
+                <div class="pricing d-flex align-items-center gap-3 my-3">
+                    {{-- Display the discounted price --}}
+                    <div class="price fw-bold">
+                        ₱{{ number_format($menu->discounted_price, 2) }}
+                    </div>
+                    {{-- Display the original price with a strike-through line if a discount is applied --}}
+                    @if ($menu->discount > 0)
+                        <div class="price-line text-muted text-decoration-line-through">
+                            @if (floor($menu->price) == $menu->price)
+                                ₱{{ number_format($menu->price, 0) }}
+                            @else
+                                ₱{{ number_format($menu->price, 2) }}
+                            @endif
+                        </div>
+                        {{-- Display the discount percentage --}}
+                        <div class="off fw-bold text-success">(-{{ $menu->discount }}% OFF)</div>
+                    @endif
                 </div>
 
                 <!-- Category and Description -->

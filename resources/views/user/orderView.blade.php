@@ -116,8 +116,13 @@
                                     alt="Picture">
                             </div>
                             <div class="menu-name d-flex flex-column align-items-center">
-                                <div class="name">{{ $menu->name }}</div>
-                                <div class="size">({{ $quantity }})</div>
+                                @if ($quantity > 1)
+                                    <div class="name">{{ $menu->name }} (₱{{ $discountedPrice }})</div>
+                                    <div class="size">({{ $quantity }})</div>
+                                @else
+                                    <div class="name">{{ $menu->name }}</div>
+                                    <div class="size">({{ $quantity }})</div>
+                                @endif
                             </div>
                             <div class="price fw-bold">
                                 ₱{{ number_format($originalTotal, 2) }}
@@ -130,28 +135,32 @@
                     </div>
 
                     <div class="cart-totals d-flex flex-column border-bottom pb-4 gap-3">
-                        <!-- Discount (if applicable) -->
+                        {{-- Show only if hasDiscount --}}
                         @if ($hasDiscount)
-                            <!-- Original Total -->
+                            {{-- Original Total --}}
                             <div class="d-flex justify-content-between fw-bold align-items-center">
                                 <div>Original Total:</div>
-                                <div class="fs-4">₱{{ number_format($originalTotal, 2) }}</div>
+                                <div class="fs-4">
+                                    ₱{{ number_format($originalTotal, 2) }}
+                                </div>
                             </div>
 
+                            {{-- Discount Section --}}
                             <div class="d-flex justify-content-between fw-bold align-items-center text-success">
                                 <div>Discount (5%):</div>
                                 <div class="fs-4">₱{{ number_format($originalTotal * 0.05, 2) }}</div>
                             </div>
                         @endif
 
-                        <!-- Final Total -->
+                        {{-- Final Total --}}
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Total:</div>
-                            <div class="fs-4">₱{{ number_format($finalTotal, 2) }}</div>
+                            <div class="fs-4">₱{{ number_format($finalTotal) }}</div>
                         </div>
                     </div>
 
-                    <input type="hidden" name="total_price" value="{{ $finalTotal }}">
+                    <input type="hidden" name="total_price" value="{{ round($finalTotal) }}">
+
 
                 </div>
 

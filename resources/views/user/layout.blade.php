@@ -26,9 +26,9 @@
 
     @yield('modals')
 
-    <!-- Product Details Modal -->
-    <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel" style="overflow: hidden;"
-        aria-hidden="true">
+    <!-- Menu Details Modal -->
+    <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel"
+        style="overflow: hidden;" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content text-black">
                 <div class="modal-header">
@@ -403,10 +403,127 @@
             const viewButtons = document.querySelectorAll('.view-menu-btn');
 
             viewButtons.forEach(button => {
+                // button.addEventListener('click', function() {
+                //     const menuId = this.getAttribute('data-id');
+
+                //     // Fetch menu details via AJAX
+                //     fetch(`/user/menuView/${menuId}`)
+                //         .then(response => {
+                //             if (!response.ok) {
+                //                 throw new Error(`HTTP error! Status: ${response.status}`);
+                //             }
+                //             return response.json();
+                //         })
+                //         .then(data => {
+                //             // Populate the modal with menu details
+                //             document.getElementById('menuImage').src = data.image ?
+                //                 `/storage/${data.image}` :
+                //                 '/images/logo.jpg';
+                //             document.getElementById('menuName').textContent = data.name;
+                //             document.getElementById('menuCategory').textContent = data.category;
+                //             document.getElementById('menuDescription').textContent = data
+                //                 .description;
+
+                //             // Populate the pricing section
+                //             const discountedPriceElement = document.getElementById(
+                //                 'discountedPrice');
+                //             const originalPriceElement = document.getElementById(
+                //                 'originalPrice');
+                //             const discountPercentageElement = document.getElementById(
+                //                 'discountPercentage');
+
+                //             if (data.discount > 0) {
+                //                 // Show discounted price and discount percentage
+                //                 discountedPriceElement.textContent =
+                //                     `₱${data.discountedPrice.toLocaleString()}`;
+                //                 discountPercentageElement.textContent =
+                //                     `(-${data.discount}% OFF)`;
+                //                 discountPercentageElement.classList.add('text-success');
+
+                //                 // Show original price with a line-through
+                //                 originalPriceElement.textContent =
+                //                     `₱${data.price.toLocaleString()}`;
+                //                 originalPriceElement.classList.add('text-muted',
+                //                     'text-decoration-line-through');
+                //             } else {
+                //                 // Show only the original price
+                //                 discountedPriceElement.textContent =
+                //                     `₱${data.price.toLocaleString()}`;
+                //                 discountPercentageElement.textContent = '';
+                //                 originalPriceElement.textContent = '';
+                //             }
+
+                //             // Other modal updates (ratings, favorites, etc.)
+                //             const starContainer = document.getElementById('menuRating');
+                //             starContainer.innerHTML = ''; // Clear previous stars if any
+                //             const rating = parseFloat(data.rating || 0);
+                //             const fullStars = Math.floor(rating);
+                //             const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+                //             const emptyStars = 5 - (fullStars + halfStar);
+
+                //             for (let i = 0; i < fullStars; i++) {
+                //                 const star = document.createElement('i');
+                //                 star.className = 'fa-solid fa-star';
+                //                 starContainer.appendChild(star);
+                //             }
+
+                //             if (halfStar) {
+                //                 const halfStarIcon = document.createElement('i');
+                //                 halfStarIcon.className = 'fa-solid fa-star-half-stroke';
+                //                 starContainer.appendChild(halfStarIcon);
+                //             }
+
+                //             for (let i = 0; i < emptyStars; i++) {
+                //                 const emptyStarIcon = document.createElement('i');
+                //                 emptyStarIcon.className = 'fa-regular fa-star';
+                //                 starContainer.appendChild(emptyStarIcon);
+                //             }
+
+                //             const ratingText = document.createElement('span');
+                //             ratingText.textContent = data.ratingCount > 0 ?
+                //                 ` (${rating.toFixed(1)}) ${data.ratingCount} review${data.ratingCount > 1 ? 's' : ''}` :
+                //                 ' No reviews yet';
+                //             starContainer.appendChild(ratingText);
+
+                //             const favoriteInfo = document.querySelector('.extra-info span');
+                //             favoriteInfo.textContent = `❤️ ${data.favoriteCount} Favorites`;
+
+                //             document.getElementById('modalQuantityInput').value = 1;
+                //             document.getElementById('modalHiddenQuantity').value = 1;
+
+                //             document.querySelector('.modal-button.order-now').onclick =
+                //                 function() {
+                //                     const quantity = document.getElementById(
+                //                         'modalHiddenQuantity').value;
+                //                     window.location.href =
+                //                         `/user/orderView/${menuId}?quantity=${quantity}`;
+                //                 };
+
+                //             document.querySelector('.modal-button.add-to-cart').onclick =
+                //                 function() {
+                //                     fetch(`/user/addToCart/${menuId}`, {
+                //                         method: 'PUT',
+                //                         headers: {
+                //                             'Content-Type': 'application/json',
+                //                             'X-CSRF-Token': '{{ csrf_token() }}',
+                //                         },
+                //                     });
+                //                     window.location.reload();
+                //                 };
+
+                //             const menuDetailsModal = new bootstrap.Modal(document
+                //                 .getElementById('menuDetailsModal'));
+                //             menuDetailsModal.show();
+                //         })
+                //         .catch(error => {
+                //             console.error('Error fetching menu details:', error);
+                //             alert('Failed to fetch menu details. Please try again.');
+                //         });
+                // });
                 button.addEventListener('click', function() {
                     const menuId = this.getAttribute('data-id');
 
-                    // Fetch menu details via AJAX
+                    // Fetch menu details
                     fetch(`/user/menuView/${menuId}`)
                         .then(response => {
                             if (!response.ok) {
@@ -415,7 +532,7 @@
                             return response.json();
                         })
                         .then(data => {
-                            // Populate the modal with menu details
+                            // Populate modal with menu details
                             document.getElementById('menuImage').src = data.image ?
                                 `/storage/${data.image}` :
                                 '/images/logo.jpg';
@@ -423,81 +540,60 @@
                             document.getElementById('menuCategory').textContent = data.category;
                             document.getElementById('menuDescription').textContent = data
                                 .description;
-                            document.getElementById('discountedPrice').textContent =
-                                `₱${parseFloat(data.price).toLocaleString()}`;
 
-                            // Build the star and rating display
+                            // Populate pricing
+                            const discountedPriceElement = document.getElementById(
+                                'discountedPrice');
+                            const originalPriceElement = document.getElementById(
+                                'originalPrice');
+                            const discountPercentageElement = document.getElementById(
+                                'discountPercentage');
+
+                            if (data.discount > 0) {
+                                discountedPriceElement.textContent =
+                                    `₱${data.discountedPrice.toLocaleString()}`;
+                                discountPercentageElement.textContent =
+                                    `(-${data.discount}% OFF)`;
+                                discountPercentageElement.classList.add('text-success');
+
+                                originalPriceElement.textContent =
+                                    `₱${data.price.toLocaleString()}`;
+                                originalPriceElement.classList.add('text-muted',
+                                    'text-decoration-line-through');
+                            } else {
+                                discountedPriceElement.textContent =
+                                    `₱${data.price.toLocaleString()}`;
+                                discountPercentageElement.textContent = '';
+                                originalPriceElement.textContent = '';
+                            }
+
+                            // Ratings and favorites
                             const starContainer = document.getElementById('menuRating');
-                            starContainer.innerHTML = ''; // Clear previous stars if any
-                            const rating = parseFloat(data.rating ||
-                                0); // Default to 0 if no rating
-                            const fullStars = Math.floor(rating); // Full stars
-                            const halfStar = rating % 1 >= 0.5 ? 1 :
-                                0; // Half star if remainder >= 0.5
-                            const emptyStars = 5 - (fullStars +
-                                halfStar); // Remaining empty stars
+                            starContainer.innerHTML = ''; // Clear stars
+                            const rating = parseFloat(data.rating || 0);
+                            const fullStars = Math.floor(rating);
+                            const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+                            const emptyStars = 5 - (fullStars + halfStar);
 
-                            // Add full stars
                             for (let i = 0; i < fullStars; i++) {
                                 const star = document.createElement('i');
                                 star.className = 'fa-solid fa-star';
                                 starContainer.appendChild(star);
                             }
 
-                            // Add half star if applicable
                             if (halfStar) {
                                 const halfStarIcon = document.createElement('i');
                                 halfStarIcon.className = 'fa-solid fa-star-half-stroke';
                                 starContainer.appendChild(halfStarIcon);
                             }
 
-                            // Add empty stars
                             for (let i = 0; i < emptyStars; i++) {
                                 const emptyStarIcon = document.createElement('i');
                                 emptyStarIcon.className = 'fa-regular fa-star';
                                 starContainer.appendChild(emptyStarIcon);
                             }
 
-                            // Append the numeric rating and review count in the desired format
-                            const ratingText = document.createElement('span');
-                            const reviewText =
-                                data.ratingCount > 0 ?
-                                ` (${rating.toFixed(1)}) ${data.ratingCount} review${data.ratingCount > 1 ? 's' : ''}` :
-                                ` No reviews yet`;
-                            ratingText.textContent = reviewText;
-                            starContainer.appendChild(ratingText);
-
-                            // Update favorites info dynamically
-                            const favoriteInfo = document.querySelector('.extra-info span');
-                            favoriteInfo.textContent = `❤️ ${data.favoriteCount} Favorites`;
-
-                            // Reset the quantity input for each new modal view
-                            document.getElementById('modalQuantityInput').value = 1;
-                            document.getElementById('modalHiddenQuantity').value = 1;
-
-                            // Set button destination for "Order Now"
-                            document.querySelector('.modal-button.order-now').onclick =
-                                function() {
-                                    const quantity = document.getElementById(
-                                        'modalHiddenQuantity').value;
-                                    window.location.href =
-                                        `/user/orderView/${menuId}?quantity=${quantity}`;
-                                };
-
-                            // Add To Cart
-                            document.querySelector('.modal-button.add-to-cart').onclick =
-                                function() {
-                                    fetch(`/user/addToCart/${menuId}`, {
-                                        method: 'PUT',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-Token': '{{ csrf_token() }}',
-                                        },
-                                    });
-                                    window.location.reload();
-                                };
-
-                            // Show the modal
+                            // Show modal
                             const menuDetailsModal = new bootstrap.Modal(document
                                 .getElementById('menuDetailsModal'));
                             menuDetailsModal.show();
@@ -506,11 +602,8 @@
                             console.error('Error fetching menu details:', error);
                             alert('Failed to fetch menu details. Please try again.');
                         });
-
-
-
-
                 });
+
             });
         });
 

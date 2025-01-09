@@ -119,114 +119,127 @@
                 <div class="menu-list">
                     <div id="menu-container" class="row row-cols-1 row-cols-md-3 g-4">
                         @forelse($menus as $menu)
-                        <div class="col menu-item" 
-                            data-price="{{ $menu->price }}"
-                            data-rating="{{ $menu->rating ?? 0 }}"
-                            data-name="{{ strtolower($menu->name) }}"
-                            data-availability="{{ $menu->availability }}">
-                            <div class="card card-shadow card-hover h-100 position-relative">
-                                {{-- Overlay for Unavailable Menus --}}
-                                @if ($menu->availability !== 'Available')
-                                    <div class="unavailable-overlay d-flex align-items-center justify-content-center">
-                                        <div class="text-center">
-                                            <i class="fa-solid fa-ban fs-3 text-white"></i>
-                                            <p class="text-white fw-bold mb-0">Unavailable</p>
-                                        </div>
-                                    </div>
-                                @endif
-                    
-                                {{-- Menu Content --}}
-                                <div class="img-container">
-                                    @if ($menu->image)
-                                        <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
-                                            alt="{{ $menu->name }}">
-                                    @else
-                                        <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken"
-                                            alt="No Image">
-                                    @endif
-                    
-                                    @if ($menu->availability === 'Available')
-                                        <div class="icon-overlay text-white">
-                                            {{-- Add to Cart --}}
-                                            <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
-                                                enctype="multipart/form-data">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="icon-buttons"><i
-                                                        class="fa-solid fa-cart-plus text-white"
-                                                        title="Add to Cart"></i></button>
-                                            </form>
-                    
-                                            {{-- Share Menu --}}
-                                            <button type="button" class="icon-buttons"
-                                                onclick="copyMenuLink({{ $menu->id }})">
-                                                <i class="fa-solid fa-share" title="Share Menu"></i>
-                                            </button>
-                    
-                                            {{-- View Menu --}}
-                                            <form action="" method="GET">
-                                                @csrf
-                                                <button type="button" class="icon-buttons"><i
-                                                        class="fa-solid fa-search view-menu-btn" title="View Menu"
-                                                        data-id="{{ $menu->id }}"></i></button>
-                                            </form>
-                    
-                                            {{-- Add to Favorites --}}
-                                            <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
-                                                enctype="multipart/form-data">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="icon-buttons">
-                                                    <i class="fa-solid fa-heart"
-                                                        style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
-                                                        title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
-                                                    </i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @endif
-                                </div>
-                    
-                                <a href="{{ $menu->availability === 'Available' ? route('user.menuDetails', $menu->id) : '#' }}" 
-                                    data-id="{{ $menu->id }}" 
-                                    class="menu-body {{ $menu->availability !== 'Available' ? 'disabled-link' : '' }}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ $menu->name }}</h5>
-                                        <p class="price fw-bold mb-0">₱{{ number_format($menu->price, 2) }}</p>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="stars d-flex">
-                                                @for ($i = 1; $i <= 5; $i++)
-                                                    @if ($i <= floor($menu->rating))
-                                                        <i class="fa-solid fa-star"></i>
-                                                    @elseif ($i - $menu->rating < 1)
-                                                        <i class="fa-solid fa-star-half-stroke"></i>
-                                                    @else
-                                                        <i class="fa-regular fa-star"></i>
-                                                    @endif
-                                                @endfor
+                            <div class="col menu-item" data-price="{{ $menu->price }}"
+                                data-rating="{{ $menu->rating ?? 0 }}" data-name="{{ strtolower($menu->name) }}"
+                                data-availability="{{ $menu->availability }}">
+                                <div class="card card-shadow card-hover h-100 position-relative">
+                                    {{-- Overlay for Unavailable Menus --}}
+                                    @if ($menu->availability !== 'Available')
+                                        <div class="unavailable-overlay d-flex align-items-center justify-content-center">
+                                            <div class="text-center">
+                                                <i class="fa-solid fa-ban fs-3 text-white"></i>
+                                                <p class="text-white fw-bold mb-0">Unavailable</p>
                                             </div>
-                                            <div class="star-label">
-                                                @if ($menu->ratingCount > 0)
-                                                    ({{ number_format($menu->rating, 1) }})
-                                                    {{ $menu->ratingCount }}
-                                                    review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                        </div>
+                                    @endif
+
+                                    {{-- Menu Content --}}
+                                    <div class="img-container">
+                                        @if ($menu->image)
+                                            <img src="{{ asset('storage/' . $menu->image) }}" class="card-img-top darken"
+                                                alt="{{ $menu->name }}">
+                                        @else
+                                            <img src="{{ asset('images/logo.jpg') }}" class="card-img-top darken"
+                                                alt="No Image">
+                                        @endif
+
+                                        @if ($menu->availability === 'Available')
+                                            <div class="icon-overlay text-white">
+                                                {{-- Add to Cart --}}
+                                                <form action="{{ route('user.addToCart', $menu->id) }}" method="POST"
+                                                    enctype="multipart/form-data">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="icon-buttons"><i
+                                                            class="fa-solid fa-cart-plus text-white"
+                                                            title="Add to Cart"></i></button>
+                                                </form>
+
+                                                {{-- Share Menu --}}
+                                                <button type="button" class="icon-buttons"
+                                                    onclick="copyMenuLink({{ $menu->id }})">
+                                                    <i class="fa-solid fa-share" title="Share Menu"></i>
+                                                </button>
+
+                                                {{-- View Menu --}}
+                                                <form action="" method="GET">
+                                                    @csrf
+                                                    <button type="button" class="icon-buttons"><i
+                                                            class="fa-solid fa-search view-menu-btn" title="View Menu"
+                                                            data-id="{{ $menu->id }}"></i></button>
+                                                </form>
+
+                                                {{-- Add to Favorites --}}
+                                                <form action="{{ route('user.addToFavorites', $menu->id) }}" method="POST"
+                                                    enctype="multipart/form-data">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="icon-buttons">
+                                                        <i class="fa-solid fa-heart"
+                                                            style="color: {{ $user->favoriteItems->contains($menu->id) ? '#f81d0b' : 'white' }};"
+                                                            title="{{ $user->favoriteItems->contains($menu->id) ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                                        </i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <a href="{{ $menu->availability === 'Available' ? route('user.menuDetails', $menu->id) : '#' }}"
+                                        data-id="{{ $menu->id }}"
+                                        class="menu-body {{ $menu->availability !== 'Available' ? 'disabled-link' : '' }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ $menu->name }}</h5>
+
+                                            <div class="price fw-bold mb-2">
+                                                @if ($menu->discount > 0)
+                                                    {{-- Display discounted price with discount percentage --}}
+                                                    ₱{{ number_format($menu->price * (1 - $menu->discount / 100), 2) }}
+                                                    <span class="text-success">(-{{ $menu->discount }}% OFF)</span>
                                                 @else
-                                                    No Rating
+                                                    {{-- Display original price --}}
+                                                    @if (floor($menu->price) == $menu->price)
+                                                        ₱{{ number_format($menu->price, 0) }}
+                                                    @else
+                                                        ₱{{ number_format($menu->price, 2) }}
+                                                    @endif
                                                 @endif
                                             </div>
+
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="stars d-flex">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        @if ($i <= floor($menu->rating))
+                                                            <i class="fa-solid fa-star"></i>
+                                                        @elseif ($i - $menu->rating < 1)
+                                                            <i class="fa-solid fa-star-half-stroke"></i>
+                                                        @else
+                                                            <i class="fa-regular fa-star"></i>
+                                                        @endif
+                                                    @endfor
+                                                </div>
+                                                <div class="star-label">
+                                                    @if ($menu->ratingCount > 0)
+                                                        ({{ number_format($menu->rating, 1) }})
+                                                        {{ $menu->ratingCount }}
+                                                        review{{ $menu->ratingCount > 1 ? 's' : '' }}
+                                                    @else
+                                                        No Rating
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </a>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    @empty
-                        <div class="order-container border rounded p-4">
-                            <div class="d-flex align-items-center fs-5">
-                                <i class="fa-regular fa-circle-question me-2"></i> No menus available.
+                        @empty
+                            <div class="order-container border rounded p-4">
+                                <div class="d-flex align-items-center fs-5">
+                                    <i class="fa-regular fa-circle-question me-2"></i> No menus available.
+                                </div>
                             </div>
-                        </div>
-                    @endforelse
-                    
+                        @endforelse
+
                     </div>
                 </div>
 
@@ -238,60 +251,6 @@
 @endsection
 
 @section('scripts')
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sortSelect = document.getElementById('sort-select');
-            const searchInput = document.getElementById('search-input');
-            const menuContainer = document.getElementById('menu-container');
-            const menuItems = [...document.querySelectorAll('.menu-item')]; // Convert NodeList to Array
-
-            // Function to render menus
-            function renderMenus(filteredMenus) {
-                menuContainer.innerHTML = ''; // Clear existing menus
-                if (filteredMenus.length === 0) {
-                    menuContainer.innerHTML = `<div class="order-container ms-2 border rounded p-3">
-                        <div class="d-flex align-items-center fs-5">
-                            <i class="fa-regular fa-circle-question me-2"></i> No menus available.
-                        </div>
-                    </div>`;
-                } else {
-                    filteredMenus.forEach(menu => menuContainer.appendChild(menu));
-                }
-            }
-
-            // Combined function for sorting and searching
-            function updateMenus() {
-                const sortValue = sortSelect.value;
-                const query = searchInput.value.toLowerCase();
-
-                // Filter menus by search query
-                let filteredMenus = menuItems.filter(menu => {
-                    const menuName = menu.getAttribute('data-name');
-                    return menuName.includes(query);
-                });
-
-                // Sort filtered menus
-                filteredMenus = filteredMenus.sort((a, b) => {
-                    if (sortValue === 'Rating') {
-                        const ratingA = parseFloat(a.getAttribute('data-rating')) || 0;
-                        const ratingB = parseFloat(b.getAttribute('data-rating')) || 0;
-                        return ratingB - ratingA; // Descending order
-                    } else {
-                        const priceA = parseFloat(a.getAttribute('data-price'));
-                        const priceB = parseFloat(b.getAttribute('data-price'));
-                        return sortValue === 'Expensive' ? priceB - priceA : priceA - priceB;
-                    }
-                });
-
-                // Render updated menus
-                renderMenus(filteredMenus);
-            }
-
-            // Event listeners
-            sortSelect.addEventListener('change', updateMenus);
-            searchInput.addEventListener('input', updateMenus);
-        });
-    </script> --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -355,4 +314,5 @@
             searchInput.addEventListener('input', updateMenus);
         });
     </script>
+
 @endsection

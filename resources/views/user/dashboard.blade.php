@@ -188,7 +188,7 @@
                                                 @endif
                                             </div>
                                             {{-- Display the discount percentage --}}
-                                            <div class="off text-success">(-{{ $menu->discount }}% OFF)</div>
+                                            <div class="off fw-bold text-success">(-{{ $menu->discount }}% OFF)</div>
                                         </div>
 
                                         <div class="d-flex align-items-center gap-2">
