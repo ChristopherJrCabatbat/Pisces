@@ -66,6 +66,53 @@
 
 <body>
 
+    @if (session()->pull('showExperienceModal'))
+        <div id="experienceModal" class="experience-modal-container">
+            <div class="experience-modal-content">
+                <!-- Close Button -->
+                <button type="button" class="experience-modal-close" onclick="closeExperienceModal()">×</button>
+
+                <!-- Modal Header and Text -->
+                <h4 class="experience-modal-header">We value your feedback!</h4>
+                <p class="experience-modal-text">Thank you for your continued support! We'd love to hear from you.
+                    Please rate our service:</p>
+
+                <!-- Feedback Form -->
+                <form action="{{ route('user.submitExperience') }}" method="POST">
+                    @csrf
+                    <div class="experience-modal-form-group">
+                        <label for="rating" class="experience-modal-label">Rate Us:</label>
+                        <select name="rating" id="rating" class="experience-modal-select" required>
+                            <option value="" disabled selected>Choose your rating</option>
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="3">3 - Good</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="5">5 - Excellent</option>
+                        </select>
+                    </div>
+                    <div class="experience-modal-form-group">
+                        <label for="feedback" class="experience-modal-label">Your Feedback:</label>
+                        <textarea name="feedback" id="feedback" class="experience-modal-textarea" rows="4"
+                            placeholder="Share your thoughts with us..."></textarea>
+                    </div>
+                    <button type="submit" class="experience-modal-button">Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+        <script>
+            // Open the modal on page load
+            window.onload = function() {
+                document.getElementById('experienceModal').style.display = 'flex';
+            };
+
+            // Close modal function
+            function closeExperienceModal() {
+                document.getElementById('experienceModal').style.display = 'none';
+            }
+        </script>
+    @endif
+
     <header>
         <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #e3f2fd;">
             <div class="container">
@@ -351,13 +398,13 @@
                 <div class="d-flex align-items-start justify-content-end mb-4">
                     ${!isGCashMessage ? `<span class="text-muted align-self-center small me-3">Just now</span>` : ''}
                     ${!isImageOnlyMessage ? `
-                                <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
-                                     style="max-width: ${isGCashMessage ? '73%' : '70%'}; 
-                                     ${isGCashMessage ? 'margin: 0 auto;' : ''};
-                                     display: ${message.message_text && message.message_text !== 'Sent an image' ? 'block' : 'none'};">
-                                    ${message.message_text && message.message_text !== 'Sent an image' ? `<p class="m-0">${message.message_text}</p>` : ''}
-                                </div>
-                            ` : ''}
+                                                    <div class="message bg-primary text-white px-3 py-2 rounded shadow-sm"
+                                                         style="max-width: ${isGCashMessage ? '73%' : '70%'}; 
+                                                         ${isGCashMessage ? 'margin: 0 auto;' : ''};
+                                                         display: ${message.message_text && message.message_text !== 'Sent an image' ? 'block' : 'none'};">
+                                                        ${message.message_text && message.message_text !== 'Sent an image' ? `<p class="m-0">${message.message_text}</p>` : ''}
+                                                    </div>
+                                                ` : ''}
                     ${message.image_url ? `<img src="${message.image_url}" alt="Sent Image" class="mt-2 rounded shadow-sm" height="310px" width="auto">` : ''}
                     <div class="message-avatar bg-primary text-white">
                         <i class="fa-solid fa-user"></i>
@@ -395,6 +442,40 @@
                 }
             });
         });
+    </script>
+
+    {{-- Icon Actions Toast Message --}}
+    <div id="customToastBox"></div>
+    <script>
+        let customToastBox = document.getElementById('customToastBox');
+
+        function showToast(msg, type) {
+            let customToast = document.createElement('div');
+            customToast.classList.add('custom-toast');
+
+            // Set the icon based on the type
+            let icon = type === 'error' ?
+                '<i class="fa fa-circle-xmark"></i>' :
+                '<i class="fa fa-circle-check"></i>';
+
+            customToast.innerHTML = `${icon} ${msg}`;
+            customToastBox.appendChild(customToast);
+
+            // Add class for error or success styles
+            if (type === 'error') {
+                customToast.classList.add('error');
+            }
+
+            setTimeout(() => {
+                customToast.remove();
+            }, 4500);
+        }
+
+        // Check if a toast message exists in the session
+        @if (session('toast'))
+            const toastData = @json(session('toast'));
+            showToast(toastData.message, toastData.type);
+        @endif
     </script>
 
     <script src="{{ asset('js/scripts.js') }}"></script>

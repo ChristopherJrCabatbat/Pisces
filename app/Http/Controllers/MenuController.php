@@ -294,7 +294,7 @@ class MenuController extends Controller
      * Update the specified resource in storage.
      */
 
-    // public function update(Request $request, string $id)
+    // public function update(Request $request, string $id, MailerService $mailerService)
     // {
     //     $menu = Menu::findOrFail($id);
 
@@ -317,6 +317,10 @@ class MenuController extends Controller
     //             $menu->image = $imagePath;
     //         }
 
+    //         // Compare the old and new discount values
+    //         $oldDiscount = $menu->discount;
+    //         $newDiscount = $validated['discount'] ?? 0; // Use 0 if no discount is provided
+
     //         // Update the menu fields
     //         $menu->update([
     //             'name' => $validated['name'],
@@ -329,6 +333,26 @@ class MenuController extends Controller
     //                 ? 'Available'
     //                 : 'Unavailable',
     //         ]);
+
+    //         // Check if the discount has changed
+    //         if ($oldDiscount != $newDiscount) {
+    //             // Fetch all users subscribed to the newsletter
+    //             $subscribedUsers = User::where('newsletter_subscription', true)->get();
+
+    //             // Send email notifications to subscribed users
+    //             foreach ($subscribedUsers as $user) {
+    //                 $mailerService->sendMail(
+    //                     $user->email,
+    //                     'Discount Update on ' . $menu->name,
+    //                     view('emails.discountUpdated', [
+    //                         'menu' => $menu,
+    //                         'user' => $user,
+    //                         'oldDiscount' => $oldDiscount,
+    //                         'newDiscount' => $newDiscount,
+    //                     ])->render()
+    //                 );
+    //             }
+    //         }
 
     //         session()->flash('toast', [
     //             'message' => 'Menu updated successfully.',
@@ -345,157 +369,89 @@ class MenuController extends Controller
     // }
 
     public function update(Request $request, string $id, MailerService $mailerService)
-{
-    $menu = Menu::findOrFail($id);
+    {
+        $menu = Menu::findOrFail($id);
 
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'price' => 'required|numeric|min:0',
-        'category' => 'required|string',
-        'description' => 'required|string',
-        'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        'discount' => 'nullable|integer|min:0|max:100', // Validate discount as integer
-    ]);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string',
+            'description' => 'required|string',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'discount' => 'nullable|integer|min:0|max:100',
+        ]);
 
-    try {
-        // Handle file upload if a new image is provided
-        if ($request->hasFile('image')) {
-            if ($menu->image) {
-                Storage::delete('public/' . $menu->image);
+        try {
+            // Handle file upload if a new image is provided
+            if ($request->hasFile('image')) {
+                if ($menu->image) {
+                    Storage::delete('public/' . $menu->image);
+                }
+                $imagePath = $request->file('image')->store('menu_images', 'public');
+                $menu->image = $imagePath;
             }
-            $imagePath = $request->file('image')->store('menu_images', 'public');
-            $menu->image = $imagePath;
+
+            // Save the old name for updating feedback
+            $oldName = $menu->name;
+
+            // Compare the old and new discount values
+            $oldDiscount = $menu->discount;
+            $newDiscount = $validated['discount'] ?? 0;
+
+            // Update the menu fields
+            $menu->update([
+                'name' => $validated['name'],
+                'category' => $validated['category'],
+                'price' => $validated['price'],
+                'discount' => $validated['discount'] ?? 0,
+                'description' => $validated['description'],
+                'image' => $menu->image ?? $menu->image,
+                'availability' => $request->has('availability') && $request->availability === 'Available'
+                    ? 'Available'
+                    : 'Unavailable',
+            ]);
+
+            // Update the feedback table where the old name is present in menu_items
+            DB::table('feedback')
+                ->where('menu_items', 'LIKE', "%$oldName%")
+                ->update([
+                    'menu_items' => DB::raw("REPLACE(menu_items, '$oldName', '{$validated['name']}')"),
+                ]);
+
+            // Check if the discount has changed
+            if ($oldDiscount != $newDiscount) {
+                // Fetch all users subscribed to the newsletter
+                $subscribedUsers = User::where('newsletter_subscription', true)->get();
+
+                // Send email notifications to subscribed users
+                foreach ($subscribedUsers as $user) {
+                    $mailerService->sendMail(
+                        $user->email,
+                        'Discount Update on ' . $menu->name,
+                        view('emails.discountUpdated', [
+                            'menu' => $menu,
+                            'user' => $user,
+                            'oldDiscount' => $oldDiscount,
+                            'newDiscount' => $newDiscount,
+                        ])->render()
+                    );
+                }
+            }
+
+            session()->flash('toast', [
+                'message' => 'Menu updated successfully.',
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            session()->flash('toast', [
+                'message' => 'Failed to update menu item. Please try again.',
+                'type' => 'error',
+            ]);
         }
 
-        // Compare the old and new discount values
-        $oldDiscount = $menu->discount;
-        $newDiscount = $validated['discount'] ?? 0; // Use 0 if no discount is provided
-
-        // Update the menu fields
-        $menu->update([
-            'name' => $validated['name'],
-            'category' => $validated['category'],
-            'price' => $validated['price'],
-            'discount' => $validated['discount'] ?? 0, // Default discount to 0
-            'description' => $validated['description'],
-            'image' => $menu->image ?? $menu->image,
-            'availability' => $request->has('availability') && $request->availability === 'Available'
-                ? 'Available'
-                : 'Unavailable',
-        ]);
-
-        // Check if the discount has changed
-        if ($oldDiscount != $newDiscount) {
-            // Fetch all users subscribed to the newsletter
-            $subscribedUsers = User::where('newsletter_subscription', true)->get();
-
-            // Send email notifications to subscribed users
-            foreach ($subscribedUsers as $user) {
-                $mailerService->sendMail(
-                    $user->email,
-                    'Discount Update on ' . $menu->name,
-                    view('emails.discountUpdated', [
-                        'menu' => $menu,
-                        'user' => $user,
-                        'oldDiscount' => $oldDiscount,
-                        'newDiscount' => $newDiscount,
-                    ])->render()
-                );
-            }
-        }
-
-        session()->flash('toast', [
-            'message' => 'Menu updated successfully.',
-            'type' => 'success',
-        ]);
-    } catch (\Exception $e) {
-        session()->flash('toast', [
-            'message' => 'Failed to update menu item. Please try again.',
-            'type' => 'error',
-        ]);
+        return redirect()->route('admin.menu.index');
     }
 
-    return redirect()->route('admin.menu.index');
-}
-
-
-    // public function update(Request $request, string $id, MailerService $mailerService)
-    // {
-    //     // Validate the input data
-    //     $validated = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'price' => 'required|numeric|min:0',
-    //         'category' => 'required|string',
-    //         'description' => 'required|string',
-    //         'discount' => 'nullable|integer|min:0|max:100', // Default discount to 0 if not set
-    //         'availability' => 'nullable|string|in:Available,Unavailable',
-    //     ]);
-    
-    //     try {
-    //         // Fetch the existing menu
-    //         $menu = Menu::findOrFail($id);
-    
-    //         // Compare the old and new discount values
-    //         $oldDiscount = $menu->discount;
-    //         $newDiscount = $validated['discount'] ?? 0; // Use 0 if no discount is provided
-    
-    //         // Handle file upload for the image (if new image is provided)
-    //         if ($request->hasFile('image')) {
-    //             $imagePath = $request->file('image')->store('menu_images', 'public');
-    //         } else {
-    //             $imagePath = $menu->image; // Keep the existing image if no new one is provided
-    //         }
-    
-    //         // Update the menu fields
-    //         $menu->update([
-    //             'name' => $validated['name'],
-    //             'category' => $validated['category'],
-    //             'price' => $validated['price'],
-    //             'discount' => $newDiscount,
-    //             'description' => $validated['description'],
-    //             'image' => $imagePath,
-    //             'availability' => $validated['availability'] ?? $menu->availability, // Default to existing value
-    //         ]);
-    
-    //         // Check if the discount has changed
-    //         if ($oldDiscount != $newDiscount) {
-    //             // Fetch all users subscribed to the newsletter
-    //             $subscribedUsers = User::where('newsletter_subscription', true)->get();
-    
-    //             // Send email notifications to subscribed users
-    //             foreach ($subscribedUsers as $user) {
-    //                 $mailerService->sendMail(
-    //                     $user->email,
-    //                     'Discount Update on ' . $menu->name,
-    //                     view('emails.discountUpdated', [
-    //                         'menu' => $menu,
-    //                         'user' => $user,
-    //                         'oldDiscount' => $oldDiscount,
-    //                         'newDiscount' => $newDiscount,
-    //                     ])->render()
-    //                 );
-    //             }
-    //         }
-    
-    //         // Set success toast message
-    //         session()->flash('toast', [
-    //             'message' => 'Menu updated successfully!',
-    //             'type' => 'success',
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         // Log the error for debugging
-    //         Log::error('Error updating menu or sending emails: ' . $e->getMessage());
-    
-    //         // Set error toast message
-    //         session()->flash('toast', [
-    //             'message' => 'Failed to update menu. Please try again.',
-    //             'type' => 'error',
-    //         ]);
-    //     }
-    
-    //     return redirect()->route('admin.menu.index');
-    // }
-    
 
     /**
      * Remove the specified resource from storage.

@@ -55,34 +55,36 @@
                                     value="{{ old('contactNumber', $user->contact_number) }}" required>
                             </div>
                         </div>
-                       
-                        {{-- Address --}}
-                        <div class="d-flex gap-2 mb-3">
+
+                        <div class="d-flex gap-4 mb-3">
                             <!-- House Number -->
-                            <div class="w-25">
-                                <label for="house_number" class="form-label">House Num:</label>
-                                <input type="text" class="form-control" id="house_number" name="house_number" placeholder="123" required>
+                            <div class="w-50">
+                                <label for="house_number" class="form-label">House Num. (optional):</label>
+                                <input type="text" class="form-control" id="house_number" name="house_number"
+                                    placeholder="123">
                             </div>
 
-                            <!-- Barangay -->
-                            <div class="w-100">
-                                <label for="barangay" class="form-label">Barangay:</label>
-                                <select class="form-control" id="barangay" name="barangay" required>
-                                    <option value="">Select Barangay</option>
-                                </select>
-                            </div>
-                          
                             <!-- Purok -->
-                            <div class="" style="width: 40% !important">
+                            <div class="w-50">
                                 <label for="purok" class="form-label">Purok (optional):</label>
-                                <input type="number" class="form-control" id="purok" name="purok" min="0" max="20" placeholder="1">
+                                <input type="number" class="form-control" id="purok" name="purok" min="0"
+                                    max="20" placeholder="1">
                             </div>
                         </div>
 
-                         <!-- Shipping -->
-                         <div class="mb-3">
-                            <label for="shippingMethod" class="form-label">Shippin Fee:</label>
-                            <input type="text" class="form-control" id="shippingMethod" name="shippingMethod" value="₱20" readonly required>
+                        <!-- Barangay -->
+                        <div class="w-100 mb-3">
+                            <label for="barangay" class="form-label">Barangay:</label>
+                            <select class="form-control" id="barangay" name="barangay" required>
+                                <option value="">Select Barangay</option>
+                            </select>
+                        </div>
+
+                        <!-- Shipping Fee -->
+                        <div class="mb-3">
+                            <label for="shippingMethod" class="form-label">Shipping Fee:</label>
+                            <input type="text" class="form-control" id="shippingMethod" name="shippingMethod"
+                                value="₱0" readonly required>
                         </div>
 
                         <!-- Payment Method -->
@@ -182,34 +184,132 @@
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.js') }}"></script>
 
+    {{-- Barangay auto shipping fee --}}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const barangayDropdown = document.getElementById('barangay');
-    
-            // Complete list of Barangays in San Carlos City, Pangasinan
-            const barangays = [
-                "Abanon", "Agdao", "Anando", "Ano", "Antipangol", "Aponit", "Bacnar", "Balaya", "Balayong",
-                "Baldog", "Balite Sur", "Balococ", "Bani", "Bega", "Bocboc", "Bogaoan", "Bolingit", "Bolosan",
-                "Bonifacio", "Buenglat", "Bugallon-Posadas Street", "Burgos Padlan", "Cacaritan", "Caingal",
-                "Calobaoan", "Calomboyan", "Caoayan-Kiling", "Capataan", "Cobol", "Coliling", "Cruz", "Doyong",
-                "Gamata", "Guelew", "Ilang", "Inerangan", "Isla", "Libas", "Lilimasan", "Longos", "Lucban",
-                "M. Soriano", "Mabalbalino", "Mabini", "Magtaking", "Malacañang", "Maliwara", "Mamarlao", "Manzon",
-                "Matagdem", "Mestizo Norte", "Naguilayan", "Nilentap", "Padilla-Gomez", "Pagal", "Paitan-Panoypoy",
-                "Palaming", "Palaris", "Palospos", "Pangalangan", "Pangoloan", "Pangpang", "Parayao", "Payapa",
-                "Payar", "Perez Boulevard", "PNR Station Site", "Polo", "Quezon Boulevard", "Quintong", "Rizal",
-                "Roxas Boulevard", "Salinap", "San Juan", "San Pedro-Taloy", "Sapinit", "Supo", "Talang", "Tamayo",
-                "Tandang Sora", "Tandoc", "Tarece", "Tarectec", "Tayambani", "Tebag", "Turac"
-            ];
-    
-            barangays.forEach(barangay => {
+            const shippingInput = document.getElementById('shippingMethod');
+
+            // Barangay with corresponding shipping fees
+            const barangayRates = {
+                "Abanon": 110,
+                "Agdao": 80,
+                "Ano": 80,
+                "Anando": 120,
+                "Antipangol": 140,
+                "Aponit": 100,
+                "Bacnar": 80,
+                "Bacnar UP": 90,
+                "Balaya": 100,
+                "Balayong": 70,
+                "Baldog": 80,
+                "Balite Sur": 90,
+                "Balococ": 100,
+                "Bani": 160,
+                "Bega": 70,
+                "Bogaoan": 170,
+                "Bocboc East": 150,
+                "Bocboc West": 170,
+                "Bolingit": 70,
+                "Bolosan": 70,
+                "Bonifacio": 40,
+                "Bugallon": 40,
+                "Buenglat": 90,
+                "Burgos-Padlan": 40,
+                "Cacaritan": 60,
+                "Caingal": 60,
+                "Calobaoan": 120,
+                "Calomboyan": 100,
+                "Caoayan Kiling": 130,
+                "Capataan": 90,
+                "Cobol": 100,
+                "Coliling": 70,
+                "Coliling Anlabo": 90,
+                "Cruz": 80,
+                "Doyong": 80,
+                "Gamata": 90,
+                "Guelew": 140,
+                "Ilang": 40,
+                "Inerangan": 90,
+                "Isla": 100,
+                "Libas": 120,
+                "Lilimasan": 70,
+                "Longos": 60,
+                "Lucban": 40,
+                "M. Soriano st.": 40,
+                "Mabalbalino": 150,
+                "Mabini": 40,
+                "Magtaking": 60,
+                "Malacañang": 90,
+                "Maliwa": 90,
+                "Mamarlao Court": 40,
+                "Manzon": 60,
+                "Matagdem": 70,
+                "Mc Arthur": 40,
+                "Meztizo Norte": 70,
+                "Naguilayan": 80,
+                "Nilentap": 90,
+                "Padilla": 40,
+                "Pagal": 70,
+                "Palaming": 70,
+                "Palaris": 40,
+                "Palospos": 120,
+                "Paitan": 80,
+                "Pangoloan": 80,
+                "Pangalangan": 80,
+                "Pangpang": 90,
+                "Parayao": 100,
+                "Payapa": 90,
+                "Payar": 100,
+                "Perez": 40,
+                "PNR": 40,
+                "Posadas Street": 40,
+                "Polo": 90,
+                "Quezon": 40,
+                "Quintong": 90,
+                "Rizal": 40,
+                "Roxas": 40,
+                "Salinap": 120,
+                "San Juan": 60,
+                "San Pedro": 40,
+                "Taloy": 60,
+                "Sapinit": 70,
+                "Supo": 150,
+                "Talang": 90,
+                "Taloy (Until VMUF)": 40,
+                "Tamayo": 130,
+                "Tandoc": 80,
+                "Tandang Sora": 40,
+                "Tarece": 60,
+                "Tarectec": 90,
+                "Tayambani": 90,
+                "Tebag": 80,
+                "Turac": 80
+            };
+
+            // Sort barangays alphabetically
+            const sortedBarangays = Object.keys(barangayRates).sort();
+
+            // Populate barangays in dropdown
+            sortedBarangays.forEach(barangay => {
                 const option = document.createElement('option');
                 option.value = barangay;
                 option.text = barangay;
                 barangayDropdown.appendChild(option);
             });
+
+            // Update shipping fee when a barangay is selected
+            barangayDropdown.addEventListener('change', function() {
+                const selectedBarangay = barangayDropdown.value;
+                if (barangayRates[selectedBarangay]) {
+                    shippingInput.value = `₱${barangayRates[selectedBarangay]}`;
+                } else {
+                    shippingInput.value = "₱0";
+                }
+            });
         });
     </script>
-    
+
 
 </body>
 

@@ -7,11 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- <title>@yield('title')</title> --}}
     <title>Pisces Coffee Hub</title>
 
-    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-home.png') }}">
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
@@ -25,6 +24,102 @@
 <body>
 
     @yield('modals')
+
+    @if (session()->pull('showExperienceModal'))
+        <div id="experienceModal" class="experience-modal-container">
+            <div class="experience-modal-content">
+                <!-- Close Button -->
+                <button type="button" class="experience-modal-close" onclick="closeExperienceModal()">×</button>
+
+                <!-- Modal Header and Text -->
+                <h4 class="experience-modal-header">We value your feedback!</h4>
+                <p class="experience-modal-text">Thank you for your continued support! We'd love to hear from you.
+                    Please rate our service:</p>
+
+                <!-- Feedback Form -->
+                <form action="{{ route('user.submitExperience') }}" method="POST">
+                    @csrf
+                    <div class="experience-modal-form-group">
+                        <label for="rating" class="experience-modal-label">Rate Us:</label>
+                        <select name="rating" id="rating" class="experience-modal-select" required>
+                            <option value="" disabled selected>Choose your rating</option>
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="3">3 - Good</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="5">5 - Excellent</option>
+                        </select>
+                    </div>
+                    <div class="experience-modal-form-group">
+                        <label for="feedback" class="experience-modal-label">Your Feedback:</label>
+                        <textarea name="feedback" id="feedback" class="experience-modal-textarea" rows="4"
+                            placeholder="Share your thoughts with us..."></textarea>
+                    </div>
+                    <button type="submit" class="experience-modal-button">Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+        <script>
+            // Open the modal on page load
+            window.onload = function() {
+                document.getElementById('experienceModal').style.display = 'flex';
+            };
+
+            // Close modal function
+            function closeExperienceModal() {
+                document.getElementById('experienceModal').style.display = 'none';
+            }
+        </script>
+    @endif
+
+
+    {{-- @if (session('experienceModal'))
+        <div id="experienceModal" class="experience-modal-container">
+            <div class="experience-modal-content">
+                <!-- Close Button -->
+                <button type="button" class="experience-modal-close" onclick="closeExperienceModal()">×</button>
+
+                <!-- Modal Header and Text -->
+                <h4 class="experience-modal-header">We value your feedback!</h4>
+                <p class="experience-modal-text">Thank you for your continued support! We'd love to hear from you.
+                    Please rate our service:</p>
+
+                <!-- Feedback Form -->
+                <form action="{{ route('user.submitExperience') }}" method="POST">
+                    @csrf
+                    <div class="experience-modal-form-group">
+                        <label for="rating" class="experience-modal-label">Rate Us:</label>
+                        <select name="rating" id="rating" class="experience-modal-select" required>
+                            <option value="" disabled selected>Choose your rating</option>
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="3">3 - Good</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="5">5 - Excellent</option>
+                        </select>
+                    </div>
+                    <div class="experience-modal-form-group">
+                        <label for="feedback" class="experience-modal-label">Your Feedback:</label>
+                        <textarea name="feedback" id="feedback" class="experience-modal-textarea" rows="4"
+                            placeholder="Share your thoughts with us..."></textarea>
+                    </div>
+                    <button type="submit" class="experience-modal-button">Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+        <script>
+            // Open the modal on page load
+            window.onload = function() {
+                document.getElementById('experienceModal').style.display = 'flex';
+            };
+
+            // Close modal function
+            function closeExperienceModal() {
+                document.getElementById('experienceModal').style.display = 'none';
+            }
+        </script>
+    @endif --}}
+
 
     <!-- Menu Details Modal -->
     <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel"
@@ -109,7 +204,7 @@
                     aria-label="Close"></button>
             </div>
             <div class="custom-modal-body">
-                <form id="editProfileForm" method="POST" action="{{ route('admin.userUpdate') }}">
+                <form id="editProfileForm" method="POST" action="{{ route('user.userUpdate') }}">
                     @csrf
                     @method('PUT')
 
@@ -191,7 +286,6 @@
             </div>
         </div>
     </div>
-
 
     <header>
         <nav class="navbar navss navbar-expand-lg fixed-top" style="background-color: #fff;">
@@ -403,123 +497,6 @@
             const viewButtons = document.querySelectorAll('.view-menu-btn');
 
             viewButtons.forEach(button => {
-                // button.addEventListener('click', function() {
-                //     const menuId = this.getAttribute('data-id');
-
-                //     // Fetch menu details via AJAX
-                //     fetch(`/user/menuView/${menuId}`)
-                //         .then(response => {
-                //             if (!response.ok) {
-                //                 throw new Error(`HTTP error! Status: ${response.status}`);
-                //             }
-                //             return response.json();
-                //         })
-                //         .then(data => {
-                //             // Populate the modal with menu details
-                //             document.getElementById('menuImage').src = data.image ?
-                //                 `/storage/${data.image}` :
-                //                 '/images/logo.jpg';
-                //             document.getElementById('menuName').textContent = data.name;
-                //             document.getElementById('menuCategory').textContent = data.category;
-                //             document.getElementById('menuDescription').textContent = data
-                //                 .description;
-
-                //             // Populate the pricing section
-                //             const discountedPriceElement = document.getElementById(
-                //                 'discountedPrice');
-                //             const originalPriceElement = document.getElementById(
-                //                 'originalPrice');
-                //             const discountPercentageElement = document.getElementById(
-                //                 'discountPercentage');
-
-                //             if (data.discount > 0) {
-                //                 // Show discounted price and discount percentage
-                //                 discountedPriceElement.textContent =
-                //                     `₱${data.discountedPrice.toLocaleString()}`;
-                //                 discountPercentageElement.textContent =
-                //                     `(-${data.discount}% OFF)`;
-                //                 discountPercentageElement.classList.add('text-success');
-
-                //                 // Show original price with a line-through
-                //                 originalPriceElement.textContent =
-                //                     `₱${data.price.toLocaleString()}`;
-                //                 originalPriceElement.classList.add('text-muted',
-                //                     'text-decoration-line-through');
-                //             } else {
-                //                 // Show only the original price
-                //                 discountedPriceElement.textContent =
-                //                     `₱${data.price.toLocaleString()}`;
-                //                 discountPercentageElement.textContent = '';
-                //                 originalPriceElement.textContent = '';
-                //             }
-
-                //             // Other modal updates (ratings, favorites, etc.)
-                //             const starContainer = document.getElementById('menuRating');
-                //             starContainer.innerHTML = ''; // Clear previous stars if any
-                //             const rating = parseFloat(data.rating || 0);
-                //             const fullStars = Math.floor(rating);
-                //             const halfStar = rating % 1 >= 0.5 ? 1 : 0;
-                //             const emptyStars = 5 - (fullStars + halfStar);
-
-                //             for (let i = 0; i < fullStars; i++) {
-                //                 const star = document.createElement('i');
-                //                 star.className = 'fa-solid fa-star';
-                //                 starContainer.appendChild(star);
-                //             }
-
-                //             if (halfStar) {
-                //                 const halfStarIcon = document.createElement('i');
-                //                 halfStarIcon.className = 'fa-solid fa-star-half-stroke';
-                //                 starContainer.appendChild(halfStarIcon);
-                //             }
-
-                //             for (let i = 0; i < emptyStars; i++) {
-                //                 const emptyStarIcon = document.createElement('i');
-                //                 emptyStarIcon.className = 'fa-regular fa-star';
-                //                 starContainer.appendChild(emptyStarIcon);
-                //             }
-
-                //             const ratingText = document.createElement('span');
-                //             ratingText.textContent = data.ratingCount > 0 ?
-                //                 ` (${rating.toFixed(1)}) ${data.ratingCount} review${data.ratingCount > 1 ? 's' : ''}` :
-                //                 ' No reviews yet';
-                //             starContainer.appendChild(ratingText);
-
-                //             const favoriteInfo = document.querySelector('.extra-info span');
-                //             favoriteInfo.textContent = `❤️ ${data.favoriteCount} Favorites`;
-
-                //             document.getElementById('modalQuantityInput').value = 1;
-                //             document.getElementById('modalHiddenQuantity').value = 1;
-
-                //             document.querySelector('.modal-button.order-now').onclick =
-                //                 function() {
-                //                     const quantity = document.getElementById(
-                //                         'modalHiddenQuantity').value;
-                //                     window.location.href =
-                //                         `/user/orderView/${menuId}?quantity=${quantity}`;
-                //                 };
-
-                //             document.querySelector('.modal-button.add-to-cart').onclick =
-                //                 function() {
-                //                     fetch(`/user/addToCart/${menuId}`, {
-                //                         method: 'PUT',
-                //                         headers: {
-                //                             'Content-Type': 'application/json',
-                //                             'X-CSRF-Token': '{{ csrf_token() }}',
-                //                         },
-                //                     });
-                //                     window.location.reload();
-                //                 };
-
-                //             const menuDetailsModal = new bootstrap.Modal(document
-                //                 .getElementById('menuDetailsModal'));
-                //             menuDetailsModal.show();
-                //         })
-                //         .catch(error => {
-                //             console.error('Error fetching menu details:', error);
-                //             alert('Failed to fetch menu details. Please try again.');
-                //         });
-                // });
                 button.addEventListener('click', function() {
                     const menuId = this.getAttribute('data-id');
 
@@ -593,9 +570,45 @@
                                 starContainer.appendChild(emptyStarIcon);
                             }
 
+                            // Add rating text and favorites
+                            const ratingText = document.createElement('span');
+                            ratingText.textContent = data.ratingCount > 0 ?
+                                ` (${rating.toFixed(1)}) ${data.ratingCount} review${data.ratingCount > 1 ? 's' : ''}` :
+                                ' No reviews yet';
+                            starContainer.appendChild(ratingText);
+
+                            const favoriteInfo = document.querySelector('.extra-info span');
+                            favoriteInfo.textContent = `❤️ ${data.favoriteCount} Favorites`;
+
+                            // Handle quantity inputs
+                            document.getElementById('modalQuantityInput').value = 1;
+                            document.getElementById('modalHiddenQuantity').value = 1;
+
+                            document.querySelector('.modal-button.order-now').onclick =
+                                function() {
+                                    const quantity = document.getElementById(
+                                        'modalHiddenQuantity').value;
+                                    window.location.href =
+                                        `/user/orderView/${menuId}?quantity=${quantity}`;
+                                };
+
+                            document.querySelector('.modal-button.add-to-cart').onclick =
+                                function() {
+                                    fetch(`/user/addToCart/${menuId}`, {
+                                        method: 'PUT',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-Token': '{{ csrf_token() }}',
+                                        },
+                                    });
+                                    window.location.reload();
+                                };
+
+
                             // Show modal
-                            const menuDetailsModal = new bootstrap.Modal(document
-                                .getElementById('menuDetailsModal'));
+                            const menuDetailsModal = new bootstrap.Modal(
+                                document.getElementById('menuDetailsModal')
+                            );
                             menuDetailsModal.show();
                         })
                         .catch(error => {
@@ -603,6 +616,7 @@
                             alert('Failed to fetch menu details. Please try again.');
                         });
                 });
+
 
             });
         });
@@ -622,7 +636,6 @@
             }
         }
     </script>
-
 
     {{-- Share Link Script --}}
     <script>
@@ -655,7 +668,7 @@
                     const userId = this.dataset.userId; // Attach userId to <a>
 
                     // Mark messages as read via AJAX
-                    fetch(`/admin/markAsRead/${userId}`, {
+                    fetch(`/user/markAsRead/${userId}`, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',

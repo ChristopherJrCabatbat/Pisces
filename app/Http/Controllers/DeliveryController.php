@@ -268,97 +268,15 @@ class DeliveryController extends Controller
      * Store a newly created resource in storage.
      */
 
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'fullName' => 'required|string|max:255',
-    //         'email' => 'required|email|max:255',
-    //         'contactNumber' => 'required|string|max:20',
-    //         'address' => 'required|string',
-    //         'shippingMethod' => 'required|string',
-    //         'paymentMethod' => 'required|string',
-    //         'note' => 'nullable|string',
-    //         'menu_names' => 'required|array',
-    //         'quantities' => 'required|array',
-    //         'total_price' => 'required|numeric',
-    //     ]);
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     $orderItems = [];
-    //     $totalQuantity = 0;
-    //     $totalPrice = 0;
-    //     $orderQuantities = implode(', ', $request->quantities);
-
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         $menu = Menu::where('name', $menuName)->firstOrFail();
-    //         $itemTotal = $menu->price * $quantity;
-    //         $orderItems[] = "{$menuName} (x{$quantity})";
-    //         $totalQuantity += $quantity;
-    //         $totalPrice += $itemTotal;
-    //     }
-
-    //     $hasDiscount = $user->has_discount;
-
-    //     if ($hasDiscount) {
-    //         $totalPrice *= 0.95;
-    //         $user->update(['has_discount' => false]);
-    //     }
-
-    //     $orderString = implode(', ', $orderItems);
-    //     $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
-
-    //     $deliveryId = DB::table('deliveries')->insertGetId([
-    //         'name' => $request->input('fullName'),
-    //         'email' => $request->input('email'),
-    //         'contact_number' => $request->input('contactNumber'),
-    //         'order' => $orderString,
-    //         'address' => $request->input('address'),
-    //         'quantity' => $orderQuantities,
-    //         'shipping_method' => $request->input('shippingMethod'),
-    //         'mode_of_payment' => $request->input('paymentMethod'),
-    //         'note' => $request->input('note'),
-    //         'status' => $status,
-    //         'total_price' => $totalPrice,
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         DB::table('orders')->insert([
-    //             'delivery_id' => $deliveryId,
-    //             'menu_name' => $menuName,
-    //             'quantity' => $quantity,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ]);
-    //     }
-
-    //     // Update the user's last_order field
-    //     $user->update(['last_order' => now()]);
-
-    //     DB::table('cart_items')->where('user_id', $user->id)->delete();
-    //     $user->cart = 0;
-    //     $user->save();
-
-    //     session()->flash('toast', [
-    //         'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
-    //         'type' => 'success',
-    //     ]);
-
-    //     return redirect()->route('user.menu');
-    // }
-
     public function store(Request $request)
     {
         $request->validate([
             'fullName' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'contactNumber' => 'required|string|max:20',
-            'address' => 'required|string',
+            'house_number' => 'nullable|string',
+            'barangay' => 'required|string',
+            'purok' => 'nullable|string',
             'shippingMethod' => 'required|string',
             'paymentMethod' => 'required|string',
             'note' => 'nullable|string',
@@ -369,6 +287,9 @@ class DeliveryController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
+
+        // Increment the order count
+        $user->increment('order_count');
 
         $orderItems = [];
         $totalQuantity = 0;
@@ -406,209 +327,16 @@ class DeliveryController extends Controller
         $orderString = implode(', ', $orderItems);
         $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
 
-        // Insert into deliveries table
-        $deliveryId = DB::table('deliveries')->insertGetId([
-            'name' => $request->input('fullName'),
-            'email' => $request->input('email'),
-            'contact_number' => $request->input('contactNumber'),
-            'order' => $orderString,
-            'address' => $request->input('address'),
-            'quantity' => $orderQuantities,
-            'shipping_method' => $request->input('shippingMethod'),
-            'mode_of_payment' => $request->input('paymentMethod'),
-            'note' => $request->input('note'),
-            'status' => $status,
-            'total_price' => $totalPrice, // Store the rounded total price
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        foreach ($request->menu_names as $index => $menuName) {
-            $quantity = $request->quantities[$index];
-            DB::table('orders')->insert([
-                'delivery_id' => $deliveryId,
-                'menu_name' => $menuName,
-                'quantity' => $quantity,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        // Construct the full address
+        $fullAddress = "";
+        if (!empty($request->house_number)) {
+            $fullAddress .= "#{$request->house_number} ";
         }
-
-        // Update the user's last_order field
-        $user->update(['last_order' => now()]);
-
-        // Clear the user's cart after placing the order
-        DB::table('cart_items')->where('user_id', $user->id)->delete();
-        $user->cart = 0;
-        $user->save();
-
-        session()->flash('toast', [
-            'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
-            'type' => 'success',
-        ]);
-
-        return redirect()->route('user.menu');
-    }
-
-
-    // public function orderStore(Request $request)
-    // {
-    //     $request->validate([
-    //         'fullName' => 'required|string|max:255',
-    //         'email' => 'required|email|max:255',
-    //         'contactNumber' => 'required|string|max:20',
-    //         'address' => 'required|string',
-    //         'shippingMethod' => 'required|string',
-    //         'paymentMethod' => 'required|string',
-    //         'note' => 'nullable|string',
-    //         'menu_names' => 'required|array',
-    //         'quantities' => 'required|array',
-    //         'total_price' => 'required|numeric',
-    //     ]);
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     $orderItems = [];
-    //     $totalQuantity = 0;
-    //     $totalPrice = 0;
-    //     $orderQuantities = implode(', ', $request->quantities);
-
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         $menu = Menu::where('name', $menuName)->firstOrFail();
-
-    //         // Calculate discounted price for the menu if applicable
-    //         $menuDiscountedPrice = $menu->discount > 0
-    //             ? round($menu->price * (1 - $menu->discount / 100), 2)
-    //             : $menu->price;
-
-    //         // Calculate item total using the discounted price
-    //         $itemTotal = $menuDiscountedPrice * $quantity;
-    //         $orderItems[] = "{$menuName} (x{$quantity})";
-    //         $totalQuantity += $quantity;
-    //         $totalPrice += $itemTotal;
-    //     }
-
-    //     // Check if the user has an additional discount
-    //     $hasDiscount = $user->has_discount;
-
-    //     if ($hasDiscount) {
-    //         // Apply user-specific discount (e.g., 5% off)
-    //         $totalPrice *= 0.95;
-    //         $user->update(['has_discount' => false]); // Reset the user's discount eligibility
-    //     }
-
-    //     // Round totalPrice to the nearest whole number
-    //     $totalPrice = round($totalPrice);
-
-    //     $orderString = implode(', ', $orderItems);
-    //     $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
-
-    //     // Insert into deliveries table
-    //     $deliveryId = DB::table('deliveries')->insertGetId([
-    //         'name' => $request->input('fullName'),
-    //         'email' => $request->input('email'),
-    //         'contact_number' => $request->input('contactNumber'),
-    //         'order' => $orderString,
-    //         'address' => $request->input('address'),
-    //         'quantity' => $orderQuantities,
-    //         'shipping_method' => $request->input('shippingMethod'),
-    //         'mode_of_payment' => $request->input('paymentMethod'),
-    //         'note' => $request->input('note'),
-    //         'status' => $status,
-    //         'total_price' => $totalPrice, // Store the rounded total price
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         DB::table('orders')->insert([
-    //             'delivery_id' => $deliveryId,
-    //             'menu_name' => $menuName,
-    //             'quantity' => $quantity,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ]);
-    //     }
-
-    //     // Update the user's last_order field
-    //     $user->update(['last_order' => now()]);
-
-    //     session()->flash('toast', [
-    //         'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
-    //         'type' => 'success',
-    //     ]);
-
-    //     return redirect()->route('user.menu');
-    // }
-
-
-
-    public function orderStore(Request $request)
-    {
-        $request->validate([
-            'fullName' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'contactNumber' => 'required|string|max:20',
-            'house_number' => 'required|string',
-            'barangay' => 'required|string',
-            'purok' => 'nullable|string',
-            'shippingMethod' => 'required|string',
-            'paymentMethod' => 'required|string',
-            'note' => 'nullable|string',
-            'menu_names' => 'required|array',
-            'quantities' => 'required|array',
-            'total_price' => 'required|numeric',
-        ]);
-
-        /** @var User $user */
-        $user = Auth::user();
-
-        $orderItems = [];
-        $totalQuantity = 0;
-        $totalPrice = 0;
-        $orderQuantities = implode(', ', $request->quantities);
-
-        foreach ($request->menu_names as $index => $menuName) {
-            $quantity = $request->quantities[$index];
-            $menu = Menu::where('name', $menuName)->firstOrFail();
-
-            // Calculate discounted price for the menu if applicable
-            $menuDiscountedPrice = $menu->discount > 0
-                ? round($menu->price * (1 - $menu->discount / 100), 2)
-                : $menu->price;
-
-            // Calculate item total using the discounted price
-            $itemTotal = $menuDiscountedPrice * $quantity;
-            $orderItems[] = "{$menuName} (x{$quantity})";
-            $totalQuantity += $quantity;
-            $totalPrice += $itemTotal;
-        }
-
-        // Check if the user has an additional discount
-        $hasDiscount = $user->has_discount;
-
-        if ($hasDiscount) {
-            // Apply user-specific discount (e.g., 5% off)
-            $totalPrice *= 0.95;
-            $user->update(['has_discount' => false]); // Reset the user's discount eligibility
-        }
-
-        // Round totalPrice to the nearest whole number
-        $totalPrice = round($totalPrice);
-
-        $orderString = implode(', ', $orderItems);
-        $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
-
-        // Combine address fields to construct a full address
-        $fullAddress = "#{$request->house_number} Barangay {$request->barangay}";
+        $fullAddress .= "Barangay {$request->barangay}";
         if ($request->filled('purok')) {
             $fullAddress .= " Purok {$request->purok}";
         }
         $fullAddress .= " San Carlos City, Pangasinan";
-
 
         // Insert into deliveries table
         $deliveryId = DB::table('deliveries')->insertGetId([
@@ -638,8 +366,43 @@ class DeliveryController extends Controller
             ]);
         }
 
+        // Clear the user's cart after placing the order
+        DB::table('cart_items')->where('user_id', $user->id)->delete();
+        $user->cart = 0;
+        $user->save();
+
         // Update the user's last_order field
         $user->update(['last_order' => now()]);
+
+        // Set modal session key if the order count is divisible by 7
+        if ($user->order_count % 7 === 0) {
+            session()->put('showExperienceModal', true); // Persistent session key
+        }
+
+        // Handle GCash payment
+        if ($request->input('paymentMethod') === 'GCash') {
+            // Prepare GCash message
+            $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
+
+            // Save the message
+            DB::table('messages')->insert([
+                'user_id' => $user->id,
+                'receiver_id' => '1', // Assuming the user receives the message
+                'sender_role' => 'System',
+                'message_text' => $messageText,
+                'is_read' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Redirect to messagesPisces with success toast
+            session()->flash('toast', [
+                'message' => 'Order placed successfully! Please check your messages to complete the GCash payment.',
+                'type' => 'success',
+            ]);
+
+            return redirect()->route('user.messagesPisces');
+        }
 
         session()->flash('toast', [
             'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
@@ -650,6 +413,242 @@ class DeliveryController extends Controller
     }
 
 
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'fullName' => 'required|string|max:255',
+    //         'email' => 'required|email|max:255',
+    //         'contactNumber' => 'required|string|max:20',
+    //         'house_number' => 'nullable|string',
+    //         'barangay' => 'required|string',
+    //         'purok' => 'nullable|string',
+    //         'shippingMethod' => 'required|string',
+    //         'paymentMethod' => 'required|string',
+    //         'note' => 'nullable|string',
+    //         'menu_names' => 'required|array',
+    //         'quantities' => 'required|array',
+    //         'total_price' => 'required|numeric',
+    //     ]);
+
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     $orderItems = [];
+    //     $totalQuantity = 0;
+    //     $totalPrice = 0;
+    //     $orderQuantities = implode(', ', $request->quantities);
+
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         $menu = Menu::where('name', $menuName)->firstOrFail();
+
+    //         // Calculate the discounted price for the menu if applicable
+    //         $menuDiscountedPrice = $menu->discount > 0
+    //             ? round($menu->price * (1 - $menu->discount / 100), 2)
+    //             : $menu->price;
+
+    //         // Calculate item total using the discounted price
+    //         $itemTotal = $menuDiscountedPrice * $quantity;
+    //         $orderItems[] = "{$menuName} (x{$quantity})";
+    //         $totalQuantity += $quantity;
+    //         $totalPrice += $itemTotal;
+    //     }
+
+    //     // Check if the user has an additional discount
+    //     $hasDiscount = $user->has_discount;
+
+    //     if ($hasDiscount) {
+    //         // Apply user-specific discount (e.g., 5% off)
+    //         $totalPrice *= 0.95;
+    //         $user->update(['has_discount' => false]); // Reset the user's discount eligibility
+    //     }
+
+    //     // Round totalPrice to the nearest whole number
+    //     $totalPrice = round($totalPrice);
+
+    //     $orderString = implode(', ', $orderItems);
+    //     $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
+    //     // Construct the full address
+    //     $fullAddress = "#{$request->house_number} Barangay {$request->barangay}";
+    //     if ($request->filled('purok')) {
+    //         $fullAddress .= " Purok {$request->purok}";
+    //     }
+    //     $fullAddress .= " San Carlos City, Pangasinan";
+
+    //     // Insert into deliveries table
+    //     $deliveryId = DB::table('deliveries')->insertGetId([
+    //         'name' => $request->input('fullName'),
+    //         'email' => $request->input('email'),
+    //         'contact_number' => $request->input('contactNumber'),
+    //         'order' => $orderString,
+    //         'address' => $fullAddress,
+    //         'quantity' => $orderQuantities,
+    //         'shipping_method' => $request->input('shippingMethod'),
+    //         'mode_of_payment' => $request->input('paymentMethod'),
+    //         'note' => $request->input('note'),
+    //         'status' => $status,
+    //         'total_price' => $totalPrice, // Store the rounded total price
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+
+    //     foreach ($request->menu_names as $index => $menuName) {
+    //         $quantity = $request->quantities[$index];
+    //         DB::table('orders')->insert([
+    //             'delivery_id' => $deliveryId,
+    //             'menu_name' => $menuName,
+    //             'quantity' => $quantity,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ]);
+    //     }
+
+    //     // Update the user's last_order field
+    //     $user->update(['last_order' => now()]);
+
+    //     // Clear the user's cart after placing the order
+    //     DB::table('cart_items')->where('user_id', $user->id)->delete();
+    //     $user->cart = 0;
+    //     $user->save();
+
+    //     session()->flash('toast', [
+    //         'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
+    //         'type' => 'success',
+    //     ]);
+
+    //     return redirect()->route('user.menu');
+    // }
+
+
+    public function orderStore(Request $request)
+    {
+        $request->validate([
+            'fullName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'contactNumber' => 'required|string|max:20',
+            'house_number' => 'nullable|string',
+            'barangay' => 'required|string',
+            'purok' => 'nullable|string',
+            'shippingMethod' => 'required|string',
+            'paymentMethod' => 'required|string',
+            'note' => 'nullable|string',
+            'menu_names' => 'required|array',
+            'quantities' => 'required|array',
+            'total_price' => 'required|numeric',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Increment the order count
+        $user->increment('order_count');
+
+        $orderItems = [];
+        $totalQuantity = 0;
+        $totalPrice = 0;
+        $orderQuantities = implode(', ', $request->quantities);
+
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            $menu = Menu::where('name', $menuName)->firstOrFail();
+
+            $menuDiscountedPrice = $menu->discount > 0
+                ? round($menu->price * (1 - $menu->discount / 100), 2)
+                : $menu->price;
+
+            $itemTotal = $menuDiscountedPrice * $quantity;
+            $orderItems[] = "{$menuName} (x{$quantity})";
+            $totalQuantity += $quantity;
+            $totalPrice += $itemTotal;
+        }
+
+        $hasDiscount = $user->has_discount;
+
+        if ($hasDiscount) {
+            $totalPrice *= 0.95;
+            $user->update(['has_discount' => false]);
+        }
+
+        $totalPrice = round($totalPrice);
+
+        $orderString = implode(', ', $orderItems);
+        $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
+        $fullAddress = "";
+        if (!empty($request->house_number)) {
+            $fullAddress .= "#{$request->house_number} ";
+        }
+        $fullAddress .= "Barangay {$request->barangay}";
+        if ($request->filled('purok')) {
+            $fullAddress .= " Purok {$request->purok}";
+        }
+        $fullAddress .= " San Carlos City, Pangasinan";
+
+        $deliveryId = DB::table('deliveries')->insertGetId([
+            'name' => $request->input('fullName'),
+            'email' => $request->input('email'),
+            'contact_number' => $request->input('contactNumber'),
+            'order' => $orderString,
+            'address' => $fullAddress,
+            'quantity' => $orderQuantities,
+            'shipping_method' => $request->input('shippingMethod'),
+            'mode_of_payment' => $request->input('paymentMethod'),
+            'note' => $request->input('note'),
+            'status' => $status,
+            'total_price' => $totalPrice,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            DB::table('orders')->insert([
+                'delivery_id' => $deliveryId,
+                'menu_name' => $menuName,
+                'quantity' => $quantity,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $user->update(['last_order' => now()]);
+
+        // Set modal session key if the order count is divisible by 7
+        if ($user->order_count % 7 === 0) {
+            session()->put('showExperienceModal', true); // Persistent session key
+        }
+
+        if ($request->input('paymentMethod') === 'GCash') {
+            // Prepare GCash message
+            $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
+
+            // Save the message
+            DB::table('messages')->insert([
+                'user_id' => $user->id,
+                'receiver_id' => '1', // Assuming the user receives the message
+                'sender_role' => 'System',
+                'message_text' => $messageText,
+                'is_read' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            session()->flash('toast', [
+                'message' => 'Order placed successfully! Please follow the instructions to finish your order/s.',
+                'type' => 'success',
+            ]);
+
+            return redirect()->route('user.messagesPisces');
+        }
+
+        session()->flash('toast', [
+            'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
+            'type' => 'success',
+        ]);
+
+        return redirect()->route('user.menu');
+    }
 
     public function menuDetailsOrder($id)
     {

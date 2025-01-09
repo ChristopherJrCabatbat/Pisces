@@ -92,7 +92,8 @@ class RoleMiddleware
             'User'  => [
                 'user.dashboard',
 
-                'admin.userUpdate',
+                'user.userUpdate',
+                'user.submitExperience',
 
                 'user.menu',
                 

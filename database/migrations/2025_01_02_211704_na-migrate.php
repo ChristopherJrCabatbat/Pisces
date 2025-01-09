@@ -12,6 +12,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->integer('order_count')->default(0)->after('favorites');
+            $table->integer('rating')->nullable()->after('favorites');
+            $table->text('feedback')->nullable()->after('favorites');
             $table->boolean('newsletter_subscription')->default(false)->after('favorites');
             $table->boolean('has_discount')->default(false)->after('favorites');
             $table->timestamp('last_order')->nullable()->after('favorites');

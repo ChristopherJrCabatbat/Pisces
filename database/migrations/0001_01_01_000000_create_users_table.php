@@ -25,6 +25,9 @@ return new class extends Migration
             $table->integer('favorites')->default(0);
 
             // di pa na-migrate, delete mo yung add_last_login
+            // $table->integer('order_count')->default(0);
+            // $table->integer('rating')->nullable();
+            // $table->text('feedback')->nullable();
             // $table->timestamp('last_login_at')->nullable();
             // $table->timestamp('last_order')->nullable();
             // $table->boolean('has_discount')->default(false);

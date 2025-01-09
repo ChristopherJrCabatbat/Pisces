@@ -121,6 +121,8 @@ Route::group([
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
     Route::put('/userUpdate', [UserController::class, 'userUpdate'])->name('userUpdate');
+    Route::post('/submitExperience', [UserController::class, 'submitExperience'])->name('submitExperience');
+
 
     Route::get('/menu', [UserController::class, 'menu'])->name('menu');
 

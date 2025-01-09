@@ -11,7 +11,7 @@ body {
     color: white;
 }
 
-nav.navss{
+nav.navss {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
@@ -581,6 +581,7 @@ th {
     flex-direction: column;
     overflow: hidden;
     padding: 20px;
+    z-index: 1000;
 }
 
 .custom-toast {
@@ -596,6 +597,7 @@ th {
     position: relative;
     transform: translateX(100%);
     animation: moveleft 0.5s linear forwards;
+    z-index: 1000;
 }
 
 @keyframes moveleft {
@@ -623,6 +625,7 @@ th {
     height: 5px;
     background: green;
     animation: anim 4.2s linear forwards;
+    z-index: 1000;
 }
 
 @keyframes anim {
@@ -632,6 +635,7 @@ th {
 }
 .custom-toast.error::after {
     background: red;
+    z-index: 1000;
 }
 
 /* End Menu Icon Toast Message */
@@ -946,4 +950,129 @@ a.more:hover {
     transform: translateX(-50%) translateY(100%);
     opacity: 0;
     bottom: -100%;
+}
+
+/* Experience Modal Container */
+.experience-modal-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+    z-index: 1126;
+}
+
+/* Modal Content */
+.experience-modal-content {
+    background: #ffffff;
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: experience-fadeIn 0.3s ease-in-out;
+    position: relative;
+}
+
+/* Header */
+.experience-modal-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333333;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #6d6d6d;
+}
+
+/* Modal Text */
+.experience-modal-text {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Form Group */
+.experience-modal-form-group {
+    margin-bottom: 15px;
+}
+
+/* Labels */
+.experience-modal-label {
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    display: block;
+    color: #333333;
+}
+
+/* Select */
+.experience-modal-select {
+    width: 100% !important;
+    padding: 8px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    background: #f9f9f9;
+}
+
+/* Textarea */
+.experience-modal-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    background: #f9f9f9;
+    resize: none;
+}
+
+/* Button */
+.experience-modal-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #007bff;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.experience-modal-button:hover {
+    background: #0056b3;
+}
+
+/* Fade-In Animation */
+@keyframes experience-fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Close Button */
+.experience-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.experience-modal-close:hover {
+    color: #ff0000;
 }

@@ -587,11 +587,11 @@
                         </blockquote>
 
                         <div class="wrapper">
-                            <img src="./home-assets/images/testi-avatar.jpg" width="70" height="70"
+                            <img src="./home-assets/images/testi-avatar.png" width="70" height="70"
                                 loading="lazy" alt="Thomas Adamson" class="author-img">
 
                             <div>
-                                <p class="author-title">Cardo Dalisay</p>
+                                <p class="author-title">Arron Paul Macaraeg</p>
 
                                 <div class="rating-wrapper">
                                     <ion-icon name="star" aria-hidden="true"></ion-icon>

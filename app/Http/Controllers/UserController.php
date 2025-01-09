@@ -21,7 +21,6 @@ class UserController extends Controller
 {
     public function dashboard()
     {
-        // dd(now());
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
@@ -153,6 +152,42 @@ class UserController extends Controller
         return view('user.dashboard', compact('userCart', 'pendingOrdersCount', 'user', 'userFavorites', 'topCategories', 'latestMenus', 'popularMenus', 'unreadCount', 'highestRatedMenus', 'bestDeals'));
     }
 
+    // public function userUpdate(Request $request)
+    // {
+    //     $request->validate([
+    //         'first_name' => 'required|string|max:255',
+    //         'last_name' => 'required|string|max:255',
+    //         'contact_number' => 'required|string|max:20',
+    //         'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
+    //         'password' => 'nullable|string|min:8|confirmed', // Only validate if provided
+    //     ]);
+
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     $user->update([
+    //         'first_name' => $request->first_name,
+    //         'last_name' => $request->last_name,
+    //         'contact_number' => $request->contact_number,
+    //         'email' => $request->email,
+    //     ]);
+
+    //     // Update password if provided
+    //     if ($request->filled('password')) {
+    //         $user->update([
+    //             'password' => Hash::make($request->password),
+    //         ]);
+    //     }
+
+    //     // Set a toast session with the success message
+    //     session()->flash('toast', [
+    //         'message' => 'Profile updated successfully.',
+    //         'type' => 'success', // 'success' or 'error'
+    //     ]);
+
+    //     return redirect()->back()->with('success', 'Profile updated successfully!');
+    // }
+
     public function userUpdate(Request $request)
     {
         $request->validate([
@@ -160,7 +195,7 @@ class UserController extends Controller
             'last_name' => 'required|string|max:255',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
-            'password' => 'nullable|string|min:8|confirmed', // Only validate if provided
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         /** @var User $user */
@@ -171,6 +206,7 @@ class UserController extends Controller
             'last_name' => $request->last_name,
             'contact_number' => $request->contact_number,
             'email' => $request->email,
+            'newsletter_subscription' => $request->has('newsletter_subscription'), // Updates newsletter_subscription
         ]);
 
         // Update password if provided
@@ -188,6 +224,29 @@ class UserController extends Controller
 
         return redirect()->back()->with('success', 'Profile updated successfully!');
     }
+
+    public function submitExperience(Request $request)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'feedback' => 'nullable|string|max:1000',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+        $user->update([
+            'rating' => $request->rating,
+            'feedback' => $request->feedback,
+        ]);
+
+        session()->flash('toast', [
+            'message' => 'Thank you for your feedback!',
+            'type' => 'success',
+        ]);
+
+        return redirect()->back();
+    }
+
 
     // Modified menu method in your Controller
 
@@ -364,41 +423,41 @@ class UserController extends Controller
     // }
 
     public function menuView($id)
-{
-    $menu = Menu::find($id); // Find menu by its primary key
+    {
+        $menu = Menu::find($id); // Find menu by its primary key
 
-    if (!$menu) {
-        return response()->json(['error' => 'Menu not found'], 404);
+        if (!$menu) {
+            return response()->json(['error' => 'Menu not found'], 404);
+        }
+
+        // Calculate discounted price
+        $discountedPrice = $menu->discount > 0
+            ? round($menu->price * (1 - $menu->discount / 100), 2)
+            : $menu->price;
+
+        // Fetch total favorites and ratings
+        $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
+        $rating = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->avg('rating');
+        $ratingCount = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->count();
+
+        // Return JSON response
+        return response()->json([
+            'name' => $menu->name,
+            'category' => $menu->category,
+            'price' => $menu->price,
+            'discountedPrice' => $discountedPrice,
+            'discount' => $menu->discount,
+            'description' => $menu->description,
+            'image' => $menu->image,
+            'rating' => $rating ?: 0,
+            'ratingCount' => $ratingCount ?: 0,
+            'favoriteCount' => $favoriteCount,
+        ]);
     }
-
-    // Calculate discounted price
-    $discountedPrice = $menu->discount > 0
-        ? round($menu->price * (1 - $menu->discount / 100), 2)
-        : $menu->price;
-
-    // Fetch total favorites and ratings
-    $favoriteCount = DB::table('favorite_items')->where('menu_id', $id)->count();
-    $rating = DB::table('feedback')
-        ->where('menu_items', 'LIKE', "%{$menu->name}%")
-        ->avg('rating');
-    $ratingCount = DB::table('feedback')
-        ->where('menu_items', 'LIKE', "%{$menu->name}%")
-        ->count();
-
-    // Return JSON response
-    return response()->json([
-        'name' => $menu->name,
-        'category' => $menu->category,
-        'price' => $menu->price,
-        'discountedPrice' => $discountedPrice,
-        'discount' => $menu->discount,
-        'description' => $menu->description,
-        'image' => $menu->image,
-        'rating' => $rating ?: 0,
-        'ratingCount' => $ratingCount ?: 0,
-        'favoriteCount' => $favoriteCount,
-    ]);
-}
 
 
     // Add To Cart Bawal Duplicate
@@ -589,7 +648,7 @@ class UserController extends Controller
     //     return view('user.favorites', compact('menus', 'pendingOrdersCount', 'categories', 'selectedCategory', 'userCart', 'user', 'userFavorites', 'unreadCount'));
     // }
 
-   
+
     public function favorites(Request $request)
     {
         /** @var User $user */

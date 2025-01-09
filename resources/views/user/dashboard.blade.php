@@ -204,7 +204,7 @@
                                                 @endfor
                                             </div>
                                             <div class="star-label">
-                                                @if ($menu->ratingCount > 0)
+                                                @if ($menu->rating > 0 && $menu->ratingCount > 0)
                                                     ({{ number_format($menu->rating, 1) }})
                                                     {{ $menu->ratingCount }} review{{ $menu->ratingCount > 1 ? 's' : '' }}
                                                 @else
@@ -212,6 +212,8 @@
                                                 @endif
                                             </div>
                                         </div>
+                                        
+
                                     </div>
                                 </a>
                             </div>
@@ -417,7 +419,7 @@
                                     <div class="card-body card-body-mt">
                                         <h5 class="card-title">{{ $menu->name }}</h5>
 
-                                       <div class="price fw-bold mb-2">
+                                        <div class="price fw-bold mb-2">
                                             @if ($menu->discount > 0)
                                                 {{-- Display discounted price with discount percentage --}}
                                                 ₱{{ number_format($menu->price * (1 - $menu->discount / 100), 2) }}
@@ -536,7 +538,7 @@
                                     <div class="card-body card-body-mt">
                                         <h5 class="card-title">{{ $menu->name }}</h5>
 
-                                      <div class="price fw-bold mb-2">
+                                        <div class="price fw-bold mb-2">
                                             @if ($menu->discount > 0)
                                                 {{-- Display discounted price with discount percentage --}}
                                                 ₱{{ number_format($menu->price * (1 - $menu->discount / 100), 2) }}
