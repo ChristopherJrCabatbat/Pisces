@@ -24,6 +24,9 @@ return new class extends Migration
             $table->text('quantity');
 
             $table->string('shipping_method');
+            // Migrate mo to
+            // $table->integer('discount')->default(0)
+
             $table->string('mode_of_payment');
             $table->string('note')->nullable();
             $table->string('status');

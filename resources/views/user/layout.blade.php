@@ -377,34 +377,40 @@
                     <div class="col d-flex flex-column gap-3">
                         <div class="h3 footer-title mb-3 fw-bold">Contact Info</div>
                         <div class="d-flex align-items-center">
-                            <span class="border-bottoms pb-2"><i class="fa-solid fa-location-dot me-2"></i> Barangay
+                            <span class="border-bottoms pb-2 red-hover"><i class="fa-solid fa-location-dot me-2"></i> Barangay
                                 Ilang, San Carlos City, Pangasinan</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <i class="fa-solid fa-envelope me-2"></i> piscescoffeehub@gmail.com
+                            <a href="mailto:piscescoffeehub@gmail.com" class="red-hover"><i class="fa-solid fa-envelope me-2"></i> piscescoffeehub@gmail.com</a>
                         </div>
                         <div class="d-flex align-items-center">
-                            <i class="fa-solid fa-phone me-2"></i> 0945 839 3794
+                            <div class="red-hover"><i class="fa-solid fa-phone me-2"></i> 0945 839 3794</div>
                         </div>
-                        <div class="icons d-flex align-items-center gap-4 mt-4">
+                        <div class="icons d-flex align-items-center gap-3 mt-4">
                             <a href="https://www.facebook.com/@piscesCH" title="Go to Pisces Facebook Page"
                                 target="_blank" class="social-link">
                                 <div class="rounded-circle">
                                     <i class="fa-brands fa-facebook"></i>
                                 </div>
                             </a>
-                            <div class="rounded-circle">
-                                <i class="fa-brands fa-instagram"></i>
-                            </div>
-                            <div class="rounded-circle">
-                                <i class="fa-brands fa-twitter"></i>
-                            </div>
+                            <a href="https://www.instagram.com/piscescoffeehub/" class="social-link"
+                                title="Go to Pisces Instagram Account" target="_blank">
+                                <div class="rounded-circle">
+                                    <i class="fa-brands fa-instagram"></i>
+                                </div>
+                            </a>
+                            <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" title="See Pisces in Maps"
+                                target="_blank" class="social-link">
+                                <div class="rounded-circle">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <div class="copyright text-center py-4">
-                    <div>Copyright 2024 Pisces. All rights reserved.</div>
+                    <div>Copyright 2025 Pisces. All rights reserved.</div>
                 </div>
             </div>
         </div>

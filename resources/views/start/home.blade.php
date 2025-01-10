@@ -175,26 +175,39 @@
             color: #F81D0B;
         }
 
-        
-/* Image container styling */
-.img-container {
-    position: relative;
-    width: 100%;
-    height: 300px; /* Set height to keep images consistent */
-    overflow: hidden;
-}
 
-/* Image within the container */
-.img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the container */
-}
+        /* Image container styling */
+        .img-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            /* Set height to keep images consistent */
+            overflow: hidden;
+        }
 
-/* Darken overlay on hover */
-.img-container:hover .darken {
-    filter: brightness(30%);
-}
+        /* Image within the container */
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Ensures the image covers the container */
+        }
+
+        /* Darken overlay on hover */
+        .img-container:hover .darken {
+            filter: brightness(30%);
+        }
+
+        /* Optional styling for icons */
+        .rounded-circle {
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid hsl(0, 0%, 47%);
+        }
     </style>
 
 
@@ -387,8 +400,8 @@
                             </li>
                         @endforeach
                     </ul>
-                    
-                    
+
+
                 </div>
             </section>
 
@@ -482,8 +495,6 @@
                     </div>
                 </div>
             </div>
-
-
 
 
 
@@ -792,10 +803,9 @@
                     </li>
 
                     <li>
-                        <address class="address">
+                        <address class="address footer-link">
                             <ion-icon name="location" aria-hidden="true"></ion-icon>
 
-                            {{-- <span class="span">1717 Harrison St, San Francisco, CA 94103, United States</span> --}}
                             <span class="span">Barangay Ilang, San Carlos City, Pangasinan</span>
                         </address>
                     </li>
@@ -820,20 +830,21 @@
                         <ul class="social-list">
 
                             <li>
-                                <a href="https://www.facebook.com/piscesCH" target="_blank" class="social-link">
+                                <a href="https://www.facebook.com/piscesCH" target="_blank" title="Go to Pisces Facebook Page" class="social-link">
                                     <ion-icon name="logo-facebook"></ion-icon>
                                 </a>
                             </li>
 
                             <li>
-                                <a href="#" class="social-link">
+                                <a href="https://www.instagram.com/piscescoffeehub/" target="_blank" title="Go to Pisces Instagram Account" class="social-link">
                                     <ion-icon name="logo-instagram"></ion-icon>
                                 </a>
                             </li>
 
                             <li>
-                                <a href="#" class="social-link">
-                                    <ion-icon name="logo-twitter"></ion-icon>
+                                <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" class="social-link" title="See Pisces in Maps"
+                                target="_blank" >
+                                    <ion-icon name="location-outline"></ion-icon>
                                 </a>
                             </li>
 

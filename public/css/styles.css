@@ -293,6 +293,15 @@ nav.navss {
     transition: ease-in-out;
 }
 
+.red-hover {
+    color: #787878;
+    text-decoration: none;
+}
+.red-hover:hover {
+    cursor: pointer;
+    color: #f81d0b;
+}
+
 .border-bottoms {
     border-bottom: 1px solid hsl(0, 0%, 47%);
 }

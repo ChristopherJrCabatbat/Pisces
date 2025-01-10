@@ -792,40 +792,73 @@ class UserController extends Controller
     }
 
 
+    // public function orderView($id)
+    // {
+    //     // Get the authenticated user
+    //     $user = Auth::user();
+
+    //     // Retrieve the specific menu item by ID
+    //     $menu = Menu::find($id);
+
+    //     // Check if the menu item exists
+    //     if (!$menu) {
+    //         return redirect()->route('user.menu')->with('error', 'Menu item not found');
+    //     }
+
+    //     // Fetch the quantity from the request, default to 1
+    //     $quantity = request()->input('quantity', 1);
+
+    //     // Calculate the menu's discounted price if it has a discount
+    //     $discountedPrice = $menu->discount > 0
+    //         ? round($menu->price * (1 - $menu->discount / 100), 2)
+    //         : $menu->price;
+
+    //     // Calculate the original total price using the discounted price
+    //     $originalTotal = $discountedPrice * $quantity;
+
+    //     // Determine if the user is eligible for a discount
+    //     $hasDiscount = $user->has_discount; // Eligible if has_discount is `true`
+    //     $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
+
+    //     // Round the final total
+    //     $finalTotal = round($finalTotal);
+
+    //     // Pass the variables to the view
+    //     return view('user.orderView', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'discountedPrice'));
+    // }
+
     public function orderView($id)
-    {
-        // Get the authenticated user
-        $user = Auth::user();
+{
+    $user = Auth::user();
+    $menu = Menu::find($id);
 
-        // Retrieve the specific menu item by ID
-        $menu = Menu::find($id);
-
-        // Check if the menu item exists
-        if (!$menu) {
-            return redirect()->route('user.menu')->with('error', 'Menu item not found');
-        }
-
-        // Fetch the quantity from the request, default to 1
-        $quantity = request()->input('quantity', 1);
-
-        // Calculate the menu's discounted price if it has a discount
-        $discountedPrice = $menu->discount > 0
-            ? round($menu->price * (1 - $menu->discount / 100), 2)
-            : $menu->price;
-
-        // Calculate the original total price using the discounted price
-        $originalTotal = $discountedPrice * $quantity;
-
-        // Determine if the user is eligible for a discount
-        $hasDiscount = $user->has_discount; // Eligible if has_discount is `true`
-        $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
-
-        // Round the final total
-        $finalTotal = round($finalTotal);
-
-        // Pass the variables to the view
-        return view('user.orderView', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'discountedPrice'));
+    if (!$menu) {
+        return redirect()->route('user.menu')->with('error', 'Menu item not found');
     }
+
+    $quantity = request()->input('quantity', 1);
+    $discountedPrice = $menu->discount > 0
+        ? round($menu->price * (1 - $menu->discount / 100), 2)
+        : $menu->price;
+
+    $originalTotal = $discountedPrice * $quantity;
+
+    $hasDiscount = $user->has_discount;
+    $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
+    $finalTotal = round($finalTotal);
+
+    // Calculate shipping fee based on the default or selected barangay
+    $barangay = request()->input('barangay', '');
+    $shippingRates = [
+        "Abanon" => 110,
+        "Agdao" => 80,
+        // Add all other barangays and rates here...
+    ];
+    $shippingFee = (int)($shippingRates[$barangay] ?? 0); // Convert shipping fee to integer
+
+    return view('user.orderView', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'discountedPrice', 'shippingFee'));
+}
+
 
 
     public function menuDetails($id)
