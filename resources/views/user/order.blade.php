@@ -83,9 +83,9 @@
 
                         <!-- Shipping Fee -->
                         <div class="mb-3">
-                            <label for="shippingMethod" class="form-label">Shipping Fee:</label>
-                            <input type="text" class="form-control" id="shippingMethod" name="shippingMethod"
-                                value="₱0" readonly required>
+                            <label for="shippingFee" class="form-label">Shipping Fee:</label>
+                            <input type="text" class="form-control" id="shippingMethod" name="shippingFee"
+                                value="0" readonly required>
                         </div>
 
                         <!-- Payment Method -->
@@ -105,7 +105,7 @@
                         <div class="mb-3">
                             <label for="note" class="form-label">Note:</label>
                             <textarea class="form-control" id="note" name="note" style="height: 100px"
-                                placeholder="Leave a note here..."></textarea>
+                            placeholder="Your area's landmark or note about your order..." required></textarea>
                         </div>
 
                         <!-- Submit Button -->
@@ -324,9 +324,9 @@
             barangayDropdown.addEventListener('change', function() {
                 const selectedBarangay = barangayDropdown.value;
                 if (barangayRates[selectedBarangay]) {
-                    shippingInput.value = `₱${barangayRates[selectedBarangay]}`;
+                    shippingInput.value = `${barangayRates[selectedBarangay]}`;
                 } else {
-                    shippingInput.value = "₱0";
+                    shippingInput.value = "0";
                 }
             });
         });

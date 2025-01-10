@@ -17,6 +17,7 @@ class Delivery extends Model
         'address',
         'quantity',
         'shipping_method',
+        'shipping_fee',
         'mode_of_payment',
         'note',
         'status',

@@ -5,8 +5,8 @@
 @section('styles-links')
     <style>
         /* .table-container {
-                padding: 1rem 2rem 0rem 2rem;
-            } */
+                    padding: 1rem 2rem 0rem 2rem;
+                } */
     </style>
 @endsection
 
@@ -189,12 +189,9 @@
     <script>
         document.getElementById('filter-button').addEventListener('click', function() {
             const filter = document.getElementById('delivery-filter').value;
-            const search = document.getElementById('search-input') ? document.getElementById('search-input').value :
-                '';
 
             const params = new URLSearchParams({
                 filter: filter,
-                search: search
             });
 
             // Reload page with query parameters

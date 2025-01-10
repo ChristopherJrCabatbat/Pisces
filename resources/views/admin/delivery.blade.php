@@ -73,9 +73,15 @@
             color: #f81d0b;
         }
 
+        td.td-select {
+            /* max-width: 110px; */
+            max-width: 131px;
+            padding: 0 10px;
+        }
+
         /* .table-container {
-                padding: 1rem 2rem 0rem 2rem;
-            } */
+                                    padding: 1rem 2rem 0rem 2rem;
+                                } */
     </style>
 @endsection
 
@@ -150,7 +156,6 @@
                     <h5 class="modal-title" id="deliveryDetailsModalLabel">Delivery Details</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
-
                 </div>
                 <div class="modal-body">
                     <div id="delivery-details" class="table-responsive"> <!-- Add responsive table wrapper -->
@@ -163,14 +168,14 @@
 
     <!-- Rider Selection Modal -->
     <div class="modal fade" id="riderSelectionModal" tabindex="-1" aria-labelledby="riderSelectionModalLabel"
-        aria-hidden="true">
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="riderSelectionModalLabel">Select Rider</h5>
 
                     <!-- Close Button in Modal -->
-                    <button type="button" class="btn-close" id="modalCloseButton" aria-label="Close"></button>
+                    <button type="button" class="btn-close text-white" id="modalCloseButton" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="assignRiderForm" method="POST">
@@ -191,6 +196,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Image Enlarge Modal -->
     <div id="imageModal" class="modal" tabindex="-1" aria-hidden="true"
@@ -539,7 +545,7 @@
                                 return `
                             <tr>
                                 <td>
-                                    <img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid" alt="Menu Image">
+                                    <img src="${imageUrl}" style="width: 70px; height: auto;" class="img-fluid pointer" alt="Menu Image">
                                 </td>
                                 <td>${order}</td>
                             </tr>
@@ -563,11 +569,14 @@
                                     <td><strong>Address:</strong> ${data.address}</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Shipping Method:</strong> ${data.shipping_method}</td>
                                     <td><strong>Mode of Payment:</strong> ${data.mode_of_payment}</td>
+                                    <td colspan="2"><strong>Note:</strong> ${data.note || 'N/A'}</td>
+
+                                  
                                 </tr>
                                 <tr>
-                                    <td colspan="2"><strong>Note:</strong> ${data.note || 'N/A'}</td>
+                                    <td><strong>Shipping Fee:</strong> ₱${data.shipping_fee}</td>
+                                    <td><strong>Total Price:</strong> ₱${data.total_price}</td>                                
                                 </tr>
                             </tbody>
                             <thead class="table-light">

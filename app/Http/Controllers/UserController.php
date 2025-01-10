@@ -16,6 +16,7 @@ use App\Models\Menu;
 use App\Models\Category;
 use App\Models\Message;
 use App\Models\Delivery;
+use App\Models\Feedback;
 
 class UserController extends Controller
 {
@@ -827,38 +828,31 @@ class UserController extends Controller
     //     return view('user.orderView', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'discountedPrice'));
     // }
 
+
+
     public function orderView($id)
-{
-    $user = Auth::user();
-    $menu = Menu::find($id);
+    {
+        $user = Auth::user();
+        $menu = Menu::find($id);
 
-    if (!$menu) {
-        return redirect()->route('user.menu')->with('error', 'Menu item not found');
+        if (!$menu) {
+            return redirect()->route('user.menu')->with('error', 'Menu item not found');
+        }
+
+        $quantity = request()->input('quantity', 1);
+        $discountedPrice = $menu->discount > 0
+            ? round($menu->price * (1 - $menu->discount / 100), 2)
+            : $menu->price;
+
+        $originalTotal = $discountedPrice * $quantity;
+
+        $hasDiscount = $user->has_discount;
+        $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
+        $finalTotal = round($finalTotal);
+
+        // Remove the default shipping fee; rely entirely on front-end updates
+        return view('user.orderView', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'discountedPrice'));
     }
-
-    $quantity = request()->input('quantity', 1);
-    $discountedPrice = $menu->discount > 0
-        ? round($menu->price * (1 - $menu->discount / 100), 2)
-        : $menu->price;
-
-    $originalTotal = $discountedPrice * $quantity;
-
-    $hasDiscount = $user->has_discount;
-    $finalTotal = $hasDiscount ? $originalTotal * 0.95 : $originalTotal;
-    $finalTotal = round($finalTotal);
-
-    // Calculate shipping fee based on the default or selected barangay
-    $barangay = request()->input('barangay', '');
-    $shippingRates = [
-        "Abanon" => 110,
-        "Agdao" => 80,
-        // Add all other barangays and rates here...
-    ];
-    $shippingFee = (int)($shippingRates[$barangay] ?? 0); // Convert shipping fee to integer
-
-    return view('user.orderView', compact('menu', 'user', 'quantity', 'originalTotal', 'finalTotal', 'hasDiscount', 'discountedPrice', 'shippingFee'));
-}
-
 
 
     public function menuDetails($id)
@@ -941,7 +935,13 @@ class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
         $userCart = $user->cart;
+        $menus = Menu::all();
         $userFavorites = $user->favoriteItems()->count();
+
+        // Check which menu items have been reviewed by the user
+        $reviewedMenus = Feedback::where('customer_name', $user->first_name . ' ' . $user->last_name)
+            ->pluck('menu_items')
+            ->toArray();
 
         // Fetch user-specific orders
         $orders = DB::table('deliveries')
@@ -1002,7 +1002,7 @@ class UserController extends Controller
             'returns' => $orders->where('status', 'Returned'),
         ];
 
-        return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount', 'pendingOrdersCount'));
+        return view('user.orders', compact('statuses', 'userCart', 'userFavorites', 'unreadCount', 'pendingOrdersCount', 'reviewedMenus'));
     }
 
 

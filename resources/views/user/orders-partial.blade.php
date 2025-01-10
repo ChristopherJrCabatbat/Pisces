@@ -35,8 +35,14 @@
             @if ($order->status == 'Delivered')
                 <button type="button" class="btn btn-warning to-review h-25" data-bs-toggle="modal"
                     data-bs-target="#feedbackModal" data-menu-name="{{ $menu->name }}"
-                    data-menu-image="{{ url($menu->image) }}" data-rider-name="{{ $order->rider_name }}">
-                    To Review
+                    data-menu-image="{{ url($menu->image) }}" data-rider-name="{{ $order->rider_name }}"
+                    @if (in_array($menu->name, $reviewedMenus)) disabled @endif>
+                    {{-- To Review --}}
+                    @if (in_array($menu->name, $reviewedMenus))
+                        Reviewed
+                    @else
+                        To Review
+                    @endif
                 </button>
             @endif
 

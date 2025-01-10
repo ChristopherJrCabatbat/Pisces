@@ -82,9 +82,9 @@
 
                         <!-- Shipping Fee -->
                         <div class="mb-3">
-                            <label for="shippingMethod" class="form-label">Shipping Fee:</label>
-                            <input type="text" class="form-control" id="shippingMethod" name="shippingMethod"
-                                value="₱0" readonly required>
+                            <label for="shippingFeeDisplay" class="form-label">Shipping Fee (₱):</label>
+                            <input type="text" class="form-control shipping-fee-input" name="shipping_fee"
+                                value="0" readonly>
                         </div>
 
                         <!-- Payment Method -->
@@ -104,7 +104,7 @@
                         <div class="mb-3">
                             <label for="note" class="form-label">Note:</label>
                             <textarea class="form-control" id="note" name="note" style="height: 100px"
-                                placeholder="Leave a note here...">{{ old('note') }}</textarea>
+                                placeholder="Your area's landmark or note about your order..." required>{{ old('note') }}</textarea>
                         </div>
 
                         <!-- Submit Button -->
@@ -173,24 +173,24 @@
                             </div>
                         @endif
 
-                        {{-- Shipping Fee --}}
+                        <!-- Shipping Fee (Display Div) -->
                         <div class="d-flex justify-content-between align-items-center">
                             <div>Shipping Fee:</div>
-                            <div class="fs-5" id="shippingFeeDisplay">₱{{ $shippingFee }}</div>
+                            <div class="fs-5 shipping-fee-display">₱0</div>
                         </div>
 
-                        {{-- Final Total --}}
+                        <!-- Final Total -->
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Final Total:</div>
-                            <div class="fs-4" id="finalTotalDisplay">
-                                ₱{{ number_format($finalTotal + $shippingFee) }}</div>
+                            <div class="fs-4" id="finalTotalDisplay">₱{{ number_format($finalTotal) }}</div>
                         </div>
 
                     </div>
 
-                    {{-- <input type="hidden" name="total_price" value="{{ round($finalTotal + $shippingFee) }}"> --}}
+                    <!-- Hidden Inputs for Form Submission -->
+                    <input type="hidden" id="hiddenShippingFee" name="shipping_fee" value="0">
                     <input type="hidden" id="originalTotal" value="{{ $originalTotal }}">
-                    <input type="hidden" name="shipping_fee" id="shippingMethod" value="₱{{ $shippingFee }}">
+                    <input type="hidden" name="total_price" value="{{ $finalTotal }}">
 
                 </div>
 
@@ -204,141 +204,18 @@
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.js') }}"></script>
 
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const barangayDropdown = document.getElementById('barangay');
-            const shippingInput = document.getElementById('shippingMethod');
-            const shippingDisplay = document.querySelector(
-            '#shippingFeeDisplay'); // Target the div displaying shipping fee
-
-            // Barangay with corresponding shipping fees
-            const barangayRates = {
-                "Abanon": 110,
-                "Agdao": 80,
-                "Ano": 80,
-                "Anando": 120,
-                "Antipangol": 140,
-                "Aponit": 100,
-                "Bacnar": 80,
-                "Bacnar UP": 90,
-                "Balaya": 100,
-                "Balayong": 70,
-                "Baldog": 80,
-                "Balite Sur": 90,
-                "Balococ": 100,
-                "Bani": 160,
-                "Bega": 70,
-                "Bogaoan": 170,
-                "Bocboc East": 150,
-                "Bocboc West": 170,
-                "Bolingit": 70,
-                "Bolosan": 70,
-                "Bonifacio": 40,
-                "Bugallon": 40,
-                "Buenglat": 90,
-                "Burgos-Padlan": 40,
-                "Cacaritan": 60,
-                "Caingal": 60,
-                "Calobaoan": 120,
-                "Calomboyan": 100,
-                "Caoayan Kiling": 130,
-                "Capataan": 90,
-                "Cobol": 100,
-                "Coliling": 70,
-                "Coliling Anlabo": 90,
-                "Cruz": 80,
-                "Doyong": 80,
-                "Gamata": 90,
-                "Guelew": 140,
-                "Ilang": 40,
-                "Inerangan": 90,
-                "Isla": 100,
-                "Libas": 120,
-                "Lilimasan": 70,
-                "Longos": 60,
-                "Lucban": 40,
-                "M. Soriano st.": 40,
-                "Mabalbalino": 150,
-                "Mabini": 40,
-                "Magtaking": 60,
-                "Malacañang": 90,
-                "Maliwa": 90,
-                "Mamarlao Court": 40,
-                "Manzon": 60,
-                "Matagdem": 70,
-                "Mc Arthur": 40,
-                "Meztizo Norte": 70,
-                "Naguilayan": 80,
-                "Nilentap": 90,
-                "Padilla": 40,
-                "Pagal": 70,
-                "Palaming": 70,
-                "Palaris": 40,
-                "Palospos": 120,
-                "Paitan": 80,
-                "Pangoloan": 80,
-                "Pangalangan": 80,
-                "Pangpang": 90,
-                "Parayao": 100,
-                "Payapa": 90,
-                "Payar": 100,
-                "Perez": 40,
-                "PNR": 40,
-                "Posadas Street": 40,
-                "Polo": 90,
-                "Quezon": 40,
-                "Quintong": 90,
-                "Rizal": 40,
-                "Roxas": 40,
-                "Salinap": 120,
-                "San Juan": 60,
-                "San Pedro": 40,
-                "Taloy": 60,
-                "Sapinit": 70,
-                "Supo": 150,
-                "Talang": 90,
-                "Taloy (Until VMUF)": 40,
-                "Tamayo": 130,
-                "Tandoc": 80,
-                "Tandang Sora": 40,
-                "Tarece": 60,
-                "Tarectec": 90,
-                "Tayambani": 90,
-                "Tebag": 80,
-                "Turac": 80
-            };
-
-            // Sort barangays alphabetically
-            const sortedBarangays = Object.keys(barangayRates).sort();
-
-            // Populate barangays in dropdown
-            sortedBarangays.forEach(barangay => {
-                const option = document.createElement('option');
-                option.value = barangay;
-                option.text = barangay;
-                barangayDropdown.appendChild(option);
-            });
-
-            // Update shipping fee when a barangay is selected
-            barangayDropdown.addEventListener('change', function() {
-                const selectedBarangay = barangayDropdown.value;
-                const shippingFee = barangayRates[selectedBarangay] || 0; // Default to 0 if no match
-                shippingInput.value = `₱${shippingFee}`; // Update the hidden input field
-                shippingDisplay.textContent = `₱${shippingFee}`; // Update the visible div
-            });
-        });
-    </script> --}}
-
+    <!-- Barangay Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const barangayDropdown = document.getElementById('barangay');
-            const shippingInput = document.getElementById('shippingMethod');
-            const shippingDisplay = document.querySelector(
-                '#shippingFeeDisplay'); // Target the div displaying shipping fee
-            const finalTotalDisplay = document.querySelector(
-                '#finalTotalDisplay'); // Target the div displaying final total
-            const originalTotalInput = document.getElementById(
-                'originalTotal'); // Hidden or preset original total value
+            const hiddenShippingInput = document.getElementById(
+                'hiddenShippingFee'); // Hidden input for form submission
+            const shippingFeeInputs = document.querySelectorAll('.shipping-fee-input'); // Shipping fee text inputs
+            const shippingFeeDisplays = document.querySelectorAll(
+                '.shipping-fee-display'); // Shipping fee display divs
+            const finalTotalDisplay = document.getElementById('finalTotalDisplay'); // Final total display
+            const originalTotalInput = document.getElementById('originalTotal'); // Original total input
+            const totalPriceInput = document.querySelector('[name="total_price"]'); // Total price input
 
             // Barangay with corresponding shipping fees
             const barangayRates = {
@@ -437,36 +314,43 @@
                 "Turac": 80
             };
 
-            // Sort barangays alphabetically
+            // Populate the Barangay dropdown
             const sortedBarangays = Object.keys(barangayRates).sort();
-
-            // Populate barangays in dropdown
             sortedBarangays.forEach(barangay => {
                 const option = document.createElement('option');
                 option.value = barangay;
-                option.text = barangay;
+                option.textContent = barangay;
                 barangayDropdown.appendChild(option);
             });
 
-            // Update shipping fee and final total when a barangay is selected
+            // Handle Barangay change
             barangayDropdown.addEventListener('change', function() {
                 const selectedBarangay = barangayDropdown.value;
                 const shippingFee = barangayRates[selectedBarangay] || 0; // Default to 0 if no match
-                const originalTotal = parseFloat(originalTotalInput.value); // Get the original total
+                const originalTotal = parseFloat(originalTotalInput.value); // Base total for the items
 
-                // Update the shipping fee display
-                shippingInput.value = `₱${shippingFee}`; // Update the hidden input field
-                shippingDisplay.textContent = `₱${shippingFee}`; // Update the visible shipping fee div
+                // Update all shipping fee inputs (text input)
+                shippingFeeInputs.forEach(input => {
+                    input.value = shippingFee.toLocaleString(); // Show formatted fee
+                });
+
+                // Update all shipping fee display divs
+                shippingFeeDisplays.forEach(display => {
+                    display.textContent = `₱${shippingFee.toLocaleString()}`; // Show formatted fee
+                });
+
+                // Update the hidden input for shipping fee
+                hiddenShippingInput.value = shippingFee; // Ensure numeric value for submission
 
                 // Calculate and update the final total
                 const finalTotal = originalTotal + shippingFee;
-                finalTotalDisplay.textContent =
-                    `₱${finalTotal.toLocaleString()}`; // Update the visible final total
+                finalTotalDisplay.textContent = `₱${finalTotal.toLocaleString()}`;
+
+                // Update the hidden total price input for form submission
+                totalPriceInput.value = finalTotal;
             });
         });
     </script>
-
-
 
 </body>
 

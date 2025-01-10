@@ -86,7 +86,7 @@
                                     <i class="fa-solid fa-times"></i>
                                 </div>
                                 <div
-                                    class="{{ $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
+                                    class="{{ $deliveries->status == 'Out for Delivery' || $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
                                 </div>
                             </div>
 
@@ -135,7 +135,7 @@
                                     <i class="fa-solid fa-check"></i>
                                 </div>
                                 <div
-                                    class="{{ $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
+                                    class="{{ $deliveries->status == 'Out for Delivery' || $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
                                 </div>
                             </div>
 
@@ -187,7 +187,7 @@
                                     <i class="fa fa-truck" style="font-size: 0.8rem"></i>
                                 </div>
                                 <div
-                                    class="{{ $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
+                                    class="{{ $deliveries->status == 'Out for Delivery' || $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
                                 </div>
                             </div>
 
@@ -240,7 +240,7 @@
                                     <i class="fa fa-utensils"></i>
                                 </div>
                                 <div
-                                    class="{{ $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
+                                    class="{{ $deliveries->status == 'Out for Delivery' || $deliveries->status == 'Delivered' || $deliveries->status == 'Returned' ? 'line-d-r' : 'line' }}">
                                 </div>
                             </div>
 

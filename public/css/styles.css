@@ -633,7 +633,7 @@ th {
     width: 100%;
     height: 5px;
     background: green;
-    animation: anim 4.2s linear forwards;
+    animation: anim 5s linear forwards;
     z-index: 1000;
 }
 

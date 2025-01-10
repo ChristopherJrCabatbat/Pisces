@@ -154,7 +154,7 @@
                                     onclick="location.href='{{ route('user.orderRepeat', ['deliveryId' => $delivery->id]) }}'">
                                     Buy Again
                                 </button>
-                                <button type="button" class="btn btn-outline-dark w-50">View Review</button>
+                                {{-- <button type="button" class="btn btn-outline-dark w-50">View Review</button> --}}
                             </div>
                         </div>
 

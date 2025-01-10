@@ -138,6 +138,7 @@ Route::group([
     Route::get('/favorites', [UserController::class, 'favorites'])->name('favorites');
 
     Route::post('/order', [UserController::class, 'order'])->name('order');
+    // Route::match(['get', 'post'], '/order', [UserController::class, 'order']);
     Route::get('/orderView/{id}', [UserController::class, 'orderView'])->name('orderView');
 
     // Route::post('/menuDetails/{id}', [UserController::class, 'menuDetails'])->name('menuDetails');

@@ -190,7 +190,7 @@
 
             setTimeout(() => {
                 customToast.remove();
-            }, 3000);
+            }, 5500);
         }
 
         @if (session('toast'))
