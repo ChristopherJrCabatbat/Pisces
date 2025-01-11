@@ -21,7 +21,7 @@
         <div class="d-flex">
 
             {{-- Combined Form --}}
-            <form action="{{ route('user.delivery.store') }}" method="POST" class="d-flex w-100">
+            <form action="{{ route('user.reviewOrderStore') }}" method="POST" class="d-flex w-100">
                 @csrf
 
                 {{-- Left Section --}}
@@ -132,23 +132,23 @@
                         <div class="d-flex flex-column gap-3">
                             @foreach ($menus as $menu)
                                 @php
-                                    $quantity = $menu->pivot->quantity ?? 1; // Fetch quantity from pivot
-                                    $itemTotal = $menu->discounted_price * $quantity; // Use discounted price
+                                    $quantity = $menu['quantity'] ?? 1; // Fetch quantity from the array
+                                    $itemTotal = $menu['discounted_price'] * $quantity; // Use discounted price
                                     $totalPrice += $itemTotal; // Update total price
                                 @endphp
 
                                 <div class="d-flex gap-3 justify-content-between align-items-center">
                                     <div class="picture border border-1">
-                                        <img src="{{ $menu->image ? asset('storage/' . $menu->image) : asset('images/default.jpg') }}"
+                                        <img src="{{ $menu['image'] ? asset('storage/' . $menu['image']) : asset('images/default.jpg') }}"
                                             class="img-fluid" width="70" alt="Picture">
                                     </div>
                                     <div class="menu-name d-flex flex-column align-items-center">
                                         @if ($quantity > 1)
-                                            <div class="name text-center">{{ $menu->name }} (₱{{ number_format($menu->discounted_price, 2) }})
-                                            </div>
+                                            <div class="name text-center">{{ $menu['name'] }}
+                                                (₱{{ number_format($menu['discounted_price'], 2) }})</div>
                                             <div class="size">({{ $quantity }})</div>
                                         @else
-                                            <div class="name">{{ $menu->name }}</div>
+                                            <div class="name">{{ $menu['name'] }}</div>
                                             <div class="size">({{ $quantity }})</div>
                                         @endif
                                     </div>
@@ -157,10 +157,11 @@
                                     </div>
 
                                     <!-- Hidden Inputs for Order Data -->
-                                    <input type="hidden" name="menu_names[]" value="{{ $menu->name }}">
+                                    <input type="hidden" name="menu_names[]" value="{{ $menu['name'] }}">
                                     <input type="hidden" name="quantities[]" value="{{ $quantity }}">
                                 </div>
                             @endforeach
+
                         </div>
                     </div>
 

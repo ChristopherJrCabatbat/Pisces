@@ -158,8 +158,9 @@ Route::group([
 
     Route::resource('delivery', DeliveryController::class);
     Route::post('/orderStore', [DeliveryController::class, 'orderStore'])->name('orderStore');
+    Route::post('/reviewOrderStore', [DeliveryController::class, 'reviewOrderStore'])->name('reviewOrderStore');
     // Route::post('/sendMessage', [DeliveryController::class, 'sendMessage'])->name('sendMessage');
-    Route::get('/orderRepeat/{deliveryId}', [DeliveryController::class, 'orderRepeat'])->name('orderRepeat');
+    Route::get('/orderRepeat/{deliveryId}', [UserController::class, 'orderRepeat'])->name('orderRepeat');
 
     Route::resource('feedback', FeedbackController::class);
 

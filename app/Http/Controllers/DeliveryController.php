@@ -221,39 +221,6 @@ class DeliveryController extends Controller
         ]);
     }
 
-    public function orderRepeat($deliveryId)
-    {
-        /** @var User $user */
-        $user = Auth::user();
-
-        // Fetch delivery details
-        $delivery = Delivery::findOrFail($deliveryId);
-
-        // Fetch related orders
-        $orders = $delivery->orders;
-
-        // Ensure there are orders associated with the delivery
-        if ($orders->isEmpty()) {
-            abort(404, 'No orders found for this delivery.');
-        }
-
-        // Prepare data to pass to the order page
-        $menus = [];
-        foreach ($orders as $order) {
-            $menu = $order->menu; // Use the 'menu' relationship
-
-            $menus[] = [
-                'name' => $order->menu_name,
-                'quantity' => $order->quantity,
-                'price' => $menu->price ?? 0, // Fallback to 0 if no menu is found
-                'image' => $menu->image ?? '', // Fallback to empty string if no menu is found
-            ];
-        }
-
-        // Redirect to order.blade.php with data
-        return view('user.order', compact('menus', 'user', 'delivery'));
-    }
-
 
 
 
@@ -271,7 +238,7 @@ class DeliveryController extends Controller
 
     // public function store(Request $request)
     // {
-    //     $request->validate([
+    //     $validatedData = $request->validate([
     //         'fullName' => 'required|string|max:255',
     //         'email' => 'required|email|max:255',
     //         'contactNumber' => 'required|string|max:20',
@@ -286,134 +253,388 @@ class DeliveryController extends Controller
     //         'total_price' => 'required|numeric',
     //     ]);
 
-    //     /** @var User $user */
-    //     $user = Auth::user();
+    //     try {
+    //         /** @var User $user */
+    //         $user = Auth::user();
+    //         $user->increment('order_count');
 
-    //     // Increment the order count
-    //     $user->increment('order_count');
+    //         $orderItems = [];
+    //         $totalQuantity = 0;
+    //         $totalPrice = 0;
 
-    //     $orderItems = [];
-    //     $totalQuantity = 0;
-    //     $totalPrice = 0;
-    //     $orderQuantities = implode(', ', $request->quantities);
+    //         foreach ($request->menu_names as $index => $menuName) {
+    //             $quantity = $request->quantities[$index];
+    //             $menu = Menu::where('name', $menuName)->firstOrFail();
+    //             $menuDiscountedPrice = $menu->discount > 0
+    //                 ? round($menu->price * (1 - $menu->discount / 100), 2)
+    //                 : $menu->price;
+    //             $itemTotal = $menuDiscountedPrice * $quantity;
 
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         $menu = Menu::where('name', $menuName)->firstOrFail();
+    //             $orderItems[] = "{$menuName} (x{$quantity})";
+    //             $totalQuantity += $quantity;
+    //             $totalPrice += $itemTotal;
+    //         }
 
-    //         // Calculate the discounted price for the menu if applicable
-    //         $menuDiscountedPrice = $menu->discount > 0
-    //             ? round($menu->price * (1 - $menu->discount / 100), 2)
-    //             : $menu->price;
+    //         if ($user->has_discount) {
+    //             $totalPrice *= 0.95;
+    //             $user->update(['has_discount' => false]);
+    //         }
 
-    //         // Calculate item total using the discounted price
-    //         $itemTotal = $menuDiscountedPrice * $quantity;
-    //         $orderItems[] = "{$menuName} (x{$quantity})";
-    //         $totalQuantity += $quantity;
-    //         $totalPrice += $itemTotal;
-    //     }
+    //         $totalPrice = round($totalPrice);
+    //         $orderString = implode(', ', $orderItems);
+    //         $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
 
-    //     // Check if the user has an additional discount
-    //     $hasDiscount = $user->has_discount;
+    //         $fullAddress = (!empty($request->house_number) ? "#{$request->house_number} " : "") .
+    //             "Barangay {$request->barangay}" .
+    //             ($request->filled('purok') ? " Purok {$request->purok}" : "") .
+    //             " San Carlos City, Pangasinan";
 
-    //     if ($hasDiscount) {
-    //         // Apply user-specific discount (e.g., 5% off)
-    //         $totalPrice *= 0.95;
-    //         $user->update(['has_discount' => false]); // Reset the user's discount eligibility
-    //     }
-
-    //     // Round totalPrice to the nearest whole number
-    //     $totalPrice = round($totalPrice);
-
-    //     $orderString = implode(', ', $orderItems);
-    //     $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
-
-    //     // Construct the full address
-    //     $fullAddress = "";
-    //     if (!empty($request->house_number)) {
-    //         $fullAddress .= "#{$request->house_number} ";
-    //     }
-    //     $fullAddress .= "Barangay {$request->barangay}";
-    //     if ($request->filled('purok')) {
-    //         $fullAddress .= " Purok {$request->purok}";
-    //     }
-    //     $fullAddress .= " San Carlos City, Pangasinan";
-
-    //     // Insert into deliveries table
-    //     $deliveryId = DB::table('deliveries')->insertGetId([
-    //         'name' => $request->input('fullName'),
-    //         'email' => $request->input('email'),
-    //         'contact_number' => $request->input('contactNumber'),
-    //         'order' => $orderString,
-    //         'address' => $fullAddress,
-    //         'quantity' => $orderQuantities,
-    //         'shipping_fee' => $request->input('shippingFee'),
-    //         'mode_of_payment' => $request->input('paymentMethod'),
-    //         'note' => $request->input('note'),
-    //         'status' => $status,
-    //         'total_price' => $totalPrice, // Store the rounded total price
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     foreach ($request->menu_names as $index => $menuName) {
-    //         $quantity = $request->quantities[$index];
-    //         DB::table('orders')->insert([
-    //             'delivery_id' => $deliveryId,
-    //             'menu_name' => $menuName,
-    //             'quantity' => $quantity,
-    //             'created_at' => now(),
-    //             'updated_at' => now(),
-    //         ]);
-    //     }
-
-    //     // Clear the user's cart after placing the order
-    //     DB::table('cart_items')->where('user_id', $user->id)->delete();
-    //     $user->cart = 0;
-    //     $user->save();
-
-    //     // Update the user's last_order field
-    //     $user->update(['last_order' => now()]);
-
-    //     // Set modal session key if the order count is divisible by 7
-    //     if ($user->order_count % 7 === 0) {
-    //         session()->put('showExperienceModal', true); // Persistent session key
-    //     }
-
-    //     // Handle GCash payment
-    //     if ($request->input('paymentMethod') === 'GCash') {
-    //         // Prepare GCash message
-    //         $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
-
-    //         // Save the message
-    //         DB::table('messages')->insert([
-    //             'user_id' => $user->id,
-    //             'receiver_id' => '1', // Assuming the user receives the message
-    //             'sender_role' => 'System',
-    //             'message_text' => $messageText,
-    //             'is_read' => false,
+    //         $deliveryId = DB::table('deliveries')->insertGetId([
+    //             'name' => $request->input('fullName'),
+    //             'email' => $request->input('email'),
+    //             'contact_number' => $request->input('contactNumber'),
+    //             'order' => $orderString,
+    //             'address' => $fullAddress,
+    //             'quantity' => implode(', ', $request->quantities),
+    //             'shipping_fee' => $request->input('shipping_fee'),
+    //             'mode_of_payment' => $request->input('paymentMethod'),
+    //             'note' => $request->input('note'),
+    //             'status' => $status,
+    //             'total_price' => $totalPrice,
     //             'created_at' => now(),
     //             'updated_at' => now(),
     //         ]);
 
-    //         // Redirect to messagesPisces with success toast
+    //         foreach ($request->menu_names as $index => $menuName) {
+    //             $quantity = $request->quantities[$index];
+    //             DB::table('orders')->insert([
+    //                 'delivery_id' => $deliveryId,
+    //                 'menu_name' => $menuName,
+    //                 'quantity' => $quantity,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ]);
+    //         }
+
+    //         // Clear the user's cart after placing the order
+    //         DB::table('cart_items')->where('user_id', $user->id)->delete();
+    //         $user->cart = 0;
+    //         $user->save();
+
+    //         // Update the user's last_order field
+    //         $user->update(['last_order' => now()]);
+
+    //         // Set modal session key if the order count is divisible by 7
+    //         if ($user->order_count % 7 === 0) {
+    //             session()->put('showExperienceModal', true); // Persistent session key
+    //         }
+
+    //         // Handle GCash payment
+    //         if ($request->input('paymentMethod') === 'GCash') {
+    //             // Prepare GCash message
+    //             $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
+
+    //             // Save the message
+    //             DB::table('messages')->insert([
+    //                 'user_id' => $user->id,
+    //                 'receiver_id' => '1', // Assuming the user receives the message
+    //                 'sender_role' => 'System',
+    //                 'message_text' => $messageText,
+    //                 'is_read' => false,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ]);
+
+    //             // Redirect to messagesPisces with success toast
+    //             session()->flash('toast', [
+    //                 'message' => 'Order placed successfully! Please check your messages to complete the GCash payment.',
+    //                 'type' => 'success',
+    //             ]);
+
+    //             return redirect()->route('user.messagesPisces');
+    //         }
+
     //         session()->flash('toast', [
-    //             'message' => 'Order placed successfully! Please check your messages to complete the GCash payment.',
+    //             'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
     //             'type' => 'success',
     //         ]);
 
-    //         return redirect()->route('user.messagesPisces');
+    //         return redirect()->route('user.menu');
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()->with('error', 'Failed to place the order. ' . $e->getMessage());
     //     }
-
-    //     session()->flash('toast', [
-    //         'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
-    //         'type' => 'success',
-    //     ]);
-
-    //     return redirect()->route('user.menu');
     // }
 
     public function store(Request $request)
+{
+    $validatedData = $request->validate([
+        'fullName' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'contactNumber' => 'required|string|max:20',
+        'house_number' => 'nullable|string',
+        'barangay' => 'required|string',
+        'purok' => 'nullable|string',
+        'shipping_fee' => 'required|string',
+        'paymentMethod' => 'required|string',
+        'note' => 'nullable|string',
+        'menu_names' => 'required|array',
+        'quantities' => 'required|array',
+        'total_price' => 'required|numeric',
+    ]);
+
+    try {
+        /** @var User $user */
+        $user = Auth::user();
+        $user->increment('order_count');
+
+        $orderItems = [];
+        $totalQuantity = 0;
+        $totalPrice = 0;
+
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            $menu = Menu::where('name', $menuName)->firstOrFail();
+            $menuDiscountedPrice = $menu->discount > 0
+                ? round($menu->price * (1 - $menu->discount / 100), 2)
+                : $menu->price;
+            $itemTotal = $menuDiscountedPrice * $quantity;
+
+            $orderItems[] = "{$menuName} (x{$quantity})";
+            $totalQuantity += $quantity;
+            $totalPrice += $itemTotal;
+        }
+
+        // Add the shipping fee to the total price
+        $shippingFee = (float)$request->input('shipping_fee');
+        $totalPrice += $shippingFee;
+
+        if ($user->has_discount) {
+            $totalPrice *= 0.95;
+            $user->update(['has_discount' => false]);
+        }
+
+        $totalPrice = round($totalPrice);
+        $orderString = implode(', ', $orderItems);
+        $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
+        $fullAddress = (!empty($request->house_number) ? "#{$request->house_number} " : "") .
+            "Barangay {$request->barangay}" .
+            ($request->filled('purok') ? " Purok {$request->purok}" : "") .
+            " San Carlos City, Pangasinan";
+
+        $deliveryId = DB::table('deliveries')->insertGetId([
+            'name' => $request->input('fullName'),
+            'email' => $request->input('email'),
+            'contact_number' => $request->input('contactNumber'),
+            'order' => $orderString,
+            'address' => $fullAddress,
+            'quantity' => implode(', ', $request->quantities),
+            'shipping_fee' => $request->input('shipping_fee'),
+            'mode_of_payment' => $request->input('paymentMethod'),
+            'note' => $request->input('note'),
+            'status' => $status,
+            'total_price' => $totalPrice,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        foreach ($request->menu_names as $index => $menuName) {
+            $quantity = $request->quantities[$index];
+            DB::table('orders')->insert([
+                'delivery_id' => $deliveryId,
+                'menu_name' => $menuName,
+                'quantity' => $quantity,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Clear the user's cart after placing the order
+        DB::table('cart_items')->where('user_id', $user->id)->delete();
+        $user->cart = 0;
+        $user->save();
+
+        // Update the user's last_order field
+        $user->update(['last_order' => now()]);
+
+        // Set modal session key if the order count is divisible by 7
+        if ($user->order_count % 7 === 0) {
+            session()->put('showExperienceModal', true); // Persistent session key
+        }
+
+        // Handle GCash payment
+        if ($request->input('paymentMethod') === 'GCash') {
+            // Prepare GCash message
+            $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
+
+            // Save the message
+            DB::table('messages')->insert([
+                'user_id' => $user->id,
+                'receiver_id' => '1', // Assuming the user receives the message
+                'sender_role' => 'System',
+                'message_text' => $messageText,
+                'is_read' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Redirect to messagesPisces with success toast
+            session()->flash('toast', [
+                'message' => 'Order placed successfully! Please check your messages to complete the GCash payment.',
+                'type' => 'success',
+            ]);
+
+            return redirect()->route('user.messagesPisces');
+        }
+
+        session()->flash('toast', [
+            'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
+            'type' => 'success',
+        ]);
+
+        return redirect()->route('user.menu');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to place the order. ' . $e->getMessage());
+    }
+}
+
+
+    // public function store(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'fullName' => 'required|string|max:255',
+    //         'email' => 'required|email|max:255',
+    //         'contactNumber' => 'required|string|max:20',
+    //         'house_number' => 'nullable|string',
+    //         'barangay' => 'required|string',
+    //         'purok' => 'nullable|string',
+    //         'shipping_fee' => 'required|string',
+    //         'paymentMethod' => 'required|string',
+    //         'note' => 'nullable|string',
+    //         'menu_names' => 'required|array',
+    //         'quantities' => 'required|array',
+    //         'total_price' => 'required|numeric',
+    //     ]);
+
+    //     try {
+    //         /** @var User $user */
+    //         $user = Auth::user();
+    //         $user->increment('order_count');
+
+    //         $orderItems = [];
+    //         $totalQuantity = 0;
+    //         $totalPrice = 0;
+
+    //         foreach ($request->menu_names as $index => $menuName) {
+    //             $quantity = $request->quantities[$index];
+    //             $menu = Menu::where('name', $menuName)->firstOrFail();
+    //             $menuDiscountedPrice = $menu->discount > 0
+    //                 ? round($menu->price * (1 - $menu->discount / 100), 2)
+    //                 : $menu->price;
+    //             $itemTotal = $menuDiscountedPrice * $quantity;
+
+    //             $orderItems[] = "{$menuName} (x{$quantity})";
+    //             $totalQuantity += $quantity;
+    //             $totalPrice += $itemTotal;
+    //         }
+
+    //         // Add the shipping fee to the total price
+    //         $shippingFee = (float)$request->input('shipping_fee');
+    //         $totalPrice += $shippingFee;
+
+    //         if ($user->has_discount) {
+    //             $totalPrice *= 0.95;
+    //             $user->update(['has_discount' => false]);
+    //         }
+
+    //         $totalPrice = round($totalPrice);
+    //         $orderString = implode(', ', $orderItems);
+    //         $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
+    //         $fullAddress = (!empty($request->house_number) ? "#{$request->house_number} " : "") .
+    //             "Barangay {$request->barangay}" .
+    //             ($request->filled('purok') ? " Purok {$request->purok}" : "") .
+    //             " San Carlos City, Pangasinan";
+
+    //         $deliveryId = DB::table('deliveries')->insertGetId([
+    //             'name' => $request->input('fullName'),
+    //             'email' => $request->input('email'),
+    //             'contact_number' => $request->input('contactNumber'),
+    //             'order' => $orderString,
+    //             'address' => $fullAddress,
+    //             'quantity' => implode(', ', $request->quantities),
+    //             'shipping_fee' => $request->input('shipping_fee'),
+    //             'mode_of_payment' => $request->input('paymentMethod'),
+    //             'note' => $request->input('note'),
+    //             'status' => $status,
+    //             'total_price' => $totalPrice,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ]);
+
+    //         foreach ($request->menu_names as $index => $menuName) {
+    //             $quantity = $request->quantities[$index];
+    //             DB::table('orders')->insert([
+    //                 'delivery_id' => $deliveryId,
+    //                 'menu_name' => $menuName,
+    //                 'quantity' => $quantity,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ]);
+    //         }
+
+    //         // Clear the user's cart after placing the order
+    //         DB::table('cart_items')->where('user_id', $user->id)->delete();
+    //         $user->cart = 0;
+    //         $user->save();
+
+    //         // Update the user's last_order field
+    //         $user->update(['last_order' => now()]);
+
+    //         // Set modal session key if the order count is divisible by 7
+    //         if ($user->order_count % 7 === 0) {
+    //             session()->put('showExperienceModal', true); // Persistent session key
+    //         }
+
+    //         // Handle GCash payment
+    //         if ($request->input('paymentMethod') === 'GCash') {
+    //             // Prepare GCash message
+    //             $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
+
+    //             // Save the message
+    //             DB::table('messages')->insert([
+    //                 'user_id' => $user->id,
+    //                 'receiver_id' => '1', // Assuming the user receives the message
+    //                 'sender_role' => 'System',
+    //                 'message_text' => $messageText,
+    //                 'is_read' => false,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ]);
+
+    //             // Redirect to messagesPisces with success toast
+    //             session()->flash('toast', [
+    //                 'message' => 'Order placed successfully! Please check your messages to complete the GCash payment.',
+    //                 'type' => 'success',
+    //             ]);
+
+    //             return redirect()->route('user.messagesPisces');
+    //         }
+
+    //         session()->flash('toast', [
+    //             'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
+    //             'type' => 'success',
+    //         ]);
+
+    //         return redirect()->route('user.menu');
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()->with('error', 'Failed to place the order. ' . $e->getMessage());
+    //     }
+    // }
+
+
+
+    public function reviewOrderStore(Request $request)
     {
         $validatedData = $request->validate([
             'fullName' => 'required|string|max:255',
@@ -422,7 +643,7 @@ class DeliveryController extends Controller
             'house_number' => 'nullable|string',
             'barangay' => 'required|string',
             'purok' => 'nullable|string',
-            'shipping_fee' => 'required|string',
+            'shipping_fee' => 'required|numeric', // Ensure shipping_fee is numeric
             'paymentMethod' => 'required|string',
             'note' => 'nullable|string',
             'menu_names' => 'required|array',
@@ -452,12 +673,17 @@ class DeliveryController extends Controller
                 $totalPrice += $itemTotal;
             }
 
+            // Apply user discount if applicable
             if ($user->has_discount) {
                 $totalPrice *= 0.95;
                 $user->update(['has_discount' => false]);
             }
 
+            // Add shipping fee to total price
+            $shippingFee = $request->input('shipping_fee');
+            $totalPrice += $shippingFee; // Include shipping fee
             $totalPrice = round($totalPrice);
+
             $orderString = implode(', ', $orderItems);
             $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
 
@@ -473,11 +699,11 @@ class DeliveryController extends Controller
                 'order' => $orderString,
                 'address' => $fullAddress,
                 'quantity' => implode(', ', $request->quantities),
-                'shipping_fee' => $request->input('shipping_fee'),
+                'shipping_fee' => $shippingFee,
                 'mode_of_payment' => $request->input('paymentMethod'),
                 'note' => $request->input('note'),
                 'status' => $status,
-                'total_price' => $totalPrice,
+                'total_price' => $totalPrice, // Save the total price with shipping fee
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -493,28 +719,21 @@ class DeliveryController extends Controller
                 ]);
             }
 
-            // Clear the user's cart after placing the order
-            DB::table('cart_items')->where('user_id', $user->id)->delete();
-            $user->cart = 0;
-            $user->save();
-
             // Update the user's last_order field
             $user->update(['last_order' => now()]);
 
             // Set modal session key if the order count is divisible by 7
             if ($user->order_count % 7 === 0) {
-                session()->put('showExperienceModal', true); // Persistent session key
+                session()->put('showExperienceModal', true);
             }
 
             // Handle GCash payment
             if ($request->input('paymentMethod') === 'GCash') {
-                // Prepare GCash message
                 $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
 
-                // Save the message
                 DB::table('messages')->insert([
                     'user_id' => $user->id,
-                    'receiver_id' => '1', // Assuming the user receives the message
+                    'receiver_id' => '1',
                     'sender_role' => 'System',
                     'message_text' => $messageText,
                     'is_read' => false,
@@ -522,7 +741,6 @@ class DeliveryController extends Controller
                     'updated_at' => now(),
                 ]);
 
-                // Redirect to messagesPisces with success toast
                 session()->flash('toast', [
                     'message' => 'Order placed successfully! Please check your messages to complete the GCash payment.',
                     'type' => 'success',
@@ -541,6 +759,7 @@ class DeliveryController extends Controller
             return redirect()->back()->with('error', 'Failed to place the order. ' . $e->getMessage());
         }
     }
+
 
 
     public function orderStore(Request $request)

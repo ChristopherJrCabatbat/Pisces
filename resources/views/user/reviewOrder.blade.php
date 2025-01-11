@@ -31,8 +31,14 @@
             @endif
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link fw-bold active" aria-current="page" href="{{ route('user.messages') }}">MESSAGES</a>
+    <li class="nav-item position-relative">
+        <a class="nav-link fw-bold" aria-current="page" href="{{ route('user.messages') }}">MESSAGES
+            @if ($unreadCount > 0)
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle-y-custom">
+                    {{ $unreadCount }}
+                </span>
+            @endif
+        </a>
     </li>
 @endsection
 
@@ -82,7 +88,7 @@
 
 
                     <!-- Shipping Details -->
-                    
+
                     <!-- Timeline -->
                     <div class="timeline">
                         <!-- Items -->
@@ -95,7 +101,7 @@
                                     </div>
                                     <div class="content ms-3">
                                         <h4>{{ $item['name'] }} (x{{ $item['quantity'] }})</h4>
-                                        <p>Price: ₱{{ number_format($item['price'], 2) }}</p>
+                                        <p>₱{{ number_format($item['discounted_price'], 2) }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -108,11 +114,11 @@
                                 <div class="status fw-bold">Order summary</div>
                                 <div class="details text-muted flex-between">
                                     <div>Subtotal</div>
-                                    <div>₱{{ number_format($delivery->total_price, 2) }}</div>
+                                    <div>₱{{ number_format($subtotal, 2) }}</div>
                                 </div>
                                 <div class="details text-muted flex-between">
-                                    <div>Shipping</div>
-                                    <div>₱0</div>
+                                    <div>Shipping Fee</div>
+                                    <div>₱{{ number_format($shippingFee, 2) }}</div>
                                 </div>
                                 <div class="details text-muted flex-between">
                                     <div>Coupons</div>
@@ -120,10 +126,11 @@
                                 </div>
                                 <div class="details fw-bold flex-between">
                                     <div>Total Price</div>
-                                    <div>₱{{ number_format($delivery->total_price, 2) }}</div>
+                                    <div>₱{{ round($totalPrice) }}</div>
                                 </div>
                             </div>
                         </div>
+                        
 
                         <!-- Order Details -->
                         <div class="timeline-item py-3 d-flex align-items-start bottom">
@@ -133,10 +140,6 @@
                                 <div class="details text-muted flex-between">
                                     <div>Order date</div>
                                     <div>{{ $delivery->created_at->format('M d, h:i A') }}</div>
-                                </div>
-                                <div class="details text-muted flex-between">
-                                    <div>Shipping Method</div>
-                                    <div>{{ $delivery->shipping_method }}</div>
                                 </div>
                                 <div class="details text-muted flex-between">
                                     <div>Payment Method</div>

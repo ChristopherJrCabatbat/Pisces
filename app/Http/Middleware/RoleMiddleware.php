@@ -126,6 +126,7 @@ class RoleMiddleware
                 'user.orders',
                 'user.orderRepeat',
                 'user.orderStore',
+                'user.reviewOrderStore',
                 
                 'user.feedback.index',
                 'user.feedback.create',

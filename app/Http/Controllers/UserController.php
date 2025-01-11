@@ -792,6 +792,77 @@ class UserController extends Controller
         return view('user.order', compact('user', 'menus'));
     }
 
+    // public function orderRepeat($deliveryId)
+    // {
+    //     /** @var User $user */
+    //     $user = Auth::user();
+
+    //     // Fetch delivery details
+    //     $delivery = Delivery::findOrFail($deliveryId);
+
+    //     // Fetch related orders
+    //     $orders = $delivery->orders;
+
+    //     // Ensure there are orders associated with the delivery
+    //     if ($orders->isEmpty()) {
+    //         abort(404, 'No orders found for this delivery.');
+    //     }
+
+    //     // Prepare data to pass to the order page
+    //     $menus = [];
+    //     foreach ($orders as $order) {
+    //         $menu = $order->menu; // Use the 'menu' relationship
+
+    //         $menus[] = [
+    //             'name' => $order->menu_name,
+    //             'quantity' => $order->quantity,
+    //             'price' => $menu->price ?? 0, // Fallback to 0 if no menu is found
+    //             'image' => $menu->image ?? '', // Fallback to empty string if no menu is found
+    //         ];
+    //     }
+
+    //     // Redirect to order.blade.php with data
+    //     return view('user.order', compact('menus', 'user', 'delivery'));
+    // }
+
+    
+    public function orderRepeat($deliveryId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Fetch delivery details
+        $delivery = Delivery::findOrFail($deliveryId);
+
+        // Fetch related orders
+        $orders = $delivery->orders;
+
+        // Ensure there are orders associated with the delivery
+        if ($orders->isEmpty()) {
+            abort(404, 'No orders found for this delivery.');
+        }
+
+        // Prepare data to pass to the order page
+        $menus = [];
+        foreach ($orders as $order) {
+            $menu = $order->menu; // Use the 'menu' relationship
+
+            $menus[] = [
+                'name' => $order->menu_name,
+                'quantity' => $order->quantity,
+                'price' => $menu->price ?? 0, // Fallback to 0 if no menu is found
+                'image' => $menu->image ?? '', // Fallback to empty string if no menu is found
+                'discounted_price' => $menu->discount > 0
+                    ? round($menu->price * (1 - $menu->discount / 100), 2)
+                    : $menu->price, // Calculate discounted price
+            ];
+        }
+
+        // Redirect to order.blade.php with data
+        return view('user.orderRepeat', compact('menus', 'user', 'delivery'));
+    }
+
+
 
     // public function orderView($id)
     // {
@@ -1272,77 +1343,13 @@ class UserController extends Controller
         return view('user.trackOrder', compact('categories', 'unreadCount', 'pendingOrdersCount', 'userCart', 'user', 'userFavorites', 'statuses', 'deliveries'));
     }
 
-    // public function reviewOrder(Request $request, $deliveryId)
-    // {
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     // Fetch the delivery by ID and ensure it belongs to the authenticated user
-    //     $delivery = Delivery::where('id', $deliveryId)
-    //         ->where('email', $user->email) // Match with the user's email to validate
-    //         ->firstOrFail();
-
-    //     // Parse the orders and quantities from the database
-    //     $orders = explode(',', $delivery->order); // Split items by commas
-    //     $items = [];
-    //     $totalPrice = 0; // Initialize total price
-
-    //     foreach ($orders as $order) {
-    //         // Extract the menu item name and quantity (e.g., "Burger (x2)")
-    //         preg_match('/^(.*?)\s*\(x(\d+)\)$/', trim($order), $matches);
-    //         $itemName = $matches[1] ?? trim($order); // Extracted name or fallback to original
-    //         $quantity = (int) ($matches[2] ?? 1); // Default to 1 if not found
-
-    //         // Find the menu item by name
-    //         $menu = Menu::where('name', trim($itemName))->first();
-
-    //         if ($menu) {
-    //             $itemTotal = $menu->price * $quantity; // Calculate item's total price
-    //             $totalPrice += $itemTotal; // Add to the overall total price
-
-    //             $items[] = [
-    //                 'name' => $menu->name,
-    //                 'price' => $menu->price,
-    //                 'total_price' => $itemTotal,
-    //                 'image' => $menu->image,
-    //                 'quantity' => $quantity,
-    //             ];
-    //         } else {
-    //             // Fallback for missing menu items
-    //             Log::warning('Menu item not found: ' . $order);
-    //             $items[] = [
-    //                 'name' => $itemName,
-    //                 'price' => 0,
-    //                 'total_price' => 0,
-    //                 'image' => null,
-    //                 'quantity' => $quantity,
-    //             ];
-    //         }
-    //     }
-
-    //     // Update the total price in the delivery table if necessary
-    //     $delivery->total_price = $totalPrice;
-    //     $delivery->save();
-
-    //     // Count unread messages
-    //     $unreadCount = Message::where('receiver_id', $user->id)
-    //         ->where('is_read', false)
-    //         ->count();
-
-    //     // Count pending or active orders
-    //     $pendingOrdersCount = DB::table('deliveries')
-    //         ->where('email', $user->email)
-    //         ->whereIn('status', ['Pending GCash Transaction', 'Pending', 'Preparing', 'Out for Delivery'])
-    //         ->count();
-
-    //     // Return the view with parsed data
-    //     return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items', 'totalPrice'));
-    // }
 
     public function reviewOrder(Request $request, $deliveryId)
     {
         /** @var User $user */
         $user = Auth::user();
+        $userCart = $user->cart;
+        $userFavorites = $user->favoriteItems()->count();
 
         // Fetch the delivery by ID and ensure it belongs to the authenticated user
         $delivery = Delivery::where('id', $deliveryId)
@@ -1352,7 +1359,7 @@ class UserController extends Controller
         // Parse the orders and quantities from the database
         $orders = explode(',', $delivery->order); // Split items by commas
         $items = [];
-        $totalPrice = 0; // Initialize total price
+        $subtotal = 0; // Initialize subtotal price
 
         foreach ($orders as $order) {
             // Extract the menu item name and quantity (e.g., "Burger (x2)")
@@ -1364,15 +1371,25 @@ class UserController extends Controller
             $menu = Menu::where('name', trim($itemName))->first();
 
             if ($menu && is_object($menu)) {
-                $itemTotal = $menu->price * $quantity; // Calculate item's total price
-                $totalPrice += $itemTotal; // Add to the overall total price
+                // Calculate the discounted price
+                $discountedPrice = $menu->discount > 0
+                    ? $menu->price - ($menu->price * $menu->discount / 100)
+                    : $menu->price;
+
+                // Calculate item's total price with the discounted price
+                $itemTotal = $discountedPrice * $quantity;
+
+                // Add to the overall subtotal
+                $subtotal += $itemTotal;
 
                 $items[] = [
                     'name' => $menu->name,
                     'price' => $menu->price,
+                    'discounted_price' => $discountedPrice,
                     'total_price' => $itemTotal,
                     'image' => $menu->image,
                     'quantity' => $quantity,
+                    'discount' => $menu->discount,
                 ];
             } else {
                 // Fallback for missing menu items
@@ -1383,12 +1400,17 @@ class UserController extends Controller
                     'total_price' => 0,
                     'image' => null,
                     'quantity' => $quantity,
+                    'discount' => 0,
                 ];
             }
         }
 
+        // Calculate the total price (Subtotal + Shipping Fee)
+        $shippingFee = $delivery->shipping_fee ?? 0; // Default to 0 if not set
+        $totalPrice = $subtotal + $shippingFee;
+
         // Update the total price in the delivery table if necessary
-        $delivery->total_price = $totalPrice;
+        $delivery->total_price = $subtotal; // Store the subtotal
         $delivery->save();
 
         // Count unread messages
@@ -1403,11 +1425,18 @@ class UserController extends Controller
             ->count();
 
         // Return the view with parsed data
-        return view('user.reviewOrder', compact('delivery', 'unreadCount', 'pendingOrdersCount', 'items', 'totalPrice'));
+        return view('user.reviewOrder', compact(
+            'delivery',
+            'unreadCount',
+            'pendingOrdersCount',
+            'items',
+            'subtotal',
+            'shippingFee',
+            'totalPrice',
+            'userCart',
+            'userFavorites',
+        ));
     }
-
-
-
 
 
     public function category($category)
