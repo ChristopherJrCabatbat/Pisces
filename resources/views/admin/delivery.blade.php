@@ -75,13 +75,13 @@
 
         td.td-select {
             /* max-width: 110px; */
-            max-width: 131px;
+            min-width: 156px;
             padding: 0 10px;
         }
 
         /* .table-container {
-                                    padding: 1rem 2rem 0rem 2rem;
-                                } */
+            padding: 1rem 2rem 0rem 2rem;
+        } */
     </style>
 @endsection
 

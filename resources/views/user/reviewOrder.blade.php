@@ -118,15 +118,16 @@
                                 </div>
                                 <div class="details text-muted flex-between">
                                     <div>Shipping Fee</div>
-                                    <div>₱{{ number_format($shippingFee, 2) }}</div>
+                                    <div>₱{{ number_format($shippingFee) }}</div>
                                 </div>
                                 <div class="details text-muted flex-between">
                                     <div>Coupons</div>
-                                    <div>₱0</div>
+                                    <div>₱{{ number_format($coupons, 2) }}</div>
                                 </div>
                                 <div class="details fw-bold flex-between">
                                     <div>Total Price</div>
-                                    <div>₱{{ round($totalPrice) }}</div>
+                                    <div>₱{{ round($totalDatabase) }}</div>
+                                    {{-- <div>₱{{ round($delivery->total_price) }}</div> --}}
                                 </div>
                             </div>
                         </div>

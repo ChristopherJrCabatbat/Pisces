@@ -41,7 +41,7 @@
                     aria-label="Close"></button>
             </div>
             <div class="custom-modal-body">
-                <form id="editProfileForm" method="POST" action="{{ route('user.userUpdate') }}">
+                <form id="editProfileForm" method="POST" action="{{ route('admin.userUpdate') }}">
                     @csrf
                     @method('PUT')
 

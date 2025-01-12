@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Order</title>
+    <title>Pisces Coffee Hub - Order</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-home.png') }}">
 
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
@@ -132,11 +132,10 @@
                             <div class="menu-name d-flex flex-column align-items-center">
                                 @if ($quantity > 1)
                                     <div class="name">{{ $menu->name }} (₱{{ $discountedPrice }})</div>
-                                    <div class="size">({{ $quantity }})</div>
                                 @else
                                     <div class="name">{{ $menu->name }}</div>
-                                    <div class="size">({{ $quantity }})</div>
                                 @endif
+                                <div class="size">({{ $quantity }})</div>
                             </div>
                             <div class="price fw-bold">
                                 ₱{{ number_format($originalTotal, 2) }}
@@ -323,11 +322,45 @@
                 barangayDropdown.appendChild(option);
             });
 
+            // // Handle Barangay change
+            // barangayDropdown.addEventListener('change', function() {
+            //     const selectedBarangay = barangayDropdown.value;
+            //     const shippingFee = barangayRates[selectedBarangay] || 0; // Default to 0 if no match
+            //     const originalTotal = parseFloat(originalTotalInput.value); // Base total for the items
+
+            //     // Update all shipping fee inputs (text input)
+            //     shippingFeeInputs.forEach(input => {
+            //         input.value = shippingFee.toLocaleString(); // Show formatted fee
+            //     });
+
+            //     // Update all shipping fee display divs
+            //     shippingFeeDisplays.forEach(display => {
+            //         display.textContent = `₱${shippingFee.toLocaleString()}`; // Show formatted fee
+            //     });
+
+            //     // Update the hidden input for shipping fee
+            //     hiddenShippingInput.value = shippingFee; // Ensure numeric value for submission
+
+            //     // Calculate and update the final total
+            //     let finalTotal = originalTotal + shippingFee;
+            //     finalTotal = Math.round(finalTotal); // Round to the nearest whole number
+            //     finalTotalDisplay.textContent = `₱${finalTotal.toLocaleString()}`;
+
+            //     // Update the hidden total price input for form submission
+            //     totalPriceInput.value = finalTotal;
+            // });
+            
             // Handle Barangay change
             barangayDropdown.addEventListener('change', function() {
                 const selectedBarangay = barangayDropdown.value;
                 const shippingFee = barangayRates[selectedBarangay] || 0; // Default to 0 if no match
                 const originalTotal = parseFloat(originalTotalInput.value); // Base total for the items
+
+                // Determine if a discount applies
+                const hasDiscount = Boolean(
+                @json($hasDiscount)); // Convert Blade variable to JS boolean
+                const discountRate = hasDiscount ? 0.05 : 0; // 5% discount if applicable
+                const discountAmount = originalTotal * discountRate; // Calculate discount
 
                 // Update all shipping fee inputs (text input)
                 shippingFeeInputs.forEach(input => {
@@ -343,12 +376,15 @@
                 hiddenShippingInput.value = shippingFee; // Ensure numeric value for submission
 
                 // Calculate and update the final total
-                const finalTotal = originalTotal + shippingFee;
+                let finalTotal = originalTotal - discountAmount +
+                shippingFee; // Apply discount and add shipping
+                finalTotal = Math.round(finalTotal); // Round to the nearest whole number
                 finalTotalDisplay.textContent = `₱${finalTotal.toLocaleString()}`;
 
                 // Update the hidden total price input for form submission
                 totalPriceInput.value = finalTotal;
             });
+
         });
     </script>
 

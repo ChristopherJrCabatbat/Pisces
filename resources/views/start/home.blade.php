@@ -819,31 +819,34 @@
                     </li>
 
                     <li>
-                        <a href="tel:+12344567890" class="footer-link">
+                        {{-- <a href="tel:+12344567890" class="footer-link"> --}}
+                        <div class="footer-link">
                             <ion-icon name="call" aria-hidden="true"></ion-icon>
-
                             <span class="span">0945 839 3794</span>
-                        </a>
+                        </div>
+                        {{-- </a> --}}
                     </li>
 
                     <li>
                         <ul class="social-list">
 
                             <li>
-                                <a href="https://www.facebook.com/piscesCH" target="_blank" title="Go to Pisces Facebook Page" class="social-link">
+                                <a href="https://www.facebook.com/piscesCH" target="_blank"
+                                    title="Go to Pisces Facebook Page" class="social-link">
                                     <ion-icon name="logo-facebook"></ion-icon>
                                 </a>
                             </li>
 
                             <li>
-                                <a href="https://www.instagram.com/piscescoffeehub/" target="_blank" title="Go to Pisces Instagram Account" class="social-link">
+                                <a href="https://www.instagram.com/piscescoffeehub/" target="_blank"
+                                    title="Go to Pisces Instagram Account" class="social-link">
                                     <ion-icon name="logo-instagram"></ion-icon>
                                 </a>
                             </li>
 
                             <li>
-                                <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" class="social-link" title="See Pisces in Maps"
-                                target="_blank" >
+                                <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" class="social-link"
+                                    title="See Pisces in Maps" target="_blank">
                                     <ion-icon name="location-outline"></ion-icon>
                                 </a>
                             </li>

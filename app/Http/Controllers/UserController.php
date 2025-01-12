@@ -788,8 +788,10 @@ class UserController extends Controller
             return $menu;
         });
 
+        $hasDiscount = $user->has_discount;
+
         // Pass data to the order view
-        return view('user.order', compact('user', 'menus'));
+        return view('user.order', compact('user', 'menus', 'hasDiscount'));
     }
 
     // public function orderRepeat($deliveryId)
@@ -1356,6 +1358,8 @@ class UserController extends Controller
             ->where('email', $user->email) // Match with the user's email to validate
             ->firstOrFail();
 
+        $totalDatabase = $delivery->total_price;
+
         // Parse the orders and quantities from the database
         $orders = explode(',', $delivery->order); // Split items by commas
         $items = [];
@@ -1410,8 +1414,11 @@ class UserController extends Controller
         $totalPrice = $subtotal + $shippingFee;
 
         // Update the total price in the delivery table if necessary
-        $delivery->total_price = $subtotal; // Store the subtotal
-        $delivery->save();
+        // $delivery->total_price = $subtotal; // Store the subtotal
+        // $delivery->save();
+
+        // $coupons = $totalPrice - $totalDatabase;
+        $coupons = $subtotal * 0.05;
 
         // Count unread messages
         $unreadCount = Message::where('receiver_id', $user->id)
@@ -1435,6 +1442,8 @@ class UserController extends Controller
             'totalPrice',
             'userCart',
             'userFavorites',
+            'totalDatabase',
+            'coupons',
         ));
     }
 

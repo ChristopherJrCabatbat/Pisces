@@ -409,7 +409,7 @@ class DeliveryController extends Controller
         $totalPrice += $shippingFee;
 
         if ($user->has_discount) {
-            $totalPrice *= 0.95;
+            $totalPrice = ($totalPrice * 0.95) + 5;
             $user->update(['has_discount' => false]);
         }
 

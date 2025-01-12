@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pisces Coffee Hub</title>
+    <title>Pisces Coffee Hub - Order</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-home.png') }}">
 
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
@@ -131,7 +131,11 @@
                                     alt="Picture">
                             </div>
                             <div class="menu-name d-flex flex-column align-items-center">
-                                <div class="name">{{ $menu->name }} (₱{{ $discountedPrice }})</div>
+                                @if( $quantity > 1 )
+                                    <div class="name">{{ $menu->name }} (₱{{ $discountedPrice }})</div>
+                                @else
+                                    <div class="name">{{ $menu->name }}</div>
+                                @endif
                                 <div class="size">({{ $quantity }})</div>
                             </div>
                             <div class="price fw-bold">
@@ -148,9 +152,9 @@
                         {{-- Show only if hasDiscount --}}
                         @if ($hasDiscount)
                             {{-- Original Total --}}
-                            <div class="d-flex justify-content-between fw-bold align-items-center">
+                            <div class="d-flex justify-content-between align-items-center">
                                 <div>Original Total:</div>
-                                <div class="fs-4">
+                                <div class="fs-5">
                                     ₱{{ number_format($originalTotal, 2) }}
                                 </div>
                             </div>
@@ -158,7 +162,7 @@
                             {{-- Discount Section --}}
                             <div class="d-flex justify-content-between fw-bold align-items-center text-success">
                                 <div>Discount (5%):</div>
-                                <div class="fs-4">₱{{ number_format($originalTotal * 0.05, 2) }}</div>
+                                <div class="fs-5">₱{{ number_format($originalTotal * 0.05, 2) }}</div>
                             </div>
                         @endif
 
@@ -201,132 +205,6 @@
 
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.js') }}"></script>
-
-    {{-- Barangay auto shipping fee --}}
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const barangayDropdown = document.getElementById('barangay');
-            const shippingInput = document.getElementById('shippingMethod');
-
-            // Barangay with corresponding shipping fees
-            const barangayRates = {
-                "Abanon": 110,
-                "Agdao": 80,
-                "Ano": 80,
-                "Anando": 120,
-                "Antipangol": 140,
-                "Aponit": 100,
-                "Bacnar": 80,
-                "Bacnar UP": 90,
-                "Balaya": 100,
-                "Balayong": 70,
-                "Baldog": 80,
-                "Balite Sur": 90,
-                "Balococ": 100,
-                "Bani": 160,
-                "Bega": 70,
-                "Bogaoan": 170,
-                "Bocboc East": 150,
-                "Bocboc West": 170,
-                "Bolingit": 70,
-                "Bolosan": 70,
-                "Bonifacio": 40,
-                "Bugallon": 40,
-                "Buenglat": 90,
-                "Burgos-Padlan": 40,
-                "Cacaritan": 60,
-                "Caingal": 60,
-                "Calobaoan": 120,
-                "Calomboyan": 100,
-                "Caoayan Kiling": 130,
-                "Capataan": 90,
-                "Cobol": 100,
-                "Coliling": 70,
-                "Coliling Anlabo": 90,
-                "Cruz": 80,
-                "Doyong": 80,
-                "Gamata": 90,
-                "Guelew": 140,
-                "Ilang": 40,
-                "Inerangan": 90,
-                "Isla": 100,
-                "Libas": 120,
-                "Lilimasan": 70,
-                "Longos": 60,
-                "Lucban": 40,
-                "M. Soriano st.": 40,
-                "Mabalbalino": 150,
-                "Mabini": 40,
-                "Magtaking": 60,
-                "Malacañang": 90,
-                "Maliwa": 90,
-                "Mamarlao Court": 40,
-                "Manzon": 60,
-                "Matagdem": 70,
-                "Mc Arthur": 40,
-                "Meztizo Norte": 70,
-                "Naguilayan": 80,
-                "Nilentap": 90,
-                "Padilla": 40,
-                "Pagal": 70,
-                "Palaming": 70,
-                "Palaris": 40,
-                "Palospos": 120,
-                "Paitan": 80,
-                "Pangoloan": 80,
-                "Pangalangan": 80,
-                "Pangpang": 90,
-                "Parayao": 100,
-                "Payapa": 90,
-                "Payar": 100,
-                "Perez": 40,
-                "PNR": 40,
-                "Posadas Street": 40,
-                "Polo": 90,
-                "Quezon": 40,
-                "Quintong": 90,
-                "Rizal": 40,
-                "Roxas": 40,
-                "Salinap": 120,
-                "San Juan": 60,
-                "San Pedro": 40,
-                "Taloy": 60,
-                "Sapinit": 70,
-                "Supo": 150,
-                "Talang": 90,
-                "Taloy (Until VMUF)": 40,
-                "Tamayo": 130,
-                "Tandoc": 80,
-                "Tandang Sora": 40,
-                "Tarece": 60,
-                "Tarectec": 90,
-                "Tayambani": 90,
-                "Tebag": 80,
-                "Turac": 80
-            };
-
-            // Sort barangays alphabetically
-            const sortedBarangays = Object.keys(barangayRates).sort();
-
-            // Populate barangays in dropdown
-            sortedBarangays.forEach(barangay => {
-                const option = document.createElement('option');
-                option.value = barangay;
-                option.text = barangay;
-                barangayDropdown.appendChild(option);
-            });
-
-            // Update shipping fee when a barangay is selected
-            barangayDropdown.addEventListener('change', function() {
-                const selectedBarangay = barangayDropdown.value;
-                if (barangayRates[selectedBarangay]) {
-                    shippingInput.value = `₱${barangayRates[selectedBarangay]}`;
-                } else {
-                    shippingInput.value = "₱0";
-                }
-            });
-        });
-    </script> --}}
 
     <!-- Updated Script -->
     <script>
@@ -453,6 +331,12 @@
                 const shippingFee = barangayRates[selectedBarangay] || 0; // Default to 0 if no match
                 const originalTotal = parseFloat(originalTotalInput.value); // Base total for the items
 
+                // Determine if a discount applies
+                const hasDiscount = Boolean(
+                @json($hasDiscount)); // Convert Blade variable to JS boolean
+                const discountRate = hasDiscount ? 0.05 : 0; // 5% discount if applicable
+                const discountAmount = originalTotal * discountRate; // Calculate discount
+
                 // Update all shipping fee inputs (text input)
                 shippingFeeInputs.forEach(input => {
                     input.value = shippingFee.toLocaleString(); // Show formatted fee
@@ -467,7 +351,9 @@
                 hiddenShippingInput.value = shippingFee; // Ensure numeric value for submission
 
                 // Calculate and update the final total
-                const finalTotal = originalTotal + shippingFee;
+                let finalTotal = originalTotal - discountAmount +
+                shippingFee; // Apply discount and add shipping
+                finalTotal = Math.round(finalTotal); // Round to the nearest whole number
                 finalTotalDisplay.textContent = `₱${finalTotal.toLocaleString()}`;
 
                 // Update the hidden total price input for form submission
