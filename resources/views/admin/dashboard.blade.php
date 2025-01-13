@@ -137,7 +137,7 @@
 
 
             {{-- Analytics --}}
-
+            
             {{-- Top Picks --}}
             <div class="analytics text-black mt-2">
                 <h3 class="h3 mb-3">Top Picks</h3>

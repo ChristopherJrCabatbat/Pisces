@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Menu;
 use App\Models\Category;
@@ -36,6 +37,20 @@ class PromotionsController extends Controller
         return view('admin.promotions', compact('promotions', 'filter', 'totalUnreadCount'));
     }
 
+    public function toggleAvailability(Request $request, Promotion $promotion)
+    {
+        try {
+            $promotion->availability = $request->availability;
+            $promotion->save();
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error('Failed to update promotion availability: ' . $e->getMessage());
+            return response()->json(['success' => false], 500);
+        }
+    }
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -59,7 +74,6 @@ class PromotionsController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image file type and size
-            'how_often' => 'required', // Validate image file type and size
         ]);
 
         // Handle file upload
@@ -72,7 +86,6 @@ class PromotionsController extends Controller
             Promotion::create([
                 'name' => $validated['name'],
                 'image' => $imagePath, // Save image path
-                'how_often' => $validated['how_often'],
             ]);
 
             // Set success toast message
@@ -125,52 +138,51 @@ class PromotionsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $promotions = Promotion::findOrFail($id);
-
+        $promotion = Promotion::findOrFail($id);
+    
         // Validate the form data
         $validated = $request->validate([
             'name' => 'required|string',
+            'availability' => 'required|boolean',
             'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image type and size
-            'how_often' => 'required',
         ]);
-
+    
         $imagePath = null;
-
-        // Check if a new image is uploaded
+    
+        // Handle image upload if provided
         if ($request->hasFile('image')) {
             // Delete the old image if it exists
-            if ($promotions->image && Storage::exists('public/' . $promotions->image)) {
-                Storage::delete('public/' . $promotions->image);
+            if ($promotion->image && Storage::exists('public/' . $promotion->image)) {
+                Storage::delete('public/' . $promotion->image);
             }
-
+    
             $imagePath = $request->file('image')->store('promotion_images', 'public');
         }
-
-        // $oldCategoryName = $promotions->category;
-        // $newPromotionName = $validated['category'];
-
+    
         try {
-            $promotions->update([
+            // Update the promotion
+            $promotion->update([
                 'name' => $validated['name'],
-                'image' => $imagePath ?? $promotions->image, // Update image path only if a new image is uploaded
-                'how_often' => $validated['how_often'],
+                'availability' => $validated['availability'], // Update availability
+                'image' => $imagePath ?? $promotion->image, // Update image path only if a new image is uploaded
             ]);
-
+    
             // Set success toast message
             session()->flash('toast', [
                 'message' => 'Promotion updated successfully.',
-                'type' => 'success', // Toast type for success
+                'type' => 'success',
             ]);
         } catch (\Exception $e) {
             // Set error toast message
             session()->flash('toast', [
                 'message' => 'Failed to update promotion. Please try again.',
-                'type' => 'error', // Toast type for error
+                'type' => 'error',
             ]);
         }
-
+    
         return redirect()->route('admin.promotions.index');
     }
+    
 
     /**
      * Remove the specified resource from storage.

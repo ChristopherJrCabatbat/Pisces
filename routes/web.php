@@ -33,7 +33,7 @@ Route::get('/welcome', function () {
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/dashboard', function () { 
+Route::get('/dashboard', function () {
     $user = Auth::user();
 
     if ($user->role === 'Admin') {
@@ -54,6 +54,11 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
+Route::post('/clear-promotions-session', function () {
+    session()->forget(['availablePromotions', 'promotions_shown_during_session']);
+    return response()->json(['message' => 'Promotions cleared']);
+})->middleware('auth');
+
 // Admin Routes
 Route::group([
     'prefix' => 'admin',
@@ -66,7 +71,7 @@ Route::group([
     //         $message->to('zhyryllposadas@gmail.com')
     //             ->subject('Test Email');
     //     });
-    
+
     //     return 'Email sent successfully!';
     // })->name('test-email');
 
@@ -95,6 +100,8 @@ Route::group([
     Route::post('/storeRider', [DeliveryController::class, 'storeRider'])->name('storeRider');
 
     Route::resource('promotions', PromotionsController::class);
+    Route::post('/promotions/{promotion}/toggleAvailability', [PromotionsController::class, 'toggleAvailability'])->name('toggleAvailability');
+
 
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');

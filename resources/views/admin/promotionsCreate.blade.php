@@ -121,13 +121,12 @@
                     @enderror
                 </div>
 
-                <!-- How Often -->
+                {{-- <!-- How Often -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="how_often" class="form-label">How often will this be shown to the user (by days)?</label>
                     <input type="number" name="how_often" class="form-control" id="how_often" value="{{ old('how_often') }}"
                         required placeholder="e.g. Every 7 days">
-                </div>
-
+                </div> --}}
 
                 <div class="d-grid my-2">
                     <button class="btn btn-primary dark-blue" type="submit">Add</button>

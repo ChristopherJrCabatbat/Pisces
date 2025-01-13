@@ -79,6 +79,8 @@ class RoleMiddleware
                 'admin.promotions.update',
                 'admin.promotions.destroy',
 
+                'admin.toggleAvailability',
+
                 'admin.customers',
                 'admin.monitoring',
                 'admin.updates',

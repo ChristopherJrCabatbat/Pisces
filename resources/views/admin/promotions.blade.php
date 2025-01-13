@@ -17,8 +17,8 @@
         }
 
         /* .table-container {
-                    padding: 1rem 2rem 0rem 2rem;
-                } */
+                            padding: 1rem 2rem 0rem 2rem;
+                        } */
     </style>
 @endsection
 
@@ -85,6 +85,7 @@
 @endsection
 
 @section('main-content')
+
     <div class="main-content">
 
         <div class="current-file mb-3 d-flex">
@@ -138,7 +139,7 @@
                     <tr>
                         <th scope="col">Image</th>
                         <th scope="col">Name</th>
-                        <th scope="col">How Often</th>
+                        <th scope="col">Availability</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
@@ -155,12 +156,15 @@
                             </td>
                             <td>{{ $promotion->name }}</td>
                             <td>
-                                @if ($promotion->how_often > 1)
-                                    Every {{ $promotion->how_often }} days.
-                                @else
-                                    Once a day.
-                                @endif
+                                <div class="form-check form-switch d-flex gap-2 justify-content-center">
+                                    <input class="form-check-input availability-toggle" type="checkbox"
+                                        data-id="{{ $promotion->id }}" {{ $promotion->availability ? 'checked' : '' }}>
+                                    <label class="form-check-label ms-0">
+                                        {{ $promotion->availability ? 'Available' : 'Unavailable' }}
+                                    </label>
+                                </div>
                             </td>
+
                             <td style="width: 16vw;">
                                 <a href="{{ route('admin.promotions.show', $promotion->id) }}" class="btn btn-sm btn-info"
                                     title="View">
@@ -247,5 +251,70 @@
 
         document.getElementById('search-input').addEventListener('input', filterTable);
     </script>
+
+    <script>
+        // Function to display toast notifications using customToastBox
+        function showToast(message, type) {
+            const customToastBox = document.getElementById('customToastBox');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            toast.innerHTML = `<i class="${type === 'error' ? 'fa fa-circle-xmark' : 'fa fa-circle-check'}"></i> ${message}`;
+            customToastBox.appendChild(toast);
+    
+            // Automatically remove the toast after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            const spinner = document.getElementById('loadingSpinner'); // Reference the spinner element
+    
+            // Add event listeners to all availability toggles
+            document.querySelectorAll('.availability-toggle').forEach(toggle => {
+                toggle.addEventListener('change', function () {
+                    const promotionId = this.getAttribute('data-id');
+                    const availability = this.checked ? 1 : 0;
+    
+                    // Show spinner and disable toggle
+                    spinner.classList.remove('d-none');
+                    this.disabled = true;
+    
+                    fetch(`/admin/promotions/${promotionId}/toggleAvailability`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ availability })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const label = this.nextElementSibling; // Find the label next to the toggle
+                                label.textContent = this.checked ? 'Available' : 'Unavailable';
+                                showToast(data.message || 'Availability updated successfully!', 'success');
+                            } else {
+                                this.checked = !this.checked; // Revert toggle on failure
+                                showToast(data.message || 'Failed to update availability.', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error toggling availability:', error);
+                            this.checked = !this.checked; // Revert toggle on error
+                            showToast('An error occurred. Please try again.', 'error');
+                        })
+                        .finally(() => {
+                            // Hide spinner and re-enable toggle
+                            spinner.classList.add('d-none');
+                            this.disabled = false;
+                        });
+                });
+            });
+        });
+    </script>
+    
+    
+
 
 @endsection

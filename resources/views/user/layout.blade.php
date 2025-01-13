@@ -25,6 +25,75 @@
 
     @yield('modals')
 
+    @php
+        $promotions = session('availablePromotions', []);
+    @endphp
+
+    @if ($promotions)
+        <div class="promotion-modal-container">
+            @foreach ($promotions as $promotion)
+                <div class="promotion-modal" id="promotionModal-{{ $promotion->id }}">
+                    <div class="promotion-modal-content">
+                        <div class="promotion-modal-header">
+                            <h5>{{ $promotion->name }}</h5>
+                            <button class="promotion-modal-close"
+                                data-modal-id="promotionModal-{{ $promotion->id }}">✖</button>
+                        </div>
+                        <div class="promotion-modal-body">
+                            <img src="{{ asset('storage/' . $promotion->image) }}" alt="{{ $promotion->name }}"
+                                class="promotion-modal-img">
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modals = Array.from(document.querySelectorAll('.promotion-modal'));
+            let currentModalIndex = 0;
+
+            const showModal = (index) => {
+                if (index >= 0 && index < modals.length) {
+                    modals[index].style.display = 'flex';
+                }
+            };
+
+            const hideModal = (index) => {
+                if (index >= 0 && index < modals.length) {
+                    modals[index].style.display = 'none';
+                }
+            };
+
+            modals.forEach((modal, index) => {
+                const closeBtn = modal.querySelector('.promotion-modal-close');
+
+                closeBtn.addEventListener('click', () => {
+                    hideModal(index);
+
+                    // Show the next modal only if it's not the last
+                    if (index + 1 < modals.length) {
+                        showModal(index + 1);
+                    } else {
+                        // Clear promotions from session after showing all modals
+                        fetch('/clear-promotions-session', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Show the first modal on page load
+            showModal(currentModalIndex);
+        });
+    </script>
+
+
     @if (session()->pull('showExperienceModal'))
         <div id="experienceModal" class="experience-modal-container">
             <div class="experience-modal-content">
@@ -71,55 +140,6 @@
             }
         </script>
     @endif
-
-
-    {{-- @if (session('experienceModal'))
-        <div id="experienceModal" class="experience-modal-container">
-            <div class="experience-modal-content">
-                <!-- Close Button -->
-                <button type="button" class="experience-modal-close" onclick="closeExperienceModal()">×</button>
-
-                <!-- Modal Header and Text -->
-                <h4 class="experience-modal-header">We value your feedback!</h4>
-                <p class="experience-modal-text">Thank you for your continued support! We'd love to hear from you.
-                    Please rate our service:</p>
-
-                <!-- Feedback Form -->
-                <form action="{{ route('user.submitExperience') }}" method="POST">
-                    @csrf
-                    <div class="experience-modal-form-group">
-                        <label for="rating" class="experience-modal-label">Rate Us:</label>
-                        <select name="rating" id="rating" class="experience-modal-select" required>
-                            <option value="" disabled selected>Choose your rating</option>
-                            <option value="1">1 - Poor</option>
-                            <option value="2">2 - Fair</option>
-                            <option value="3">3 - Good</option>
-                            <option value="4">4 - Very Good</option>
-                            <option value="5">5 - Excellent</option>
-                        </select>
-                    </div>
-                    <div class="experience-modal-form-group">
-                        <label for="feedback" class="experience-modal-label">Your Feedback:</label>
-                        <textarea name="feedback" id="feedback" class="experience-modal-textarea" rows="4"
-                            placeholder="Share your thoughts with us..."></textarea>
-                    </div>
-                    <button type="submit" class="experience-modal-button">Submit Feedback</button>
-                </form>
-            </div>
-        </div>
-        <script>
-            // Open the modal on page load
-            window.onload = function() {
-                document.getElementById('experienceModal').style.display = 'flex';
-            };
-
-            // Close modal function
-            function closeExperienceModal() {
-                document.getElementById('experienceModal').style.display = 'none';
-            }
-        </script>
-    @endif --}}
-
 
     <!-- Menu Details Modal -->
     <div class="modal fade" id="menuDetailsModal" tabindex="-1" aria-labelledby="menuDetailsModalLabel"
@@ -377,11 +397,13 @@
                     <div class="col d-flex flex-column gap-3">
                         <div class="h3 footer-title mb-3 fw-bold">Contact Info</div>
                         <div class="d-flex align-items-center">
-                            <span class="border-bottoms pb-2 red-hover"><i class="fa-solid fa-location-dot me-2"></i> Barangay
+                            <span class="border-bottoms pb-2 red-hover"><i class="fa-solid fa-location-dot me-2"></i>
+                                Barangay
                                 Ilang, San Carlos City, Pangasinan</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <a href="mailto:piscescoffeehub@gmail.com" class="red-hover"><i class="fa-solid fa-envelope me-2"></i> piscescoffeehub@gmail.com</a>
+                            <a href="mailto:piscescoffeehub@gmail.com" class="red-hover"><i
+                                    class="fa-solid fa-envelope me-2"></i> piscescoffeehub@gmail.com</a>
                         </div>
                         <div class="d-flex align-items-center">
                             <div class="red-hover"><i class="fa-solid fa-phone me-2"></i> 0945 839 3794</div>

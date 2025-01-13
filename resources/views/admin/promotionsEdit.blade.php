@@ -17,8 +17,8 @@
         }
 
         /* .table-container {
-            padding: 1rem 2rem 0rem 2rem;
-        } */
+                    padding: 1rem 2rem 0rem 2rem;
+                } */
     </style>
 @endsection
 
@@ -31,10 +31,11 @@
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
-    
+
     <li>
-        <a href="/admin/promotions" class="active fs-5 sidebar-font"><i class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
-   </li>
+        <a href="/admin/promotions" class="active fs-5 sidebar-font"><i
+                class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
+    </li>
 
     <li class="sidebar-item position-relative" id="customersDropdown">
         <a href="javascript:void(0)"
@@ -88,8 +89,7 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                    class="navigation">Dashboard</a> / <a
-                    href="/admin/promotions" class="navigation">Promotions</a> /</div>
+                    class="navigation">Dashboard</a> / <a href="/admin/promotions" class="navigation">Promotions</a> /</div>
             <span class="faded-white ms-1">Add Promotion</span>
         </div>
 
@@ -110,12 +110,17 @@
                     <input type="text" name="name" class="form-control" id="name"
                         value="{{ old('name', $promotion->name) }}" required placeholder="e.g. Christmas Promo" autofocus>
                 </div>
-                
-                <!-- How Often -->
+
+                <!-- Availability -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="how_often" class="form-label">How often will this be shown to the user (by days)?</label>
-                    <input type="text" name="how_often" class="form-control" id="how_often"
-                        value="{{ old('how_often', $promotion->how_often) }}" required placeholder="e.g. Every 7 days">
+                    <label for="availability" class="form-label">Availability:</label>
+                    <div class="form-check form-switch d-flex gap-2 justify-content-center">
+                        <input class="form-check-input availability-toggle" type="checkbox" id="availability"
+                            name="availability" {{ $promotion->availability ? 'checked' : '' }}>
+                        <label class="form-check-label ms-0" id="availabilityLabel">
+                            {{ $promotion->availability ? 'Available' : 'Unavailable' }}
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Current Image -->
@@ -137,7 +142,6 @@
                     @enderror
                 </div>
 
-
                 <div class="d-grid my-2">
                     <button class="btn btn-primary dark-blue" type="submit">Update</button>
                 </div>
@@ -149,4 +153,11 @@
 @endsection
 
 @section('scripts')
+    <script>
+        // Update the label based on the toggle state
+        document.getElementById('availability').addEventListener('change', function() {
+            const label = document.getElementById('availabilityLabel');
+            label.textContent = this.checked ? 'Available' : 'Unavailable';
+        });
+    </script>
 @endsection

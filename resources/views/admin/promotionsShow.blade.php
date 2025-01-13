@@ -17,8 +17,8 @@
         }
 
         /* .table-container {
-            padding: 1rem 2rem 0rem 2rem;
-        } */
+                    padding: 1rem 2rem 0rem 2rem;
+                } */
     </style>
 @endsection
 
@@ -31,10 +31,11 @@
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
-    
+
     <li>
-        <a href="/admin/promotions" class="active fs-5 sidebar-font"><i class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
-   </li>
+        <a href="/admin/promotions" class="active fs-5 sidebar-font"><i
+                class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
+    </li>
 
     <li class="sidebar-item position-relative" id="customersDropdown">
         <a href="javascript:void(0)"
@@ -88,8 +89,7 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                    class="navigation">Dashboard</a> / <a
-                    href="/admin/promotions" class="navigation">Promotions</a> /</div>
+                    class="navigation">Dashboard</a> / <a href="/admin/promotions" class="navigation">Promotions</a> /</div>
             <span class="faded-white ms-1">Add Promotion</span>
         </div>
 
@@ -107,12 +107,24 @@
                     <label for="name" class="form-label">Promotion Name:</label>
                     <div class="form-control">{{ $promotion->name }}</div>
                 </div>
-               
-                <!-- How Often -->
+
+                <!-- Availability -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="availability" class="form-label">Availability:</label>
+                    <div class="form-control">
+                        @if ($promotion->availability)
+                            This promotion is currently available.
+                        @else
+                            This promotion is currently not available.
+                        @endif
+                    </div>
+                </div>
+
+                {{-- <!-- How Often -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="how_often" class="form-label">How often will this be shown to the user (by days):</label>
                     <div class="form-control">{{ $promotion->how_often }}</div>
-                </div>
+                </div> --}}
 
                 <!-- Current Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">

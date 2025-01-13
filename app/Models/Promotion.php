@@ -13,5 +13,6 @@ class Promotion extends Model
         'name',
         'image',
         'how_often',
+        'availability',
     ];
 }
