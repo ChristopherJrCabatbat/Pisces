@@ -10,6 +10,7 @@ use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\PromotionsController;
 
 use Illuminate\Support\Facades\Mail;
 
@@ -90,6 +91,8 @@ Route::group([
     Route::get('/deliveryDetails/{id}', [DeliveryController::class, 'deliveryDetails'])->name('deliveryDetails');
     Route::get('/deliveryCreateRider', [DeliveryController::class, 'deliveryCreateRider'])->name('deliveryCreateRider');
     Route::post('/storeRider', [DeliveryController::class, 'storeRider'])->name('storeRider');
+
+    Route::resource('promotions', PromotionsController::class);
 
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');

@@ -13,39 +13,43 @@ class RiderController extends Controller
      * Display a listing of the resource.
      */
 
-     public function index(Request $request, UnreadMessagesController $unreadMessagesController)
-     {
-         // Fetch unread message data
-         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
-         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
-     
-         // Fetch search and filter parameters
-         $search = $request->input('search', '');
-         $filter = $request->input('filter', 'default'); // Default to "default"
-     
-         // Query riders with search and filter
-         $riders = Rider::when($search, function ($query, $search) {
-             $query->where('name', 'like', '%' . $search . '%');
-         })
-             ->when($filter === 'alphabetically', function ($query) {
-                 $query->orderBy('name', 'asc'); // Alphabetically ascending
-             })
-             ->when($filter === 'byRating', function ($query) {
-                 $query->orderBy('rating', 'desc'); // By rating descending
-             })
-             ->get(); // Retrieve all results without pagination
-     
-         // Pass variables to the view
-         return view('admin.rider', compact('riders', 'filter', 'search', 'totalUnreadCount'));
-     }
-     
+    public function index(Request $request, UnreadMessagesController $unreadMessagesController)
+    {
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        // Fetch search and filter parameters
+        $search = $request->input('search', '');
+        $filter = $request->input('filter', 'default'); // Default to "default"
+
+        // Query riders with search and filter
+        $riders = Rider::when($search, function ($query, $search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        })
+            ->when($filter === 'alphabetically', function ($query) {
+                $query->orderBy('name', 'asc'); // Alphabetically ascending
+            })
+            ->when($filter === 'byRating', function ($query) {
+                $query->orderBy('rating', 'desc'); // By rating descending
+            })
+            ->get(); // Retrieve all results without pagination
+
+        // Pass variables to the view
+        return view('admin.rider', compact('riders', 'filter', 'search', 'totalUnreadCount'));
+    }
+
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request, UnreadMessagesController $unreadMessagesController)
     {
-        return view('admin.riderCreate');
+        // Fetch unread message data using the UnreadMessagesController
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        return view('admin.riderCreate', compact('totalUnreadCount'));
     }
 
     /**
@@ -84,20 +88,28 @@ class RiderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id, Request $request, UnreadMessagesController $unreadMessagesController)
     {
+        // Fetch unread message data using the UnreadMessagesController
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
         $rider = Rider::findOrFail($id);
-        return view('admin.riderShow', compact('rider'));
+        return view('admin.riderShow', compact('rider', 'totalUnreadCount'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id, Request $request, UnreadMessagesController $unreadMessagesController)
     {
+        // Fetch unread message data using the UnreadMessagesController
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
         $rider = Rider::findOrFail($id);
 
-        return view('admin.riderEdit', compact('rider'));
+        return view('admin.riderEdit', compact('rider', 'totalUnreadCount'));
     }
 
     /**

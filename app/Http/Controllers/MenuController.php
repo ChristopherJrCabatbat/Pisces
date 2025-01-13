@@ -154,10 +154,15 @@ class MenuController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request, UnreadMessagesController $unreadMessagesController)
     {
         $categories = Category::all(); // Fetch all categories from the database
-        return view('admin.menuCreate', compact('categories'));
+
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        return view('admin.menuCreate', compact('categories', 'totalUnreadCount'));
     }
 
     public function menuCreateCategory()
@@ -273,21 +278,29 @@ class MenuController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id, Request $request, UnreadMessagesController $unreadMessagesController)
     {
         $menus = Menu::findOrFail($id);
-        return view('admin.menuShow', compact('menus'));
+
+        // Fetch unread message data using the UnreadMessagesController
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+        return view('admin.menuShow', compact('menus', 'totalUnreadCount'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id, Request $request, UnreadMessagesController $unreadMessagesController)
     {
         $menus = Menu::findOrFail($id);
         $categories = Category::all(); // Fetch all categories
 
-        return view('admin.menuEdit', compact('menus', 'categories'));
+        // Fetch unread message data using the UnreadMessagesController
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        return view('admin.menuEdit', compact('menus', 'categories', 'totalUnreadCount'));
     }
 
     /**

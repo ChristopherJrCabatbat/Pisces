@@ -15,32 +15,53 @@
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
+    
+    <li>
+        <a href="/admin/promotions" class="fs-5 sidebar-font"><i class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
+   </li>
 
-    <li class="sidebar-item" id="customersDropdown">
+    <li class="sidebar-item position-relative" id="customersDropdown">
         <a href="javascript:void(0)"
             class="fs-5 sidebar-font d-flex customers justify-content-between {{ request()->is('admin/updates', 'admin/feedback', 'admin/monitoring') ? 'active' : '' }}">
-            <div><i class="fa-solid fa-users me-3"></i>Customers</div>
+            <div>
+                <i class="fa-solid fa-users me-3"></i>Customers
+            </div>
+            <!-- Unread messages badge -->
+            @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                <span class="badge bg-danger position-absolute translate-middle" style="left: 10.5rem; top: 1rem;">
+                    {{ $totalUnreadCount }}
+                </span>
+            @endif
             <div class="caret-icon">
                 <i class="fa-solid fa-caret-right"></i>
             </div>
         </a>
         <!-- Dropdown menu -->
         <ul class="dropdown-customers" style="display: none;">
-            <li><a href="{{ route('admin.updates') }}"
-                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-user-pen me-2"></i>Customer Updates</a>
+            <li>
+                <a href="{{ route('admin.updates') }}"
+                    class="{{ request()->routeIs('admin.updates') ? 'active-customer-route' : '' }}">
+                    <i class="fa-solid fa-user-pen me-2"></i>Customer Updates
+                </a>
             </li>
-            <li><a href="{{ route('admin.feedback') }}"
-                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-comments me-2"></i>Feedback
-                    Collection</a></li>
-            {{-- <li><a href="{{ route('admin.monitoring') }}"
-                    class="{{ request()->routeIs('admin.monitoring') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-users-gear me-2"></i><span class="monitor-margin">Customer Activity</span>
-                    <span class="monitor-margin">Monitoring</span></a></li> --}}
-            <li><a href="{{ route('admin.customerMessages') }}"
-                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+            <li>
+                <a href="{{ route('admin.feedback') }}"
+                    class="{{ request()->routeIs('admin.feedback') ? 'active-customer-route' : '' }}">
+                    <i class="fa-solid fa-comments me-2"></i>Feedback Collection
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.customerMessages') }}"
+                    class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}">
+                    <i class="fa-solid fa-message"></i> Customer Messages
+                    <!-- Individual unread messages badge -->
+                    @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                        <span class="badge bg-danger">
+                            {{ $totalUnreadCount }}
+                        </span>
+                    @endif
+                </a>
+            </li>
         </ul>
     </li>
 
@@ -66,7 +87,7 @@
                 <!-- Name -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="name" class="form-label">Name:</label>
-                    <div class="form-control">{{ $menus->name }}</div>
+                    <div class="form-control">{{ $menus->name }} @if($menus->rating)<small>({{ $menus->rating }} <i class="fa-solid fa-star"></i>)</small>@endif</div>
                 </div>
 
                 <div class="mb-3 w-100 d-flex justify-content-center align-items-start gap-2">
@@ -75,9 +96,9 @@
                         <label for="price" class="form-label">Price:</label>
                         <div class="form-control">
                             @if (floor($menus->price) == $menus->price)
-                                {{ number_format($menus->price, 0) }} <!-- No decimals if it's a whole number -->
+                                ₱{{ number_format($menus->price, 0) }} <!-- No decimals if it's a whole number -->
                             @else
-                                {{ number_format($menus->price, 2) }} <!-- Show two decimals if it's not a whole number -->
+                                ₱{{ number_format($menus->price, 2) }} <!-- Show two decimals if it's not a whole number -->
                             @endif
                         </div>
                     </div>

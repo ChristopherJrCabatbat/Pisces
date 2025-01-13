@@ -38,28 +38,28 @@ class CategoryController extends Controller
     // }
 
     public function index(Request $request, UnreadMessagesController $unreadMessagesController)
-{
-    // Fetch unread message data
-    $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
-    $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+    {
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-    // Fetch search, filter, and sort parameters
-    $search = $request->input('search'); // Search term
-    $filter = $request->input('filter', ''); // Sorting direction (asc/desc)
+        // Fetch search, filter, and sort parameters
+        $search = $request->input('search'); // Search term
+        $filter = $request->input('filter', ''); // Sorting direction (asc/desc)
 
-    // Query categories with filtering, searching, and sorting
-    $categories = Category::query()
-        ->when($search, function ($query, $search) {
-            $query->where('category', 'like', '%' . $search . '%'); // Apply search filter
-        })
-        ->when($filter, function ($query, $filter) {
-            $query->orderBy('category', $filter); // Apply sorting filter
-        })
-        ->get(); // Retrieve all categories without pagination
+        // Query categories with filtering, searching, and sorting
+        $categories = Category::query()
+            ->when($search, function ($query, $search) {
+                $query->where('category', 'like', '%' . $search . '%'); // Apply search filter
+            })
+            ->when($filter, function ($query, $filter) {
+                $query->orderBy('category', $filter); // Apply sorting filter
+            })
+            ->get(); // Retrieve all categories without pagination
 
-    // Pass variables to the view
-    return view('admin.category', compact('categories', 'search', 'filter', 'totalUnreadCount'));
-}
+        // Pass variables to the view
+        return view('admin.category', compact('categories', 'search', 'filter', 'totalUnreadCount'));
+    }
 
 
 
@@ -67,9 +67,13 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request, UnreadMessagesController $unreadMessagesController)
     {
-        return view('admin.categoryCreate');
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        return view('admin.categoryCreate', compact('totalUnreadCount'));
     }
 
     /**
@@ -119,20 +123,32 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id, Request $request, UnreadMessagesController $unreadMessagesController)
     {
+        // Fetch the category by ID
         $category = Category::findOrFail($id);
-        return view('admin.categoryShow', compact('category'));
+
+        // Fetch unread message data using the UnreadMessagesController
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        // Pass both the category and unread message count to the view
+        return view('admin.categoryShow', compact('category', 'totalUnreadCount'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id, Request $request, UnreadMessagesController $unreadMessagesController)
     {
         $category = Category::findOrFail($id);
 
-        return view('admin.categoryEdit', compact('category'));
+        // Fetch unread message data using the UnreadMessagesController
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        return view('admin.categoryEdit', compact('category','totalUnreadCount'));
     }
 
     /**

@@ -68,6 +68,14 @@ class RoleMiddleware
                 'admin.assignRider',
                 'admin.deliveryCreateRider',
                 'admin.storeRider',
+                   
+                'admin.promotions.index',
+                'admin.promotions.create',
+                'admin.promotions.store',
+                'admin.promotions.show',
+                'admin.promotions.edit',
+                'admin.promotions.update',
+                'admin.promotions.destroy',
 
                 'admin.customers',
                 'admin.monitoring',
