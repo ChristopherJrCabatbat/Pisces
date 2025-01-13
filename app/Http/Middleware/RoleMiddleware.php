@@ -26,6 +26,8 @@ class RoleMiddleware
                 'admin.dashboard',
 
                 'admin.userUpdate',
+                'admin.userDestroy',
+                'admin.saveFeedback',
 
                 'admin.menu.index',
                 'admin.menu.create',

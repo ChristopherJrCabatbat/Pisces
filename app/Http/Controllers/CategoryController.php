@@ -16,27 +16,6 @@ class CategoryController extends Controller
      * Display a listing of the resource.
      */
 
-    // public function index(Request $request)
-    // {
-    //     // Fetch search, filter, and sort parameters
-    //     $search = $request->input('search'); // Search term
-    //     $filter = $request->input('filter', ''); // Sorting direction (asc/desc)
-
-    //     // Query categories with filtering, searching, and sorting
-    //     $categories = Category::query()
-    //         ->when($search, function ($query, $search) {
-    //             $query->where('category', 'like', '%' . $search . '%'); // Apply search filter
-    //         })
-    //         ->when($filter, function ($query, $filter) {
-    //             $query->orderBy('category', $filter); // Apply sorting filter
-    //         })
-    //         ->paginate(4) // Paginate with 4 items per page
-    //         ->appends(['search' => $search, 'filter' => $filter]); // Preserve query parameters in pagination
-
-    //     // Pass variables to the view
-    //     return view('admin.category', compact('categories', 'search', 'filter'));
-    // }
-
     public function index(Request $request, UnreadMessagesController $unreadMessagesController)
     {
         // Fetch unread message data
@@ -44,21 +23,20 @@ class CategoryController extends Controller
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
         // Fetch search, filter, and sort parameters
-        $search = $request->input('search'); // Search term
-        $filter = $request->input('filter', ''); // Sorting direction (asc/desc)
+        $filter = $request->input('filter', '');
 
         // Query categories with filtering, searching, and sorting
         $categories = Category::query()
-            ->when($search, function ($query, $search) {
-                $query->where('category', 'like', '%' . $search . '%'); // Apply search filter
-            })
+            // ->when($search, function ($query, $search) {
+            //     $query->where('category', 'like', '%' . $search . '%'); // Apply search filter
+            // })
             ->when($filter, function ($query, $filter) {
                 $query->orderBy('category', $filter); // Apply sorting filter
             })
             ->get(); // Retrieve all categories without pagination
 
         // Pass variables to the view
-        return view('admin.category', compact('categories', 'search', 'filter', 'totalUnreadCount'));
+        return view('admin.category', compact('categories', 'filter', 'totalUnreadCount'));
     }
 
 
@@ -211,8 +189,6 @@ class CategoryController extends Controller
         // Redirect back to the category index page
         return redirect()->route('admin.category.index');
     }
-
-
 
 
     /**

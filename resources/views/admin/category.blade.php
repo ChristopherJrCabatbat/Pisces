@@ -102,23 +102,6 @@
 
                 <!-- Left Section -->
                 <div class="left d-flex">
-                    {{-- <div class="d-flex custom-filter me-3">
-                        <!-- Category Filter Section -->
-                        <form action="{{ route('admin.category.index') }}" method="GET" id="filter-form" class="d-flex">
-                            <select name="filter" id="categoryFilter" class="form-select custom-select"
-                                aria-label="Category Filter">
-                                <option value="" {{ request('filter') == '' ? 'selected' : '' }}>Default</option>
-                                <option value="asc" {{ request('filter') == 'asc' ? 'selected' : '' }}>A - Z
-                                </option>
-                                <option value="desc" {{ request('filter') == 'desc' ? 'selected' : '' }}>Z - A
-                                </option>
-                            </select>
-                            <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
-                                <i class="fa-solid fa-sort me-2"></i>Apply
-                            </button>
-                        </form>
-                    </div> --}}
-                    
                     <div class="d-flex justify-content-between gap-1">
                         <!-- Filter Form -->
                         <form action="{{ route('admin.category.index') }}" method="GET" id="filter-form" class="d-flex">
@@ -127,20 +110,8 @@
                                 <option value="asc" {{ request('filter') == 'asc' ? 'selected' : '' }}>A - Z</option>
                                 <option value="desc" {{ request('filter') == 'desc' ? 'selected' : '' }}>Z - A</option>
                             </select>
-                            <!-- Preserve search value when filtering -->
-                            <input type="hidden" name="search" value="{{ request('search') }}">
                         </form>
 
-                        {{-- <!-- Search Form -->
-                        <form action="{{ route('admin.category.index') }}" method="GET" id="search-form" class="d-flex">
-                            <input type="search" name="search" placeholder="Search something..."
-                                class="form-control no-right-radius" id="search-input" value="{{ request('search') }}">
-                            <!-- Preserve filter value when searching -->
-                            <input type="hidden" name="filter" value="{{ request('filter') }}">
-                            <button type="submit" class="btn btn-primary no-left-radius">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </form> --}}
                     </div>
                 </div>
 
@@ -148,30 +119,10 @@
                 <div class="right d-flex gap-2">
                     <div class="position-relative custom-search" id="search-form">
                         <!-- Search Form -->
-                        <form action="{{ route('admin.category.index') }}" method="GET">
                             <input type="search" name="search" placeholder="Search something..." class="form-control"
                                 id="search-input" value="{{ $search ?? '' }}">
                             <i class="fas fa-search custom-search-icon"></i>
-                        </form>
                     </div>
-
-                    {{-- <div class="position-relative custom-search" id="search-form">
-                        <form action="{{ route('admin.category.index') }}" method="GET" id="search-form">
-                            <input type="search" name="search" placeholder="Search something..." class="form-control"
-                                id="search-input" value="{{ $search ?? '' }}" />
-                            <i class="fas fa-search custom-search-icon"></i>
-                        </form>
-                    </div>
-                    <!-- Search Form -->
-                    <form action="{{ route('admin.category.index') }}" method="GET" id="search-form" class="d-flex">
-                        <input type="search" name="search" placeholder="Search something..."
-                            class="form-control no-right-radius" id="search-input" value="{{ request('search') }}">
-                        <!-- Preserve filter value when searching -->
-                        <input type="hidden" name="filter" value="{{ request('filter') }}">
-                        <button type="submit" class="btn btn-primary no-left-radius">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </form> --}}
 
                     <div>
                         <a href="{{ route('admin.category.create') }}" class="btn btn-primary">

@@ -15,6 +15,7 @@ use App\Models\Category;
 use App\Models\Delivery;
 use App\Models\Message;
 use App\Models\Feedback;
+use App\Models\Home;
 
 class AdminController extends Controller
 {
@@ -117,10 +118,72 @@ class AdminController extends Controller
         // Set a toast session with the success message
         session()->flash('toast', [
             'message' => 'Profile updated successfully.',
-            'type' => 'success', // 'success' or 'error'
+            'type' => 'success',
         ]);
 
         return redirect()->back()->with('success', 'Profile updated successfully!');
+    }
+
+    public function saveFeedback(Request $request)
+    {
+        // Validate the input
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'rating' => 'nullable|integer|min:1|max:5',
+            'feedback' => 'nullable|string',
+        ]);
+
+        try {
+            // Save to the homes table
+            Home::create([
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'rating' => $validated['rating'],
+                'feedback' => $validated['feedback'],
+            ]);
+
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'Feedback saved successfully.',
+                'type' => 'success', // Toast type for success
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to save feedback. Please try again.',
+                'type' => 'error', // Toast type for error
+            ]);
+        }
+
+        // Redirect back to the previous page
+        return redirect()->back();
+    }
+
+
+    public function userDestroy(string $id)
+    {
+        $user = User::findOrFail($id);
+
+        try {
+            // Delete the user
+            $user->delete();
+
+            // Set success toast message
+            session()->flash('toast', [
+                'message' => 'User deleted successfully.',
+                'type' => 'success', // Toast type for success
+            ]);
+        } catch (\Exception $e) {
+            // Set error toast message
+            session()->flash('toast', [
+                'message' => 'Failed to delete user. Please try again.',
+                'type' => 'error',
+            ]);
+        }
+
+        // Redirect back to the updates page
+        return redirect()->route('admin.updates');
     }
 
 
@@ -397,6 +460,39 @@ class AdminController extends Controller
 
 
 
+    // public function updates(Request $request, UnreadMessagesController $unreadMessagesController)
+    // {
+    //     // Fetch unread message data
+    //     $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+    //     $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+    //     // Fetch search and filter parameters
+    //     $search = $request->input('search', '');
+    //     $filter = $request->input('filter', 'default'); // Default filter
+
+    //     // Query users with search and filter
+    //     $users = User::where('role', 'User')
+    //         ->when($search, function ($query, $search) {
+    //             $query->where(function ($subQuery) use ($search) {
+    //                 $subQuery->where('first_name', 'like', '%' . $search . '%')
+    //                     ->orWhere('last_name', 'like', '%' . $search . '%');
+    //             });
+    //         })
+    //         ->when($filter === 'alphabetical', function ($query) {
+    //             $query->orderBy('first_name')->orderBy('last_name'); // Alphabetical order
+    //         })
+    //         ->when($filter === 'new', function ($query) {
+    //             $query->orderBy('created_at', 'desc'); // New customers first
+    //         })
+    //         ->when($filter === 'old', function ($query) {
+    //             $query->orderBy('created_at', 'asc'); // Old customers first
+    //         })
+    //         ->get(); // Retrieve all results without pagination
+
+    //     // Pass variables to the view
+    //     return view('admin.updates', compact('users', 'search', 'filter', 'totalUnreadCount'));
+    // }
+
     public function updates(Request $request, UnreadMessagesController $unreadMessagesController)
     {
         // Fetch unread message data
@@ -430,6 +526,7 @@ class AdminController extends Controller
         return view('admin.updates', compact('users', 'search', 'filter', 'totalUnreadCount'));
     }
 
+
     public function viewOrders($userId)
     {
         $user = User::findOrFail($userId);
@@ -457,51 +554,51 @@ class AdminController extends Controller
     }
 
     public function getOrderDetails($id)
-{
-    // Find the delivery record by ID or fail with a 404
-    $delivery = Delivery::findOrFail($id);
+    {
+        // Find the delivery record by ID or fail with a 404
+        $delivery = Delivery::findOrFail($id);
 
-    // Log the delivery data
-    Log::info('Delivery data fetched:', ['delivery' => $delivery]);
+        // Log the delivery data
+        Log::info('Delivery data fetched:', ['delivery' => $delivery]);
 
-    // Split orders to extract menu names
-    $orders = explode(', ', $delivery->order);
+        // Split orders to extract menu names
+        $orders = explode(', ', $delivery->order);
 
-    // Remove the quantity part (e.g., "(x5)") from each menu name
-    $plainMenuNames = array_map(function ($order) {
-        return preg_replace('/\s*\(x\d+\)$/', '', $order);
-    }, $orders);
+        // Remove the quantity part (e.g., "(x5)") from each menu name
+        $plainMenuNames = array_map(function ($order) {
+            return preg_replace('/\s*\(x\d+\)$/', '', $order);
+        }, $orders);
 
-    // Log cleaned menu names
-    Log::info('Cleaned menu names:', ['menu_names' => $plainMenuNames]);
+        // Log cleaned menu names
+        Log::info('Cleaned menu names:', ['menu_names' => $plainMenuNames]);
 
-    // Fetch menu images using the cleaned menu names
-    $menuImages = Menu::whereIn('name', $plainMenuNames)
-        ->pluck('image', 'name')
-        ->map(function ($image) {
-            // Use fallback image if the menu item doesn't have an image
-            return $image ? asset('storage/' . $image) : asset('images/logo.jpg');
-        })
-        ->toArray();
+        // Fetch menu images using the cleaned menu names
+        $menuImages = Menu::whereIn('name', $plainMenuNames)
+            ->pluck('image', 'name')
+            ->map(function ($image) {
+                // Use fallback image if the menu item doesn't have an image
+                return $image ? asset('storage/' . $image) : asset('images/logo.jpg');
+            })
+            ->toArray();
 
-    // Log menu images
-    Log::info('Menu images fetched:', ['menu_images' => $menuImages]);
+        // Log menu images
+        Log::info('Menu images fetched:', ['menu_images' => $menuImages]);
 
-    return response()->json([
-        'success' => true,
-        'delivery' => [
-            'name' => $delivery->name,
-            'email' => $delivery->email,
-            'contact_number' => $delivery->contact_number,
-            'address' => $delivery->address,
-            'total_price' => $delivery->total_price,
-            'status' => $delivery->status,
-            'order' => $delivery->order,
-            'quantity' => $delivery->quantity,
-        ],
-        'menu_images' => $menuImages, // Include menu images in the response
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'delivery' => [
+                'name' => $delivery->name,
+                'email' => $delivery->email,
+                'contact_number' => $delivery->contact_number,
+                'address' => $delivery->address,
+                'total_price' => $delivery->total_price,
+                'status' => $delivery->status,
+                'order' => $delivery->order,
+                'quantity' => $delivery->quantity,
+            ],
+            'menu_images' => $menuImages, // Include menu images in the response
+        ]);
+    }
 
 
     public function monitoring()

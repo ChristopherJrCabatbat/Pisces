@@ -584,7 +584,7 @@
         - #TESTIMONIALS
       -->
 
-            <section class="section testi" aria-labelledby="testi-label">
+            {{-- <section class="section testi" aria-labelledby="testi-label">
                 <div class="container">
 
                     <div class="testi-content" data-reveal="left">
@@ -622,9 +622,53 @@
                     </figure>
 
                 </div>
+            </section> --}}
+
+            <section class="section testi" aria-labelledby="testi-label">
+                <div class="container">
+            
+                    <div class="testi-content" data-reveal="left">
+            
+                        <h2 class="h2 section-title" id="testi-label">What customers say about us</h2>
+            
+                        <blockquote class="testi-text">
+                            "{{ $feedback->feedback ?? 'No feedback available yet.' }}"
+                        </blockquote>
+            
+                        <div class="wrapper">
+                            <img src="./home-assets/images/testi-avatar.png" width="70" height="70"
+                                loading="lazy" alt="Author Image" class="author-img">
+            
+                            <div>
+                                <p class="author-title">
+                                    {{ $feedback ? $feedback->first_name . ' ' . $feedback->last_name : 'Anonymous' }}
+                                </p>
+            
+                                <div class="rating-wrapper">
+                                    @if ($feedback && $feedback->rating)
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= $feedback->rating)
+                                                <ion-icon name="star" aria-hidden="true"></ion-icon>
+                                            @else
+                                                <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
+                                            @endif
+                                        @endfor
+                                    @else
+                                        <p>No rating available</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+            
+                    </div>
+            
+                    <figure class="testi-banner" data-reveal="right">
+                        <img src="./home-assets/images/testimonial-banner.png" width="680" height="588"
+                            alt="testimonial banner" class="w-100">
+                    </figure>
+            
+                </div>
             </section>
-
-
 
 
 

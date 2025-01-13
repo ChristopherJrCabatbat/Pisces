@@ -73,6 +73,8 @@ Route::group([
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     Route::put('/userUpdate', [AdminController::class, 'userUpdate'])->name('userUpdate');
+    Route::delete('/userDestroy/{id}', [AdminController::class, 'userDestroy'])->name('userDestroy');
+    Route::post('/saveFeedback', [AdminController::class, 'saveFeedback'])->name('saveFeedback');
 
     // Route::get('/menu', [AdminController::class, 'menu'])->name('menu');
     Route::resource('menu', MenuController::class);

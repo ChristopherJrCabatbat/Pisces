@@ -10,7 +10,7 @@
     <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a>
     </li>
     <li><a href="/admin/menu" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
-    <li class="add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-list me-2"></i> Category</a></li>
+    <li class="add-categ"><a href="/admin/category" class="sidebar-font"><i class="fa-solid fa-list me-2"></i> Category</a></li>
     {{-- <li class="edit-categ add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-edit me-2"></i> Edit Category</a></li> --}}
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>

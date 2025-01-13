@@ -17,8 +17,8 @@
         }
 
         /* .table-container {
-            padding: 1rem 2rem 0rem 2rem;
-        } */
+                    padding: 1rem 2rem 0rem 2rem;
+                } */
     </style>
 @endsection
 
@@ -26,17 +26,16 @@
     <li><a href="{{ route('admin.dashboard') }}" class="fs-5 sidebar-font"><i class="fa-solid fa-house me-3"></i>Dashboard</a>
     </li>
 
-    <li><a href="/admin/menu" class="active fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
+    <li><a href="/admin/menu" class="fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
 
-    <li class="add-categ"><a href="#" class="sidebar-font"><i class="fa-solid fa-list me-2"></i> Category</a></li>
-    
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
-    
+
     <li>
-        <a href="/admin/promotions" class="fs-5 sidebar-font"><i class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
-   </li>
+        <a href="/admin/promotions" class="active fs-5 sidebar-font"><i
+                class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
+    </li>
 
     <li class="sidebar-item position-relative" id="customersDropdown">
         <a href="javascript:void(0)"
@@ -90,57 +89,28 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                    class="navigation">Dashboard</a> / <a href="{{ route('admin.menu.index') }}"
-                    class="navigation">Menu</a>
-                / </div>
-            <span class="faded-white ms-1">Category</span>
+                    class="navigation">Dashboard</a> /
+            </div>
+            <span class="faded-white ms-1">Promotions</span>
         </div>
 
         <div class="table-container">
+            {{-- <h2 class="text-black">Promotions</h2> --}}
 
             <div class="taas-table mb-3 d-flex justify-content-between align-items-center">
 
                 <!-- Left Section -->
                 <div class="left d-flex">
-                    {{-- <div class="d-flex custom-filter me-3">
-                        <!-- Category Filter Section -->
-                        <form action="{{ route('admin.category.index') }}" method="GET" id="filter-form" class="d-flex">
-                            <select name="filter" id="categoryFilter" class="form-select custom-select"
-                                aria-label="Category Filter">
-                                <option value="" {{ request('filter') == '' ? 'selected' : '' }}>Default</option>
-                                <option value="asc" {{ request('filter') == 'asc' ? 'selected' : '' }}>A - Z
-                                </option>
-                                <option value="desc" {{ request('filter') == 'desc' ? 'selected' : '' }}>Z - A
-                                </option>
-                            </select>
-                            <button type="submit" class="btn btn-primary custom-filter-btn button-wid">
-                                <i class="fa-solid fa-sort me-2"></i>Apply
-                            </button>
-                        </form>
-                    </div> --}}
-                    
-                    <div class="d-flex justify-content-between gap-1">
+                    <div class="d-flex justify-content-between">
                         <!-- Filter Form -->
-                        <form action="{{ route('admin.category.index') }}" method="GET" id="filter-form" class="d-flex">
+                        <form action="{{ route('admin.promotions.index') }}" method="GET" id="filter-form"
+                            class="d-flex">
                             <select name="filter" id="categoryFilter" class="form-select custom-select">
                                 <option value="" {{ request('filter') == '' ? 'selected' : '' }}>Default</option>
                                 <option value="asc" {{ request('filter') == 'asc' ? 'selected' : '' }}>A - Z</option>
                                 <option value="desc" {{ request('filter') == 'desc' ? 'selected' : '' }}>Z - A</option>
                             </select>
-                            <!-- Preserve search value when filtering -->
-                            <input type="hidden" name="search" value="{{ request('search') }}">
                         </form>
-
-                        {{-- <!-- Search Form -->
-                        <form action="{{ route('admin.category.index') }}" method="GET" id="search-form" class="d-flex">
-                            <input type="search" name="search" placeholder="Search something..."
-                                class="form-control no-right-radius" id="search-input" value="{{ request('search') }}">
-                            <!-- Preserve filter value when searching -->
-                            <input type="hidden" name="filter" value="{{ request('filter') }}">
-                            <button type="submit" class="btn btn-primary no-left-radius">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </form> --}}
                     </div>
                 </div>
 
@@ -148,33 +118,13 @@
                 <div class="right d-flex gap-2">
                     <div class="position-relative custom-search" id="search-form">
                         <!-- Search Form -->
-                        <form action="{{ route('admin.category.index') }}" method="GET">
-                            <input type="search" name="search" placeholder="Search something..." class="form-control"
-                                id="search-input" value="{{ $search ?? '' }}">
-                            <i class="fas fa-search custom-search-icon"></i>
-                        </form>
+                        <input type="search" name="search" placeholder="Search something..." class="form-control"
+                            id="search-input" value="{{ $search ?? '' }}">
+                        <i class="fas fa-search custom-search-icon"></i>
                     </div>
-
-                    {{-- <div class="position-relative custom-search" id="search-form">
-                        <form action="{{ route('admin.category.index') }}" method="GET" id="search-form">
-                            <input type="search" name="search" placeholder="Search something..." class="form-control"
-                                id="search-input" value="{{ $search ?? '' }}" />
-                            <i class="fas fa-search custom-search-icon"></i>
-                        </form>
-                    </div>
-                    <!-- Search Form -->
-                    <form action="{{ route('admin.category.index') }}" method="GET" id="search-form" class="d-flex">
-                        <input type="search" name="search" placeholder="Search something..."
-                            class="form-control no-right-radius" id="search-input" value="{{ request('search') }}">
-                        <!-- Preserve filter value when searching -->
-                        <input type="hidden" name="filter" value="{{ request('filter') }}">
-                        <button type="submit" class="btn btn-primary no-left-radius">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </form> --}}
 
                     <div>
-                        <a href="{{ route('admin.category.create') }}" class="btn btn-primary">
+                        <a href="{{ route('admin.promotions.create') }}" class="btn btn-primary">
                             <i class="fa-solid fa-plus me-2"></i>Add
                         </a>
                     </div>
@@ -188,33 +138,41 @@
                     <tr>
                         <th scope="col">Image</th>
                         <th scope="col">Name</th>
+                        <th scope="col">How Often</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="menu-table-body">
-                    @forelse ($categories as $category)
+                    @forelse ($promotions as $promotion)
                         <tr class="menu-row">
                             <td>
-                                @if ($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
+                                @if ($promotion->image)
+                                    <img src="{{ asset('storage/' . $promotion->image) }}" alt="{{ $promotion->name }}"
                                         class="img-fluid" width="50">
                                 @else
                                     <span>No Image</span>
                                 @endif
                             </td>
-                            <td>{{ $category->category }}</td>
+                            <td>{{ $promotion->name }}</td>
+                            <td>
+                                @if ($promotion->how_often > 1)
+                                    Every {{ $promotion->how_often }} days.
+                                @else
+                                    Once a day.
+                                @endif
+                            </td>
                             <td style="width: 16vw;">
-                                <a href="{{ route('admin.category.show', $category->id) }}" class="btn btn-sm btn-info"
+                                <a href="{{ route('admin.promotions.show', $promotion->id) }}" class="btn btn-sm btn-info"
                                     title="View">
                                     <i class="fa fa-eye"></i>
                                 </a>
-                                <a href="{{ route('admin.category.edit', $category->id) }}" class="btn btn-sm btn-warning"
-                                    title="Edit">
+                                <a href="{{ route('admin.promotions.edit', $promotion->id) }}"
+                                    class="btn btn-sm btn-warning" title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.category.destroy', $category->id) }}" method="POST"
+                                <form action="{{ route('admin.promotions.destroy', $promotion->id) }}" method="POST"
                                     style="display:inline;"
-                                    onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                    onsubmit="return confirm('Are you sure you want to delete this promotion?');">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-danger" type="submit" title="Delete">
@@ -225,11 +183,11 @@
                         </tr>
                     @empty
                         <tr id="">
-                            <td colspan="6">No categories found.</td>
+                            <td colspan="6">No promotions found.</td>
                         </tr>
                     @endforelse
                     <tr id="no-menus-row" style="display: none">
-                        <td colspan="6">No categories found.</td>
+                        <td colspan="6">No promotions found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -262,9 +220,10 @@
 
             categoryRows.forEach(row => {
                 const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const howOften = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
 
                 // Check if the row matches the search term
-                const matchesSearch = name.includes(searchTerm);
+                const matchesSearch = name.includes(searchTerm) || howOften.includes(searchTerm);
 
                 // Show or hide the row based on the match
                 if (matchesSearch) {
@@ -282,7 +241,7 @@
             } else {
                 noCategoriesRow.style.display = "";
                 noCategoriesRow.innerHTML =
-                    `<td colspan="6">No categories found matching your search.</td>`;
+                    `<td colspan="6">No promotions found.</td>`;
             }
         }
 
