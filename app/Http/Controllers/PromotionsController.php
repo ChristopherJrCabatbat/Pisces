@@ -136,29 +136,76 @@ class PromotionsController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    // public function update(Request $request, string $id)
+    // {
+    //     $promotion = Promotion::findOrFail($id);
+
+    //     // Validate the form data
+    //     $validated = $request->validate([
+    //         'name' => 'required|string',
+    //         'availability' => 'required|boolean',
+    //         'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image type and size
+    //     ]);
+
+    //     $imagePath = null;
+
+    //     // Handle image upload if provided
+    //     if ($request->hasFile('image')) {
+    //         // Delete the old image if it exists
+    //         if ($promotion->image && Storage::exists('public/' . $promotion->image)) {
+    //             Storage::delete('public/' . $promotion->image);
+    //         }
+
+    //         $imagePath = $request->file('image')->store('promotion_images', 'public');
+    //     }
+
+    //     try {
+    //         // Update the promotion
+    //         $promotion->update([
+    //             'name' => $validated['name'],
+    //             'availability' => $validated['availability'], // Update availability
+    //             'image' => $imagePath ?? $promotion->image, // Update image path only if a new image is uploaded
+    //         ]);
+
+    //         // Set success toast message
+    //         session()->flash('toast', [
+    //             'message' => 'Promotion updated successfully.',
+    //             'type' => 'success',
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         // Set error toast message
+    //         session()->flash('toast', [
+    //             'message' => 'Failed to update promotion. Please try again.',
+    //             'type' => 'error',
+    //         ]);
+    //     }
+
+    //     return redirect()->route('admin.promotions.index');
+    // }
+
     public function update(Request $request, string $id)
     {
         $promotion = Promotion::findOrFail($id);
-    
+
         // Validate the form data
         $validated = $request->validate([
             'name' => 'required|string',
             'availability' => 'required|boolean',
             'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image type and size
         ]);
-    
+
         $imagePath = null;
-    
+
         // Handle image upload if provided
         if ($request->hasFile('image')) {
             // Delete the old image if it exists
             if ($promotion->image && Storage::exists('public/' . $promotion->image)) {
                 Storage::delete('public/' . $promotion->image);
             }
-    
+
             $imagePath = $request->file('image')->store('promotion_images', 'public');
         }
-    
+
         try {
             // Update the promotion
             $promotion->update([
@@ -166,23 +213,22 @@ class PromotionsController extends Controller
                 'availability' => $validated['availability'], // Update availability
                 'image' => $imagePath ?? $promotion->image, // Update image path only if a new image is uploaded
             ]);
-    
-            // Set success toast message
+
             session()->flash('toast', [
                 'message' => 'Promotion updated successfully.',
                 'type' => 'success',
             ]);
         } catch (\Exception $e) {
-            // Set error toast message
             session()->flash('toast', [
                 'message' => 'Failed to update promotion. Please try again.',
                 'type' => 'error',
             ]);
         }
-    
+
         return redirect()->route('admin.promotions.index');
     }
-    
+
+
 
     /**
      * Remove the specified resource from storage.

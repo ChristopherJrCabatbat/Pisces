@@ -99,37 +99,37 @@
                 <div class="h2"><i class="fa-solid fa-plus me-2"></i>Edit Promotion</div>
             </div>
 
-            <form action="{{ route('admin.promotions.update', $promotion->id) }}" method="POST"
-                enctype="multipart/form-data">
+            <form action="{{ route('admin.promotions.update', $promotion->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-
+            
                 <!-- Name -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="name" class="form-label">Promotion Name:</label>
                     <input type="text" name="name" class="form-control" id="name"
                         value="{{ old('name', $promotion->name) }}" required placeholder="e.g. Christmas Promo" autofocus>
                 </div>
-
+            
                 <!-- Availability -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="availability" class="form-label">Availability:</label>
+                    <input type="hidden" name="availability" value="0"> <!-- Hidden input for unchecked state -->
                     <div class="form-check form-switch d-flex gap-2 justify-content-center">
-                        <input class="form-check-input availability-toggle" type="checkbox" id="availability"
-                            name="availability" {{ $promotion->availability ? 'checked' : '' }}>
+                        <input class="form-check-input availability-toggle" type="checkbox" id="availability" name="availability"
+                            value="1" {{ $promotion->availability ? 'checked' : '' }}>
                         <label class="form-check-label ms-0" id="availabilityLabel">
                             {{ $promotion->availability ? 'Available' : 'Unavailable' }}
                         </label>
                     </div>
                 </div>
-
+            
                 <!-- Current Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="current_image" class="form-label">Image:</label>
                     <img src="{{ Storage::url($promotion->image) }}" alt="{{ $promotion->name }}" class="img-fluid"
                         width="150">
                 </div>
-
+            
                 <!-- New Image -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
                     <label for="image" class="form-label">New Image (optional):</label>
@@ -141,23 +141,22 @@
                         <div class="error alert alert-danger">{{ $message }}</div>
                     @enderror
                 </div>
-
+            
                 <div class="d-grid my-2">
                     <button class="btn btn-primary dark-blue" type="submit">Update</button>
                 </div>
             </form>
-
         </div>
 
     </div>
 @endsection
 
 @section('scripts')
-    <script>
-        // Update the label based on the toggle state
-        document.getElementById('availability').addEventListener('change', function() {
-            const label = document.getElementById('availabilityLabel');
-            label.textContent = this.checked ? 'Available' : 'Unavailable';
-        });
-    </script>
+<script>
+    // Update the label based on the toggle state
+    document.getElementById('availability').addEventListener('change', function () {
+        const label = document.getElementById('availabilityLabel');
+        label.textContent = this.checked ? 'Available' : 'Unavailable';
+    });
+</script>
 @endsection
