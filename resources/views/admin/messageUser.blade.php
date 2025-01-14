@@ -101,7 +101,6 @@
                     </div>
                 </div>
 
-                {{-- Nasa important notes yung original chat body --}}
                 <!-- Chat Body -->
                 <div id="chatBody" class="shop-messages overflow-auto px-3 py-3">
                     @foreach ($messages as $message)
@@ -183,7 +182,6 @@
                     @endforeach
                 </div>
 
-
                 <!-- Input Section -->
                 <div class="d-flex border-top p-3 align-items-center">
                     <form id="sendMessageForm" class="d-flex w-100" enctype="multipart/form-data">
@@ -202,7 +200,6 @@
                         </button>
                     </form>
                 </div>
-
 
             </div>
 
@@ -281,54 +278,6 @@
         });
 
         // Automatically send the image when selected
-        // imageInput.addEventListener('change', async function() {
-        //     if (imageInput.files.length === 0) return;
-
-        //     const formData = new FormData();
-        //     const imageFile = imageInput.files[0];
-
-        //     formData.append('image', imageFile);
-        //     formData.append('_token', '{{ csrf_token() }}'); // CSRF token
-
-        //     try {
-        //         const response = await fetch('{{ route('admin.sendMessage', ['userId' => 1]) }}', {
-        //             method: 'POST',
-        //             body: formData,
-        //         });
-
-        //         const result = await response.json();
-        //         if (response.ok && result.success) {
-        //             // Append the new image message to the chat body
-        //             const newMessage = `
-    //         <div class="d-flex align-items-start justify-content-end mb-4">
-    //             <span class="text-muted align-self-center small me-3">Just now</span>
-    //             ${
-    //                 result.message.image_url
-    //                     ? `<img src="${result.message.image_url}" class="rounded mt-2" alt="Sent Image" height="310px" width="auto">`
-    //                     : ''
-    //             }
-    //               <img src="{{ asset('images/logo.jpg') }}" class="rounded-circle border ms-3"
-    //                             alt="Shop icon" style="width: 40px; height: 40px; object-fit: cover;">
-    //         </div>
-    //     `;
-        //             chatBody.insertAdjacentHTML('beforeend', newMessage);
-
-        //             // Clear the file input
-        //             imageInput.value = '';
-
-        //             // Scroll to the bottom of the chat body
-        //             setTimeout(() => {
-        //                 chatBody.scrollTop = chatBody.scrollHeight;
-        //             }, 100);
-        //         } else {
-        //             alert('Failed to send the image. Please try again.');
-        //         }
-        //     } catch (error) {
-        //         console.error('Error:', error);
-        //         alert('An error occurred. Please try again.');
-        //     }
-        // });
-
         imageInput.addEventListener('change', async function() {
             if (imageInput.files.length === 0) return;
 
@@ -397,6 +346,4 @@
             });
         });
     </script>
-
-
 @endsection

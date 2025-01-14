@@ -1376,15 +1376,10 @@ class UserController extends Controller
         // Calculate the total price (Subtotal + Shipping Fee)
         $shippingFee = $delivery->shipping_fee ?? 0; // Default to 0 if not set
         $totalPrice = $subtotal + $shippingFee;
-
-        // Update the total price in the delivery table if necessary
-        // $delivery->total_price = $subtotal; // Store the subtotal
-        // $delivery->save();
-
-        // $coupons = $totalPrice - $totalDatabase;
-        $coupons = $subtotal * 0.05;
-
-        $hasDiscount = $user->has_discount;
+        
+        $coupons = $totalPrice - $totalDatabase;
+        
+        // $hasDiscount = $user->has_discount;
 
         // Count unread messages
         $unreadCount = Message::where('receiver_id', $user->id)
@@ -1409,7 +1404,7 @@ class UserController extends Controller
             'userCart',
             'userFavorites',
             'totalDatabase',
-            'hasDiscount',
+            // 'hasDiscount',
             'coupons',
         ));
     }

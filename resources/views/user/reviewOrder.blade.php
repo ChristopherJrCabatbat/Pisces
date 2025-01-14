@@ -123,11 +123,7 @@
                                 <div class="details text-muted flex-between">
                                     <div>Coupons</div>
                                     <div>
-                                        @if ($hasDiscount)
-                                            ₱{{ number_format($coupons, 2) }}
-                                        @else
-                                            ₱0
-                                        @endif
+                                        ₱{{ round($coupons) }}
                                     </div>
                                 </div>
                                 <div class="details fw-bold flex-between">
