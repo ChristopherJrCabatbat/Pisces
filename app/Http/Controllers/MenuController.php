@@ -154,9 +154,11 @@ class MenuController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    
     public function create(Request $request, UnreadMessagesController $unreadMessagesController)
     {
-        $categories = Category::all(); // Fetch all categories from the database
+        // Fetch all categories and order them alphabetically by the 'category' column
+        $categories = Category::orderBy('category', 'asc')->get();
 
         // Fetch unread message data
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();

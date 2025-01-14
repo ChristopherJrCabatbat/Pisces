@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Menu;
 use App\Models\Category;
 use App\Models\Promotion;
+use App\Models\User;
+
+use App\Services\MailerService;
 
 class PromotionsController extends Controller
 {
@@ -68,12 +71,49 @@ class PromotionsController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request)
+    // public function store(Request $request)
+    // {
+    //     // Validate the form data
+    //     $validated = $request->validate([
+    //         'name' => 'required|string',
+    //         'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image file type and size
+    //     ]);
+
+    //     // Handle file upload
+    //     $imagePath = null;
+    //     if ($request->hasFile('image')) {
+    //         $imagePath = $request->file('image')->store('promotion_images', 'public');
+    //     }
+
+    //     try {
+    //         Promotion::create([
+    //             'name' => $validated['name'],
+    //             'image' => $imagePath, // Save image path
+    //         ]);
+
+    //         // Set success toast message
+    //         session()->flash('toast', [
+    //             'message' => 'Promotion added successfully.',
+    //             'type' => 'success', // Toast type for success
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         // Set error toast message
+    //         session()->flash('toast', [
+    //             'message' => 'Failed to add promotion. Please try again.',
+    //             'type' => 'error', // Toast type for error
+    //         ]);
+    //     }
+
+    //     return redirect()->route('admin.promotions.index');
+    // }
+
+
+    public function store(Request $request, MailerService $mailerService)
     {
         // Validate the form data
         $validated = $request->validate([
             'name' => 'required|string',
-            'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image file type and size
+            'image' => 'image|mimes:jpeg,png,jpg,gif', // Validate image file type
         ]);
 
         // Handle file upload
@@ -83,10 +123,23 @@ class PromotionsController extends Controller
         }
 
         try {
-            Promotion::create([
+            // Create a new promotion entry in the database
+            $promotion = Promotion::create([
                 'name' => $validated['name'],
-                'image' => $imagePath, // Save image path
+                'image' => $imagePath, // Save the image path
             ]);
+
+            // Fetch all users subscribed to the newsletter
+            $subscribedUsers = User::where('newsletter_subscription', true)->get();
+
+            // Send email notifications to subscribed users
+            foreach ($subscribedUsers as $user) {
+                $mailerService->sendMail(
+                    $user->email,
+                    'New Promotion: ' . $promotion->name,
+                    view('emails.newPromotion', compact('promotion', 'user'))->render()
+                );
+            }
 
             // Set success toast message
             session()->flash('toast', [
@@ -94,6 +147,9 @@ class PromotionsController extends Controller
                 'type' => 'success', // Toast type for success
             ]);
         } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Error creating promotion or sending emails: ' . $e->getMessage());
+
             // Set error toast message
             session()->flash('toast', [
                 'message' => 'Failed to add promotion. Please try again.',
@@ -103,6 +159,7 @@ class PromotionsController extends Controller
 
         return redirect()->route('admin.promotions.index');
     }
+
 
     /**
      * Display the specified resource.
