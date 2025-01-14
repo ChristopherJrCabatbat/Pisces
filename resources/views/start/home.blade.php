@@ -198,16 +198,16 @@
             filter: brightness(30%);
         }
 
-        /* Optional styling for icons */
-        .rounded-circle {
-            width: 40px;
-            height: 40px;
-            background-color: transparent;
-            display: flex;
-            align-items: center;
+        .social-link i {
+            font-size: 2.2rem;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
             justify-content: center;
-            border: 1px solid hsl(0, 0%, 47%);
+            align-items: center;
+            background-color: transparent;
         }
+
     </style>
 
 
@@ -537,7 +537,7 @@
         - #STATS
       -->
 
-            <section class="stats" aria-label="statistics" data-reveal>
+            {{-- <section class="stats" aria-label="statistics" data-reveal>
                 <div class="container">
 
                     <ul class="grid-list">
@@ -576,74 +576,30 @@
                     </ul>
 
                 </div>
-            </section>
-
-
-
-            <!--
-        - #TESTIMONIALS
-      -->
-
-            {{-- <section class="section testi" aria-labelledby="testi-label">
-                <div class="container">
-
-                    <div class="testi-content" data-reveal="left">
-
-                        <h2 class="h2 section-title" id="testi-label">What customers say about us</h2>
-
-                        <blockquote class="testi-text">
-                            "I really love this place! The coffee is amazing, and the food is so good, especially the
-                            pizza! The staff is super friendly, and it feels just like home. It's definitely my new
-                            favorite tambayan!"
-                        </blockquote>
-
-                        <div class="wrapper">
-                            <img src="./home-assets/images/testi-avatar.png" width="70" height="70"
-                                loading="lazy" alt="Thomas Adamson" class="author-img">
-
-                            <div>
-                                <p class="author-title">Arron Paul Macaraeg</p>
-
-                                <div class="rating-wrapper">
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                    <ion-icon name="star" aria-hidden="true"></ion-icon>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <figure class="testi-banner" data-reveal="right">
-                        <img src="./home-assets/images/testimonial-banner.png" width="680" height="588"
-                            alt="testimonial banner" class="w-100">
-                    </figure>
-
-                </div>
             </section> --}}
 
+
+            <!-- #FEEDBACK -->
             <section class="section testi" aria-labelledby="testi-label">
                 <div class="container">
-            
+
                     <div class="testi-content" data-reveal="left">
-            
+
                         <h2 class="h2 section-title" id="testi-label">What customers say about us</h2>
-            
+
                         <blockquote class="testi-text">
                             "{{ $feedback->feedback ?? 'No feedback available yet.' }}"
                         </blockquote>
-            
+
                         <div class="wrapper">
                             <img src="./home-assets/images/testi-avatar.png" width="70" height="70"
                                 loading="lazy" alt="Author Image" class="author-img">
-            
+
                             <div>
                                 <p class="author-title">
                                     {{ $feedback ? $feedback->first_name . ' ' . $feedback->last_name : 'Anonymous' }}
                                 </p>
-            
+
                                 <div class="rating-wrapper">
                                     @if ($feedback && $feedback->rating)
                                         @for ($i = 1; $i <= 5; $i++)
@@ -659,14 +615,14 @@
                                 </div>
                             </div>
                         </div>
-            
+
                     </div>
-            
+
                     <figure class="testi-banner" data-reveal="right">
                         <img src="./home-assets/images/testimonial-banner.png" width="680" height="588"
                             alt="testimonial banner" class="w-100">
                     </figure>
-            
+
                 </div>
             </section>
 
@@ -729,9 +685,6 @@
 
                 </div>
             </section> --}}
-
-
-
 
 
             <!--
@@ -875,23 +828,26 @@
                         <ul class="social-list">
 
                             <li>
-                                <a href="https://www.facebook.com/piscesCH" target="_blank"
-                                    title="Go to Pisces Facebook Page" class="social-link">
-                                    <ion-icon name="logo-facebook"></ion-icon>
+                                <a href="https://www.facebook.com/piscesCH" target="_blank" title="Go to Pisces Facebook Page" class="social-link">
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="https://www.instagram.com/piscescoffeehub/" target="_blank" title="Go to Pisces Instagram Account" class="social-link">
+                                    <i class="fab fa-instagram"></i>
                                 </a>
                             </li>
 
                             <li>
-                                <a href="https://www.instagram.com/piscescoffeehub/" target="_blank"
-                                    title="Go to Pisces Instagram Account" class="social-link">
-                                    <ion-icon name="logo-instagram"></ion-icon>
+                                <a href="https://www.tiktok.com/@piscescoffeehub2017" target="_blank" title="Go to Pisces TikTok Page" class="social-link">
+                                    <i class="fab fa-tiktok"></i>
                                 </a>
                             </li>
-
+                            
                             <li>
-                                <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" class="social-link"
-                                    title="See Pisces in Maps" target="_blank">
-                                    <ion-icon name="location-outline"></ion-icon>
+                                <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" class="social-link" title="See Pisces in Maps" target="_blank">
+                                    <i class="fas fa-map-marker-alt"></i>
                                 </a>
                             </li>
 

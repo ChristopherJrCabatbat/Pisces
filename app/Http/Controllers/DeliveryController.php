@@ -366,137 +366,137 @@ class DeliveryController extends Controller
     // }
 
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'fullName' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'contactNumber' => 'required|string|max:20',
-        'house_number' => 'nullable|string',
-        'barangay' => 'required|string',
-        'purok' => 'nullable|string',
-        'shipping_fee' => 'required|string',
-        'paymentMethod' => 'required|string',
-        'note' => 'nullable|string',
-        'menu_names' => 'required|array',
-        'quantities' => 'required|array',
-        'total_price' => 'required|numeric',
-    ]);
-
-    try {
-        /** @var User $user */
-        $user = Auth::user();
-        $user->increment('order_count');
-
-        $orderItems = [];
-        $totalQuantity = 0;
-        $totalPrice = 0;
-
-        foreach ($request->menu_names as $index => $menuName) {
-            $quantity = $request->quantities[$index];
-            $menu = Menu::where('name', $menuName)->firstOrFail();
-            $menuDiscountedPrice = $menu->discount > 0
-                ? round($menu->price * (1 - $menu->discount / 100), 2)
-                : $menu->price;
-            $itemTotal = $menuDiscountedPrice * $quantity;
-
-            $orderItems[] = "{$menuName} (x{$quantity})";
-            $totalQuantity += $quantity;
-            $totalPrice += $itemTotal;
-        }
-
-        // Add the shipping fee to the total price
-        $shippingFee = (float)$request->input('shipping_fee');
-        $totalPrice += $shippingFee;
-
-        if ($user->has_discount) {
-            $totalPrice = ($totalPrice * 0.95) + 5;
-            $user->update(['has_discount' => false]);
-        }
-
-        $totalPrice = round($totalPrice);
-        $orderString = implode(', ', $orderItems);
-        $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
-
-        $fullAddress = (!empty($request->house_number) ? "#{$request->house_number} " : "") .
-            "Barangay {$request->barangay}" .
-            ($request->filled('purok') ? " Purok {$request->purok}" : "") .
-            " San Carlos City, Pangasinan";
-
-        $deliveryId = DB::table('deliveries')->insertGetId([
-            'name' => $request->input('fullName'),
-            'email' => $request->input('email'),
-            'contact_number' => $request->input('contactNumber'),
-            'order' => $orderString,
-            'address' => $fullAddress,
-            'quantity' => implode(', ', $request->quantities),
-            'shipping_fee' => $request->input('shipping_fee'),
-            'mode_of_payment' => $request->input('paymentMethod'),
-            'note' => $request->input('note'),
-            'status' => $status,
-            'total_price' => $totalPrice,
-            'created_at' => now(),
-            'updated_at' => now(),
+    {
+        $validatedData = $request->validate([
+            'fullName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'contactNumber' => 'required|string|max:20',
+            'house_number' => 'nullable|string',
+            'barangay' => 'required|string',
+            'purok' => 'nullable|string',
+            'shipping_fee' => 'required|string',
+            'paymentMethod' => 'required|string',
+            'note' => 'nullable|string',
+            'menu_names' => 'required|array',
+            'quantities' => 'required|array',
+            'total_price' => 'required|numeric',
         ]);
 
-        foreach ($request->menu_names as $index => $menuName) {
-            $quantity = $request->quantities[$index];
-            DB::table('orders')->insert([
-                'delivery_id' => $deliveryId,
-                'menu_name' => $menuName,
-                'quantity' => $quantity,
+        try {
+            /** @var User $user */
+            $user = Auth::user();
+            $user->increment('order_count');
+
+            $orderItems = [];
+            $totalQuantity = 0;
+            $totalPrice = 0;
+
+            foreach ($request->menu_names as $index => $menuName) {
+                $quantity = $request->quantities[$index];
+                $menu = Menu::where('name', $menuName)->firstOrFail();
+                $menuDiscountedPrice = $menu->discount > 0
+                    ? round($menu->price * (1 - $menu->discount / 100), 2)
+                    : $menu->price;
+                $itemTotal = $menuDiscountedPrice * $quantity;
+
+                $orderItems[] = "{$menuName} (x{$quantity})";
+                $totalQuantity += $quantity;
+                $totalPrice += $itemTotal;
+            }
+
+            // Add the shipping fee to the total price
+            $shippingFee = (float)$request->input('shipping_fee');
+            $totalPrice += $shippingFee;
+
+            if ($user->has_discount) {
+                $totalPrice = ($totalPrice * 0.95) + 5;
+                $user->update(['has_discount' => false]);
+            }
+
+            $totalPrice = round($totalPrice);
+            $orderString = implode(', ', $orderItems);
+            $status = $request->input('paymentMethod') === 'GCash' ? 'Pending GCash Transaction' : 'Pending';
+
+            $fullAddress = (!empty($request->house_number) ? "#{$request->house_number} " : "") .
+                "Barangay {$request->barangay}" .
+                ($request->filled('purok') ? " Purok {$request->purok}" : "") .
+                " San Carlos City, Pangasinan";
+
+            $deliveryId = DB::table('deliveries')->insertGetId([
+                'name' => $request->input('fullName'),
+                'email' => $request->input('email'),
+                'contact_number' => $request->input('contactNumber'),
+                'order' => $orderString,
+                'address' => $fullAddress,
+                'quantity' => implode(', ', $request->quantities),
+                'shipping_fee' => $request->input('shipping_fee'),
+                'mode_of_payment' => $request->input('paymentMethod'),
+                'note' => $request->input('note'),
+                'status' => $status,
+                'total_price' => $totalPrice,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-        }
 
-        // Clear the user's cart after placing the order
-        DB::table('cart_items')->where('user_id', $user->id)->delete();
-        $user->cart = 0;
-        $user->save();
+            foreach ($request->menu_names as $index => $menuName) {
+                $quantity = $request->quantities[$index];
+                DB::table('orders')->insert([
+                    'delivery_id' => $deliveryId,
+                    'menu_name' => $menuName,
+                    'quantity' => $quantity,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
-        // Update the user's last_order field
-        $user->update(['last_order' => now()]);
+            // Clear the user's cart after placing the order
+            DB::table('cart_items')->where('user_id', $user->id)->delete();
+            $user->cart = 0;
+            $user->save();
 
-        // Set modal session key if the order count is divisible by 7
-        if ($user->order_count % 7 === 0) {
-            session()->put('showExperienceModal', true); // Persistent session key
-        }
+            // Update the user's last_order field
+            $user->update(['last_order' => now()]);
 
-        // Handle GCash payment
-        if ($request->input('paymentMethod') === 'GCash') {
-            // Prepare GCash message
-            $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
+            // Set modal session key if the order count is divisible by 7
+            if ($user->order_count % 7 === 0) {
+                session()->put('showExperienceModal', true); // Persistent session key
+            }
 
-            // Save the message
-            DB::table('messages')->insert([
-                'user_id' => $user->id,
-                'receiver_id' => '1', // Assuming the user receives the message
-                'sender_role' => 'System',
-                'message_text' => $messageText,
-                'is_read' => false,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Handle GCash payment
+            if ($request->input('paymentMethod') === 'GCash') {
+                // Prepare GCash message
+                $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
 
-            // Redirect to messagesPisces with success toast
+                // Save the message
+                DB::table('messages')->insert([
+                    'user_id' => $user->id,
+                    'receiver_id' => '1', // Assuming the user receives the message
+                    'sender_role' => 'System',
+                    'message_text' => $messageText,
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Redirect to messagesPisces with success toast
+                session()->flash('toast', [
+                    'message' => 'Order placed successfully! Please check your messages to complete the GCash payment.',
+                    'type' => 'success',
+                ]);
+
+                return redirect()->route('user.messagesPisces');
+            }
+
             session()->flash('toast', [
-                'message' => 'Order placed successfully! Please check your messages to complete the GCash payment.',
+                'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
                 'type' => 'success',
             ]);
 
-            return redirect()->route('user.messagesPisces');
+            return redirect()->route('user.menu');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to place the order. ' . $e->getMessage());
         }
-
-        session()->flash('toast', [
-            'message' => 'Order placed successfully! You can monitor your order in the Orders section.',
-            'type' => 'success',
-        ]);
-
-        return redirect()->route('user.menu');
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Failed to place the order. ' . $e->getMessage());
     }
-}
 
 
     // public function store(Request $request)

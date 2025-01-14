@@ -16,10 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('category');
             $table->decimal('price', 8, 2);
-            
-            // migrate mo
-            // $table->integer('discount')->default(0);
-
+            $table->integer('discount')->default(0);
             $table->text('description');
             $table->text('image');
             $table->decimal('rating', 2, 1)->nullable();

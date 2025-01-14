@@ -1491,6 +1491,54 @@ Messages
 
 
 
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+// 2025_01_02_211704_na-migrate DELETE.php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('order_count')->default(0)->after('favorites');
+            $table->integer('rating')->nullable()->after('favorites');
+            $table->text('feedback')->nullable()->after('favorites');
+            $table->boolean('newsletter_subscription')->default(false)->after('favorites');
+            $table->boolean('has_discount')->default(false)->after('favorites');
+            $table->timestamp('last_order')->nullable()->after('favorites');
+            $table->timestamp('last_login_at')->nullable()->after('favorites');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('newsletter_subscription');
+            $table->dropColumn('last_order');
+            $table->dropColumn('last_login_at');
+            $table->dropColumn('has_discount');
+        });
+    }
+};
 
 
 
@@ -1505,7 +1553,35 @@ Messages
 
 
 
-                    <?php
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 2025_01_08_203639_create_discount DELETE.php
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -1518,8 +1594,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('deliveries', function (Blueprint $table) {
-            $table->integer('shipping_fee')->default(0)->after('shipping_method');        
+        Schema::table('menus', function (Blueprint $table) {
+            $table->integer('discount')->default(0)->after('price');        
         });
     }
 
@@ -1528,8 +1604,38 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('deliveries', function (Blueprint $table) {
-            $table->integer('shipping_fee')->default(0);        
+        Schema::table('menus', function (Blueprint $table) {
+            $table->integer('discount')->default(0);        
         });
     }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+

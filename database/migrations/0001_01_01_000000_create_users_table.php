@@ -20,19 +20,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-
             $table->integer('cart')->default(0);
             $table->integer('favorites')->default(0);
-
-            // di pa na-migrate, delete mo yung add_last_login
-            // $table->integer('order_count')->default(0);
-            // $table->integer('rating')->nullable();
-            // $table->text('feedback')->nullable();
-            // $table->timestamp('last_login_at')->nullable();
-            // $table->timestamp('last_order')->nullable();
-            // $table->boolean('has_discount')->default(false);
-            // $table->boolean('newsletter_subscription')->default(false);
-
+            $table->integer('order_count')->default(0);
+            $table->integer('rating')->nullable();
+            $table->text('feedback')->nullable();
+            $table->boolean('newsletter_subscription')->default(false);
+            $table->boolean('has_discount')->default(false);
+            $table->timestamp('last_order')->nullable();
+            $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

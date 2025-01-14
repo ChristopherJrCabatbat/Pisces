@@ -421,6 +421,12 @@
                                     <i class="fa-brands fa-instagram"></i>
                                 </div>
                             </a>
+                            <a href="https://www.tiktok.com/@piscescoffeehub2017" title="Go to Pisces TikTok"
+                                target="_blank" class="social-link">
+                                <div class="rounded-circle">
+                                    <i class="fa-brands fa-tiktok"></i>
+                                </div>
+                            </a>
                             <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" title="See Pisces in Maps"
                                 target="_blank" class="social-link">
                                 <div class="rounded-circle">
