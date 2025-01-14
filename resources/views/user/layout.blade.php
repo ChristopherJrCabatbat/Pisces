@@ -231,7 +231,7 @@
                     <!-- First Name -->
                     <div class="mb-3 d-flex gap-2">
                         <div class="w-100">
-                            <label for="firstName" class="form-label text-black">First Name</label>
+                            <label for="firstName" class="form-label text-black">First Name:</label>
                             <input type="text" class="form-control" id="firstName" name="first_name"
                                 value="{{ old('first_name', Auth::user()->first_name) }}" required>
                             @error('first_name')
@@ -240,7 +240,7 @@
                         </div>
                         <!-- Last Name -->
                         <div class="w-100">
-                            <label for="lastName" class="form-label text-black">Last Name</label>
+                            <label for="lastName" class="form-label text-black">Last Name:</label>
                             <input type="text" class="form-control" id="lastName" name="last_name"
                                 value="{{ old('last_name', Auth::user()->last_name) }}" required>
                             @error('last_name')
@@ -252,7 +252,7 @@
                     <!-- Email -->
                     <div class="mb-3 d-flex gap-2">
                         <div class="w-100">
-                            <label for="email" class="form-label text-black">Email</label>
+                            <label for="email" class="form-label text-black">Email:</label>
                             <input type="email" class="form-control" id="email" name="email"
                                 value="{{ old('email', Auth::user()->email) }}" required>
                             @error('email')
@@ -260,8 +260,8 @@
                             @enderror
                         </div>
                         <!-- Contact Number -->
-                        <div class="w-75">
-                            <label for="contactNumber" class="form-label text-black">Contact Number</label>
+                        <div class="" style="width: 60%;">
+                            <label for="contactNumber" class="form-label text-black">Contact Number:</label>
                             <input type="text" class="form-control" id="contactNumber" name="contact_number"
                                 value="{{ old('contact_number', Auth::user()->contact_number) }}" required>
                             @error('contact_number')
@@ -272,7 +272,7 @@
 
                     <!-- Change Password -->
                     <div class="mb-3">
-                        <label for="newPassword" class="form-label text-black">New Password</label>
+                        <label for="newPassword" class="form-label text-black">New Password:</label>
                         <input type="password" class="form-control" id="newPassword" name="password">
                         <small class="text-secondary">*Leave this blank if you don't want to change your
                             password.</small>
@@ -283,7 +283,7 @@
 
                     <!-- Confirm New Password -->
                     <div class="mb-3">
-                        <label for="confirmPassword" class="form-label text-black">Confirm New Password</label>
+                        <label for="confirmPassword" class="form-label text-black">Confirm New Password:</label>
                         <input type="password" class="form-control" id="confirmPassword"
                             name="password_confirmation">
                         @error('password_confirmation')

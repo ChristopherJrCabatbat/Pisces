@@ -325,7 +325,7 @@ class DeliveryController extends Controller
     //         $user->update(['last_order' => now()]);
 
     //         // Set modal session key if the order count is divisible by 7
-    //         if ($user->order_count % 7 === 0) {
+    //         if ($user->order_count % 3 === 0) {
     //             session()->put('showExperienceModal', true); // Persistent session key
     //         }
 
@@ -458,7 +458,7 @@ class DeliveryController extends Controller
             $user->update(['last_order' => now()]);
 
             // Set modal session key if the order count is divisible by 7
-            if ($user->order_count % 7 === 0) {
+            if ($user->order_count % 3 === 0) {
                 session()->put('showExperienceModal', true); // Persistent session key
             }
 
@@ -592,7 +592,7 @@ class DeliveryController extends Controller
     //         $user->update(['last_order' => now()]);
 
     //         // Set modal session key if the order count is divisible by 7
-    //         if ($user->order_count % 7 === 0) {
+    //         if ($user->order_count % 3 === 0) {
     //             session()->put('showExperienceModal', true); // Persistent session key
     //         }
 
@@ -723,7 +723,7 @@ class DeliveryController extends Controller
             $user->update(['last_order' => now()]);
 
             // Set modal session key if the order count is divisible by 7
-            if ($user->order_count % 7 === 0) {
+            if ($user->order_count % 3 === 0) {
                 session()->put('showExperienceModal', true);
             }
 
@@ -872,7 +872,7 @@ class DeliveryController extends Controller
             $user->update(['last_order' => now()]);
 
             // Set modal session key if the order count is divisible by 7
-            if ($user->order_count % 7 === 0) {
+            if ($user->order_count % 3 === 0) {
                 session()->put('showExperienceModal', true); // Persistent session key
             }
 

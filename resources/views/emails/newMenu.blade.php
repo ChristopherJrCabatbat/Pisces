@@ -16,6 +16,6 @@
     </ul>
     <p><a href="{{ route('user.menuDetails', $menu->id) }}">Click here</a> to view the menu item.</p>
     <p>Thank you for subscribing to our newsletter!</p>
-    <p>- Pisces Restaurant Team</p>
+    <p>- Pisces Coffee Hub</p>
 </body>
 </html>

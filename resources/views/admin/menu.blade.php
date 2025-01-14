@@ -339,7 +339,10 @@
                                 @endif
                             </td>
 
-                            <td style="width: 25vw !important;">{{ $menu->description }}</td>
+                            <td style="width: 25vw !important;">
+                                {{-- {{ $menu->description }} --}}
+                                {{ Str::words($menu->description, 13, '...') }}
+                            </td>
                             <td style="width: 82px;">
                                 @if ($menu->review_count > 0)
                                     {{ number_format($menu->rating, 1) }} <i class="fa-solid fa-star"></i>

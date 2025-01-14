@@ -94,7 +94,7 @@
 
                 <!-- Price -->
                 <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
-                    <label for="price" class="form-label">Price:</label>
+                    <label for="price" class="form-label">Price (₱):</label>
                     <input type="text" name="price" class="form-control" id="price" value="{{ old('price') }}"
                         required placeholder="e.g. 199">
                     @error('price')
