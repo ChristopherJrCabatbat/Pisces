@@ -33,47 +33,47 @@ class AuthenticatedSessionController extends Controller
     //  public function store(LoginRequest $request): RedirectResponse
     //  {
     //      $request->authenticate();
-     
+
     //      $request->session()->regenerate();
-     
+
     //      $user = $request->user();
-     
+
     //      Log::info('User last login at: ' . $user->last_login_at);
     //      Log::info('Current time: ' . now());
-     
+
     //      // Check if promotions have been shown in the current session
     //      if (!$request->session()->has('promotions_shown_during_session')) {
     //          $promotions = Promotion::all();
     //          $availablePromotions = [];
-     
+
     //          foreach ($promotions as $promotion) {
     //              $lastShownKey = 'promotion_last_shown_' . $promotion->id;
     //              $lastShownDate = session($lastShownKey);
-     
+
     //              // Check `how_often` to decide if the promotion should be displayed
     //              if (!$lastShownDate || Carbon::parse($lastShownDate)->lte(now()->subDays($promotion->how_often))) {
     //                  $availablePromotions[] = $promotion;
-     
+
     //                  // Update the session with the last shown timestamp
     //                  session([$lastShownKey => now()]);
     //              }
     //          }
-     
+
     //          // Save the promotions to session if available
     //          if (!empty($availablePromotions)) {
     //              session(['availablePromotions' => $availablePromotions]);
     //              session(['promotions_shown_during_session' => true]); // Mark as shown
     //          }
     //      }
-     
+
     //      // Apply discount logic if user is inactive for 10+ days and has made an order
     //      if ($user->last_order) {
     //          Log::info('User last order at: ' . $user->last_order);
     //          Log::info('10 days ago: ' . now()->subDays(10));
-     
+
     //          if (Carbon::parse($user->last_order)->lte(now()->subDays(10))) {
     //              $user->update(['has_discount' => true]);
-     
+
     //              session()->flash('discount', 'Welcome back! Here’s a 5% discount on your next order.');
     //              Log::info('Discount applied for user: ' . $user->id);
     //          } else {
@@ -82,10 +82,10 @@ class AuthenticatedSessionController extends Controller
     //      } else {
     //          Log::info('User has no last order. Discount not applied.');
     //      }
-     
+
     //      // Update last login timestamp
     //      $user->update(['last_login_at' => now()]);
-     
+
     //      // Redirect user to the appropriate dashboard
     //      if ($user->role === 'Admin') {
     //          return redirect('admin/dashboard');
@@ -97,52 +97,52 @@ class AuthenticatedSessionController extends Controller
     //  }
 
     public function store(LoginRequest $request): RedirectResponse
-{
-    $request->authenticate();
+    {
+        $request->authenticate();
 
-    $request->session()->regenerate();
+        $request->session()->regenerate();
 
-    $user = $request->user();
+        $user = $request->user();
 
-    Log::info('User last login at: ' . $user->last_login_at);
-    Log::info('Current time: ' . now());
+        Log::info('User last login at: ' . $user->last_login_at);
+        Log::info('Current time: ' . now());
 
-    // Fetch all promotions and store them in the session
-    $promotions = Promotion::all();
+        // Fetch all promotions and store them in the session
+        $promotions = Promotion::all();
 
-    if ($promotions->isNotEmpty()) {
-        session(['availablePromotions' => $promotions]);
-    }
-
-    // Apply discount logic if user is inactive for 10+ days and has made an order
-    if ($user->last_order) {
-        Log::info('User last order at: ' . $user->last_order);
-        Log::info('10 days ago: ' . now()->subDays(10));
-
-        if (Carbon::parse($user->last_order)->lte(now()->subDays(10))) {
-            $user->update(['has_discount' => true]);
-
-            session()->flash('discount', 'Welcome back! Here’s a 5% discount on your next order.');
-            Log::info('Discount applied for user: ' . $user->id);
-        } else {
-            Log::info('User not inactive for more than 10 days.');
+        if ($promotions->isNotEmpty()) {
+            session(['availablePromotions' => $promotions]);
         }
-    } else {
-        Log::info('User has no last order. Discount not applied.');
-    }
 
-    // Update last login timestamp
-    $user->update(['last_login_at' => now()]);
+        // Apply discount logic if user is inactive for 10+ days and has made an order
+        if ($user->last_order) {
+            Log::info('User last order at: ' . $user->last_order);
+            Log::info('10 days ago: ' . now()->subDays(10));
 
-    // Redirect user to the appropriate dashboard
-    if ($user->role === 'Admin') {
-        return redirect('admin/dashboard');
-    } elseif ($user->role === 'Rider') {
-        return redirect('rider/dashboard');
-    } else {
-        return redirect('user/dashboard');
+            if (Carbon::parse($user->last_order)->lte(now()->subDays(10))) {
+                $user->update(['has_discount' => true]);
+
+                session()->flash('discount', 'Welcome back! Here’s a 5% discount on your next order.');
+                Log::info('Discount applied for user: ' . $user->id);
+            } else {
+                Log::info('User not inactive for more than 10 days.');
+            }
+        } else {
+            Log::info('User has no last order. Discount not applied.');
+        }
+
+        // Update last login timestamp
+        $user->update(['last_login_at' => now()]);
+
+        // Redirect user to the appropriate dashboard
+        if ($user->role === 'Admin') {
+            return redirect('admin/dashboard');
+        } elseif ($user->role === 'Rider') {
+            return redirect('rider/dashboard');
+        } else {
+            return redirect('user/dashboard');
+        }
     }
-}
 
 
 

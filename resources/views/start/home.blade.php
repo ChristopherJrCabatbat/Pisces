@@ -207,7 +207,6 @@
             align-items: center;
             background-color: transparent;
         }
-
     </style>
 
 
@@ -588,7 +587,11 @@
                         <h2 class="h2 section-title" id="testi-label">What customers say about us</h2>
 
                         <blockquote class="testi-text">
-                            "{{ $feedback->feedback ?? 'No feedback available yet.' }}"
+                            @if ($feedback->feedback)
+                                "{{ $feedback->feedback }}"
+                            @else
+                                No feedback available yet
+                            @endif
                         </blockquote>
 
                         <div class="wrapper">
@@ -597,7 +600,11 @@
 
                             <div>
                                 <p class="author-title">
-                                    {{ $feedback ? $feedback->first_name . ' ' . $feedback->last_name : 'Anonymous' }}
+                                    @if ($feedback->feedback)
+                                        {{ $feedback ? $feedback->first_name . ' ' . $feedback->last_name : 'Anonymous' }}
+                                    @else
+                                        Anonymous
+                                    @endif
                                 </p>
 
                                 <div class="rating-wrapper">
@@ -828,25 +835,29 @@
                         <ul class="social-list">
 
                             <li>
-                                <a href="https://www.facebook.com/piscesCH" target="_blank" title="Go to Pisces Facebook Page" class="social-link">
+                                <a href="https://www.facebook.com/piscesCH" target="_blank"
+                                    title="Go to Pisces Facebook Page" class="social-link">
                                     <i class="fab fa-facebook"></i>
                                 </a>
                             </li>
-                            
+
                             <li>
-                                <a href="https://www.instagram.com/piscescoffeehub/" target="_blank" title="Go to Pisces Instagram Account" class="social-link">
+                                <a href="https://www.instagram.com/piscescoffeehub/" target="_blank"
+                                    title="Go to Pisces Instagram Account" class="social-link">
                                     <i class="fab fa-instagram"></i>
                                 </a>
                             </li>
 
                             <li>
-                                <a href="https://www.tiktok.com/@piscescoffeehub2017" target="_blank" title="Go to Pisces TikTok Page" class="social-link">
+                                <a href="https://www.tiktok.com/@piscescoffeehub2017" target="_blank"
+                                    title="Go to Pisces TikTok Page" class="social-link">
                                     <i class="fab fa-tiktok"></i>
                                 </a>
                             </li>
-                            
+
                             <li>
-                                <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" class="social-link" title="See Pisces in Maps" target="_blank">
+                                <a href="https://maps.app.goo.gl/a7SCsvrNhQdoydqg7" class="social-link"
+                                    title="See Pisces in Maps" target="_blank">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </a>
                             </li>

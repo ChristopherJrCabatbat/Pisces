@@ -1384,6 +1384,8 @@ class UserController extends Controller
         // $coupons = $totalPrice - $totalDatabase;
         $coupons = $subtotal * 0.05;
 
+        $hasDiscount = $user->has_discount;
+
         // Count unread messages
         $unreadCount = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
@@ -1407,6 +1409,7 @@ class UserController extends Controller
             'userCart',
             'userFavorites',
             'totalDatabase',
+            'hasDiscount',
             'coupons',
         ));
     }

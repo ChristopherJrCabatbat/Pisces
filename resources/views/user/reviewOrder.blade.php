@@ -122,7 +122,13 @@
                                 </div>
                                 <div class="details text-muted flex-between">
                                     <div>Coupons</div>
-                                    <div>₱{{ number_format($coupons, 2) }}</div>
+                                    <div>
+                                        @if ($hasDiscount)
+                                            ₱{{ number_format($coupons, 2) }}
+                                        @else
+                                            ₱0
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="details fw-bold flex-between">
                                     <div>Total Price</div>
@@ -131,7 +137,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
 
                         <!-- Order Details -->
                         <div class="timeline-item py-3 d-flex align-items-start bottom">
@@ -153,7 +159,6 @@
                         <div class="timeline-item py-3 d-flex align-items-start">
                             <!-- Content -->
                             <div class="content order-width d-flex gap-2">
-                                {{-- <button type="button" class="btn btn-outline-dark w-50" onclick="location.href='{{ route('user.shoppingCart', ['deliveryId' => $delivery->id]) }}'">Buy Again</button> --}}
                                 <button type="button" class="btn btn-outline-dark w-50"
                                     onclick="location.href='{{ route('user.orderRepeat', ['deliveryId' => $delivery->id]) }}'">
                                     Buy Again

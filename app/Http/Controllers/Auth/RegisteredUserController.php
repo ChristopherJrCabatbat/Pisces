@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Promotion;
+
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -80,6 +82,13 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
+
+        // Fetch all promotions and store them in the session
+        $promotions = Promotion::all();
+
+        if ($promotions->isNotEmpty()) {
+            session(['availablePromotions' => $promotions]);
+        }
 
         Auth::login($user);
 
