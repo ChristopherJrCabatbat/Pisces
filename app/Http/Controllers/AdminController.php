@@ -83,6 +83,16 @@ class AdminController extends Controller
             'Out for Delivery'
         ])->count();
 
+        // Fetch the top 5 customers with the most 'Delivered' orders
+        $topCustomers = User::select('users.first_name', 'users.last_name', 'users.last_order', 'users.last_login_at')
+            ->join('deliveries', 'users.email', '=', 'deliveries.email')
+            ->where('deliveries.status', 'Delivered')
+            ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.last_order', 'users.last_login_at')
+            ->selectRaw('users.id, COUNT(deliveries.id) as order_count')
+            ->orderByDesc('order_count')
+            ->take(5)
+            ->get();
+
         // dd($deliveryBadgeCount);
 
         return view('admin.dashboard', compact(
@@ -95,6 +105,7 @@ class AdminController extends Controller
             'monthlySales',
             'totalUnreadCount',
             'deliveryBadgeCount',
+            'topCustomers',
         ));
     }
 

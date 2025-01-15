@@ -285,7 +285,7 @@
                             <td>{{ $delivery->name }}</td>
                             <td style="max-width: 30vw">
                                 {{-- {{ $delivery->order }} --}}
-                                {{ Str::words($delivery->order, 10, '...') }}
+                                {{ Str::words($delivery->order, 7, '...') }}
                             </td>
 
                             <td class="td-select">

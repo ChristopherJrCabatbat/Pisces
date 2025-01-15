@@ -44,7 +44,7 @@
                             <!-- Email -->
                             <div class="w-50">
                                 <label for="email" class="form-label">Email Address:</label>
-                                <input type="email" class="form-control" id="email" name="email"
+                                <input type="email" readonly class="form-control" id="email" name="email"
                                     value="{{ $user->email }}" required>
                             </div>
 

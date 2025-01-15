@@ -34,6 +34,11 @@ class User extends Authenticatable
         'newsletter_subscription',
     ];
 
+    protected $casts = [
+        'last_order' => 'datetime',
+        'last_login_at' => 'datetime', // Add other date fields here if needed
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *

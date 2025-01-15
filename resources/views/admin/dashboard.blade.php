@@ -24,23 +24,22 @@
         <a href="/admin/menu" class="fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a>
     </li>
 
-   <li class="position-relative">
+    <li class="position-relative">
         <a href="/admin/delivery" class="fs-5 sidebar-font">
             <i class="fa-solid fa-truck-fast me-3"></i>Delivery
             <!-- Badge for delivery statuses -->
             @if (isset($deliveryBadgeCount) && $deliveryBadgeCount > 0)
-                <span class="badge position-absolute bg-danger translate-middle"
-                      style="left: 9.1rem; top: 1rem;">
+                <span class="badge position-absolute bg-danger translate-middle" style="left: 9.1rem; top: 1rem;">
                     {{ $deliveryBadgeCount }}
                 </span>
             @endif
         </a>
     </li>
-    
+
     <li>
         <a href="/admin/promotions" class="fs-5 sidebar-font"><i class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
-   </li>
-    
+    </li>
+
     <li class="sidebar-item position-relative" id="customersDropdown">
         <a href="javascript:void(0)"
             class="fs-5 sidebar-font d-flex customers justify-content-between {{ request()->is('admin/updates', 'admin/feedback', 'admin/monitoring') ? 'active' : '' }}">
@@ -147,7 +146,7 @@
 
 
             {{-- Analytics --}}
-            
+
             {{-- Top Picks --}}
             <div class="analytics text-black mt-2">
                 <h3 class="h3 mb-3">Top Picks</h3>
@@ -198,6 +197,38 @@
                     </tbody>
                 </table>
             </div>
+
+            {{-- Customer Activity Tracking --}}
+            <div class="analytics text-black mt-4">
+                <h3 class="h3 mb-3">Customer Activity Tracking</h3>
+                {{-- Table --}}
+                <table class="table text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Customer Name</th>
+                            <th scope="col">Order Count</th>
+                            <th scope="col">Last Order Date</th>
+                            <th scope="col">Last Login Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($topCustomers as $customer)
+                            <tr>
+                                <td>{{ $customer->first_name }} {{ $customer->last_name }}</td>
+                                <td>{{ $customer->order_count }}</td>
+                                <td>{{ $customer->last_order ? $customer->last_order->format('Y-m-d H:i:s') : 'N/A' }}</td>
+                                <td>{{ $customer->last_login_at ? $customer->last_login_at->format('Y-m-d H:i:s') : 'N/A' }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4">No customer activity found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
 
             {{-- Highest Rated Menus --}}
             <div class="analytics text-black mt-4">
