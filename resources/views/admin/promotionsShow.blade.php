@@ -17,8 +17,8 @@
         }
 
         /* .table-container {
-                    padding: 1rem 2rem 0rem 2rem;
-                } */
+                        padding: 1rem 2rem 0rem 2rem;
+                    } */
     </style>
 @endsection
 
@@ -131,6 +131,12 @@
                     <label for="current_image" class="form-label">Image:</label>
                     <img src="{{ Storage::url($promotion->image) }}" alt="{{ $promotion->name }}" class="img-fluid"
                         width="150">
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea readonly class="form-control">{{ $promotion->description }}</textarea>
                 </div>
 
             </form>

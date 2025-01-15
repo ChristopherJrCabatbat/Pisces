@@ -17,8 +17,8 @@
         }
 
         /* .table-container {
-            padding: 1rem 2rem 0rem 2rem;
-        } */
+                padding: 1rem 2rem 0rem 2rem;
+            } */
     </style>
 @endsection
 
@@ -31,10 +31,11 @@
     <li>
         <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
     </li>
-    
+
     <li>
-        <a href="/admin/promotions" class="active fs-5 sidebar-font"><i class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
-   </li>
+        <a href="/admin/promotions" class="active fs-5 sidebar-font"><i
+                class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
+    </li>
 
     <li class="sidebar-item position-relative" id="customersDropdown">
         <a href="javascript:void(0)"
@@ -88,8 +89,7 @@
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
-                    class="navigation">Dashboard</a> / <a
-                    href="/admin/promotions" class="navigation">Promotions</a> /</div>
+                    class="navigation">Dashboard</a> / <a href="/admin/promotions" class="navigation">Promotions</a> /</div>
             <span class="faded-white ms-1">Add Promotion</span>
         </div>
 
@@ -119,6 +119,13 @@
                     @error('image')
                         <div class="error alert alert-danger">{{ $message }}</div>
                     @enderror
+                </div>
+
+                <!-- Promotion Description -->
+                <div class="mb-3 d-flex flex-column justify-content-start align-items-start">
+                    <label for="description" class="form-label">Promotion Description:</label>
+                    <textarea name="description" id="description" cols="30" rows="5" class="form-control" required
+                        placeholder="Enter promotion description here...">{{ old('description') }}</textarea>
                 </div>
 
                 {{-- <!-- How Often -->

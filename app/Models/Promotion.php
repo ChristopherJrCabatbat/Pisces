@@ -12,6 +12,7 @@ class Promotion extends Model
     protected $fillable = [
         'name',
         'image',
+        'description',
         'how_often',
         'availability',
     ];
