@@ -206,7 +206,7 @@
                     <thead class="table-light">
                         <tr>
                             <th scope="col">Customer Name</th>
-                            <th scope="col">Order Count</th>
+                            <th scope="col">Orders Delivered</th>
                             <th scope="col">Last Order Date</th>
                             <th scope="col">Last Login Date</th>
                         </tr>
@@ -216,9 +216,8 @@
                             <tr>
                                 <td>{{ $customer->first_name }} {{ $customer->last_name }}</td>
                                 <td>{{ $customer->order_count }}</td>
-                                <td>{{ $customer->last_order ? $customer->last_order->format('Y-m-d H:i:s') : 'N/A' }}</td>
-                                <td>{{ $customer->last_login_at ? $customer->last_login_at->format('Y-m-d H:i:s') : 'N/A' }}
-                                </td>
+                                <td>{{ $customer->last_order ? $customer->last_order->format('M. d, Y - g:i A') : 'N/A' }}</td>
+                                <td>{{ $customer->last_login_at ? $customer->last_login_at->format('M. d, Y - g:i A') : 'N/A' }}</td>                                
                             </tr>
                         @empty
                             <tr>
@@ -228,7 +227,6 @@
                     </tbody>
                 </table>
             </div>
-
 
             {{-- Highest Rated Menus --}}
             <div class="analytics text-black mt-4">

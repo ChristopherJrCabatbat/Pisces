@@ -93,8 +93,6 @@ class AdminController extends Controller
             ->take(5)
             ->get();
 
-        // dd($deliveryBadgeCount);
-
         return view('admin.dashboard', compact(
             'userCount',
             'deliveryCount',
