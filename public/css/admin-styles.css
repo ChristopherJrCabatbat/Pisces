@@ -259,6 +259,11 @@ li.add-categ:hover {
         font-size: 1.1rem !important;
     }
 
+    span.badge-active {
+        background-color: white !important;
+        color: #DC3545 !important;
+    }
+
     .dropdown-customers li a {
         font-size: 0.92rem;
     }

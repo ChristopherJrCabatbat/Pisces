@@ -28,10 +28,19 @@
 
     <li><a href="/admin/menu" class="fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a></li>
 
-    <li>
-        <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
+    <li class="position-relative">
+        <a href="/admin/delivery" class="fs-5 sidebar-font">
+            <i class="fa-solid fa-truck-fast me-3"></i>Delivery
+            <!-- Badge for delivery statuses -->
+            @if (isset($deliveryBadgeCount) && $deliveryBadgeCount > 0)
+                <span class="badge position-absolute bg-danger translate-middle"
+                      style="left: 9.1rem; top: 1rem;">
+                    {{ $deliveryBadgeCount }}
+                </span>
+            @endif
+        </a>
     </li>
-
+    
     <li>
         <a href="/admin/promotions" class="active fs-5 sidebar-font"><i
                 class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>

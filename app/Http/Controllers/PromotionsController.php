@@ -12,6 +12,7 @@ use App\Models\Menu;
 use App\Models\Category;
 use App\Models\Promotion;
 use App\Models\User;
+use App\Models\Delivery;
 
 use App\Services\MailerService;
 
@@ -26,6 +27,15 @@ class PromotionsController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         // Fetch search, filter, and sort parameters
         $filter = $request->input('filter', ''); // Sorting direction (asc/desc)
 
@@ -37,7 +47,7 @@ class PromotionsController extends Controller
             ->get();
 
         // Pass variables to the view
-        return view('admin.promotions', compact('promotions', 'filter', 'totalUnreadCount'));
+        return view('admin.promotions', compact('promotions', 'filter', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     public function toggleAvailability(Request $request, Promotion $promotion)
@@ -64,7 +74,16 @@ class PromotionsController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-        return view('admin.promotionsCreate', compact('totalUnreadCount'));
+        
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.promotionsCreate', compact('totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**
@@ -192,8 +211,17 @@ class PromotionsController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         // Pass both the category and unread message count to the view
-        return view('admin.promotionsShow', compact('promotion', 'totalUnreadCount'));
+        return view('admin.promotionsShow', compact('promotion', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
     /**
      * Show the form for editing the specified resource.
@@ -207,7 +235,16 @@ class PromotionsController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-        return view('admin.promotionsEdit', compact('promotion', 'totalUnreadCount'));
+        
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.promotionsEdit', compact('promotion', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**

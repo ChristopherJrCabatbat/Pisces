@@ -92,8 +92,19 @@
     <li>
         <a href="/admin/menu" class="fs-5 sidebar-font"><i class="fa-solid fa-utensils me-3"></i> Menu</a>
     </li>
-    <li>
+    {{-- <li>
         <a href="#" class="active fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
+    </li> --}}
+    <li class="position-relative">
+        <a href="#" class="fs-5 sidebar-font active">
+            <i class="fa-solid fa-truck-fast me-3"></i>Delivery
+            <!-- Badge for delivery statuses -->
+            @if (isset($deliveryBadgeCount) && $deliveryBadgeCount > 0)
+                <span class="badge position-absolute translate-middle" style="left: 9.1rem; top: 1rem; background-color: white !important; color: #DC3545 !important;">
+                    {{ $deliveryBadgeCount }}
+                </span>
+            @endif
+        </a>
     </li>
     <li class="add-categ"><a href="/admin/rider" class="sidebar-font"><i class="fa-solid fa-motorcycle me-2"></i> Riders</a>
     </li>
@@ -272,7 +283,10 @@
                     @forelse ($deliveries as $delivery)
                         <tr class="menu-row">
                             <td>{{ $delivery->name }}</td>
-                            <td style="max-width: 30vw">{{ $delivery->order }}</td>
+                            <td style="max-width: 30vw">
+                                {{-- {{ $delivery->order }} --}}
+                                {{ Str::words($delivery->order, 10, '...') }}
+                            </td>
 
                             <td class="td-select">
                                 <form action="{{ route('admin.updateStatus', $delivery->id) }}" method="POST"

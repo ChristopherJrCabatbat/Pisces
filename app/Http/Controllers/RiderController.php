@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Rider;
+use App\Models\Delivery;
 
 class RiderController extends Controller
 {
@@ -18,6 +19,14 @@ class RiderController extends Controller
         // Fetch unread message data
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
 
         // Fetch search and filter parameters
         $search = $request->input('search', '');
@@ -36,7 +45,7 @@ class RiderController extends Controller
             ->get(); // Retrieve all results without pagination
 
         // Pass variables to the view
-        return view('admin.rider', compact('riders', 'filter', 'search', 'totalUnreadCount'));
+        return view('admin.rider', compact('riders', 'filter', 'search', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
 
@@ -49,7 +58,15 @@ class RiderController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-        return view('admin.riderCreate', compact('totalUnreadCount'));
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.riderCreate', compact('totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**
@@ -94,8 +111,16 @@ class RiderController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         $rider = Rider::findOrFail($id);
-        return view('admin.riderShow', compact('rider', 'totalUnreadCount'));
+        return view('admin.riderShow', compact('rider', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**
@@ -107,9 +132,17 @@ class RiderController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         $rider = Rider::findOrFail($id);
 
-        return view('admin.riderEdit', compact('rider', 'totalUnreadCount'));
+        return view('admin.riderEdit', compact('rider', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**

@@ -16,8 +16,17 @@
             <i class="fa-solid fa-utensils me-3"></i> Menu
         </a>
     </li>
-    <li>
-        <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
+    
+    <li class="position-relative">
+        <a href="/admin/delivery" class="fs-5 sidebar-font">
+            <i class="fa-solid fa-truck-fast me-3"></i>Delivery
+            <!-- Badge for delivery statuses -->
+            @if (isset($deliveryBadgeCount) && $deliveryBadgeCount > 0)
+                <span class="badge position-absolute bg-danger translate-middle" style="left: 9.1rem; top: 1rem;">
+                    {{ $deliveryBadgeCount }}
+                </span>
+            @endif
+        </a>
     </li>
     
     <li>
@@ -27,6 +36,13 @@
     <li class="sidebar-item" id="customersDropdown">
         <a href="javascript:void(0)" class="fs-5 sidebar-font d-flex active customers justify-content-between">
             <div><i class="fa-solid fa-users me-3"></i>Customers</div>
+             <!-- Unread messages badge -->
+             @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+             <span class="badge position-absolute translate-middle"
+                 style="left: 10.5rem; top: 1rem;  background-color: white !important; color: #DC3545 !important;">
+                 {{ $totalUnreadCount }}
+             </span>
+         @endif
             <div class="caret-icon">
                 <i class="fa-solid fa-caret-right"></i>
             </div>
@@ -47,7 +63,13 @@
                     <span class="monitor-margin">Monitoring</span></a></li> --}}
             <li><a href="{{ route('admin.customerMessages') }}"
                     class="{{ request()->routeIs('admin.customerMessages') ? 'active-customer-route' : '' }}"><i
-                        class="fa-solid fa-message me-2"></i> Customer Messages</a></li>
+                        class="fa-solid fa-message me-2"></i> Customer Messages
+                        @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                        <span class="badge bg-danger">
+                            {{ $totalUnreadCount }}
+                        </span>
+                    @endif
+                    </a></li>
         </ul>
     </li>
 

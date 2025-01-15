@@ -75,6 +75,16 @@ class AdminController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        // dd($deliveryBadgeCount);
+
         return view('admin.dashboard', compact(
             'userCount',
             'deliveryCount',
@@ -83,7 +93,8 @@ class AdminController extends Controller
             'topPicks',
             'highestRatedMenus',
             'monthlySales',
-            'totalUnreadCount'
+            'totalUnreadCount',
+            'deliveryBadgeCount',
         ));
     }
 
@@ -208,6 +219,14 @@ class AdminController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         // Fetch search and filter parameters
         $search = $request->input('search', '');
         $filter = $request->input('filter', 'default'); // Default to "default"
@@ -236,7 +255,7 @@ class AdminController extends Controller
             ->get(); // Retrieve all results without pagination
 
         // Pass variables to the view
-        return view('admin.feedback', compact('feedbacks', 'filter', 'search', 'totalUnreadCount'));
+        return view('admin.feedback', compact('feedbacks', 'filter', 'search', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
 
@@ -309,6 +328,14 @@ class AdminController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         // Fetch search and filter parameters
         $search = $request->input('search', '');
         $filter = $request->input('filter', 'recent'); // Default to "recent"
@@ -365,7 +392,7 @@ class AdminController extends Controller
             });
         }
 
-        return view('admin.customerMessages', compact('userMessages', 'filter', 'search', 'totalUnreadCount'));
+        return view('admin.customerMessages', compact('userMessages', 'filter', 'search', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     public function markMessagesAsRead($userId)
@@ -377,7 +404,7 @@ class AdminController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    public function messageUser($userId)
+    public function messageUser($userId, UnreadMessagesController $unreadMessagesController)
     {
         $authenticatedUser = Auth::user();
 
@@ -404,7 +431,19 @@ class AdminController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
-        return view('admin.messageUser', compact('user', 'messages'));
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.messageUser', compact('user', 'messages', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     public function sendMessage(Request $request, $userId)
@@ -499,6 +538,14 @@ class AdminController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         // Fetch search and filter parameters
         $search = $request->input('search', '');
         $filter = $request->input('filter', 'default'); // Default filter
@@ -523,11 +570,11 @@ class AdminController extends Controller
             ->get(); // Retrieve all results without pagination
 
         // Pass variables to the view
-        return view('admin.updates', compact('users', 'search', 'filter', 'totalUnreadCount'));
+        return view('admin.updates', compact('users', 'search', 'filter', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
 
-    public function viewOrders($userId)
+    public function viewOrders($userId, UnreadMessagesController $unreadMessagesController)
     {
         $user = User::findOrFail($userId);
 
@@ -550,7 +597,19 @@ class AdminController extends Controller
             return $delivery;
         });
 
-        return view('admin.viewOrders', compact('deliveriesWithImages'));
+        // Fetch unread message data
+        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.viewOrders', compact('deliveriesWithImages', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     public function getOrderDetails($id)

@@ -464,7 +464,7 @@
                                         <a href="#" class="card-meta">{{ $menu->category }}</a>
                                     </div>
                                     <p class="card-text">₱{{ number_format($menu->price, 2) }}</p>
-                                    <p class="card-text">{{ $menu->description }}</p>
+                                    <p class="card-text"> {{ Str::words($menu->description, 30, '...') }}</p>
                                 </div>
                             </li>
                         @endforeach

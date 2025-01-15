@@ -9,8 +9,8 @@
         }
 
         /* .table-container {
-            padding: 1rem 2rem 0rem 2rem;
-        } */
+                padding: 1rem 2rem 0rem 2rem;
+            } */
     </style>
 @endsection
 
@@ -123,18 +123,35 @@
             <i class="fa-solid fa-utensils me-3"></i> Menu
         </a>
     </li>
-    <li>
-        <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
-    </li>
     
+    <li class="position-relative">
+        <a href="/admin/delivery" class="fs-5 sidebar-font">
+            <i class="fa-solid fa-truck-fast me-3"></i>Delivery
+            <!-- Badge for delivery statuses -->
+            @if (isset($deliveryBadgeCount) && $deliveryBadgeCount > 0)
+                <span class="badge position-absolute bg-danger translate-middle"
+                      style="left: 9.1rem; top: 1rem;">
+                    {{ $deliveryBadgeCount }}
+                </span>
+            @endif
+        </a>
+    </li>
+
     <li>
         <a href="/admin/promotions" class="fs-5 sidebar-font"><i class="fa-solid fa-rectangle-ad me-3"></i>Promotions</a>
-   </li>
+    </li>
 
     <li class="sidebar-item" id="customersDropdown">
         <a href="javascript:void(0)"
             class="fs-5 sidebar-font d-flex customers justify-content-between {{ request()->is('admin/updates', 'admin/feedback', 'admin/monitoring') ? 'active' : '' }}">
             <div><i class="fa-solid fa-users me-3"></i>Customers</div>
+            <!-- Unread messages badge -->
+            @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                <span class="badge position-absolute translate-middle"
+                    style="left: 10.5rem; top: 1rem;  background-color: white !important; color: #DC3545 !important;">
+                    {{ $totalUnreadCount }}
+                </span>
+            @endif
             <div class="caret-icon">
                 <i class="fa-solid fa-caret-right"></i>
             </div>

@@ -16,6 +16,7 @@ use App\Mail\NewMenuNotification;
 use App\Models\User;
 use App\Models\Menu;
 use App\Models\Category;
+use App\Models\Delivery;
 
 use App\Services\MailerService;
 
@@ -148,7 +149,15 @@ class MenuController extends Controller
             ]);
         }
 
-        return view('admin.menu', compact('menus', 'categories', 'activeFilter', 'totalUnreadCount'));
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.menu', compact('menus', 'categories', 'activeFilter', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**
@@ -164,7 +173,15 @@ class MenuController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-        return view('admin.menuCreate', compact('categories', 'totalUnreadCount'));
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.menuCreate', compact('categories', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     public function menuCreateCategory()
@@ -302,7 +319,15 @@ class MenuController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-        return view('admin.menuEdit', compact('menus', 'categories', 'totalUnreadCount'));
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.menuEdit', compact('menus', 'categories', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**

@@ -40,6 +40,14 @@ class DeliveryController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         // Fetch all deliveries
         $deliveries = Delivery::orderBy('created_at', 'desc')->get();
 
@@ -54,7 +62,7 @@ class DeliveryController extends Controller
         }
 
         // Pass variables to the view
-        return view('admin.delivery', compact('deliveries', 'riders', 'totalUnreadCount'));
+        return view('admin.delivery', compact('deliveries', 'riders', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
 

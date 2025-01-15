@@ -5,8 +5,8 @@
 @section('styles-links')
     <style>
         /* .table-container {
-                                padding: 1rem 2rem 0rem 2rem;
-                            } */
+                                    padding: 1rem 2rem 0rem 2rem;
+                                } */
 
         .modal-content {
             border-radius: 8px;
@@ -38,8 +38,18 @@
             <i class="fa-solid fa-utensils me-3"></i> Menu
         </a>
     </li>
-    <li>
-        <a href="/admin/delivery" class="fs-5 sidebar-font"><i class="fa-solid fa-truck-fast me-3"></i>Delivery</a>
+   
+    <li class="position-relative">
+        <a href="/admin/delivery" class="fs-5 sidebar-font">
+            <i class="fa-solid fa-truck-fast me-3"></i>Delivery
+            <!-- Badge for delivery statuses -->
+            @if (isset($deliveryBadgeCount) && $deliveryBadgeCount > 0)
+                <span class="badge position-absolute bg-danger translate-middle"
+                      style="left: 9.1rem; top: 1rem;">
+                    {{ $deliveryBadgeCount }}
+                </span>
+            @endif
+        </a>
     </li>
 
     <li>
@@ -49,6 +59,12 @@
     <li class="sidebar-item" id="customersDropdown">
         <a href="javascript:void(0)" class="fs-5 sidebar-font d-flex active customers justify-content-between">
             <div><i class="fa-solid fa-users me-3"></i>Customers</div>
+            <!-- Unread messages badge -->
+            @if (isset($totalUnreadCount) && $totalUnreadCount > 0)
+                <span class="badge position-absolute translate-middle" style="left: 10.5rem; top: 1rem;  background-color: white !important; color: #DC3545 !important;">
+                    {{ $totalUnreadCount }}
+                </span>
+            @endif
             <div class="caret-icon">
                 <i class="fa-solid fa-caret-right"></i>
             </div>
@@ -85,7 +101,7 @@
 
 @section('main-content')
 
-   <div class="main-content">
+    <div class="main-content">
 
         <div class="current-file mb-3 d-flex">
             <div class="fw-bold"><i class="fa-solid fa-house me-2"></i><a href="{{ route('admin.dashboard') }}"
@@ -179,16 +195,19 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content shadow-sm border-0">
                                     <div class="modal-header bg-primary text-white">
-                                        <h5 class="modal-title" id="feedbackModalLabel-{{ $user->id }}">User Feedback</h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <h5 class="modal-title" id="feedbackModalLabel-{{ $user->id }}">User Feedback
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body p-4">
                                         <!-- User Name -->
                                         <div class="mb-3">
                                             <h6 class="text-uppercase text-secondary fw-bold">Name</h6>
-                                            <p class="fs-5 mb-0 text-black">{{ $user->first_name }} {{ $user->last_name }}</p>
+                                            <p class="fs-5 mb-0 text-black">{{ $user->first_name }}
+                                                {{ $user->last_name }}</p>
                                         </div>
-                        
+
                                         <!-- User Rating -->
                                         <div class="mb-3">
                                             <h6 class="text-uppercase text-secondary fw-bold">Rating</h6>
@@ -204,16 +223,18 @@
                                                 @endfor
                                             </div>
                                         </div>
-                        
+
                                         <!-- User Feedback -->
                                         <div>
                                             <h6 class="text-uppercase text-secondary fw-bold">Feedback</h6>
-                                            <p class="fs-5 text-muted mb-0">{{ $user->feedback ?? 'No feedback provided.' }}</p>
+                                            <p class="fs-5 text-muted mb-0">
+                                                {{ $user->feedback ?? 'No feedback provided.' }}</p>
                                         </div>
                                     </div>
                                     <div class="modal-footer bg-light">
                                         <!-- Save Feedback Button -->
-                                        <form method="POST" action="{{ route('admin.saveFeedback') }}" class="d-inline">
+                                        <form method="POST" action="{{ route('admin.saveFeedback') }}"
+                                            class="d-inline">
                                             @csrf
                                             <input type="hidden" name="first_name" value="{{ $user->first_name }}">
                                             <input type="hidden" name="last_name" value="{{ $user->last_name }}">
@@ -221,12 +242,13 @@
                                             <input type="hidden" name="feedback" value="{{ $user->feedback }}">
                                             <button type="submit" class="btn btn-success">Choose Feedback</button>
                                         </form>
-                                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-outline-primary"
+                                            data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
+
 
                         {{-- <div class="modal fade" id="feedbackModal-{{ $user->id }}" tabindex="-1"
                             aria-labelledby="feedbackModalLabel-{{ $user->id }}" aria-hidden="true">
@@ -279,7 +301,7 @@
                                 </div>
                             </div>
                         </div> --}}
-                        
+
 
                     @empty
                         <tr id="no-updates-row">

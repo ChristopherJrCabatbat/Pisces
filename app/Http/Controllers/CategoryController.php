@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\Menu;
 use App\Models\Category;
+use App\Models\Delivery;
 
 class CategoryController extends Controller
 {
@@ -21,6 +22,14 @@ class CategoryController extends Controller
         // Fetch unread message data
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
 
         // Fetch search, filter, and sort parameters
         $filter = $request->input('filter', '');
@@ -36,7 +45,7 @@ class CategoryController extends Controller
             ->get(); // Retrieve all categories without pagination
 
         // Pass variables to the view
-        return view('admin.category', compact('categories', 'filter', 'totalUnreadCount'));
+        return view('admin.category', compact('categories', 'filter', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
 
@@ -51,7 +60,15 @@ class CategoryController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-        return view('admin.categoryCreate', compact('totalUnreadCount'));
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.categoryCreate', compact('totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**
@@ -110,8 +127,16 @@ class CategoryController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
         // Pass both the category and unread message count to the view
-        return view('admin.categoryShow', compact('category', 'totalUnreadCount'));
+        return view('admin.categoryShow', compact('category', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
 
@@ -126,7 +151,15 @@ class CategoryController extends Controller
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
         $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
 
-        return view('admin.categoryEdit', compact('category','totalUnreadCount'));
+        // Count deliveries with specified statuses
+        $deliveryBadgeCount = Delivery::whereIn('status', [
+            'Pending GCash Transaction',
+            'Pending',
+            'Preparing',
+            'Out for Delivery'
+        ])->count();
+
+        return view('admin.categoryEdit', compact('category', 'totalUnreadCount', 'deliveryBadgeCount'));
     }
 
     /**
