@@ -887,7 +887,7 @@ class DeliveryController extends Controller
             // Handle GCash payment
             if ($request->input('paymentMethod') === 'GCash') {
                 // Prepare GCash message
-                $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$totalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
+                $messageText = "Please complete your GCash transaction. Kindly send the payment for the following orders: {$orderString} with a total of ₱{$finalPrice}. Notify us once done. GCash Account: Goddard Gabriel Manese. GCash Number: 0945 839 3794.";
 
                 // Save the message
                 DB::table('messages')->insert([

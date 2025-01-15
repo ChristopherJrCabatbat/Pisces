@@ -149,6 +149,7 @@
                         <th scope="col">Image</th>
                         <th scope="col">Name</th>
                         <th scope="col">Availability</th>
+                        <th scope="col" style="width: 39%;">Description</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
@@ -172,6 +173,9 @@
                                         {{ $promotion->availability ? 'Available' : 'Unavailable' }}
                                     </label>
                                 </div>
+                            </td>
+                            <td>
+                                {{ Str::words($promotion->description, 13, '...') }}
                             </td>
 
                             <td style="width: 16vw;">

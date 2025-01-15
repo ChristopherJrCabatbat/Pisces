@@ -105,7 +105,7 @@
                         <div class="card-body">
                             <span class="icon-background"><i class="fas fa-users"></i></span>
                             <h2 class="card-title">{{ $userCount ?? 0 }}</h2>
-                            <p class="card-text">Users</p>
+                            <p class="card-text">Customers</p>
                         </div>
                     </div>
                 </div>

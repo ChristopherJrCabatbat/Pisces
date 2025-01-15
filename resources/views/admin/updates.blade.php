@@ -233,8 +233,8 @@
                                     </div>
                                     <div class="modal-footer bg-light">
                                         <!-- Save Feedback Button -->
-                                        <form method="POST" action="{{ route('admin.saveFeedback') }}"
-                                            class="d-inline">
+                                        @if($user->feedback)
+                                        <form method="POST" action="{{ route('admin.saveFeedback') }}" class="d-inline">
                                             @csrf
                                             <input type="hidden" name="first_name" value="{{ $user->first_name }}">
                                             <input type="hidden" name="last_name" value="{{ $user->last_name }}">
@@ -242,6 +242,10 @@
                                             <input type="hidden" name="feedback" value="{{ $user->feedback }}">
                                             <button type="submit" class="btn btn-success">Choose Feedback</button>
                                         </form>
+                                    @else
+                                        <button class="btn btn-secondary" disabled>Feedback Not Available</button>
+                                    @endif
+                                    
                                         <button type="button" class="btn btn-outline-primary"
                                             data-bs-dismiss="modal">Close</button>
                                     </div>
