@@ -16,6 +16,12 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('contact_number');
+
+            // $table->string('house_num')->nullable();
+            // $table->string('purok')->nullable();
+            // $table->string('barangay')->nullable();
+            // $table->string('shipping_fee')->nullable();
+
             $table->string('role')->default('User');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

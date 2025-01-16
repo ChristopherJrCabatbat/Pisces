@@ -117,6 +117,8 @@
     - custom js link
   -->
     <script src="./home-assets/js/script.js"></script>
+    @yield('scripts')
+
 
     <!--
     - ionicon link

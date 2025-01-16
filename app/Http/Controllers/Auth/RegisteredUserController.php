@@ -30,28 +30,39 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+
     // public function store(Request $request): RedirectResponse
     // {
     //     $request->validate([
-    //         // 'name' => ['required', 'string', 'max:255'],
-    //         'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+    //         'first_name' => ['required', 'string', 'max:255'],
+    //         'last_name' => ['required', 'string', 'max:255'],
+    //         'contact_number' => ['required', 'string', 'max:20'],
+    //         'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
     //         'password' => ['required', 'confirmed', Rules\Password::defaults()],
     //     ]);
 
+    //     // Set the newsletter_subscription to true if the checkbox is checked
     //     $user = User::create([
-    //         // 'name' => $request->name,
     //         'first_name' => $request->first_name,
     //         'last_name' => $request->last_name,
     //         'contact_number' => $request->contact_number,
     //         'email' => $request->email,
     //         'password' => Hash::make($request->password),
+    //         'newsletter_subscription' => $request->has('newsletter_subscription'), // Sets to true if checkbox is checked
     //     ]);
 
     //     event(new Registered($user));
 
+    //     // Fetch all promotions and store them in the session
+    //     $promotions = Promotion::all();
+
+    //     if ($promotions->isNotEmpty()) {
+    //         session(['availablePromotions' => $promotions]);
+    //     }
+
     //     Auth::login($user);
 
-    //     // return redirect(route('dashboard', absolute: false));
+    //     // Redirect based on user role
     //     if ($request->user()->role === 'Admin') {
     //         return redirect('admin/dashboard');
     //     } elseif ($request->user()->role === 'Staff') {
@@ -67,25 +78,32 @@ class RegisteredUserController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'contact_number' => ['required', 'string', 'max:20'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'house_num' => ['nullable', 'string', 'max:255'], // Optional field
+            'purok' => ['nullable', 'string', 'max:255'],     // Optional field
+            'barangay' => ['required', 'string', 'max:255'],  // Required field
+            'shipping_fee' => ['required', 'integer', 'min:0'], // Hidden, required
         ]);
 
-        // Set the newsletter_subscription to true if the checkbox is checked
+        // Create the new user
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'contact_number' => $request->contact_number,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'newsletter_subscription' => $request->has('newsletter_subscription'), // Sets to true if checkbox is checked
+            'house_num' => $request->house_num,
+            'purok' => $request->purok,
+            'barangay' => $request->barangay,
+            'newsletter_subscription' => $request->has('newsletter_subscription'), // Set newsletter subscription
+            'shipping_fee' => $request->shipping_fee, // Add the calculated shipping fee
         ]);
 
         event(new Registered($user));
 
-        // Fetch all promotions and store them in the session
+        // Fetch promotions and store them in session
         $promotions = Promotion::all();
-
         if ($promotions->isNotEmpty()) {
             session(['availablePromotions' => $promotions]);
         }
