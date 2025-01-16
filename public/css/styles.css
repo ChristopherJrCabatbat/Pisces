@@ -909,11 +909,11 @@ a.more:hover {
 /* Modal container */
 .custom-modal {
     position: fixed;
-    bottom: -100%;
+    top: 5%;
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    max-width: 500px;
+    max-width: 650px;
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
@@ -951,7 +951,6 @@ a.more:hover {
 .custom-modal.active {
     transform: translateX(-50%) translateY(0%);
     opacity: 1;
-    bottom: 10%; /* ensures the modal slides up */
 }
 
 /* Hiding modal */
@@ -1085,11 +1084,6 @@ a.more:hover {
 .experience-modal-close:hover {
     color: #ff0000;
 }
-
-
-
-
-
 
 /* Modal container */
 .promotion-modal-container {

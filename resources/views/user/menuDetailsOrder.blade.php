@@ -61,21 +61,21 @@
                             <div class="w-50">
                                 <label for="house_number" class="form-label">House Num. (optional):</label>
                                 <input type="text" class="form-control" id="house_number" name="house_number"
-                                    placeholder="123">
+                                    placeholder="123" value="{{ old('house_num', Auth::user()->house_num) }}">
                             </div>
 
                             <!-- Purok -->
                             <div class="w-50">
                                 <label for="purok" class="form-label">Purok (optional):</label>
                                 <input type="number" class="form-control" id="purok" name="purok" min="0"
-                                    max="20" placeholder="1">
+                                    max="20" placeholder="1" value="{{ old('purok', Auth::user()->purok) }}">
                             </div>
                         </div>
 
                         <!-- Barangay -->
                         <div class="w-100 mb-3">
                             <label for="barangay" class="form-label">Barangay:</label>
-                            <select class="form-control" id="barangay" name="barangay" required>
+                            <select class="form-select" id="barangay" name="barangay" required>
                                 <option value="">Select Barangay</option>
                             </select>
                         </div>
@@ -84,7 +84,7 @@
                         <div class="mb-3">
                             <label for="shippingFeeDisplay" class="form-label">Shipping Fee (₱):</label>
                             <input type="text" class="form-control shipping-fee-input" name="shipping_fee"
-                                value="0" readonly>
+                                value="{{ old('shipping_fee', Auth::user()->shipping_fee) }}" readonly>
                         </div>
 
                         <!-- Payment Method -->
@@ -131,7 +131,7 @@
                                     alt="Picture">
                             </div>
                             <div class="menu-name d-flex flex-column align-items-center">
-                                @if( $quantity > 1 )
+                                @if ($quantity > 1)
                                     <div class="name">{{ $menu->name }} (₱{{ $discountedPrice }})</div>
                                 @else
                                     <div class="name">{{ $menu->name }}</div>
@@ -177,13 +177,19 @@
                         <!-- Shipping Fee (Display Div) -->
                         <div class="d-flex justify-content-between align-items-center">
                             <div>Shipping Fee:</div>
-                            <div class="fs-5 shipping-fee-display">₱0</div>
+                            <div class="fs-5 shipping-fee-display">
+                                ₱{{ old('shipping_fee', Auth::user()->shipping_fee) }}</div>
                         </div>
+
+                        @php
+                            $ship_fee = Auth::user()->shipping_fee;
+                            $original_total = $ship_fee + $originalTotal;
+                        @endphp
 
                         <!-- Final Total -->
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Final Total:</div>
-                            <div class="fs-4" id="finalTotalDisplay">₱{{ number_format($finalTotal) }}</div>
+                            <div class="fs-4" id="finalTotalDisplay">₱{{ number_format($original_total) }}</div>
                         </div>
 
                     </div>
@@ -218,6 +224,8 @@
             const finalTotalDisplay = document.getElementById('finalTotalDisplay'); // Final total display
             const originalTotalInput = document.getElementById('originalTotal'); // Original total input
             const totalPriceInput = document.querySelector('[name="total_price"]'); // Total price input
+
+            const oldBarangay = "{{ old('barangay', Auth::user()->barangay) }}"; // Old or default value
 
             // Barangay with corresponding shipping fees
             const barangayRates = {
@@ -322,6 +330,13 @@
                 const option = document.createElement('option');
                 option.value = barangay;
                 option.textContent = barangay;
+
+                // Preselect the option if it matches the oldBarangay value
+                if (barangay === oldBarangay) {
+                    option.selected = true;
+                    hiddenShippingInput.value = barangayRates[barangay]; // Set initial shipping fee
+                }
+
                 barangayDropdown.appendChild(option);
             });
 
@@ -333,7 +348,7 @@
 
                 // Determine if a discount applies
                 const hasDiscount = Boolean(
-                @json($hasDiscount)); // Convert Blade variable to JS boolean
+                    @json($hasDiscount)); // Convert Blade variable to JS boolean
                 const discountRate = hasDiscount ? 0.05 : 0; // 5% discount if applicable
                 const discountAmount = originalTotal * discountRate; // Calculate discount
 
@@ -352,7 +367,7 @@
 
                 // Calculate and update the final total
                 let finalTotal = originalTotal - discountAmount +
-                shippingFee; // Apply discount and add shipping
+                    shippingFee; // Apply discount and add shipping
                 finalTotal = Math.round(finalTotal); // Round to the nearest whole number
                 finalTotalDisplay.textContent = `₱${finalTotal.toLocaleString()}`;
 
@@ -361,6 +376,7 @@
             });
         });
     </script>
+
 
 </body>
 

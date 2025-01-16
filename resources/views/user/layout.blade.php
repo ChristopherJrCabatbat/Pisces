@@ -42,7 +42,7 @@
                         <div class="promotion-modal-body text-center">
                             <img src="{{ asset('storage/' . $promotion->image) }}" alt="{{ $promotion->name }}"
                                 class="promotion-modal-img">
-                                <p class="promotion-notice">This promotion is available for dine-in customers only.</p>
+                            <p class="promotion-notice">This promotion is available for dine-in customers only.</p>
                         </div>
                     </div>
                 </div>
@@ -229,47 +229,88 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- First Name -->
                     <div class="mb-3 d-flex gap-2">
+
+                        <!-- First Name -->
                         <div class="w-100">
                             <label for="firstName" class="form-label text-black">First Name:</label>
                             <input type="text" class="form-control" id="firstName" name="first_name"
-                                value="{{ old('first_name', Auth::user()->first_name) }}" required>
+                                value="{{ old('first_name', Auth::user()->first_name) }}" required
+                                placeholder="e.g. John">
                             @error('first_name')
                                 <div><small class="text-danger">{{ $message }}</small></div>
                             @enderror
                         </div>
+
                         <!-- Last Name -->
                         <div class="w-100">
                             <label for="lastName" class="form-label text-black">Last Name:</label>
                             <input type="text" class="form-control" id="lastName" name="last_name"
-                                value="{{ old('last_name', Auth::user()->last_name) }}" required>
+                                value="{{ old('last_name', Auth::user()->last_name) }}" required
+                                placeholder="e.g. Doe">
                             @error('last_name')
                                 <div><small class="text-danger">{{ $message }}</small></div>
                             @enderror
                         </div>
+
                     </div>
 
-                    <!-- Email -->
                     <div class="mb-3 d-flex gap-2">
+
+                        <!-- Email -->
                         <div class="w-100">
                             <label for="email" class="form-label text-black">Email:</label>
                             <input type="email" class="form-control" id="email" name="email"
-                                value="{{ old('email', Auth::user()->email) }}" required>
+                                value="{{ old('email', Auth::user()->email) }}" required
+                                placeholder="e.g. my@email.com">
                             @error('email')
                                 <div><small class="text-danger">{{ $message }}</small></div>
                             @enderror
                         </div>
+
                         <!-- Contact Number -->
                         <div class="" style="width: 60%;">
                             <label for="contactNumber" class="form-label text-black">Contact Number:</label>
                             <input type="text" class="form-control" id="contactNumber" name="contact_number"
-                                value="{{ old('contact_number', Auth::user()->contact_number) }}" required>
+                                value="{{ old('contact_number', Auth::user()->contact_number) }}" required
+                                placeholder="09876543210">
                             @error('contact_number')
                                 <div><small class="text-danger">{{ $message }}</small></div>
                             @enderror
                         </div>
+
                     </div>
+
+                    <div class="mb-3 d-flex gap-2">
+
+                        <!-- House Number -->
+                        <div class="" style="width: 30%;">
+                            <label for="house_num" class="form-label text-black">House Num:</label>
+                            <input type="number" class="form-control" id="house_num" name="house_num"
+                                value="{{ old('house_num', Auth::user()->house_num) }}" placeholder="e.g. 123">
+                        </div>
+
+                        <!-- Purok -->
+                        <div class="" style="width: 30%;">
+                            <label for="purok" class="form-label text-black">Purok:</label>
+                            <input type="number" class="form-control" id="purok" name="purok"
+                                value="{{ old('purok', Auth::user()->purok) }}" placeholder="e.g. 5">
+                        </div>
+
+                        <!-- Barangay -->
+                        <div class="w-100">
+                            <label for="barangay" class="form-label text-black">Barangay:</label>
+                            <select id="barangay" name="barangay" class="form-select" style="width: 100% !important;" required>
+                                <option value="">Select Barangay</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Hidden Input for Shipping Fee -->
+                    <input type="hidden" id="hiddenShippingFee" name="shipping_fee" value="{{ old('shipping_fee', Auth::user()->shipping_fee) }}">
+
 
                     <!-- Change Password -->
                     <div class="mb-3">
@@ -722,9 +763,132 @@
         });
     </script>
 
-    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script> --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const barangayDropdown = document.getElementById('barangay');
+            const hiddenShippingInput = document.getElementById('hiddenShippingFee');
+    
+            const oldBarangay = "{{ old('barangay', Auth::user()->barangay) }}"; // Old or default value
+            // Barangay with corresponding shipping fees
+            const barangayRates = {
+                "Abanon": 110,
+                "Agdao": 80,
+                "Ano": 80,
+                "Anando": 120,
+                "Antipangol": 140,
+                "Aponit": 100,
+                "Bacnar": 80,
+                "Bacnar UP": 90,
+                "Balaya": 100,
+                "Balayong": 70,
+                "Baldog": 80,
+                "Balite Sur": 90,
+                "Balococ": 100,
+                "Bani": 160,
+                "Bega": 70,
+                "Bogaoan": 170,
+                "Bocboc East": 150,
+                "Bocboc West": 170,
+                "Bolingit": 70,
+                "Bolosan": 70,
+                "Bonifacio": 40,
+                "Bugallon": 40,
+                "Buenglat": 90,
+                "Burgos-Padlan": 40,
+                "Cacaritan": 60,
+                "Caingal": 60,
+                "Calobaoan": 120,
+                "Calomboyan": 100,
+                "Caoayan Kiling": 130,
+                "Capataan": 90,
+                "Cobol": 100,
+                "Coliling": 70,
+                "Coliling Anlabo": 90,
+                "Cruz": 80,
+                "Doyong": 80,
+                "Gamata": 90,
+                "Guelew": 140,
+                "Ilang": 40,
+                "Inerangan": 90,
+                "Isla": 100,
+                "Libas": 120,
+                "Lilimasan": 70,
+                "Longos": 60,
+                "Lucban": 40,
+                "M. Soriano st.": 40,
+                "Mabalbalino": 150,
+                "Mabini": 40,
+                "Magtaking": 60,
+                "Malacañang": 90,
+                "Maliwa": 90,
+                "Mamarlao Court": 40,
+                "Manzon": 60,
+                "Matagdem": 70,
+                "Mc Arthur": 40,
+                "Meztizo Norte": 70,
+                "Naguilayan": 80,
+                "Nilentap": 90,
+                "Padilla": 40,
+                "Pagal": 70,
+                "Palaming": 70,
+                "Palaris": 40,
+                "Palospos": 120,
+                "Paitan": 80,
+                "Pangoloan": 80,
+                "Pangalangan": 80,
+                "Pangpang": 90,
+                "Parayao": 100,
+                "Payapa": 90,
+                "Payar": 100,
+                "Perez": 40,
+                "PNR": 40,
+                "Posadas Street": 40,
+                "Polo": 90,
+                "Quezon": 40,
+                "Quintong": 90,
+                "Rizal": 40,
+                "Roxas": 40,
+                "Salinap": 120,
+                "San Juan": 60,
+                "San Pedro": 40,
+                "Taloy": 60,
+                "Sapinit": 70,
+                "Supo": 150,
+                "Talang": 90,
+                "Taloy (Until VMUF)": 40,
+                "Tamayo": 130,
+                "Tandoc": 80,
+                "Tandang Sora": 40,
+                "Tarece": 60,
+                "Tarectec": 90,
+                "Tayambani": 90,
+                "Tebag": 80,
+                "Turac": 80
+            };
+    
+            // Populate the dropdown
+            Object.entries(barangayRates).forEach(([barangay, rate]) => {
+                const option = document.createElement('option');
+                option.value = barangay;
+                option.textContent = barangay;
+    
+                // Set the selected option
+                if (barangay === oldBarangay) {
+                    option.selected = true;
+                    hiddenShippingInput.value = rate; // Set the initial shipping fee
+                }
+    
+                barangayDropdown.appendChild(option);
+            });
+    
+            // Handle dropdown change to update the shipping fee
+            barangayDropdown.addEventListener('change', function () {
+                const selectedBarangay = barangayDropdown.value;
+                const shippingFee = barangayRates[selectedBarangay] || 0; // Default to 0 if not found
+                hiddenShippingInput.value = shippingFee; // Update the hidden input
+            });
+        });
+    </script>
 
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>

@@ -62,21 +62,21 @@
                             <div class="w-50">
                                 <label for="house_number" class="form-label">House Num. (optional):</label>
                                 <input type="text" class="form-control" id="house_number" name="house_number"
-                                    placeholder="123">
+                                    placeholder="e.g. 123" value="{{ old('house_num', Auth::user()->house_num) }}">
                             </div>
 
                             <!-- Purok -->
                             <div class="w-50">
                                 <label for="purok" class="form-label">Purok (optional):</label>
                                 <input type="number" class="form-control" id="purok" name="purok" min="0"
-                                    max="20" placeholder="1">
+                                    max="20" placeholder="e.g. 1" value="{{ old('purok', Auth::user()->purok) }}">
                             </div>
                         </div>
 
                         <!-- Barangay -->
                         <div class="w-100 mb-3">
                             <label for="barangay" class="form-label">Barangay:</label>
-                            <select class="form-control" id="barangay" name="barangay" required>
+                            <select class="form-select" id="barangay" name="barangay" required>
                                 <option value="">Select Barangay</option>
                             </select>
                         </div>
@@ -84,8 +84,8 @@
                         <!-- Shipping Fee -->
                         <div class="mb-3">
                             <label for="shippingFeeDisplay" class="form-label">Shipping Fee (₱):</label>
-                            <input type="text" class="form-control shipping-fee-input" name="shipping_fee"
-                                value="0" readonly>
+                            <input type="text" class="form-control shipping-fee-input" name="shipping_fee" readonly
+                                value="{{ old('shipping_fee', Auth::user()->shipping_fee) }}">
                         </div>
 
                         <!-- Payment Method -->
@@ -198,13 +198,19 @@
                         <!-- Shipping Fee (Display Div) -->
                         <div class="d-flex justify-content-between align-items-center">
                             <div>Shipping Fee:</div>
-                            <div class="fs-5 shipping-fee-display">₱0</div>
+                            <div class="fs-5 shipping-fee-display">
+                                ₱{{ old('shipping_fee', Auth::user()->shipping_fee) }}</div>
                         </div>
+
+                        @php
+                            $ship_fee = Auth::user()->shipping_fee;
+                            $original_total = $ship_fee + $finalTotal;
+                        @endphp
 
                         <!-- Final Total -->
                         <div class="d-flex justify-content-between fw-bold align-items-center">
                             <div>Final Total:</div>
-                            <div class="fs-4" id="finalTotalDisplay">₱{{ number_format($finalTotal) }}</div>
+                            <div class="fs-4" id="finalTotalDisplay">₱{{ number_format($original_total) }}</div>
                         </div>
 
                         <!-- Hidden Inputs for Form Submission -->
@@ -238,6 +244,8 @@
             const finalTotalDisplay = document.getElementById('finalTotalDisplay'); // Final total display
             const originalTotalInput = document.getElementById('originalTotal'); // Original total input
             const totalPriceInput = document.querySelector('[name="total_price"]'); // Total price input
+
+            const oldBarangay = "{{ old('barangay', Auth::user()->barangay) }}"; // Old or default value
 
             // Barangay with corresponding shipping fees
             const barangayRates = {
@@ -342,6 +350,13 @@
                 const option = document.createElement('option');
                 option.value = barangay;
                 option.textContent = barangay;
+
+                // Preselect the option if it matches the oldBarangay value
+                if (barangay === oldBarangay) {
+                    option.selected = true;
+                    hiddenShippingInput.value = barangayRates[barangay]; // Set initial shipping fee
+                }
+
                 barangayDropdown.appendChild(option);
             });
             // Handle Barangay change
