@@ -536,48 +536,6 @@
         - #STATS
       -->
 
-            {{-- <section class="stats" aria-label="statistics" data-reveal>
-                <div class="container">
-
-                    <ul class="grid-list">
-
-                        <li>
-                            <h2 class="h3 section-title">Service shows good taste.</h2>
-                        </li>
-
-                        <li class="stats-item">
-                            <span class="span">976</span>
-
-                            <p class="stats-text">
-                                Satisfied <br>
-                                Customer
-                            </p>
-                        </li>
-
-                        <li class="stats-item">
-                            <span class="span">12</span>
-
-                            <p class="stats-text">
-                                Best <br>
-                                Restaurants
-                            </p>
-                        </li>
-
-                        <li class="stats-item">
-                            <span class="span">1K+</span>
-
-                            <p class="stats-text">
-                                Food <br>
-                                Delivered
-                            </p>
-                        </li>
-
-                    </ul>
-
-                </div>
-            </section> --}}
-
-
             <!-- #FEEDBACK -->
             <section class="section testi" aria-labelledby="testi-label">
                 <div class="container">
@@ -587,7 +545,7 @@
                         <h2 class="h2 section-title" id="testi-label">What customers say about us</h2>
 
                         <blockquote class="testi-text">
-                            @if ($feedback->feedback)
+                            @if ($feedback && $feedback->feedback)
                                 "{{ $feedback->feedback }}"
                             @else
                                 No feedback available yet
@@ -600,7 +558,7 @@
 
                             <div>
                                 <p class="author-title">
-                                    @if ($feedback->feedback)
+                                    @if ($feedback && $feedback->feedback)
                                         {{ $feedback ? $feedback->first_name . ' ' . $feedback->last_name : 'Anonymous' }}
                                     @else
                                         Anonymous
@@ -632,100 +590,6 @@
 
                 </div>
             </section>
-
-
-
-            <!--
-        - #PARTNERSHIP
-      -->
-
-            {{-- <section class="section partnership" aria-label="partnership">
-                <div class="container">
-
-                    <h2 class="h2 section-title" data-reveal>Want to Join Partnership?</h2>
-
-                    <ul class="grid-list">
-
-                        <li data-reveal="left">
-                            <div class="partnership-card">
-
-                                <figure class="card-banner img-holder" style="--width: 640; --height: 402;">
-                                    <img src="./home-assets/images/partner-1.jpg" width="640" height="402"
-                                        loading="lazy" alt="Join Courier" class="img-cover">
-                                </figure>
-
-                                <div class="card-content">
-                                    <h3 class="h5 card-title">Join Courier</h3>
-
-                                    <a href="#" class="btn btn-primary has-after">
-                                        <span class="span">Learn More</span>
-
-                                        <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
-                                    </a>
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li data-reveal="right">
-                            <div class="partnership-card">
-
-                                <figure class="card-banner img-holder" style="--width: 640; --height: 402;">
-                                    <img src="./home-assets/images/partner-2.jpg" width="640" height="402"
-                                        loading="lazy" alt="Join Merchant" class="img-cover">
-                                </figure>
-
-                                <div class="card-content">
-                                    <h3 class="h5 card-title">Join Merchant</h3>
-
-                                    <a href="#" class="btn btn-primary has-after">
-                                        <span class="span">Learn More</span>
-
-                                        <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
-                                    </a>
-                                </div>
-
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </div>
-            </section> --}}
-
-
-            <!--
-        - #NEWSLETTER
-      -->
-
-            {{-- <section class="section newsletter" aria-label="newsletter">
-                <div class="container">
-
-                    <figure class="newsletter-banner" data-reveal="left">
-                        <img src="./home-assets/images/newsletter-banenr.png" width="680" height="405"
-                            loading="lazy" alt="Illustration" class="w-100">
-                    </figure>
-
-                    <div class="newsletter-content" data-reveal="right">
-                        <h2 class="h4 section-title">
-                            Get the menu of your favorite restaurants every day
-                        </h2>
-
-                        <div class="input-wrapper">
-                            <input type="email" name="email_address" placeholder="Enter email address" required
-                                class="input-field">
-
-                            <button type="submit" class="btn btn-primary has-after">
-                                <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
-
-                                <span class="span">Subscribe</span>
-                            </button>
-                        </div>
-
-                    </div>
-
-                </div>
-            </section> --}}
 
         </article>
     </main>
