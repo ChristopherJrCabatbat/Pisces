@@ -324,6 +324,7 @@
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
+                
                 <tbody id="menu-table-body">
                     @forelse ($menus as $menu)
                         <tr class="menu-row {{ $menu->availability === 'Unavailable' ? 'table-danger' : '' }}">
@@ -389,6 +390,7 @@
                         <td colspan="7">No menu available</td>
                     </tr>
                 </tbody>
+
             </table>
 
             <!-- Pagination -->
