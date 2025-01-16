@@ -39,9 +39,10 @@
                             <button class="promotion-modal-close"
                                 data-modal-id="promotionModal-{{ $promotion->id }}">✖</button>
                         </div>
-                        <div class="promotion-modal-body">
+                        <div class="promotion-modal-body text-center">
                             <img src="{{ asset('storage/' . $promotion->image) }}" alt="{{ $promotion->name }}"
                                 class="promotion-modal-img">
+                                <p class="promotion-notice">This promotion is available for dine-in customers only.</p>
                         </div>
                     </div>
                 </div>

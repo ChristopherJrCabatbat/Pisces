@@ -191,47 +191,47 @@ class UserController extends Controller
     // }
 
     public function userUpdate(Request $request)
-{
-    $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'contact_number' => 'required|string|max:20',
-        'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
-        'password' => 'nullable|string|min:8|confirmed',
-    ]);
-
-    /** @var User $user */
-    $user = Auth::user();
-
-    // Store the old email before updating
-    $oldEmail = $user->email;
-
-    $user->update([
-        'first_name' => $request->first_name,
-        'last_name' => $request->last_name,
-        'contact_number' => $request->contact_number,
-        'email' => $request->email,
-        'newsletter_subscription' => $request->has('newsletter_subscription'), // Updates newsletter_subscription
-    ]);
-
-    // Update password if provided
-    if ($request->filled('password')) {
-        $user->update([
-            'password' => Hash::make($request->password),
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'contact_number' => 'required|string|max:20',
+            'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Store the old email before updating
+        $oldEmail = $user->email;
+
+        $user->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'contact_number' => $request->contact_number,
+            'email' => $request->email,
+            'newsletter_subscription' => $request->has('newsletter_subscription'), // Updates newsletter_subscription
+        ]);
+
+        // Update password if provided
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
+
+        // Update the email in the deliveries table for all records matching the old email
+        DB::table('deliveries')->where('email', $oldEmail)->update(['email' => $request->email]);
+
+        // Set a toast session with the success message
+        session()->flash('toast', [
+            'message' => 'Profile updated successfully!',
+            'type' => 'success', // 'success' or 'error'
+        ]);
+
+        return redirect()->back()->with('success', 'Profile updated successfully!');
     }
-
-    // Update the email in the deliveries table for all records matching the old email
-    DB::table('deliveries')->where('email', $oldEmail)->update(['email' => $request->email]);
-
-    // Set a toast session with the success message
-    session()->flash('toast', [
-        'message' => 'Profile updated successfully!',
-        'type' => 'success', // 'success' or 'error'
-    ]);
-
-    return redirect()->back()->with('success', 'Profile updated successfully!');
-}
 
 
     public function submitExperience(Request $request)
@@ -835,7 +835,7 @@ class UserController extends Controller
     //     return view('user.order', compact('menus', 'user', 'delivery'));
     // }
 
-    
+
     public function orderRepeat($deliveryId)
     {
         /** @var User $user */
@@ -1033,33 +1033,41 @@ class UserController extends Controller
             ") // Custom ordering
             ->get();
 
-        $orders = $orders->map(function ($order) {
-            $order->created_at = Carbon::parse($order->created_at);
-
-            // Parse order items and quantities
-            $orderItems = explode(', ', $order->order);
-            $quantities = explode(', ', $order->quantity);
-
-            // Fetch all menu details for the order
-            $menuDetails = [];
-            foreach ($orderItems as $index => $item) {
-                $menuName = explode(' (', $item)[0]; // Extract menu name
-                $menu = DB::table('menus')->where('name', $menuName)->first();
-
-                if ($menu) {
-                    $menuDetails[] = (object)[ // Convert to an object
-                        'name' => $menuName,
-                        'quantity' => $quantities[$index] ?? 1,
-                        'image' => 'storage/' . $menu->image,
-                        'price' => $menu->price,
-                    ];
+            $orders = $orders->map(function ($order) {
+                $order->created_at = Carbon::parse($order->created_at);
+            
+                // Parse order items and quantities
+                $orderItems = explode(', ', $order->order);
+                $quantities = explode(', ', $order->quantity);
+            
+                // Fetch all menu details for the order
+                $menuDetails = [];
+                foreach ($orderItems as $index => $item) {
+                    $menuName = explode(' (', $item)[0]; // Extract menu name
+                    $menu = DB::table('menus')->where('name', $menuName)->first();
+            
+                    if ($menu) {
+                        // Calculate discounted price if applicable
+                        $discountedPrice = !is_null($menu->discount) && $menu->discount > 0
+                            ? $menu->price - ($menu->price * ($menu->discount / 100))
+                            : $menu->price;
+            
+                        $menuDetails[] = (object)[
+                            'name' => $menuName,
+                            'quantity' => $quantities[$index] ?? 1,
+                            'image' => 'storage/' . $menu->image,
+                            'price' => $discountedPrice,
+                        ];
+                    }
                 }
-            }
+            
+                $order->menuDetails = $menuDetails;
+                $order->rider_name = $order->rider;
+                $order->address = $order->address; // Add the order address
+                return $order;
+            });
+            
 
-            $order->menuDetails = $menuDetails;
-            $order->rider_name = $order->rider;
-            return $order;
-        });
 
         // Count unread messages from the admin
         $unreadCount = Message::where('receiver_id', $user->id)
@@ -1420,9 +1428,9 @@ class UserController extends Controller
         // Calculate the total price (Subtotal + Shipping Fee)
         $shippingFee = $delivery->shipping_fee ?? 0; // Default to 0 if not set
         $totalPrice = $subtotal + $shippingFee;
-        
+
         $coupons = $totalPrice - $totalDatabase;
-        
+
         // $hasDiscount = $user->has_discount;
 
         // Count unread messages

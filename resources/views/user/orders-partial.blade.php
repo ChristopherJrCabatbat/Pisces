@@ -2,7 +2,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <p class="text-muted mb-1">Order Date</p>
-            <p class="fw-bold mb-0">{{ $order->created_at->format('M d, Y') }}</p>
+            <p class="fw-bold mb-0">{{ $order->created_at->format('M d, Y') }} - <small class="text-muted">{{ $order->address }}</small></p>
         </div>
         <div>
             {{-- Dynamic Badge Color Based on Order Status --}}

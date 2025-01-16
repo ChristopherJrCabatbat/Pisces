@@ -37,16 +37,9 @@
                             <input type="hidden" name="menu_items" id="menuItemInput">
                         </div>
 
-                        <!-- Feedback Text -->
-                        <div class="mb-3">
-                            <label for="feedbackText" class="form-label">Feedback</label>
-                            <textarea class="form-control" id="feedbackText" name="feedback_text" rows="3"
-                                placeholder="Share your experience..."></textarea>
-                        </div>
-
                         <!-- Star Rating -->
                         <div class="mb-3">
-                            <label for="rating" class="form-label">Rate</label>
+                            <label for="rating" class="form-label">Rate the menu:</label>
                             <div id="starRating" class="star-rating">
                                 @for ($i = 5; $i >= 1; $i--)
                                     <input type="radio" required id="star{{ $i }}" name="rating"
@@ -59,7 +52,7 @@
                         <!-- Rider Rating -->
                         <div class="mb-3">
                             <label for="riderRating" class="form-label">
-                                You can also rate <span id="riderName">the rider</span> for his/her service:
+                                Rate the rider <span id="riderName"></span> for his/her service:
                             </label>
                             <div id="riderRating" class="star-rating">
                                 @for ($i = 5; $i >= 1; $i--)
@@ -71,6 +64,13 @@
                         </div>
                         <!-- Hidden input to store rider's name -->
                         <input type="hidden" name="rider_name" id="riderNameInput">
+
+                         <!-- Feedback Text -->
+                         <div class="mb-3">
+                            <label for="feedbackText" class="form-label">Feedback (optional):</label>
+                            <textarea class="form-control" id="feedbackText" name="feedback_text" rows="3"
+                                placeholder="Share your experience..."></textarea>
+                        </div>
 
                     </div>
                     <div class="modal-footer">
@@ -192,35 +192,6 @@
 @endsection
 
 @section('scripts')
-
-    {{-- Rider Modal --}}
-    {{-- <script>
-        document.querySelectorAll('.to-review').forEach(button => {
-            button.addEventListener('click', function() {
-                const menuName = this.getAttribute('data-menu-name') || 'N/A';
-                const menuImage = this.getAttribute('data-menu-image') || '';
-
-                if (!menuImage) {
-                    console.error('No image URL found for this menu!');
-                }
-
-                // Target modal elements
-                const nameElement = document.getElementById('menuName');
-                const imageElement = document.getElementById('menuImage');
-                const hiddenInputElement = document.getElementById('menuItemInput');
-
-                // Update modal content
-                if (nameElement && imageElement && hiddenInputElement) {
-                    nameElement.textContent = menuName; // Display menu name
-                    imageElement.src = menuImage; // Display image source
-                    imageElement.alt = menuName; // Set image alt attribute
-                    hiddenInputElement.value = menuName; // Set hidden input value
-                } else {
-                    console.error('Modal elements not found!');
-                }
-            });
-        });
-    </script> --}}
 
     <script>
         document.querySelectorAll('.to-review').forEach(button => {
