@@ -104,7 +104,7 @@
                 <!-- Modal Header and Text -->
                 <h4 class="experience-modal-header">We value your feedback!</h4>
                 <p class="experience-modal-text">Thank you for your continued support! We'd love to hear from you.
-                    Please rate our service:</p>
+                    Please rate your experience in using our service:</p>
 
                 <!-- Feedback Form -->
                 <form action="{{ route('user.submitExperience') }}" method="POST">

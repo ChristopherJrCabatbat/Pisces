@@ -216,8 +216,10 @@
                             <tr>
                                 <td>{{ $customer->first_name }} {{ $customer->last_name }}</td>
                                 <td>{{ $customer->order_count }}</td>
-                                <td>{{ $customer->last_order ? $customer->last_order->format('M. d, Y - g:i A') : 'N/A' }}</td>
-                                <td>{{ $customer->last_login_at ? $customer->last_login_at->format('M. d, Y - g:i A') : 'N/A' }}</td>                                
+                                <td>{{ $customer->last_order ? $customer->last_order->format('M. d, Y - g:i A') : 'N/A' }}
+                                </td>
+                                <td>{{ $customer->last_login_at ? $customer->last_login_at->format('M. d, Y - g:i A') : 'N/A' }}
+                                </td>
                             </tr>
                         @empty
                             <tr>
@@ -280,9 +282,57 @@
                 </table>
             </div>
 
-            {{-- Monthly Sales --}}
-            <div class="bar-graph text-black mt-4">
-                <h3 class="h3 text-black">Monthly Sales</h3>
+            {{-- <!-- Daily Sales -->
+            <div class="bar-graph text-black mt-4" id="dailySalesContainer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="h3 text-black">Daily Sales</h3>
+                    <div>
+                        <button id="toggleToMonthly" class="btn btn-primary">Switch to Monthly Sales</button>
+                        <button id="printDailyReport" class="btn btn-secondary">Print Report</button>
+                    </div>
+                </div>
+                <div>
+                    <canvas id="dailySalesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Monthly Sales -->
+            <div class="bar-graph text-black mt-4" style="display: none;" id="monthlySalesContainer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="h3 text-black">Monthly Sales</h3>
+                    <div>
+                        <button id="toggleToDaily" class="btn btn-primary">Switch to Daily Sales</button>
+                        <button id="printMonthlyReport" class="btn btn-secondary">Print Report</button>
+                    </div>
+                </div>
+                <div>
+                    <canvas id="monthlySalesChart" width="400" height="200"></canvas>
+                </div>
+            </div> --}}
+
+            <!-- Daily Sales -->
+            <div class="bar-graph text-black mt-4" id="dailySalesContainer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="h3 text-black">Daily Sales</h3>
+                    <div>
+                        <button id="toggleToMonthly" class="btn btn-primary">Switch to Monthly Sales</button>
+                        <button id="printDailyReport" class="btn btn-secondary">Print Report</button>
+                    </div>
+                </div>
+                <div>
+                    <canvas id="dailySalesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Monthly Sales -->
+            <div class="bar-graph text-black mt-4" style="display: none;" id="monthlySalesContainer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="h3 text-black">Monthly Sales</h3>
+                    <div>
+                        <button id="toggleToDaily" class="btn btn-primary">Switch to Daily Sales</button>
+                        <button id="printMonthlyReport" class="btn btn-secondary">Print Report</button>
+                    </div>
+                </div>
                 <div>
                     <canvas id="monthlySalesChart" width="400" height="200"></canvas>
                 </div>
@@ -294,23 +344,23 @@
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Monthly Sales Data
         const monthlySales = @json($monthlySales);
+        const monthlyLabels = Object.keys(monthlySales); // Month names
+        const monthlyData = Object.values(monthlySales); // Total sales
 
-        // Prepare data for Chart.js
-        const labels = Object.keys(monthlySales); // Month names
-        const data = Object.values(monthlySales); // Total sales
-
-        // Configure the Chart.js bar graph
-        const ctx = document.getElementById('monthlySalesChart').getContext('2d');
-        const monthlySalesChart = new Chart(ctx, {
+        // Configure the Monthly Sales Chart
+        const monthlyCtx = document.getElementById('monthlySalesChart').getContext('2d');
+        new Chart(monthlyCtx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: monthlyLabels,
                 datasets: [{
                     label: 'Total Sales (₱)',
-                    data: data,
+                    data: monthlyData,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
@@ -340,5 +390,391 @@
                 }
             }
         });
+
+        // Daily Sales Data
+        const dailySales = @json($dailySales);
+        const dailyLabels = Object.keys(dailySales); // Day names
+        const dailyData = Object.values(dailySales); // Total sales
+
+        // Configure the Daily Sales Chart
+        const dailyCtx = document.getElementById('dailySalesChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    label: 'Total Sales (₱)',
+                    data: dailyData,
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Sales in ₱'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Days'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Toggle Button Functionality
+        const toggleToMonthly = document.getElementById('toggleToMonthly');
+        const toggleToDaily = document.getElementById('toggleToDaily');
+        const dailySalesContainer = document.getElementById('dailySalesContainer');
+        const monthlySalesContainer = document.getElementById('monthlySalesContainer');
+
+        toggleToMonthly.addEventListener('click', () => {
+            dailySalesContainer.style.display = 'none';
+            monthlySalesContainer.style.display = 'block';
+        });
+
+        toggleToDaily.addEventListener('click', () => {
+            monthlySalesContainer.style.display = 'none';
+            dailySalesContainer.style.display = 'block';
+        });
+
+        // Print Report Functionality
+        const printDailyReport = document.getElementById('printDailyReport');
+        const printMonthlyReport = document.getElementById('printMonthlyReport');
+
+        printDailyReport.addEventListener('click', () => {
+            const reportContent = `
+                Daily Sales Report
+                ==================
+                ${dailyLabels.map((label, index) => `${label}: ₱${dailyData[index].toLocaleString()}`).join('\n')}
+                Total Sales: ₱${dailyData.reduce((a, b) => a + b, 0).toLocaleString()}
+            `;
+            printReport(reportContent);
+        });
+
+        printMonthlyReport.addEventListener('click', () => {
+            const reportContent = `
+                Monthly Sales Report
+                ====================
+                ${monthlyLabels.map((label, index) => `${label}: ₱${monthlyData[index].toLocaleString()}`).join('\n')}
+                Total Sales: ₱${monthlyData.reduce((a, b) => a + b, 0).toLocaleString()}
+            `;
+            printReport(reportContent);
+        });
+
+        // Helper Function to Print Report
+        function printReport(content) {
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write('<pre>' + content + '</pre>');
+            newWindow.document.close();
+            newWindow.print();
+        }
+    </script> --}}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Monthly Sales Data
+        const monthlySales = @json($monthlySales);
+        const monthlyLabels = Object.keys(monthlySales);
+        const monthlyData = Object.values(monthlySales);
+
+        // Configure the Monthly Sales Chart
+        const monthlyCtx = document.getElementById('monthlySalesChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: 'Total Sales (₱)',
+                    data: monthlyData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Sales in ₱'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Months'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Daily Sales Data
+        const dailySales = @json($dailySales);
+        const dailyLabels = Object.keys(dailySales);
+        const dailyData = Object.values(dailySales);
+
+        // Configure the Daily Sales Chart
+        const dailyCtx = document.getElementById('dailySalesChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    label: 'Total Sales (₱)',
+                    data: dailyData,
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Sales in ₱'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Days'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Toggle Button Functionality
+        document.getElementById('toggleToMonthly').addEventListener('click', () => {
+            document.getElementById('dailySalesContainer').style.display = 'none';
+            document.getElementById('monthlySalesContainer').style.display = 'block';
+        });
+
+        document.getElementById('toggleToDaily').addEventListener('click', () => {
+            document.getElementById('monthlySalesContainer').style.display = 'none';
+            document.getElementById('dailySalesContainer').style.display = 'block';
+        });
+
+        // // Print Report Functionality
+        // document.getElementById('printDailyReport').addEventListener('click', () => {
+        //     const reportContent = `
+    //         <h1>Daily Sales Report</h1>
+    //         <table border="1" style="width: 100%; text-align: left; border-collapse: collapse;">
+    //             <thead>
+    //                 <tr>
+    //                     <th>Date</th>
+    //                     <th>Sales (₱)</th>
+    //                 </tr>
+    //             </thead>
+    //             <tbody>
+    //                 ${dailyLabels.map((label, index) => `<tr><td>${label}</td><td>₱${dailyData[index].toLocaleString()}</td></tr>`).join('')}
+    //             </tbody>
+    //             <tfoot>
+    //                 <tr>
+    //                     <td><strong>Total Sales</strong></td>
+    //                     <td><strong>₱${dailyData.reduce((a, b) => a + b, 0).toLocaleString()}</strong></td>
+    //                 </tr>
+    //             </tfoot>
+    //         </table>
+    //     `;
+        //     printStyledReport(reportContent);
+        // });
+
+        // document.getElementById('printMonthlyReport').addEventListener('click', () => {
+        //     const reportContent = `
+    //         <h1>Monthly Sales Report</h1>
+    //         <table border="1" style="width: 100%; text-align: left; border-collapse: collapse;">
+    //             <thead>
+    //                 <tr>
+    //                     <th>Month</th>
+    //                     <th>Sales (₱)</th>
+    //                 </tr>
+    //             </thead>
+    //             <tbody>
+    //                 ${monthlyLabels.map((label, index) => `<tr><td>${label}</td><td>₱${monthlyData[index].toLocaleString()}</td></tr>`).join('')}
+    //             </tbody>
+    //             <tfoot>
+    //                 <tr>
+    //                     <td><strong>Total Sales</strong></td>
+    //                     <td><strong>₱${monthlyData.reduce((a, b) => a + b, 0).toLocaleString()}</strong></td>
+    //                 </tr>
+    //             </tfoot>
+    //         </table>
+    //     `;
+        //     printStyledReport(reportContent);
+        // });
+
+        // // Helper Function to Print Report with Styling
+        // function printStyledReport(content) {
+        //     const newWindow = window.open('', '_blank');
+        //     newWindow.document.write(`
+    //         <html>
+    //         <head>
+    //             <title>Sales Report</title>
+    //             <style>
+    //                 body { font-family: Arial, sans-serif; padding: 20px; }
+    //                 h1 { text-align: center; }
+    //                 table { margin: 20px auto; border: 1px solid #ddd; }
+    //                 th, td { padding: 8px; border: 1px solid #ddd; }
+    //                 th { background-color: #f4f4f4; }
+    //             </style>
+    //         </head>
+    //         <body>${content}</body>
+    //         </html>
+    //     `);
+        //     newWindow.document.close();
+        //     newWindow.print();
+        // }
+
+        // Print Report Functionality
+        document.getElementById('printDailyReport').addEventListener('click', () => {
+            const month = new Date().toLocaleString('default', {
+                month: 'long'
+            }); // Get current month name
+            const totalDailySales = dailyData.reduce((a, b) => Number(a) + Number(b),
+                0); // Ensure numbers are summed
+            const reportContent = `
+        <div style="text-align: center;">
+            <img src="{{ asset('images/logo-name.png') }}" alt="Company Logo" style="max-width: 150px; margin-bottom: 20px;">
+            <h1>Daily Sales Report - ${month}</h1>
+        </div>
+        <table border="1" style="width: 80%; text-align: left; border-collapse: collapse; margin: 0 auto;">
+            <thead>
+                <tr style="background-color: #bababa;">
+                    <th>Date</th>
+                    <th>Sales (₱)</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${dailyLabels.map((label, index) => `<tr><td>${month} ${label}</td><td>₱${Number(dailyData[index]).toLocaleString()}</td></tr>`).join('')}
+            </tbody>
+            <tfoot>
+                <tr style="background-color: #f8f9fa;">
+                    <td><strong>Total Sales</strong></td>
+                    <td><strong>₱${totalDailySales.toLocaleString()}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+            printStyledReport(reportContent);
+        });
+
+        document.getElementById('printMonthlyReport').addEventListener('click', () => {
+            const totalMonthlySales = monthlyData.reduce((a, b) => Number(a) + Number(b),
+                0); // Ensure numbers are summed
+            const reportContent = `
+        <div style="text-align: center;">
+            <img src="{{ asset('images/logo-name.png') }}" alt="Company Logo" style="max-width: 150px; margin-bottom: 20px;">
+            <h1>Monthly Sales Report</h1>
+        </div>
+        <table border="1" style="width: 80%; text-align: left; border-collapse: collapse; margin: 0 auto;">
+            <thead>
+                <tr style="background-color: #bababa;">
+                    <th>Month</th>
+                    <th>Sales (₱)</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${monthlyLabels.map((label, index) => `<tr><td>${label}</td><td>₱${Number(monthlyData[index]).toLocaleString()}</td></tr>`).join('')}
+            </tbody>
+            <tfoot>
+                <tr style="background-color: #f8f9fa;">
+                    <td><strong>Total Sales</strong></td>
+                    <td><strong>₱${totalMonthlySales.toLocaleString()}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+            printStyledReport(reportContent);
+        });
+
+        // Helper Function to Print Report with Styling
+        function printStyledReport(content) {
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+        <html>
+        <head>
+            <title>Sales Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { text-align: center; font-size: 24px; }
+                table { 
+                    border: 1px solid #ddd; 
+                    border-radius: 8px; 
+                    overflow: hidden; 
+                    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); 
+                }
+                th, td { 
+                    padding: 10px; 
+                    text-align: center; 
+                    border: 1px solid #ddd; 
+                }
+                th { 
+                    font-size: 16px; 
+                    font-weight: bold; 
+                    background-color: #bababa; 
+                }
+                tfoot td {
+                    font-weight: bold;
+                    background-color: #f8f9fa;
+                }
+                tr:nth-child(even) { background-color: #f2f2f2; }
+                img { max-width: 150px; margin-bottom: 20px; }
+            </style>
+        </head>
+        <body>${content}</body>
+        </html>
+    `);
+
+            newWindow.document.close();
+
+            // Wait for the logo image to load before printing
+            const logoImage = newWindow.document.querySelector('img');
+            if (logoImage) {
+                logoImage.onload = () => {
+                    newWindow.print();
+                };
+                logoImage.onerror = () => {
+                    console.error("Logo image failed to load.");
+                    newWindow.print(); // Print even if the image fails to load
+                };
+            } else {
+                // If no image is present, proceed to print
+                newWindow.print();
+            }
+        }
     </script>
+
 @endsection

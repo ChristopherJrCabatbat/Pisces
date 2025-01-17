@@ -61,6 +61,16 @@ class AdminController extends Controller
             ->sortByDesc('rating')
             ->take(5);
 
+        // // Calculate total sales for each month (only 'Delivered' orders)
+        // $monthlySales = Delivery::select(
+        //     DB::raw("SUM(total_price) as total_sales"),
+        //     DB::raw("MONTHNAME(created_at) as month_name")
+        // )
+        //     ->where('status', 'Delivered')
+        //     ->groupBy(DB::raw("MONTH(created_at)"), DB::raw("MONTHNAME(created_at)"))
+        //     ->orderBy(DB::raw("MONTH(created_at)"))
+        //     ->pluck('total_sales', 'month_name');
+
         // Calculate total sales for each month (only 'Delivered' orders)
         $monthlySales = Delivery::select(
             DB::raw("SUM(total_price) as total_sales"),
@@ -70,6 +80,18 @@ class AdminController extends Controller
             ->groupBy(DB::raw("MONTH(created_at)"), DB::raw("MONTHNAME(created_at)"))
             ->orderBy(DB::raw("MONTH(created_at)"))
             ->pluck('total_sales', 'month_name');
+
+        // Calculate total sales for each day of the current month
+        $dailySales = Delivery::select(
+            DB::raw("SUM(total_price) as total_sales"),
+            DB::raw("DAY(created_at) as day")
+        )
+            ->where('status', 'Delivered')
+            ->whereMonth('created_at', now()->month) // Filter by current month
+            ->groupBy(DB::raw("DAY(created_at)"))
+            ->orderBy(DB::raw("DAY(created_at)"))
+            ->pluck('total_sales', 'day');
+
 
         // Fetch unread message data
         $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
@@ -104,6 +126,7 @@ class AdminController extends Controller
             'totalUnreadCount',
             'deliveryBadgeCount',
             'topCustomers',
+            'dailySales',
         ));
     }
 
