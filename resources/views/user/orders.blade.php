@@ -11,6 +11,11 @@
         select {
             width: 30% !important;
         }
+
+        .modal-content {
+            position: absolute;
+            top: -2vh;
+        }
     </style>
 @endsection
 
@@ -28,6 +33,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+
                         <!-- Menu Details -->
                         <div class="d-flex align-items-center mb-3">
                             <img id="menuImage" src="" alt="Menu Image" class="rounded me-3"
@@ -37,7 +43,7 @@
                             <input type="hidden" name="menu_items" id="menuItemInput">
                         </div>
 
-                        <!-- Star Rating -->
+                        <!-- Menu Rating -->
                         <div class="mb-3">
                             <label for="rating" class="form-label">Rate the menu:</label>
                             <div id="starRating" class="star-rating">
@@ -48,6 +54,14 @@
                                 @endfor
                             </div>
                         </div>
+
+                        <!-- Feedback Text -->
+                        <div class="mb-3">
+                            <label for="feedbackText" class="form-label">Feedback to Menu (optional):</label>
+                            <textarea class="form-control" id="feedbackText" name="feedback_text" rows="2"
+                                placeholder="Share your experience about the menu..."></textarea>
+                        </div>
+
 
                         <!-- Rider Rating -->
                         <div class="mb-3">
@@ -65,11 +79,11 @@
                         <!-- Hidden input to store rider's name -->
                         <input type="hidden" name="rider_name" id="riderNameInput">
 
-                         <!-- Feedback Text -->
-                         <div class="mb-3">
-                            <label for="feedbackText" class="form-label">Feedback (optional):</label>
-                            <textarea class="form-control" id="feedbackText" name="feedback_text" rows="3"
-                                placeholder="Share your experience..."></textarea>
+                        <!-- Feedback Rider -->
+                        <div class="mb-3">
+                            <label for="feedbackRider" class="form-label">Feedback for Rider (optional):</label>
+                            <textarea class="form-control" id="feedbackRider" name="feedback_rider" rows="2"
+                                placeholder="Share your experience about the rider..."></textarea>
                         </div>
 
                     </div>
@@ -192,6 +206,37 @@
 @endsection
 
 @section('scripts')
+
+    {{-- <script>
+        document.querySelectorAll('.to-review').forEach(button => {
+            button.addEventListener('click', function() {
+                const menuName = this.getAttribute('data-menu-name') || 'N/A';
+                const menuImage = this.getAttribute('data-menu-image') || '';
+                const riderName = this.getAttribute('data-rider-name') || 'the rider';
+
+                // Target modal elements
+                const nameElement = document.getElementById('menuName');
+                const imageElement = document.getElementById('menuImage');
+                const hiddenInputElement = document.getElementById('menuItemInput');
+                const riderNameElement = document.getElementById('riderName');
+                const hiddenRiderInput = document.getElementById('riderNameInput');
+
+                // Update modal content
+                if (nameElement && imageElement && hiddenInputElement && riderNameElement &&
+                    hiddenRiderInput) {
+                    nameElement.textContent = menuName;
+                    imageElement.src = menuImage;
+                    imageElement.alt = menuName;
+                    hiddenInputElement.value = menuName;
+
+                    riderNameElement.textContent = riderName;
+                    hiddenRiderInput.value = riderName;
+                } else {
+                    console.error('Modal elements not found!');
+                }
+            });
+        });
+    </script> --}}
 
     <script>
         document.querySelectorAll('.to-review').forEach(button => {

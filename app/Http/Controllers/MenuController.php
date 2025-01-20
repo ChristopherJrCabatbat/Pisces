@@ -27,143 +27,6 @@ class MenuController extends Controller
      * Display a listing of the resource.
      */
 
-    public function index(Request $request, UnreadMessagesController $unreadMessagesController)
-    {
-        // Fetch unread message data
-        $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
-        $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
-
-        $query = Menu::query();
-        $toastMessage = null;
-        $activeFilter = 'Default view'; // Default description
-
-        // Handle Default Filter
-        if ($request->has('default') && $request->default === 'true') {
-            $toastMessage = 'Default view applied. Showing all menus!';
-        }
-
-        // Apply Available Filter
-        if ($request->has('mainFilter') && $request->mainFilter === 'available') {
-            $query->where('availability', 'Available');
-            $toastMessage = 'Successfully filtered by Availability: Available';
-            $activeFilter = 'Availability: Available';
-        }
-
-        // Apply Unavailable Filter
-        if ($request->has('mainFilter') && $request->mainFilter === 'unavailable') {
-            $query->where('availability', 'Unavailable');
-            $toastMessage = 'Successfully filtered by Availability: Unavailable';
-            $activeFilter = 'Availability: Unavailable';
-        }
-
-        // Handle other filters (category, price, date, etc.)
-        if ($request->has('categoryFilter') && $request->categoryFilter) {
-            $query->where('category', $request->categoryFilter);
-            $toastMessage = 'Successfully filtered by Category: ' . $request->categoryFilter;
-            $activeFilter = 'Category: ' . $request->categoryFilter;
-        }
-
-        if ($request->has('priceFilter')) {
-            $query->when($request->priceFilter === 'expensive', function ($q) {
-                $q->orderBy('price', 'desc');
-            })->when($request->priceFilter === 'cheap', function ($q) {
-                $q->orderBy('price', 'asc');
-            });
-
-            $toastMessage = 'Successfully filtered by Price: ' . ucfirst($request->priceFilter);
-            $activeFilter = 'Price: ' . ucfirst($request->priceFilter);
-        }
-
-        if ($request->has('dateFilter')) {
-            $query->when($request->dateFilter === 'recent', function ($q) {
-                $q->orderBy('created_at', 'desc');
-            })->when($request->dateFilter === 'oldest', function ($q) {
-                $q->orderBy('created_at', 'asc');
-            });
-
-            $toastMessage = 'Successfully filtered by Date: ' . ucfirst($request->dateFilter);
-            $activeFilter = 'Date: ' . ucfirst($request->dateFilter);
-        }
-
-        if ($request->has('analyticsFilter')) {
-            if ($request->analyticsFilter === 'best-sellers') {
-                $bestSellerMenus = DB::table('orders')
-                    ->select('menu_name', DB::raw('SUM(quantity) as total_quantity'))
-                    ->groupBy('menu_name')
-                    ->orderByDesc('total_quantity')
-                    ->pluck('menu_name');
-
-                $query->whereIn('name', $bestSellerMenus);
-                $toastMessage = 'Successfully filtered by Analytics: Best Sellers';
-                $activeFilter = 'Analytics: Best Sellers';
-            } elseif ($request->analyticsFilter === 'customer-favorites') {
-                $favoriteMenuIds = DB::table('favorite_items')
-                    ->select('menu_id', DB::raw('COUNT(user_id) as total_favorites'))
-                    ->groupBy('menu_id')
-                    ->orderByDesc('total_favorites')
-                    ->pluck('menu_id');
-
-                $query->whereIn('id', $favoriteMenuIds);
-                $toastMessage = 'Successfully filtered by Analytics: Customer Favorites';
-                $activeFilter = 'Analytics: Customer Favorites';
-            } elseif ($request->analyticsFilter === 'highest-rated') {
-                $query->get()->map(function ($menu) {
-                    $menu->rating = DB::table('feedback')
-                        ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                        ->avg('rating');
-                    $menu->review_count = DB::table('feedback')
-                        ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                        ->count();
-                    return $menu;
-                })->sortByDesc('rating');
-                $toastMessage = 'Successfully filtered by Analytics: Highest Rated';
-                $activeFilter = 'Analytics: Highest Rated';
-            }
-        }
-
-        // Add discounted price calculation in the `map` function
-        $menus = $query->get()->map(function ($menu) {
-            $menu->rating = DB::table('feedback')
-                ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                ->avg('rating');
-            $menu->review_count = DB::table('feedback')
-                ->where('menu_items', 'LIKE', "%{$menu->name}%")
-                ->count();
-
-            // Calculate discounted price
-            if (!is_null($menu->discount) && $menu->discount > 0) {
-                $menu->discounted_price = $menu->price - ($menu->price * ($menu->discount / 100));
-            } else {
-                $menu->discounted_price = $menu->price;
-            }
-
-            return $menu;
-        });
-
-
-        // Sort menus by highest rating
-        // $menus = $menus->sortByDesc('rating')->values();
-
-        $categories = DB::table('categories')->select('category')->distinct()->get();
-
-        if (!is_null($toastMessage)) {
-            session()->flash('toast', [
-                'message' => $toastMessage,
-                'type' => 'success',
-            ]);
-        }
-
-        // Count deliveries with specified statuses
-        $deliveryBadgeCount = Delivery::whereIn('status', [
-            'Pending GCash Transaction',
-            'Pending',
-            'Preparing',
-            'Out for Delivery'
-        ])->count();
-
-        return view('admin.menu', compact('menus', 'categories', 'activeFilter', 'totalUnreadCount', 'deliveryBadgeCount'));
-    }
-
     // public function index(Request $request, UnreadMessagesController $unreadMessagesController)
     // {
     //     // Fetch unread message data
@@ -231,6 +94,8 @@ class MenuController extends Controller
     //                 ->pluck('menu_name');
 
     //             $query->whereIn('name', $bestSellerMenus);
+    //             $toastMessage = 'Successfully filtered by Analytics: Best Sellers';
+    //             $activeFilter = 'Analytics: Best Sellers';
     //         } elseif ($request->analyticsFilter === 'customer-favorites') {
     //             $favoriteMenuIds = DB::table('favorite_items')
     //                 ->select('menu_id', DB::raw('COUNT(user_id) as total_favorites'))
@@ -239,9 +104,10 @@ class MenuController extends Controller
     //                 ->pluck('menu_id');
 
     //             $query->whereIn('id', $favoriteMenuIds);
+    //             $toastMessage = 'Successfully filtered by Analytics: Customer Favorites';
+    //             $activeFilter = 'Analytics: Customer Favorites';
     //         } elseif ($request->analyticsFilter === 'highest-rated') {
-    //             // Sorting only if 'highest-rated' filter is applied
-    //             $menus = $query->get()->map(function ($menu) {
+    //             $query->get()->map(function ($menu) {
     //                 $menu->rating = DB::table('feedback')
     //                     ->where('menu_items', 'LIKE', "%{$menu->name}%")
     //                     ->avg('rating');
@@ -249,18 +115,14 @@ class MenuController extends Controller
     //                     ->where('menu_items', 'LIKE', "%{$menu->name}%")
     //                     ->count();
     //                 return $menu;
-    //             })->sortByDesc('rating')->values();
-
+    //             })->sortByDesc('rating');
     //             $toastMessage = 'Successfully filtered by Analytics: Highest Rated';
     //             $activeFilter = 'Analytics: Highest Rated';
     //         }
-    //     } else {
-    //         // Default case: do not sort by rating
-    //         $menus = $query->get();
     //     }
 
     //     // Add discounted price calculation in the `map` function
-    //     $menus = $menus->map(function ($menu) {
+    //     $menus = $query->get()->map(function ($menu) {
     //         $menu->rating = DB::table('feedback')
     //             ->where('menu_items', 'LIKE', "%{$menu->name}%")
     //             ->avg('rating');
@@ -277,6 +139,10 @@ class MenuController extends Controller
 
     //         return $menu;
     //     });
+
+
+    //     // Sort menus by highest rating
+    //     // $menus = $menus->sortByDesc('rating')->values();
 
     //     $categories = DB::table('categories')->select('category')->distinct()->get();
 
@@ -297,6 +163,138 @@ class MenuController extends Controller
 
     //     return view('admin.menu', compact('menus', 'categories', 'activeFilter', 'totalUnreadCount', 'deliveryBadgeCount'));
     // }
+
+    public function index(Request $request, UnreadMessagesController $unreadMessagesController)
+{
+    // Fetch unread message data
+    $unreadMessageData = $unreadMessagesController->getUnreadMessageData();
+    $totalUnreadCount = $unreadMessageData['totalUnreadCount'];
+
+    $query = Menu::query();
+    $toastMessage = null;
+    $activeFilter = 'Default view'; // Default description
+
+    // Handle Default Filter
+    if ($request->has('default') && $request->default === 'true') {
+        $toastMessage = 'Default view applied. Showing all menus!';
+    }
+
+    // Apply Available Filter
+    if ($request->has('mainFilter') && $request->mainFilter === 'available') {
+        $query->where('availability', 'Available');
+        $toastMessage = 'Successfully filtered by Availability: Available';
+        $activeFilter = 'Availability: Available';
+    }
+
+    // Apply Unavailable Filter
+    if ($request->has('mainFilter') && $request->mainFilter === 'unavailable') {
+        $query->where('availability', 'Unavailable');
+        $toastMessage = 'Successfully filtered by Availability: Unavailable';
+        $activeFilter = 'Availability: Unavailable';
+    }
+
+    // Handle other filters (category, price, date, etc.)
+    if ($request->has('categoryFilter') && $request->categoryFilter) {
+        $query->where('category', $request->categoryFilter);
+        $toastMessage = 'Successfully filtered by Category: ' . $request->categoryFilter;
+        $activeFilter = 'Category: ' . $request->categoryFilter;
+    }
+
+    if ($request->has('priceFilter')) {
+        $query->when($request->priceFilter === 'expensive', function ($q) {
+            $q->orderBy('price', 'desc');
+        })->when($request->priceFilter === 'cheap', function ($q) {
+            $q->orderBy('price', 'asc');
+        });
+
+        $toastMessage = 'Successfully filtered by Price: ' . ucfirst($request->priceFilter);
+        $activeFilter = 'Price: ' . ucfirst($request->priceFilter);
+    }
+
+    if ($request->has('dateFilter')) {
+        $query->when($request->dateFilter === 'recent', function ($q) {
+            $q->orderBy('created_at', 'desc');
+        })->when($request->dateFilter === 'oldest', function ($q) {
+            $q->orderBy('created_at', 'asc');
+        });
+
+        $toastMessage = 'Successfully filtered by Date: ' . ucfirst($request->dateFilter);
+        $activeFilter = 'Date: ' . ucfirst($request->dateFilter);
+    }
+
+    if ($request->has('analyticsFilter')) {
+        if ($request->analyticsFilter === 'best-sellers') {
+            $bestSellerMenus = DB::table('orders')
+                ->select('menu_name', DB::raw('SUM(quantity) as total_quantity'))
+                ->groupBy('menu_name')
+                ->orderByDesc('total_quantity')
+                ->pluck('menu_name');
+
+            $query->whereIn('name', $bestSellerMenus);
+            $toastMessage = 'Successfully filtered by Analytics: Best Sellers';
+            $activeFilter = 'Analytics: Best Sellers';
+        } elseif ($request->analyticsFilter === 'customer-favorites') {
+            $favoriteMenuIds = DB::table('favorite_items')
+                ->select('menu_id', DB::raw('COUNT(user_id) as total_favorites'))
+                ->groupBy('menu_id')
+                ->orderByDesc('total_favorites')
+                ->pluck('menu_id');
+
+            $query->whereIn('id', $favoriteMenuIds);
+            $toastMessage = 'Successfully filtered by Analytics: Customer Favorites';
+            $activeFilter = 'Analytics: Customer Favorites';
+        } elseif ($request->analyticsFilter === 'highest-rated') {
+            // Only select menus with a rating and sort them by rating descending
+            $query->whereNotNull('rating')->orderByDesc('rating');
+        
+            $toastMessage = 'Successfully filtered by Analytics: Highest Rated';
+            $activeFilter = 'Analytics: Highest Rated';
+        }
+        
+    }
+
+    // Retrieve menus and calculate additional attributes
+    $menus = $query->get()->map(function ($menu) {
+        // Calculate ratings and review count
+        $menu->rating = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->avg('rating');
+        $menu->review_count = DB::table('feedback')
+            ->where('menu_items', 'LIKE', "%{$menu->name}%")
+            ->count();
+
+        // Calculate discounted price
+        if (!is_null($menu->discount) && $menu->discount > 0) {
+            $menu->discounted_price = $menu->price - ($menu->price * ($menu->discount / 100));
+        } else {
+            $menu->discounted_price = $menu->price;
+        }
+
+        return $menu;
+    });
+
+    // Retrieve distinct categories
+    $categories = DB::table('categories')->select('category')->distinct()->get();
+
+    if (!is_null($toastMessage)) {
+        session()->flash('toast', [
+            'message' => $toastMessage,
+            'type' => 'success',
+        ]);
+    }
+
+    // Count deliveries with specified statuses
+    $deliveryBadgeCount = Delivery::whereIn('status', [
+        'Pending GCash Transaction',
+        'Pending',
+        'Preparing',
+        'Out for Delivery'
+    ])->count();
+
+    return view('admin.menu', compact('menus', 'categories', 'activeFilter', 'totalUnreadCount', 'deliveryBadgeCount'));
+}
+
+
 
 
     /**

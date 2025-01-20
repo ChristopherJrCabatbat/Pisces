@@ -6,11 +6,14 @@
     <style>
         .modal-content {
             color: black;
+            position: absolute;
+            top: -1vh;
         }
 
         /* .table-container {
                 padding: 1rem 2rem 0rem 2rem;
             } */
+             
     </style>
 @endsection
 
@@ -44,25 +47,40 @@
                         </div>
                         <div class="d-flex flex-column align-items-center" style="width: 20%">
                             <label for="view-rating" class="fw-bold form-label">Rating:</label>
-                            <div id="view-rating" class=" text-center form-control"></div>
+                            <div id="view-rating" class="text-center form-control"></div>
                         </div>
                     </div>
 
-
                     <div class="mb-2">
-                        <label for="view-feedback-text" class="fw-bold form-label">Feedback:</label>
-                        <textarea readonly id="view-feedback-text" rows="4" class="form-control"></textarea>
+                        <label for="view-feedback-text" class="fw-bold form-label">Menu Feedback:</label>
+                        <textarea readonly id="view-feedback-text" rows="2" class="form-control"></textarea>
+                    </div>
+
+                    <div class="mb-2 d-flex gap-3">
+                        <div class="d-flex flex-column" style="width: 80%">
+                            <label for="view-rider" class="fw-bold form-label">Rider:</label>
+                            <div id="view-rider" class="form-control"></div>
+                        </div>
+                        <div class="d-flex flex-column align-items-center" style="width: 20%">
+                            <label for="view-rider-rating" class="fw-bold form-label">Rating:</label>
+                            <div id="view-rider-rating" class="text-center form-control"></div>
+                        </div>
+                    </div>
+                  
+                    <div class="mb-2">
+                        <label for="view-feedback-rider" class="fw-bold form-label">Rider Feedback:</label>
+                        <textarea readonly id="view-feedback-rider" rows="2" class="form-control"></textarea>
                     </div>
 
                     <div class="mb-2">
                         <label for="view-response" class="fw-bold form-label">Response:</label>
-                        <textarea name="response" readonly id="view-response" class="form-control" rows="4" required
+                        <textarea name="response" readonly id="view-response" class="form-control" rows="2" required
                             placeholder="No response yet."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
+                {{-- <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -79,24 +97,42 @@
                 <form action="{{ route('admin.respondFeedback') }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="respond-menu-items" class="fw-bold form-label">Menu Items:</label>
-                            <div id="respond-menu-items" class="form-control"></div>
+                        
+                        <div class="mb-2 d-flex gap-3">
+                            <div class="d-flex flex-column" style="width: 80%">
+                                <label for="respond-menu-items" class="fw-bold form-label">Menu:</label>
+                                <div id="respond-menu-items" class="form-control"></div>
+                            </div>
+                            <div class="d-flex flex-column align-items-center" style="width: 20%">
+                                <label for="respond-rating" class="fw-bold form-label">Rating:</label>
+                            <div id="respond-rating" class="form-control text-center"></div>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="respond-feedback-text" class="fw-bold form-label">Feedback:</label>
-                            <div id="respond-feedback-text" class="form-control"></div>
+                        <div class="mb-2">
+                            <label for="respond-feedback-text" class="fw-bold form-label">Menu Feedback:</label>
+                            <textarea rows="2" id="respond-feedback-text" class="form-control"></textarea>
+                        </div>
+                       
+                        <div class="mb-2 d-flex gap-3">
+                            <div class="d-flex flex-column" style="width: 80%">
+                                <label for="respond-rider" class="fw-bold form-label">Rider:</label>
+                                <div id="respond-rider" class="form-control"></div>
+                            </div>
+                            <div class="d-flex flex-column align-items-center" style="width: 20%">
+                                <label for="respond-rider-rating" class="fw-bold form-label">Rating:</label>
+                            <div id="respond-rider-rating" class="form-control text-center"></div>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="respond-rating" class="fw-bold form-label">Rating:</label>
-                            <div id="respond-rating" class="form-control"></div>
+                        <div class="mb-2">
+                            <label for="respond-feedback-rider" class="fw-bold form-label">Rider Feedback:</label>
+                            <textarea rows="2" id="respond-feedback-rider" class="form-control"></textarea>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <label for="response-text" class="fw-bold form-label">Response:</label>
-                            <textarea name="response" autofocus id="response-text" class="form-control" rows="3" required
+                            <textarea name="response" autofocus id="response-text" class="form-control" rows="2" required
                                 placeholder="Type response here..."></textarea>
                         </div>
                     </div>
@@ -237,7 +273,7 @@
                     <tr>
                         <th scope="col">Customer Name</th>
                         <th scope="col">Menu</th>
-                        <th scope="col">Feedback</th>
+                        <th scope="col" style="width: 38vw;">Feedback</th>
                         <th scope="col">Rating</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -247,7 +283,10 @@
                         <tr class="feedback-row">
                             <td>{{ $feedback->customer_name }}</td>
                             <td>{{ $feedback->menu_items }}</td>
-                            <td>{{ $feedback->feedback_text ?: 'No feedback' }}</td>
+                            <td>
+                                {{-- {{ $feedback->feedback_text ?: 'No feedback' }} --}}
+                                {{ Str::words($feedback->feedback_text ?: 'No Feedback', 13, '...') }}
+                            </td>
                             <td>
                                 @if ($feedback->rating > 0)
                                     {{ $feedback->rating }} <i class="fa-solid fa-star"></i>
@@ -296,6 +335,9 @@
                     document.getElementById('view-order-number').textContent = feedback.order_number;
                     document.getElementById('view-menu-items').textContent = feedback.menu_items;
                     document.getElementById('view-feedback-text').textContent = feedback.feedback_text;
+                    document.getElementById('view-rider').textContent = feedback.rider_name;
+                    document.getElementById('view-rider-rating').textContent = feedback.rider_rating;
+                    document.getElementById('view-feedback-rider').textContent = feedback.feedback_rider;
                     // document.getElementById('view-sentiment').textContent = feedback.sentiment;
                     document.getElementById('view-rating').textContent = feedback.rating;
                     document.getElementById('view-response').textContent = feedback.response ||
@@ -310,6 +352,9 @@
                     document.getElementById('customer-name').textContent = feedback.customer_name;
                     document.getElementById('respond-menu-items').textContent = feedback.menu_items;
                     document.getElementById('respond-feedback-text').textContent = feedback.feedback_text;
+                    document.getElementById('respond-rider').textContent = feedback.rider_name;
+                    document.getElementById('respond-rider-rating').textContent = feedback.rider_rating;
+                    document.getElementById('respond-feedback-rider').textContent = feedback.feedback_rider;
                     document.getElementById('respond-rating').textContent = feedback.rating;
                     document.getElementById('feedback-id').value = feedback.id;
                     new bootstrap.Modal(document.getElementById('respondModal')).show();
@@ -402,12 +447,12 @@
         <script>
             document.getElementById('filterButton').addEventListener('click', function() {
                 const filterValue = document.getElementById('categoryFilter').value;
-                const searchValue = document.getElementById('search-input').value;
+                // const searchValue = document.getElementById('search-input').value;
 
                 // Redirect to the same page with query parameters for filtering and searching
                 const queryParams = new URLSearchParams({
                     filter: filterValue,
-                    search: searchValue
+                    // search: searchValue
                 });
                 window.location.href = `{{ route('admin.feedback') }}?${queryParams.toString()}`;
             });
