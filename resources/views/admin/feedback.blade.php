@@ -273,7 +273,7 @@
                     <tr>
                         <th scope="col">Customer Name</th>
                         <th scope="col">Menu</th>
-                        <th scope="col" style="width: 38vw;">Feedback</th>
+                        <th scope="col" style="width: 35vw;">Feedback</th>
                         <th scope="col">Rating</th>
                         <th scope="col">Action</th>
                     </tr>
