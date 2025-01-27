@@ -682,7 +682,7 @@
                         <a href="mailto:quickeat@mail.net" class="footer-link">
                             <ion-icon name="mail" aria-hidden="true"></ion-icon>
 
-                            <span class="span">piscescoffeehub@gmail.com</span>
+                            <span class="span">piscescofeehub@gmail.com</span>
                         </a>
                     </li>
 

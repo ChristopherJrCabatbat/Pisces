@@ -444,8 +444,8 @@
                                 Ilang, San Carlos City, Pangasinan</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <a href="mailto:piscescoffeehub@gmail.com" class="red-hover"><i
-                                    class="fa-solid fa-envelope me-2"></i> piscescoffeehub@gmail.com</a>
+                            <a href="mailto:piscescofeehub@gmail.com" class="red-hover"><i
+                                    class="fa-solid fa-envelope me-2"></i> piscescofeehub@gmail.com</a>
                         </div>
                         <div class="d-flex align-items-center">
                             <div class="red-hover"><i class="fa-solid fa-phone me-2"></i> 0945 839 3794</div>
